@@ -501,7 +501,8 @@ export class BattleScene {
   /** Presents one battle event on the units it concerns. */
   private applyEvent(e: BattleEvent, skill: SkillDef | null, actor?: UnitView) {
     const v = this.view(e.target);
-    const top = () => v.head().y - 8;
+    // above the HP bar and the status icon row
+    const top = () => v.head().y - 30;
     switch (e.kind) {
       case 'damage': {
         v.hp = Math.max(0, v.hp - e.amount);

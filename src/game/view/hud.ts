@@ -224,15 +224,15 @@ export class Hud {
     ctx.fillStyle = u.team === 'player' ? '#3ccf5a' : '#e0453a';
     ctx.fillRect(bx, by, Math.round((u.hp / u.maxHp) * bw), 5);
     this.text(ctx, `${Math.max(0, Math.round(u.hp))} / ${u.maxHp}`, bx + bw, by + 7, { color: '#d8e2f4', align: 'right' });
-    // statuses with hover tips
-    u.statuses.slice(0, 6).forEach((s, i) => {
+    // statuses (with hover tips) under the HP bar, role in the top-right corner
+    u.statuses.slice(0, 5).forEach((s, i) => {
       const r = this.a.ui.json.status[s.id].rect;
-      const sx = x + 8 + i * 13, sy = y + h - 14;
-      if (sx > x + 40) return;
+      const sx = bx + i * 13, sy = by + 8;
       blit(ctx, this.a.ui.img, r, sx, sy);
+      if (s.turns < 9) this.tinyNum(ctx, s.turns, sx + 8, sy + 7);
       this.regions.push({ x: sx, y: sy, w: 12, h: 12, tip: () => ({ title: STATUSES[s.id].name, sub: `${s.turns} turn${s.turns === 1 ? '' : 's'}`, body: STATUSES[s.id].desc, color: STATUSES[s.id].color }) });
     });
-    this.text(ctx, u.hero.role.toUpperCase(), bx, by + 7, { color: '#6f7f9c' });
+    this.text(ctx, u.hero.role.toUpperCase(), x + w - 7, y + 6, { color: '#6f7f9c', align: 'right' });
   }
 
   /** Skill slots for the hero whose turn it is. */
