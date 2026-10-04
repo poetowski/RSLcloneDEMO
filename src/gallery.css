@@ -1,0 +1,74 @@
+body.gallery {
+  margin: 0;
+  background: #0b0f1c;
+  color: #d8e2f4;
+  font: 14px/1.4 system-ui, sans-serif;
+}
+
+.gallery header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 12px 20px;
+  background: #0d1220ee;
+  border-bottom: 1px solid #2a3348;
+}
+
+.gallery h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #f0c650;
+}
+
+.gallery header p {
+  margin: 4px 0 8px;
+  color: #9fb0cc;
+}
+
+.gallery .controls {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.gallery a {
+  color: #8fc0ff;
+}
+
+.gallery main {
+  padding: 8px 20px 40px;
+}
+
+.gallery section h2 {
+  margin: 24px 0 2px;
+  font-size: 17px;
+}
+
+.gallery section p {
+  margin: 0 0 10px;
+  color: #8fa0c0;
+}
+
+.gallery .grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.gallery figure {
+  margin: 0;
+}
+
+.gallery canvas {
+  display: block;
+  image-rendering: pixelated;
+  border: 1px solid #2a3348;
+}
+
+.gallery figcaption {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #9fb0cc;
+  max-width: 520px;
+}

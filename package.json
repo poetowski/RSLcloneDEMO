@@ -1,0 +1,27 @@
+{
+  "name": "rsl-clone-demo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Proof of concept of a turn-based hero battler in the style of RAID: Shadow Legends / SWGOH, with procedurally generated pixel-art sprites.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "art": "tsx tools/art/build.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tools/tsconfig.json",
+    "shots": "tsx tools/shots.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/pngjs": "^6.0.5",
+    "gifenc": "^1.0.3",
+    "playwright-core": "^1.63.0",
+    "pngjs": "^7.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  }
+}
