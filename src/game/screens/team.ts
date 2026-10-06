@@ -1,6 +1,8 @@
 // Team select: your formation stands on podiums in the stage's arena facing
 // the enemy line-up. Pick up to three champions from the roster below; every
-// card shows how many enemies that champion hits strong (+) or weak (-).
+// card shows how many enemies that champion hits strong (+) or weak (-). A
+// roster wider than its panel scrolls sideways (wheel, the end arrows,
+// keyboard focus).
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
 import { locationOf, stage } from '../data/campaign';
@@ -8,14 +10,16 @@ import { champion, CHAMPIONS } from '../data/champions';
 import { affinityEdge, AFFINITIES, RARITIES } from '../data/meta';
 import { ChampionDef, StageDef } from '../data/types';
 import { isUnlocked, roster } from '../profile';
+import { Scroller } from '../ui/scroll';
 import { COLORS } from '../ui/ui';
-import { blit, nine } from '../view/assets';
+import { blit, nine, Rect4 } from '../view/assets';
 import { BaseScreen, Diorama } from './base';
 
 export class TeamScreen extends BaseScreen {
   private s: StageDef;
   private team: string[];
   private diorama: Diorama;
+  private strip = new Scroller();
 
   constructor(app: App, stageId: string) {
     super(app);
@@ -33,6 +37,12 @@ export class TeamScreen extends BaseScreen {
 
   protected update(dt: number) {
     this.diorama.update(dt);
+    this.strip.update(dt);
+  }
+
+  wheel(dy: number, dx: number) {
+    const d = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    this.strip.by(Math.sign(d) * Math.min(138, Math.max(46, Math.abs(d))));
   }
 
   private matchup(c: ChampionDef) {
@@ -100,29 +110,39 @@ export class TeamScreen extends BaseScreen {
 
     this.header(ctx, 'PREPARE', `${this.s.id}  ${this.s.name}`);
 
-    // roster strip
+    // roster strip: centered when it fits, otherwise a window that scrolls between two arrows
     const own = CHAMPIONS.filter((c) => isUnlocked(this.profile, c.id));
-    const cw = 40, chh = 52, gap = 6;
+    const cw = 40, chh = 48, gap = 6;
     const stripW = own.length * (cw + gap) - gap;
-    const px = 10, py = H - 70, pw = W - 20 - 118, ph = 62;
+    // the title row has its own band so cards never cover it
+    const px = 10, py = H - 72, pw = W - 20 - 118, ph = 64;
     ui.panel(ctx, 'dark', px, py, pw, ph);
-    ui.text(ctx, `ROSTER  ${this.team.length}/3`, px + 10, py + 6, { color: COLORS.dim, variant: 'bold' });
-    ui.text(ctx, '+ strong hits   - weak hits', px + pw - 10, py + 6, { color: COLORS.faint, align: 'right' });
-    let x = Math.round(px + pw / 2 - stripW / 2);
-    const y = py + 9;
+    ui.text(ctx, `ROSTER  ${this.team.length}/3`, px + 10, py + 5, { color: COLORS.dim, variant: 'bold' });
+    ui.text(ctx, '+ strong hits   - weak hits', px + pw - 10, py + 5, { color: COLORS.faint, align: 'right' });
+    const scrolls = stripW > pw - 16;
+    const win: Rect4 = scrolls ? [px + 20, py + 8, pw - 40, ph - 10] : [px, py, pw, ph];
+    this.strip.extent(scrolls ? stripW : 0, win[2]);
+    const focused = own.findIndex((c) => 'r_' + c.id === ui.focusId);
+    if (ui.keyboard && focused >= 0) this.strip.reveal(focused * (cw + gap), cw, win[2]);
+    let x = scrolls ? win[0] - this.strip.offset : Math.round(px + pw / 2 - stripW / 2);
+    const y = py + 15;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(...win);
+    ctx.clip();
     for (const c of own) {
       const sel = this.team.includes(c.id);
       const id = 'r_' + c.id;
-      const hot = ui.hot(id, x, y, cw, chh);
-      const top = y + (sel ? -3 : 0);
+      const hot = ui.hot(id, x, y, cw, chh, win);
+      const top = y + (sel ? -2 : 0);
       ctx.fillStyle = sel ? '#2a3a5a' : '#141c30';
       ctx.fillRect(x + 2, top + 2, cw - 4, chh - 4);
-      blit(ctx, this.a.ui.img, this.a.ui.json.portraits[c.id], x + 6, top + 5);
+      blit(ctx, this.a.ui.img, this.a.ui.json.portraits[c.id], x + 6, top + 4);
       nine(ctx, this.a.ui.img, ui.part('card_' + c.rarity), x, top, cw, chh, 8);
-      ui.blit(ctx, 'gem_' + c.affinity, x + 3, top + 26);
+      ui.blit(ctx, 'gem_' + c.affinity, x + 3, top + 24);
       const m = this.matchup(c);
-      if (m.strong) ui.text(ctx, `+${m.strong}`, x + 6, top + 38, { color: COLORS.good, variant: 'bold' });
-      if (m.weak) ui.text(ctx, `-${m.weak}`, x + cw - 6, top + 38, { color: COLORS.bad, variant: 'bold', align: 'right' });
+      if (m.strong) ui.text(ctx, `+${m.strong}`, x + 6, top + 35, { color: COLORS.good, variant: 'bold' });
+      if (m.weak) ui.text(ctx, `-${m.weak}`, x + cw - 6, top + 35, { color: COLORS.bad, variant: 'bold', align: 'right' });
       if (sel) ui.blit(ctx, 'check', x + cw - 11, top + 2);
       if (hot) {
         ctx.strokeStyle = COLORS.goldHi;
@@ -130,7 +150,7 @@ export class TeamScreen extends BaseScreen {
       }
       if (this.profile.fresh.includes(c.id)) ui.blit(ctx, 'new', x + cw - 16, top - 5);
       ui.regions.push({
-        id, x, y: top, w: cw, h: chh,
+        id, x, y: top, w: cw, h: chh, clip: win,
         click: () => this.toggle(c.id),
         tip: () => {
           const strong = this.s.enemies.filter((e) => affinityEdge(c.affinity, champion(e.champion).affinity) > 0).map((e) => champion(e.champion).name);
@@ -144,6 +164,19 @@ export class TeamScreen extends BaseScreen {
         },
       });
       x += cw + gap;
+    }
+    ctx.restore();
+    if (scrolls) {
+      // page by most of the window; an arrow dims when there is nothing more on its side
+      const page = win[2] - cw;
+      for (const [part, ax, more, d] of [['arrow_l', px + 5, this.strip.before, -1], ['arrow_r', px + pw - 15, this.strip.after, 1]] as const) {
+        const ay = py + 31;
+        const hot = more && ui.inside(ax - 4, ay - 6, 18, 27);
+        ctx.globalAlpha = more ? 1 : 0.3;
+        ui.blit(ctx, part, ax + (hot ? d : 0), ay);
+        ctx.globalAlpha = 1;
+        if (more) ui.regions.push({ x: ax - 4, y: ay - 6, w: 18, h: 27, click: () => this.strip.by(d * page) });
+      }
     }
     ui.button(ctx, 'fight', W - 124, H - 62, 114, 46, 'FIGHT!', { click: () => this.fight(), icon: 'mi_fight', disabled: !this.team.length });
   }

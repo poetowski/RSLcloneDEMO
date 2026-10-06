@@ -5,7 +5,7 @@
 // skill in the arena.
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
-import { champion } from '../data/champions';
+import { champion, CHAMPIONS } from '../data/champions';
 import { Block, Chapter, chapter, CHAPTERS, FigureId } from '../data/codex';
 import { AFFINITIES, RARITIES, ROLES } from '../data/meta';
 import { STATUSES } from '../data/statuses';
@@ -103,7 +103,10 @@ export class AcademyScreen extends BaseScreen {
       const d = this.ch.demo;
       const owner = champion(ownerOf(d.skill));
       ui.text(ctx, `${owner.name}, ${owner.title}`, px + 14, py + ph - 24, { color: COLORS.faint });
-      ui.button(ctx, 'demo', px + pw - 156, py + ph - 32, 144, 24, d.label.toUpperCase(), { click: () => this.app.router.demo(d.skill, () => this.app.router.academy(this.ch.id)), icon: 'mi_play' });
+      // the button grows with its label (skill names vary in length)
+      const label = d.label.toUpperCase();
+      const bw = Math.max(144, ui.measure(label, 'bold') + 40);
+      ui.button(ctx, 'demo', px + pw - 12 - bw, py + ph - 32, bw, 24, label, { click: () => this.app.router.demo(d.skill, () => this.app.router.academy(this.ch.id)), icon: 'mi_play' });
     }
   }
 
@@ -357,8 +360,7 @@ export class AcademyScreen extends BaseScreen {
 }
 
 function ownerOf(skill: string): string {
-  for (const id of ['knight', 'warrior', 'archer', 'monk', 'frostmage', 'dreadknight', 'stalker', 'jackal', 'priestess', 'tomblord']) {
-    if (champion(id).skills.some((s) => s.id === skill)) return id;
-  }
-  throw new Error('no owner for ' + skill);
+  const owner = CHAMPIONS.find((c) => c.skills.some((s) => s.id === skill));
+  if (!owner) throw new Error('no owner for ' + skill);
+  return owner.id;
 }

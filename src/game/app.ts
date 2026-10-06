@@ -14,8 +14,8 @@ export interface Screen {
   pointerMove(x: number, y: number): boolean;
   click(x: number, y: number): void;
   key(k: string): void;
-  /** mouse wheel (scrolling lists) */
-  wheel?(dy: number): void;
+  /** mouse wheel in pixels (scrolling lists); dx for horizontal wheels and trackpads */
+  wheel?(dy: number, dx: number): void;
   leave?(): void;
 }
 

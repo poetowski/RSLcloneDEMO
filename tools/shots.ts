@@ -6,6 +6,7 @@
 //   c<x>:<y>   click at game coordinates (640x360 space)
 //   m<x>:<y>   move the mouse to game coordinates
 //   k<key>     press a key
+//   W<dy>      mouse wheel by dy pixels at the pointer (move it over the game first)
 //   B<n>:<ms>  burst: n captures of the raw 640x360 game buffer, every ms
 // Console errors and page errors are echoed.
 import fs from 'node:fs';
@@ -37,6 +38,7 @@ for (const st of steps.split(',')) {
   } else if (op === 'c') await page.mouse.click(...at(arg));
   else if (op === 'm') await page.mouse.move(...at(arg));
   else if (op === 'k') await page.keyboard.press(arg);
+  else if (op === 'W') await page.mouse.wheel(0, Number(arg));
   else if (op === 'B') {
     const [count, every] = arg.split(':').map(Number);
     for (let i = 0; i < count; i++) {

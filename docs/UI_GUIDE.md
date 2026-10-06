@@ -55,6 +55,7 @@ Every text is drawn with a 1 px dark outline (`ink`), so it reads on any backgro
 - Destructive actions (reset progress) ask inline: `Sure? YES / NO`, never a browser dialog.
 - Screen changes use the dithered dissolve (`App.go`); input is ignored while it plays.
 - Animated sprites in menus use `drawChampion` / `frameAt`; hovering a recruited card plays its A1.
+- **Anything that grows with the roster scrolls** instead of running off the screen: the collection grid (vertically) and the team-select roster strip (sideways). Use `Scroller` (`src/game/ui/scroll.ts`): `extent()` every frame, the wheel and paging keys move it, and `reveal()` pulls the keyboard-focused item into view. Clip the drawing to the window and give each item's region `clip: window` so a half-hidden card can never be clicked or hovered outside it; items scrolled fully out of view keep their region so arrow keys still reach them. Show where more content is: a scrollbar and a fading edge with a bobbing chevron (collection), or `arrow_l/r` that dim at the ends (roster strip); both are clickable for touch screens, which have no wheel.
 
 ## 5. Text rules
 

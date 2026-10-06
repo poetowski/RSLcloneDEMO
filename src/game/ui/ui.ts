@@ -26,6 +26,8 @@ export interface Region {
   tip?: () => Tip;
   /** place the tooltip under the region instead of above it */
   tipBelow?: boolean;
+  /** the pointer only hits it inside this rect [x, y, w, h] (items of a scrolled list) */
+  clip?: Rect4;
 }
 
 export const COLORS = {
@@ -121,6 +123,7 @@ export class Ui {
   hit(x: number, y: number): Region | undefined {
     for (let i = this.regions.length - 1; i >= 0; i--) {
       const r = this.regions[i];
+      if (r.clip && !(x >= r.clip[0] && y >= r.clip[1] && x < r.clip[0] + r.clip[2] && y < r.clip[1] + r.clip[3])) continue;
       if (x >= r.x && y >= r.y && x < r.x + r.w && y < r.y + r.h) return r;
     }
     return undefined;
@@ -130,9 +133,9 @@ export class Ui {
     return !this.keyboard && this.mouse.x >= x && this.mouse.y >= y && this.mouse.x < x + w && this.mouse.y < y + h;
   }
 
-  /** Hovered by the mouse or focused by the keyboard. */
-  hot(id: string, x: number, y: number, w: number, h: number) {
-    return this.keyboard ? this.focusId === id : this.inside(x, y, w, h);
+  /** Hovered by the mouse or focused by the keyboard; `clip` limits hovering to a scrolled list's window. */
+  hot(id: string, x: number, y: number, w: number, h: number, clip?: Rect4) {
+    return this.keyboard ? this.focusId === id : this.inside(x, y, w, h) && (!clip || this.inside(...clip));
   }
 
   panel(ctx: CanvasRenderingContext2D, kind: 'dark' | 'gold' | 'red' | 'well', x: number, y: number, w: number, h: number) {

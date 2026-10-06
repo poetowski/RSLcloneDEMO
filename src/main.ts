@@ -122,7 +122,9 @@ async function boot() {
   });
   canvas.display.addEventListener('wheel', (e) => {
     e.preventDefault();
-    app.scene?.wheel?.(e.deltaY);
+    // some browsers report lines or pages instead of pixels
+    const k = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 320 : 1;
+    app.scene?.wheel?.(e.deltaY * k, e.deltaX * k);
   }, { passive: false });
   window.addEventListener('keydown', (e) => {
     if (e.key.startsWith('Arrow') || e.key === ' ' || e.key === 'PageUp' || e.key === 'PageDown' || e.key === 'Backspace') e.preventDefault();
