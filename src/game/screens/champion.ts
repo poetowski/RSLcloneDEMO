@@ -9,6 +9,7 @@ import { champion, CHAMPIONS } from '../data/champions';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../data/meta';
 import { STAT_LIMITS } from '../data/norms';
 import { ChampionDef } from '../data/types';
+import { homeZone } from '../data/zones';
 import { isUnlocked } from '../profile';
 import { COLORS } from '../ui/ui';
 import { blit, nine } from '../view/assets';
@@ -31,7 +32,7 @@ export class ChampionScreen extends BaseScreen {
   ) {
     super(app);
     this.c = champion(id);
-    this.diorama = new Diorama(app, this.c.faction === 'sunscar' ? 'sunscar' : 'frostfang');
+    this.diorama = new Diorama(app, homeZone(this.c.faction).id);
     this.seen();
   }
 

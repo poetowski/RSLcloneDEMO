@@ -35,6 +35,7 @@ export const FACTIONS: Record<FactionId, FactionDef> = {
   coven: { id: 'coven', name: 'Frostfang Coven', color: '#7fd8ff', desc: 'Witches and oath-breakers who rule the frozen ruins.' },
   temple: { id: 'temple', name: 'Temple of the Still Peak', color: '#f39432', desc: 'Warrior-monks of the high mountain monastery.' },
   sunscar: { id: 'sunscar', name: 'Sunscar Dynasty', color: '#ffb340', desc: 'The undying court of the desert sun kings.' },
+  nyota: { id: 'nyota', name: 'Free City of Nyota', color: '#ff5fb0', desc: 'Star-smiths, griots and spear-dancers of the high plateau, who carried the old crafts into the sky.' },
 };
 
 export const ROLES: Record<Role, RoleDef> = {

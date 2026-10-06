@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Battle, combatants } from '../src/game/battle/battle';
 import { flatten, simulate } from '../src/game/battle/sim';
-import { archer, dreadknight, frostmage, jackal, knight, monk, priestess, stalker, tomblord, warrior } from '../src/game/data/champions';
+import { archer, colossus, dreadknight, frostmage, jackal, knight, monk, priestess, stalker, starsinger, tomblord, warrior } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
 
@@ -217,6 +217,46 @@ describe('statuses', () => {
     const b = new Battle(combatants([priestess]), combatants([knight, warrior, archer]), { seed: 9 });
     b.useSkill(b.get('p0'), skill(priestess, 'sun_wrath'));
     for (const e of b.alive('enemy')) expect(b.has(e, 'heal_block')).toBe(true);
+  });
+
+  it("fills the other allies' turn meters with Rhythm of the March", () => {
+    const b = new Battle(combatants([starsinger, knight, warrior]), combatants([dreadknight]), { seed: 4 });
+    for (const u of b.units) u.tm = 10;
+    const k = b.get('p0');
+    const r = b.useSkill(k, skill(starsinger, 'march_rhythm'));
+    expect(b.get('p1').tm).toBe(30);
+    expect(b.get('p2').tm).toBe(30);
+    expect(k.tm).toBe(10);
+    expect(r.events.filter((e) => e.kind === 'tm')).toHaveLength(2);
+    for (const a of b.alive('player')) expect(b.has(a, 'spd_up')).toBe(true);
+    // the boost never pushes a meter past full
+    b.get('p1').tm = 95;
+    b.useSkill(k, skill(starsinger, 'march_rhythm'));
+    expect(b.get('p1').tm).toBe(100);
+  });
+
+  it('overloads the Starforged Core once below half HP', () => {
+    const b = new Battle(combatants([warrior]), combatants([colossus]), { seed: 5 });
+    const c = b.get('e0');
+    c.hp = Math.round(c.maxHp * 0.55);
+    const r = b.useSkill(b.get('p0'), skill(warrior, 'rending_chop'), 'e0');
+    expect(c.alive).toBe(true);
+    expect(c.overdriven).toBe(true);
+    expect(r.events.some((e) => e.kind === 'passive')).toBe(true);
+    expect(b.has(c, 'atk_up') && b.has(c, 'def_up')).toBe(true);
+    c.statuses = [];
+    const again = b.useSkill(b.get('p0'), skill(warrior, 'rending_chop'), 'e0');
+    expect(again.events.some((e) => e.kind === 'passive')).toBe(false);
+    expect(b.has(c, 'atk_up')).toBe(false);
+  });
+
+  it('does not overload on a lethal hit', () => {
+    const b = new Battle(combatants([warrior]), combatants([colossus]), { seed: 6 });
+    const c = b.get('e0');
+    c.hp = 1;
+    const r = b.useSkill(b.get('p0'), skill(warrior, 'rending_chop'), 'e0');
+    expect(c.alive).toBe(false);
+    expect(r.events.some((e) => e.kind === 'passive')).toBe(false);
   });
 });
 

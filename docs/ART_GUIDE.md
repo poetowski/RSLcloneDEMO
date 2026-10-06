@@ -71,13 +71,18 @@ Every champion must be recognisable from a solid black silhouette (the collectio
 | Kha'zir (Jackal Warden) | tall jackal ears and muzzle, crescent glaive | bronze + turquoise |
 | Nefret (Sun Priestess) | sun-disc crown between horns, wings of light, ankh staff | linen white + gold + lapis |
 | Anhotep (Tomb Lord) | striped nemes, gold death mask, crook and flail | linen wraps + gold + tomb green |
+| Imara (Sunspear) | towering folded gele, oval hard-light shield, long spear | magenta + gold, cyan light |
+| Kwesi (Starsinger) | wide agbada sleeves, halo of star-orbs, kora-staff with a calabash | teal + gold, violet kufi |
+| Mwamba (Starforged) | crest of light-tipped rays, stacked disc pauldrons, sun core, huge fists | gold on ebony, cyan seams |
 
-Within one faction no two champions share a hue family; across factions the material language separates them (Frostfang steel and fur, Sunscar bronze, linen and lapis).
+Within one faction no two champions share a hue family; across factions the material language separates them (Frostfang steel and fur, Sunscar bronze, linen and lapis, Nyota ebony and gold with seams of hard light, neck rings, beadwork and woven bands).
+
+The Nyota look is afrofuturist: traditions of the continent carried into a star-faring city. Draw from real forms (the folded gele, stacked neck rings, Maasai bead collars, kente weaving, the agbada, the kora, Sahelian mud-brick with toron beams, Ndebele wall painting, baobabs) and add one layer of technology to each: hard light (`MAT.glowCyan`) in a blade, a shield, a band or a seam, never a whole costume.
 
 ## 3. Light
 
 - **One key light for the whole game**: from the **top-left, slightly in front** (`LIGHT_DIR = normalize(-0.5, -0.65, 0.58)` in screen space).
-- Every backdrop places its light source in the upper-left to justify it: the moon over Frostfang, the setting sun over Sunscar. Tiles are lit the same way (top/left edges bright, bottom/right edges dark), and so are carvings: in sunk relief the upper-left lip of a cut is in shadow and the lower-right wall catches the light.
+- Every backdrop places its light source in the upper-left to justify it: the moon over Frostfang, the setting sun over Sunscar, the bright star over Nyota. Tiles are lit the same way (top/left edges bright, bottom/right edges dark), and so are carvings: in sunk relief the upper-left lip of a cut is in shadow and the lower-right wall catches the light.
 - Because the light must stay top-left, sprites are **rendered** for both facings instead of mirrored. A mirrored sprite would light its right side.
 - Runtime light only adds: additive glow pools around fires (`ZoneDef.glow`), a mood tint (`ZoneDef.tint`), and unit shadows offset away from the light (`ZoneDef.shadow`: a low sun throws them longer and further right).
 
@@ -163,7 +168,7 @@ Weapon smears are crescents drawn between the previous and current weapon angle:
 
 ## 8. Effects (`tools/art/fx/`)
 
-- `kit.ts` holds the shared vocabulary: crescents, cuts, bursts, sparks, rings, shards, flames, motes, glyph stamps, crossed blades. `common.ts` holds the original effects, `sunscar.ts` the desert ones; `index.ts` merges them. New champions add their effects to the module of their faction.
+- `kit.ts` holds the shared vocabulary: crescents, cuts, bursts, sparks, rings, shards, flames, motes, glyph stamps, crossed blades. `common.ts` holds the original effects, `sunscar.ts` the desert ones, `nyota.ts` the hard light, sound and starfire of the plateau; `index.ts` merges them. New champions add their effects to the module of their faction.
 - Every effect uses `FXR` ramps ending in a near-white core.
 - 40-80 ms per frame; impacts are 5-8 frames, set pieces up to 12 (the sarcophagus), looping cues (stun stars, cast circles, projectiles) loop.
 - Each effect has an **anchor**: chest-level impacts are centered (`ay 0.5`), ground effects are anchored at the feet (`ay 0.9-1.0`); the battle places any effect with `ay > 0.8` on the target's feet automatically.
@@ -203,11 +208,17 @@ A zone is one module exporting a `ZoneArt` (contract in `zones/shared.ts`):
 | Value | the floor is mid value and low contrast so outlined champions always pop; reserve the brightest values for sky and sparkle |
 | Budget | backdrop at most 220 colors, tileset at most 160 (`npm run audit`) |
 
-Runtime behaviour lives in `src/game/data/zones.ts` (`ZoneDef`): ambience (`snow` or `sand`), glow color of fires, shadow offset and stretch, mood tint, birds, heat haze.
+Runtime behaviour lives in `src/game/data/zones.ts` (`ZoneDef`): ambience (`snow`, `sand` or `motes`: drifting star-dust plus shooting stars behind the architecture), glow color of fires, ember colors (`embers`, default firelight), shadow offset and stretch, mood tint, birds (any flying sprite named `bird`: vultures, sky-skiffs), heat haze. `homeZone()` picks a faction's background for its Academy demos and champion dioramas.
 
 | Frostfang Ruins | Sunscar Ruins |
 | --- | --- |
 | ![Frostfang](images/zone_frostfang.png) | ![Sunscar](images/zone_sunscar.png) |
+
+| Nyota Skyforge |
+| --- |
+| ![Nyota](images/zone_nyota.png) |
+
+Floor tiles repeat across the arena, so a crack or a stain painted into a common variant repeats everywhere: keep damage to one rarely placed variant (`floor_cracked` in `nyota.ts`).
 
 ## 11. Files and naming
 
@@ -230,5 +241,8 @@ Frame rects are `[x, y, w, h, ox, oy]` where `ox, oy` is the trimmed rect's offs
 | `npx tsx tools/art/preview.ts <id> 2 out.png all both` | contact sheet of every animation, both facings |
 | `npx tsx tools/art/lineup.ts out.png 3` | every champion side by side |
 | `npx tsx tools/art/fxpreview.ts out.png 2 name,name` | effect frames |
+| `npx tsx tools/art/zoom.ts <id> <anim> <frame> out.png 9` | one frame cropped and enlarged: faces, trims, small props |
+| `npx tsx tools/art/iconpreview.ts <id>[,<id>] out.png 6` | a champion's three skill icons, enlarged |
+| `npx tsx tools/art/measure.ts [<id> <anim>]` | standing heights; with an animation, hand positions at hit frames (for `muzzle`) |
 | `npx tsx tools/art/uipreview.ts out.png 3 [prefix]` | UI parts and status icons |
 | `gallery.html` | every animation, effect and icon looping in the browser |

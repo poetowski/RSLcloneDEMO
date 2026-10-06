@@ -13,7 +13,7 @@ A combat background ("zone") is one art module and one behaviour entry:
 | Behaviour: ambience, light pools, shadows, tint, birds, haze | `src/game/data/zones.ts` (a `ZoneDef`) | `tests/content.test.ts` |
 | Where it is used | a `LocationDef.zone` in `src/game/data/campaign.ts` | content tests |
 
-The contract (`ZoneArt`, `PropKind`, rows, spawns) is in `tools/art/zones/shared.ts`. Reference zones: `frostfang.ts` (night, snow, stone arches) and `sunscar.ts` (sunset, sand, reliefs, a gate and a colonnade framing the desert). Read `docs/ART_GUIDE.md` sections 3, 4 and 10 first.
+The contract (`ZoneArt`, `PropKind`, rows, spawns) is in `tools/art/zones/shared.ts`. Reference zones: `frostfang.ts` (night, snow, stone arches), `sunscar.ts` (sunset, sand, reliefs, a gate and a colonnade framing the desert) and `nyota.ts` (cosmic dusk, painted panels, a mud-brick gate whose portal is a pulsing prop, pylons over an open void with floating islands). Read `docs/ART_GUIDE.md` sections 3, 4 and 10 first.
 
 ## 1. Design (worksheet first)
 
@@ -33,7 +33,7 @@ Rules that are not negotiable:
 1. Copy `templates/zone-art.template.ts` to `tools/art/zones/<id>.ts`, rename the export, register it in `tools/art/zones/index.ts`.
 2. Palette block at the top of the module: every color of the zone is declared there as a ramp (sky, stone, ground, accents, fire). Reuse `flames(ramp)` from `shared.ts` for fires.
 3. **Backdrop** (640x200): sky ramp top to `horizon`, the light source upper-left with a dithered halo, then distance layers from far (low contrast, hazy, cooler) to near (warmer, more contrast). Set `horizon` to where land meets sky.
-4. **Tiles** (32x32 painters `(b, seed) => void`): floor variants (3-6 so the grid does not repeat visibly), edge transitions (drifts, rubble), wall pieces (plain, dark, crown, base, special pieces), multi-tile set pieces cut from a 64x64 painting (see `quarter()` in `sunscar.ts`).
+4. **Tiles** (32x32 painters `(b, seed) => void`): floor variants (6-9 so the grid does not repeat visibly), edge transitions (drifts, rubble), wall pieces (plain, dark, crown, base, special pieces), multi-tile set pieces cut from a 64x64 painting (see `quarter()` in `sunscar.ts`). Each tile is painted once and repeated wherever it is placed: a crack or stain in a common floor variant shows up all over the arena, so keep damage to one rarely placed variant.
 5. **Props**: one bitmap list per kind; describe each in `kinds` with an `anchor` and a `mode` (`static`, `loop` with `ms`, `pulse` = frame 1 breathes over frame 0) and `fire: { dy }` for anything that burns (needs a `flame` kind). Characters-like props (statues, urns) can use the champion renderer (`sprite()` in `sunscar.ts`) so they share the champions' shading.
 6. **Layout**: fill `ground` rows 6-11 and `wall` rows 1-5 by tile name; place props with layers `back` (on the wall), `floor` (under units), `fg` (edges only).
 
@@ -43,13 +43,14 @@ Add a `ZoneDef` with the same id to `src/game/data/zones.ts`:
 
 | Field | Meaning |
 | --- | --- |
-| `ambient` | `snow` or `sand` particle weather (a new kind needs code in `src/game/view/zone.ts` `spawnAmbient`) |
+| `ambient` | `snow`, `sand` or `motes` (star-dust and shooting stars); a new kind needs code in `src/game/view/zone.ts` `spawnAmbient` |
+| `embers` | optional colors of the embers rising from fire props (first color, then the fade), e.g. teal for plasma braziers |
 | `glow` | RGB of the light pools around fire props |
 | `shadow` | `{ dx, stretch }` of unit shadows: high light `1 / 1`, low sun `6 / 1.35` |
 | `tint` | optional full-screen mood overlay `{ color, alpha, op }` (keep alpha under 0.1) |
 | `birds`, `haze` | circling birds (needs a `bird` prop kind with frames), heat shimmer around `horizon` |
 
-Then point a location at it (`zone: '<id>'` in `campaign.ts`). Champions whose `faction` belongs to the place show it behind their detail page; update `ChampionScreen` if you add a faction home.
+Then point a location at it (`zone: '<id>'` in `campaign.ts`). Champions whose `faction` belongs to the place show it behind their detail page and in their Academy demos: map the faction to the zone in `homeZone()` (`src/game/data/zones.ts`). The main menu stands in the zone of the newest open location.
 
 ## 4. Build and verify (all must pass)
 

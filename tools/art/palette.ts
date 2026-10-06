@@ -36,6 +36,7 @@ export const MAT = {
   silver: m('silver', 'metal', ['#20222e', '#3c4256', '#646d84', '#98a3b8', '#cfd8e6', '#ffffff']),
   bronze: m('bronze', 'metal', ['#2a1606', '#5a3410', '#8a5418', '#ba7e2a', '#e2aa48', '#fff0a8']),
   jackal: m('jackal', 'metal', ['#060408', '#100c18', '#1c1628', '#2c2440', '#463c60', '#8a80b0']),
+  ebony: m('ebony', 'metal', ['#08060a', '#16101a', '#271c24', '#3c2c30', '#5a4442', '#a08a7a']),
 
   // --- leathers / woods ----------------------------------------------------
   leather: m('leather', 'matte', ['#1f120d', '#36201a', '#573323', '#7e4e30', '#a97245', '#cf9d6a']),
@@ -61,6 +62,10 @@ export const MAT = {
   indigo: m('indigo', 'cloth', ['#070a1a', '#0e1430', '#18224c', '#24346c', '#384c90', '#5a72b8']),
   sandstone: m('sandstone', 'matte', ['#2a140c', '#5a2e18', '#8a4e2c', '#bc7c48', '#e0aa6c', '#f6d8a0']),
   sand: m('sand', 'matte', ['#3a1c0e', '#7a4220', '#b06a34', '#d89850', '#f0c478', '#fff0c0']),
+  magenta: m('magenta', 'cloth', ['#1e0618', '#3e0c34', '#6a1458', '#9c2080', '#cc3aa6', '#f080d0']),
+  teal: m('teal', 'cloth', ['#04181c', '#08303a', '#0c4a56', '#147078', '#2aa0a0', '#70d8c8']),
+  terracotta: m('terracotta', 'matte', ['#1e0a06', '#4a1c10', '#7a3420', '#a8502e', '#cc7444', '#eaa070']),
+  calabash: m('calabash', 'matte', ['#1e1008', '#4a2a10', '#7a4a1c', '#a8702c', '#cc9a48', '#ecc478']),
 
   // --- furs ----------------------------------------------------------------
   furWhite: m('furWhite', 'fur', ['#262838', '#4b5068', '#7a849c', '#b0bccc', '#dbe4ee', '#fbfdff']),
@@ -87,6 +92,7 @@ export const MAT = {
   glowRed: m('glowRed', 'glow', ['#3a0a0a', '#7a1010', '#c02020', '#f04a30', '#ff9a6a', '#ffe0c8']),
   glowCyan: m('glowCyan', 'glow', ['#062a2a', '#0e5a5a', '#18908a', '#36d0c0', '#90f5e2', '#e8fff8']),
   glowAmber: m('glowAmber', 'glow', ['#3a1a04', '#7a3a08', '#c06a10', '#f0a020', '#ffd060', '#fff4c0']),
+  glowMagenta: m('glowMagenta', 'glow', ['#2e0624', '#6a1056', '#b02a8c', '#e84cb8', '#ff9ad8', '#ffe8f6']),
 } as const;
 
 export type MatName = keyof typeof MAT;
@@ -129,6 +135,8 @@ export const ACCENT = {
   iceGlint: hex('#d8f6ff'),
   deepViolet: hex('#2a0a3a'),
   lipRose: hex('#b0524a'),
+  smearCyan: hex('#90f5e2'),
+  smearMagenta: hex('#ff9ad8'),
 };
 
 /** Single accent colors used for decals (eyes, mouths, paint). */
@@ -164,6 +172,11 @@ export const FXR = {
   tomb: fx(['#0a2410', '#155a1e', '#2fae4a', '#8af07a', '#e4ffd8']),
   curse: fx(['#120a1c', '#2a1440', '#4a2468', '#3f8a3a', '#9af07a']),
   blood: fx(['#3a0a10', '#7a1420', '#c02a30', '#ff6a5a', '#ffd0c0']),
+  magenta: fx(['#3a0a2c', '#8a1a64', '#d0409a', '#ff8ad0', '#ffe8f6']),
+  cosmic: fx(['#1a0a3a', '#4a2a8a', '#4a8ae0', '#8af0f0', '#f0ffff']),
+  core: fx(['#3a1a06', '#c06a12', '#ffc850', '#fff0a8', '#ffffff']),
+  /** Nyota hard light: the same cyan as MAT.glowCyan on the sprites */
+  hardlight: fx(['#0e5a5a', '#18908a', '#36d0c0', '#90f5e2', '#e8fff8']),
 };
 
 function fx(colors: string[]): RGBA[] {
@@ -205,6 +218,7 @@ export const UIR = {
     coven: fx(['#0e2440', '#7fd8ff']),
     temple: fx(['#3a1a08', '#f39432']),
     sunscar: fx(['#2a1a3a', '#ffb340']),
+    nyota: fx(['#2a0a2a', '#ff5fb0']),
   },
   role: {
     Tank: hex('#8fc0ff'),

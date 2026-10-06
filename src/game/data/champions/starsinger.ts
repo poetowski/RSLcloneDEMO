@@ -1,0 +1,48 @@
+import { ChampionDef } from '../types';
+
+export const starsinger: ChampionDef = {
+  id: 'starsinger',
+  name: 'Kwesi',
+  title: 'the Starsinger',
+  role: 'Support',
+  rarity: 'rare',
+  affinity: 'wild',
+  faction: 'nyota',
+  color: '#40d8c8',
+  muzzle: [35, 62],
+  stats: { hp: 1200, atk: 96, def: 62, spd: 114, crit: 0.12 },
+  lore: "A griot of Nyota who keeps the city's memory in song. His kora-staff is strung with starlight, and when he plays, the whole line moves to his rhythm.",
+  skills: [
+    {
+      id: 'resonance', name: 'Resonance', tag: 'Single enemy', slot: 1, cooldown: 0,
+      desc: 'Sends a ring of resonant sound at an enemy and knocks 15% off their Turn Meter.',
+      target: 'enemy', anim: 'attack1', approach: 'ranged',
+      hits: [{ mult: 1.1, fx: 'sound_burst' }],
+      projectile: 'sound_ring',
+      tmTargets: -15,
+      ai: { priority: 1 },
+    },
+    {
+      id: 'march_rhythm', name: 'Rhythm of the March', tag: 'All allies', slot: 2, cooldown: 3,
+      desc: "Beats the marching rhythm of the city: fills every other ally's Turn Meter by 20%, grants SPD Up to all allies for 2 turns and shakes one debuff off each of them.",
+      target: 'allies', anim: 'skill', approach: 'none',
+      hits: [{ mult: 0, fx: 'rhythm' }],
+      tmAllies: 20,
+      cleanse: true,
+      statuses: [{ status: 'spd_up', turns: 2, to: 'allies' }],
+      castFx: 'cast_teal',
+      actorFx: 'rhythm_pulse',
+      ai: { priority: 2 },
+    },
+    {
+      id: 'starsong', name: 'Starsong Crescendo', tag: 'All enemies', slot: 3, cooldown: 4,
+      desc: 'A crescendo of starlight and sound: damages all enemies and heals all allies by 15% of their max HP.',
+      target: 'enemies', anim: 'attack3', approach: 'ranged',
+      hits: [{ mult: 1.0, fx: 'crescendo' }],
+      healAllies: 0.15,
+      castFx: 'cast_teal',
+      shake: 2,
+      ai: { priority: 3 },
+    },
+  ],
+};

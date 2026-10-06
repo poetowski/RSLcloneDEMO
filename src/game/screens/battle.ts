@@ -4,7 +4,7 @@
 import { App, Screen } from '../app';
 import { allStages, locationOf, stage } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
-import { zone } from '../data/zones';
+import { homeZone, zone } from '../data/zones';
 import { recordClear } from '../profile';
 import { BattleScene, BattleSetup } from '../view/scene';
 
@@ -62,7 +62,7 @@ export class BattleScreen implements Screen {
       const setup: BattleSetup = {
         player,
         enemy,
-        zone: zone(owner.faction === 'sunscar' ? 'sunscar' : 'frostfang'),
+        zone: homeZone(owner.faction),
         seed: 7,
         auto: true,
         speed: 1,

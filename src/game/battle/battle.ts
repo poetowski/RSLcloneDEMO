@@ -38,6 +38,8 @@ export interface Unit {
   alive: boolean;
   /** Undying already spent */
   revived: boolean;
+  /** Overdrive already triggered */
+  overdriven: boolean;
   /** turn meter granted for the end of this turn (selfTm skills) */
   pendingTm: number;
 }
@@ -53,6 +55,7 @@ export type BattleEvent =
   | { kind: 'dispel'; target: string; status: StatusId; hit: number }
   | { kind: 'tm'; target: string; delta: number; hit: number }
   | { kind: 'revive'; target: string; hp: number; hit: number }
+  | { kind: 'passive'; target: string; name: string; hit: number }
   | { kind: 'death'; target: string; hit: number };
 
 export interface SkillResult {
@@ -111,6 +114,7 @@ export class Battle {
         statuses: [],
         alive: true,
         revived: false,
+        overdriven: false,
         pendingTm: 0,
       };
     };
@@ -301,6 +305,14 @@ export class Battle {
         events.push({ kind: 'tm', target: t.uid, delta: t.tm - before, hit: last });
       }
     }
+    if (skill.tmAllies) {
+      for (const a of this.allies(actor)) {
+        if (a === actor) continue;
+        const before = a.tm;
+        a.tm = Math.max(0, Math.min(TURN_FULL, a.tm + skill.tmAllies));
+        events.push({ kind: 'tm', target: a.uid, delta: a.tm - before, hit: last });
+      }
+    }
     if (skill.selfTm && !asCounter) actor.pendingTm = skill.selfTm;
 
     const result: SkillResult = { actor: actor.uid, skill, target: primary?.uid, targets: targets.map((t) => t.uid), events, counter: asCounter, counters: [] };
@@ -368,8 +380,8 @@ export class Battle {
     const lost = Math.min(t.hp, amount - absorbed);
     t.hp -= lost;
     events.push({ kind: 'damage', target: t.uid, amount: amount - absorbed, crit, absorbed, edge, hit, ...(dot ? { dot } : {}) });
+    const p = t.champion.passive;
     if (t.hp <= 0 && t.alive) {
-      const p = t.champion.passive;
       if (p?.kind === 'undying' && !t.revived) {
         t.revived = true;
         t.hp = Math.max(1, Math.round(t.maxHp * p.value));
@@ -380,6 +392,14 @@ export class Battle {
         t.statuses = [];
         t.tm = 0;
         events.push({ kind: 'death', target: t.uid, hit });
+      }
+    } else if (t.alive && p?.kind === 'overdrive' && !t.overdriven && t.hp / t.maxHp < p.value) {
+      // the core overloads once: a second phase for bosses like Mwamba
+      t.overdriven = true;
+      events.push({ kind: 'passive', target: t.uid, name: p.name, hit });
+      for (const st of p.statuses ?? []) {
+        this.addStatus(t, st.status, st.turns, 0, t.uid);
+        events.push({ kind: 'status', target: t.uid, status: st.status, turns: st.turns, hit });
       }
     }
     return lost;

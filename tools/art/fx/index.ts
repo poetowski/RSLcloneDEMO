@@ -7,12 +7,13 @@ import { writeJson } from '../io.ts';
 import { Bitmap, hex, packShelves, PackItem } from '../raster.ts';
 import { COMMON_FX } from './common.ts';
 import { FxDef, FxJson } from './kit.ts';
+import { NYOTA_FX } from './nyota.ts';
 import { SUNSCAR_FX } from './sunscar.ts';
 
 export type { FxJson };
 
 /** Every effect by name; names are what SkillDef.hits[].fx / projectile / castFx refer to. */
-export const FX: Record<string, FxDef> = { ...COMMON_FX, ...SUNSCAR_FX };
+export const FX: Record<string, FxDef> = { ...COMMON_FX, ...SUNSCAR_FX, ...NYOTA_FX };
 
 export function buildFx(out: string) {
   const items: PackItem[] = [];

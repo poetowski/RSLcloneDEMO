@@ -34,7 +34,7 @@ Every piece of content is plain data in `src/game/data/`, paired with an art mod
 | Rarity | Common, Uncommon, **Rare**, **Epic**, **Legendary** | the stat budget (`norms.ts`); the card frame color |
 | Affinity | **Force**, **Wild**, **Arcane**, Void | Force > Wild > Arcane > Force for +/-20% damage; Void is neutral |
 | Role | Tank, Bruiser, Damage, Support, Control | how the budget is spent and what the kit does |
-| Faction | Order of Dawn, Clans of the North, Wildwood, Frostfang Coven, Temple of the Still Peak, Sunscar Dynasty | story and visual family; picks the champion's home background |
+| Faction | Order of Dawn, Clans of the North, Wildwood, Frostfang Coven, Temple of the Still Peak, Sunscar Dynasty, Free City of Nyota | story and visual family; picks the champion's home background (`homeZone()` in `zones.ts`) |
 
 The roster today:
 
@@ -50,6 +50,9 @@ The roster today:
 | Kha'zir | Epic | Force | Tank | Sunscar Dynasty | clear 2-2 |
 | Nefret | Epic | Arcane | Support | Sunscar Dynasty | clear 2-3 |
 | Anhotep | Legendary | Void | Control | Sunscar Dynasty | clear 2-4 (boss) |
+| Imara | Epic | Force | Bruiser | Free City of Nyota | clear 3-1 |
+| Kwesi | Rare | Wild | Support | Free City of Nyota | clear 3-2 |
+| Mwamba | Legendary | Arcane | Tank | Free City of Nyota | clear 3-3 (boss) |
 
 ## 3. The campaign (`src/game/data/campaign.ts`)
 
@@ -62,6 +65,7 @@ The roster today:
 | --- | --- | --- |
 | I. Frostfang Ruins | `frostfang` | 1-1 The Frozen Gate, 1-2 Hall of Icicles, 1-3 Throne of the Dread Knight (boss Vorhaal) |
 | II. Sunscar Ruins (after 1-3) | `sunscar` | 2-1 Dunes of Ash, 2-2 The Sunken Colonnade, 2-3 Temple of the Burning Sun, 2-4 Tomb of Anhotep (boss Anhotep) |
+| III. Nyota Highlands (after 2-4) | `nyota` | 3-1 The Baobab Steps, 3-2 The Hall of Echoes, 3-3 Heart of the Skyforge (boss Mwamba) |
 
 ## 4. The profile (`src/game/profile.ts`)
 

@@ -4,12 +4,12 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 
 ![Battle](docs/images/battle.gif)
 
-- **10 champions** in 6 factions, each with idle, run, three attacks, hurt and death (Anhotep also rises from the dead), rendered for both facings.
-- **2 combat backgrounds**: the snowbound *Frostfang Ruins* and the sunset necropolis of the *Sunscar Ruins*.
-- **A campaign** of 7 stages on a painted world map; every enemy you defeat can be **recruited** on the first clear.
+- **13 champions** in 7 factions, each with idle, run, three attacks, hurt and death (Anhotep also rises from the dead), rendered for both facings.
+- **3 combat backgrounds**: the snowbound *Frostfang Ruins*, the sunset necropolis of the *Sunscar Ruins* and the afrofuturist *Nyota Skyforge* on the high plateau.
+- **A campaign** of 10 stages in three chapters on a painted world map; every enemy you defeat can be **recruited** on the first clear.
 - **A collection** of champions with locked silhouettes, rarities, affinities, factions and roles, and a detail page with every animation and skill.
 - **The Academy**: an in-game codex that teaches combat, the turn meter, damage, affinities, all buffs, debuffs and special mechanics, with live demonstrations.
-- **Real mechanics**: turn meter, A1/A2/A3 cooldowns, 16 statuses, affinity cycle, counterattacks, dispels, lifesteal, execute, Undying, bosses, stars, auto battle and speed controls.
+- **Real mechanics**: turn meter, A1/A2/A3 cooldowns, 16 statuses, affinity cycle, counterattacks, dispels, lifesteal, execute, turn meter boosts, Undying, Overdrive, bosses, stars, auto battle and speed controls.
 - **Guardrails** that keep new content consistent: balance norms and a balance simulator, content tests, an art audit, and two project skills for adding champions and backgrounds.
 
 | | |
@@ -35,7 +35,7 @@ Open http://localhost:5173. The sprite gallery (every animation, effect and icon
 | `A`, `S`, `Esc` | auto battle, speed x1/x2/x3, pause menu (and back in menus) |
 | arrows + `Enter` in menus | move between buttons, activate |
 
-Deep links: `?screen=campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=2-3`, `&team=knight,monk,frostmage`, `&champion=tomblord`, `&chapter=buffs`; `?demo=<skill_id>` loops one skill; `?unlockall=1`, `?progress=2-1` (clear up to a stage), `?reset=1`.
+Deep links: `?screen=campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=3-3`, `&team=knight,monk,frostmage`, `&champion=colossus`, `&chapter=buffs`; `?demo=<skill_id>` loops one skill; `?unlockall=1`, `?progress=2-1` (clear up to a stage), `?reset=1`.
 
 ## The champions
 
@@ -51,6 +51,9 @@ Deep links: `?screen=campaign|team|battle|collection|champion|academy|options|re
 | ![](docs/images/reel_jackal.gif) | **Kha'zir, the Jackal Warden**. Epic Force Tank, Sunscar Dynasty. Crescent glaive. | **Jackal's Bite**: may Weaken. **Warden's Vigil**: a howl gives all allies Counterattack, Taunts. **Weighing of Hearts**: strips every buff, then strikes. |
 | ![](docs/images/reel_priestess.gif) | **Nefret, the Sun Priestess**. Epic Arcane Support, Sunscar Dynasty. Wings of light. | **Solar Lance**: may Burn. **Blessing of Dawn**: heals all allies, ATK Up. **Wrath of the Sun**: pillars of sunfire, Heal Block, may Burn. |
 | ![](docs/images/reel_tomblord.gif) | **Anhotep, the Tomb Lord**. Legendary Void Control, Sunscar Dynasty. Crook and flail. | **Grave Touch**: may Poison. **Curse of Ages**: Weaken and slow all enemies. **Eternal Tomb**: seals a target in a golden sarcophagus (Stun, Heal Block). Passive **Undying**. |
+| ![](docs/images/reel_sunspear.gif) | **Imara, the Sunspear**. Epic Force Bruiser, Free City of Nyota. Gele headwrap, hard-light shield and spear. | **Sunspear Flurry**: two thrusts, may Shield herself. **Spiral of Spears**: spins through all enemies twice, may place DEF Down. **Sunfall Javelin**: leaps and hurls her spear, Weaken. |
+| ![](docs/images/reel_starsinger.gif) | **Kwesi, the Starsinger**. Rare Wild Support, Free City of Nyota. Griot with a kora-staff and a halo of star-orbs. | **Resonance**: a ring of sound, -15% turn meter. **Rhythm of the March**: +20% turn meter to every other ally, SPD Up, cleanses a debuff each. **Starsong Crescendo**: starlight on all enemies, heals all allies. |
+| ![](docs/images/reel_colossus.gif) | **Mwamba, the Starforged**. Legendary Arcane Tank, Free City of Nyota. Guardian of the Skyforge with a sun core and a crest of rays. | **Gravity Fist**: may slow. **Magnetic Pull**: all enemies, may place ATK Down, Taunts. **Starfall Protocol**: forged stars on all enemies, may Stun. Passive **Overdrive**: below 50% HP its core overloads (ATK Up, DEF Up). |
 
 ### Skill icons (A1 / A2 / A3, one row per champion)
 
@@ -62,6 +65,11 @@ Deep links: `?screen=campaign|team|battle|collection|champion|academy|options|re
 | --- | --- |
 | ![Frostfang](docs/images/zone_frostfang.png) | ![Sunscar](docs/images/zone_sunscar.png) |
 | A snowed-in temple courtyard at night under an aurora: braziers, banners, a glowing rune circle; the arches open onto the mountains. | A necropolis at sunset: offering reliefs, a pylon gate framing the great pyramid, jackal statues, a ruined colonnade before a toppled colossus, a sun mosaic, sand blowing in gusts, vultures and heat haze. |
+
+| Nyota Skyforge |
+| --- |
+| ![Nyota](docs/images/zone_nyota.png) |
+| The terrace of the star-smiths at cosmic dusk: a wall painted in bold geometric panels with circuits of hard light, a mud-brick gate tower with toron beams, kente banners and a star portal, light pylons over the void, floating islands with waterfalls, a sky-tower beam, a ringed world, plasma braziers, a star-map inlaid in the floor, drifting star-dust and shooting stars. |
 
 ![World map](docs/images/world_map.png)
 

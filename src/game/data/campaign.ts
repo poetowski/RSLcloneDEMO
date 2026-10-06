@@ -92,6 +92,44 @@ export const LOCATIONS: LocationDef[] = [
       },
     ],
   },
+  {
+    id: 'nyota',
+    chapter: 'III',
+    name: 'Nyota Highlands',
+    zone: 'nyota',
+    blurb: 'Above the desert rises the high plateau of the Free City of Nyota, where star-smiths forge with fallen starlight. Its guardians test everyone who climbs.',
+    requires: '2-4',
+    map: { x: 474, y: 88 },
+    stages: [
+      {
+        id: '3-1',
+        name: 'The Baobab Steps',
+        blurb: 'The stair-road winds up the escarpment between baobabs older than the Oath. The Spear Guard bars the way.',
+        enemies: [{ champion: 'sunspear' }, { champion: 'starsinger' }],
+        power: 1.35,
+        recruit: 'sunspear',
+        map: { x: 526, y: 152 },
+      },
+      {
+        id: '3-2',
+        name: 'The Hall of Echoes',
+        blurb: "In the singing hall the griots keep the city's memory in light and sound. They will not hand it to strangers.",
+        enemies: [{ champion: 'sunspear' }, { champion: 'starsinger' }, { champion: 'starsinger' }],
+        power: 0.98,
+        recruit: 'starsinger',
+        map: { x: 568, y: 112 },
+      },
+      {
+        id: '3-3',
+        name: 'Heart of the Skyforge',
+        blurb: 'Mwamba, the guardian of the forge, wakes from its thousand-year watch. Prove you are worthy of its fire.',
+        enemies: [{ champion: 'colossus', boss: true }, { champion: 'sunspear' }, { champion: 'starsinger' }],
+        power: 0.85,
+        recruit: 'colossus',
+        map: { x: 604, y: 70 },
+      },
+    ],
+  },
 ];
 
 export function allStages(): StageDef[] {

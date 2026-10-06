@@ -49,7 +49,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -243,6 +243,7 @@ export class BattleScene {
         u.hp = u.maxHp;
         u.alive = true;
         u.revived = false;
+        u.overdriven = false;
         u.statuses = [];
         u.cooldowns = {};
         const v = this.view(u.uid);
@@ -472,10 +473,13 @@ export class BattleScene {
           arrow_venom: ['#eaffc8', '#4cd43a', '#155a1e'],
           sun_orb: ['#fffbe0', '#ffd060', '#d0401a'],
           grave_orb: ['#e4ffd8', '#8af07a', '#155a1e'],
+          sun_javelin: ['#e8fff8', '#36d0c0', '#b02a8c'],
+          sound_ring: ['#e8fff8', '#90f5e2', '#18908a'],
         };
-        const slow = skill.projectile === 'ice_shard' || skill.projectile === 'grave_orb';
+        const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10 };
+        const slow = skill.projectile === 'ice_shard' || skill.projectile === 'grave_orb' || skill.projectile === 'sound_ring';
         for (const t of targets) {
-          pendings.push(this.fx.projectile(skill.projectile, from, t.chest(), { speed: slow ? 440 : 620, arc: skill.projectile.startsWith('arrow') ? 8 : skill.projectile === 'grave_orb' ? 14 : 0, trail: trails[skill.projectile], rotate: skill.projectile !== 'sun_orb' }).then(() => groupFx(t)));
+          pendings.push(this.fx.projectile(skill.projectile, from, t.chest(), { speed: slow ? 440 : 620, arc: skill.projectile.startsWith('arrow') ? 8 : arcs[skill.projectile] ?? 0, trail: trails[skill.projectile], rotate: skill.projectile !== 'sun_orb' }).then(() => groupFx(t)));
         }
       } else if (skill.target === 'allies') {
         targets.forEach((t, i) => groupFx(t, i * 80));
@@ -710,6 +714,15 @@ export class BattleScene {
           v.play('idle');
         })();
         break;
+      case 'passive': {
+        // a passive wakes mid-fight (Overdrive): banner, the burst on the body, its name over the head
+        this.hud.showBanner(e.name, v.team === 'player' ? '#ffe9a0' : '#ffc0b0');
+        void this.fx.spawn('overdrive', v.x, v.y + 1, { layer: 'top', additive: true });
+        this.fx.text(v.uid, v.x, top() - 6, 'OVERDRIVE!', { color: '#ffd860', variant: 'bold', scale: 2, outline: '#3a1a06' });
+        this.flash = Math.max(this.flash, 0.12);
+        this.shake(3);
+        break;
+      }
       case 'death':
         v.dead = true;
         v.stunned = false;

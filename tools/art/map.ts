@@ -1,7 +1,8 @@
 // The campaign world map (640x360): the realm seen from above, lit from the
 // top-left like everything else. Snowfields and peaks in the north-west
 // around the Frostfang temple, green hills and a river through the middle,
-// the sea in the south-west and the Sunscar desert in the south-east. The
+// the sea in the south-west, the Sunscar desert in the south-east and, above
+// a laterite escarpment in the north-east, the golden highland of Nyota. The
 // road and the location landmarks are placed from the campaign data
 // (src/game/data/campaign.ts), so new stages extend the road automatically;
 // stage nodes and labels are drawn by the runtime on top.
@@ -20,12 +21,16 @@ const STEPPE = ramp(['#4a4a22', '#6a662c', '#8c8238', '#ae9e4a', '#c8b660']);
 const DESERT = ramp(['#7a4622', '#a66432', '#cc8644', '#e6a85c', '#f6c87c']);
 const SEA = ramp(['#0a1632', '#10264c', '#183a6a', '#24548a', '#3c74aa', '#78a8d8']);
 const ROCK = ramp(['#1c1a26', '#34324a', '#54526e', '#7c7a96', '#a6a6be']);
-const REDROCK = ramp(['#2a1418', '#4a2424', '#743a2c', '#9c5838', '#c07c4c']);
 const PINE = ramp(['#0c1c14', '#163222', '#22482c', '#326238']);
 const LEAF = ramp(['#10260e', '#1c3c16', '#2c5a20', '#447a2c', '#64983a']);
 const ROAD = ramp(['#2a180c', '#6a4424', '#a07040', '#c89a60']);
 const STONE = ramp(['#1e1c26', '#3a3848', '#5e5c70', '#8a889c', '#b8b6c8']);
 const GOLD = ramp(['#5a3410', '#a8701e', '#e8b440', '#fff0a8']);
+const SAVANNA = ramp(['#4e3418', '#7a5220', '#a8782a', '#cc9e36', '#e8c250']);
+const LATERITE = ramp(['#3a140c', '#6a2a18', '#94422a', '#b8603a', '#d8844e']);
+const ADOBE = ramp(['#3a160c', '#7a3a1e', '#b0602e', '#d88a48', '#f2b070']);
+const ACACIA = ramp(['#14240e', '#24401a', '#3a5e24', '#567c30']);
+const LIGHT = ramp(['#0e5a5a', '#36d0c0', '#90f5e2', '#e8fff8']);
 const SUNRED = hex('#c8361a');
 const INKC = hex('#07080e');
 
@@ -51,6 +56,19 @@ const climate = (x: number, y: number) => (x / W) * 0.55 + (y / H) * 0.45 + (fbm
 const seaLevel = (x: number, y: number) => x / W + (1 - y / H) * 0.85 + (fbm(x, y, 11) - 0.5) * 0.18;
 const isSea = (x: number, y: number) => seaLevel(x, y) < 0.36;
 const height = (x: number, y: number) => fbm(x, y, 21);
+
+/** The Nyota escarpment: the plateau lies north-east of this edge (y of the rim at x). */
+const rimY = (x: number) => 40 + (x - 400) * 0.83 + (vnoise(x, 0, 18, 41) - 0.5) * 14;
+/** > 0 on the plateau (px above the rim), <= 0 below it. */
+const plateau = (x: number, y: number) => rimY(x) - y;
+/** The cliff face: the band of rock just below the rim. */
+const CLIFF = 11;
+
+/** Streams of the highland that pour off the escarpment. */
+const STREAMS: [number, number][][] = [
+  [[560, 0], [552, 26], [530, 52], [506, 80], [490, 106], [484, 124]],
+  [[640, 150], [628, 170], [614, 196], [606, 214]],
+];
 
 /** The river: from the mountains in the north down to the sea in the south-west. */
 const RIVER: [number, number][] = [[318, 0], [312, 30], [296, 58], [300, 92], [286, 128], [256, 156], [236, 190], [200, 214], [168, 238], [128, 262], [96, 290]];
@@ -91,8 +109,20 @@ function ground(b: Bitmap) {
       const sh = (height(x - 2, y - 2) - height(x + 2, y + 2)) * 9;
       const c = climate(x, y);
       const shore = seaLevel(x, y) < 0.375;
+      const pl = plateau(x, y);
       let col: RGBA;
-      if (shore) col = rampDither(DESERT, 3.4 + sh * 0.5, x, y);
+      if (pl > 0) {
+        // golden highland grass; bare red laterite shows through in patches; the rim catches the light
+        const laterite = fbm(x, y, 51) > 0.6;
+        col = laterite ? rampDither(LATERITE, 2.8 + sh * 0.6 + (vnoise(x, y, 5, 53) - 0.5) * 0.6, x, y) : rampDither(SAVANNA, 2.6 + sh * 0.8 + (vnoise(x, y, 6, 55) - 0.5) * 0.8, x, y);
+        if (pl < 1.5) col = SAVANNA[4];
+      } else if (pl > -CLIFF && x > 330) {
+        // the cliff face: laterite strata cut by vertical flutes, darker toward the foot
+        const k = -pl / CLIFF;
+        const flute = Math.sin(x * 1.1 + vnoise(x, y, 4, 57) * 4) > 0.45 ? -0.9 : 0;
+        const stratum = Math.floor(-pl + vnoise(x, 0, 9, 59) * 3) % 4 === 0 ? -0.5 : 0;
+        col = pl > -1 ? LATERITE[4] : rampDither(LATERITE, 3.3 - k * 2.6 + flute + stratum, x, y);
+      } else if (shore) col = rampDither(DESERT, 3.4 + sh * 0.5, x, y);
       else if (c < 0.36) col = rampDither(SNOW, 2.8 + sh + (vnoise(x, y, 6, 9) - 0.5) * 0.5, x, y);
       else if (c < 0.4) col = rampDither(TUNDRA, 1.8 + sh + (c - 0.36) * 20, x, y);
       else if (c < 0.57) col = rampDither(GRASS, 2.4 + sh + (vnoise(x, y, 7, 13) - 0.5) * 0.8, x, y);
@@ -110,6 +140,24 @@ function ground(b: Bitmap) {
       if (d < w) b.set(x, y, rampDither(SEA, d < w * 0.4 ? 4.2 : 3.2, x, y));
       else if (d < w + 1) b.set(x, y, climate(x, y) < 0.38 ? SNOW[4] : SEA[1]);
     }
+  }
+  // highland streams, each ending in a waterfall down the escarpment and a pool of spray
+  for (const st of STREAMS) {
+    for (let y = 0; y < H; y++) {
+      for (let x = 330; x < W; x++) {
+        if (plateau(x, y) <= 0) continue;
+        const d = nearPolyline(x + (vnoise(x, y, 8, 61) - 0.5) * 4, y, st);
+        if (d < 1.3) b.set(x, y, rampDither(SEA, d < 0.6 ? 4.4 : 3.4, x, y));
+        else if (d < 2.2) b.set(x, y, ACACIA[1]);
+      }
+    }
+    const [ex] = st[st.length - 1];
+    const top = Math.round(rimY(ex));
+    for (let y = top - 1; y < top + CLIFF + 1; y++) {
+      b.set(ex, y, y % 3 === 0 ? SEA[5] : SEA[4]);
+      b.set(ex + 1, y, SEA[3]);
+    }
+    ellipseFill(b, ex + 0.5, top + CLIFF + 2, 3.4, 1.6, (x, y, d) => (d < 0.55 ? SEA[5] : SEA[3]));
   }
 }
 
@@ -165,6 +213,53 @@ function pyramid(b: Bitmap, x: number, base: number, h: number) {
   b.blit(outline(icon, DESERT[0]), x - h - 2, base - h - 2);
 }
 
+/** Flat-topped acacia of the highland. */
+function acacia(b: Bitmap, x: number, y: number) {
+  const icon = new Bitmap(14, 10);
+  ellipseFill(icon, 7, 3, 6.2, 2, (px, py, d) => rampDither(ACACIA, 3.4 - (px - 1) / 6 - d * 0.5, px, py));
+  for (let py = 4; py < 9; py++) icon.set(7 - (py > 6 ? 1 : 0), py, ROAD[1]);
+  icon.set(5, 5, ROAD[1]);
+  b.blit(outline(icon, ACACIA[0]), Math.round(x - 7), Math.round(y - 9));
+}
+
+/** Baobab: a swollen bottle trunk with a ragged crown. */
+function baobabIcon(b: Bitmap, x: number, y: number) {
+  const icon = new Bitmap(16, 17);
+  const TRUNK = ramp(['#2a1c18', '#5a4236', '#86644e', '#aa8a6c']);
+  ellipseFill(icon, 8, 11.5, 3.4, 4.6, (px, py, d) => rampDither(TRUNK, 3.3 - (px - 5) / 2.6 - d * 0.5, px, py));
+  // stubby branches spreading from the top of the trunk, a thin crown on them
+  for (const [x0, y0, x1, y1] of [[7, 7, 3, 4], [8, 7, 8, 3], [9, 7, 13, 4]] as const) {
+    for (let t = 0; t <= 1; t += 0.25) icon.set(Math.round(x0 + (x1 - x0) * t), Math.round(y0 + (y1 - y0) * t), TRUNK[2]);
+  }
+  for (const [cx, cy] of [[3, 3.4], [8, 2.4], [13, 3.4]] as const) ellipseFill(icon, cx, cy, 2.6, 1.4, (px, py, d) => rampDither(ACACIA, 3.2 - (px - cx + 2) / 3 - d * 0.5, px, py));
+  b.blit(outline(icon, TRUNK[0]), Math.round(x - 8), Math.round(y - 16));
+}
+
+/** Nyota landmark: the star-gate tower of the city, pinnacles tipped with light, a beam into the sky. */
+function skyCity(b: Bitmap, x: number, y: number) {
+  const icon = new Bitmap(36, 40);
+  // the beam of the sky-tower behind the city
+  for (let py = 0; py < 22; py++) if (dith(27, py, 0.35 + py / 30)) icon.set(27, py, LIGHT[py > 12 ? 2 : 1]);
+  // side towers, then the tall gate tower in the middle
+  for (const [x0, x1, top] of [[3, 12, 22], [24, 33, 20], [11, 25, 12]] as const) {
+    polyFill(icon, [[x0 + 1, top], [x1 - 1, top], [x1, 37], [x0, 37]], (px) => (px < (x0 + x1) / 2 ? ADOBE[3] : ADOBE[2]));
+    for (let px = x0 + 1; px < x1; px++) icon.set(px, top, ADOBE[4]);
+    // pinnacles with orbs of light
+    for (let px = x0 + 2; px < x1 - 1; px += 4) {
+      icon.set(px, top - 1, ADOBE[3]);
+      icon.set(px, top - 2, ADOBE[3]);
+      icon.set(px, top - 3, LIGHT[3]);
+    }
+    // toron studs
+    for (let py = top + 4; py < 34; py += 5) for (let px = x0 + 2 + ((py >> 2) % 2); px < x1 - 1; px += 4) icon.set(px, py, ADOBE[0]);
+  }
+  // the star portal and the gold star over it
+  ellipseFill(icon, 18, 29, 3.4, 5.4, (px, py, d) => (d < 0.6 ? LIGHT[3] : LIGHT[1]));
+  for (let py = 29; py < 37; py++) for (let px = 15; px <= 21; px++) if (Math.abs(px - 18) < 3.4) icon.set(px, py, py === 36 ? GOLD[1] : LIGHT[py < 31 ? 2 : 1]);
+  for (const [dx, dy] of [[0, -2], [0, 2], [-2, 0], [2, 0], [0, -1], [0, 1], [-1, 0], [1, 0], [0, 0]]) icon.set(18 + dx, 18 + dy, dx === 0 && dy === 0 ? GOLD[3] : GOLD[2]);
+  b.blit(outline(icon, ADOBE[0]), x - 18, y - 36);
+}
+
 /** Frostfang landmark: a snowbound temple of columns. */
 function frostTemple(b: Bitmap, x: number, y: number) {
   const icon = new Bitmap(30, 24);
@@ -211,12 +306,17 @@ function scatter(b: Bitmap, clear: (x: number, y: number) => boolean) {
       if (nearPolyline(x, y, RIVER) < 7) continue;
       const c = climate(x, y);
       const n = fbm(x, y, 31);
+      const pl = plateau(x, y);
+      if (pl > -CLIFF - 4 && pl < 3) continue;
+      if (pl > 0) {
+        if (STREAMS.some((st) => nearPolyline(x, y, st) < 5)) continue;
+        if (n > 0.6) icons.push({ y, draw: () => baobabIcon(b, x, y) });
+        else if (n > 0.4) icons.push({ y, draw: () => acacia(b, x, y) });
+        continue;
+      }
       if (y < 34 || (c < 0.33 && n > 0.56)) {
         const hgt = 12 + r() * 12;
         icons.push({ y, draw: () => mountain(b, x, y, hgt, hgt * 0.95, ROCK, c < 0.5) });
-      } else if (x > 470 && y < 150 && n > 0.5) {
-        const hgt = 9 + r() * 9;
-        icons.push({ y, draw: () => mountain(b, x, y, hgt, hgt * 1.2, REDROCK, false) });
       } else if (c < 0.42 && n > 0.42) {
         const s = 0.8 + r() * 0.3;
         icons.push({ y, draw: () => pine(b, x, y, s, c < 0.38) });
@@ -261,6 +361,13 @@ function road(b: Bitmap) {
     b.set(X, Y, hash2(X, Y, 3) > 0.85 ? ROAD[1] : ROAD[2]);
     b.set(X + 1, Y, ROAD[3]);
     b.set(X, Y + 1, ROAD[1]);
+  }
+  // steps cut into the cliff where the road climbs the escarpment
+  for (const [x, y] of all) {
+    const pl = plateau(x, y);
+    if (pl > 1 || pl < -CLIFF - 1 || x < 330) continue;
+    const X = Math.round(x), Y = Math.round(y);
+    for (let k = -2; k <= 2; k++) b.set(X + k, Y, Y % 2 ? LATERITE[4] : LATERITE[1]);
   }
   // a plank bridge where the road crosses the river
   for (const [x, y] of all) {
@@ -309,7 +416,8 @@ export function buildMap(out: string) {
     nodes.every(([nx, ny]) => Math.hypot(x - nx, y - ny) > 18) && marks.every(([mx, my]) => Math.hypot(x - mx, y - my + 8) > 26) && roadPts.every(([rx, ry]) => Math.hypot(x - rx, y - ry) > 8);
   scatter(b, clear);
   road(b);
-  for (const l of LOCATIONS) (l.zone === 'sunscar' ? sunTemple : frostTemple)(b, l.map.x, l.map.y);
+  const landmark: Record<string, (b: Bitmap, x: number, y: number) => void> = { frostfang: frostTemple, sunscar: sunTemple, nyota: skyCity };
+  for (const l of LOCATIONS) (landmark[l.zone] ?? frostTemple)(b, l.map.x, l.map.y);
   pyramid(b, 600, 262, 9);
   pyramid(b, 616, 270, 6);
   pyramid(b, 520, 304, 7);

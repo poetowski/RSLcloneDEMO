@@ -1,7 +1,7 @@
 // Renders a combat background: backdrop, pre-baked tile layers, props driven
 // by their kind (static, looping, pulsing, burning), the ambience of the zone
-// (falling snow or blowing sand, circling birds, heat haze), light pools, a
-// mood tint and the vignette. Everything zone-specific comes from the zone's
+// (falling snow, blowing sand or drifting star-dust with shooting stars,
+// circling birds, heat haze), light pools, a mood tint and the vignette. Everything zone-specific comes from the zone's
 // JSON (art) and ZoneDef (behaviour), so a new zone needs no code here.
 import { Particles } from '../../engine/particles';
 import { H, W } from '../../engine/screen';
@@ -24,6 +24,9 @@ export class ZoneView {
   private t = 0;
   readonly ambient = new Particles();
   readonly embers = new Particles();
+  /** shooting stars cross the sky behind the architecture */
+  private sky = new Particles();
+  private starT = 1500;
   readonly json: ZoneJson;
   private art: ZoneArt;
   private birds: Bird[] = [];
@@ -66,6 +69,27 @@ export class ZoneView {
   }
 
   private spawnAmbient(x = -4, y = -4) {
+    if (this.def.ambient === 'motes') {
+      // star-dust: glowing motes rising slowly through the air, kindling and fading as they go
+      const respawn = x < 0;
+      const life = 5000 + Math.random() * 6000;
+      const hue = Math.random();
+      const fade = hue < 0.6 ? ['#0e5a5a', '#18908a', '#36d0c0', '#90f5e2', '#36d0c0', '#18908a'] : hue < 0.85 ? ['#5a3a10', '#c08a28', '#ffd070', '#fff0a8', '#ffd070', '#c08a28'] : ['#4a1040', '#b02a8c', '#ff9ad8', '#ffe8f6', '#ff9ad8', '#b02a8c'];
+      this.ambient.add({
+        x: respawn ? Math.random() * W : x,
+        y: respawn ? 120 + Math.random() * (H - 110) : y,
+        vx: (Math.random() - 0.5) * 5,
+        vy: -(3 + Math.random() * 7),
+        life,
+        max: life,
+        size: Math.random() < 0.18 ? 2 : 1,
+        color: fade[0],
+        fade,
+        sway: 4 + Math.random() * 6,
+        additive: true,
+      });
+      return;
+    }
     if (this.def.ambient === 'snow') {
       const near = Math.random() < 0.35;
       this.ambient.add({
@@ -103,8 +127,8 @@ export class ZoneView {
     const amb = this.ambient;
     const speedUp = this.def.ambient === 'sand' && this.gust > 0 ? 2.2 : 1;
     amb.update(dt * speedUp);
-    for (const p of amb.list) if (p.y > H + 4 || p.x > W + 8 || p.x < -60) p.life = 0;
-    const target = this.def.ambient === 'snow' ? 90 : this.gust > 0 ? 150 : 70;
+    for (const p of amb.list) if (p.y > H + 4 || p.y < -6 || p.x > W + 8 || p.x < -60) p.life = 0;
+    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.gust > 0 ? 150 : 70;
     while (amb.list.length < target) this.spawnAmbient();
     if (this.def.ambient === 'sand') {
       // every few seconds a gust sweeps a veil of sand across the arena
@@ -115,14 +139,33 @@ export class ZoneView {
       }
       this.gust = Math.max(0, this.gust - dt);
     }
+    if (this.def.ambient === 'motes') {
+      // now and then a shooting star streaks down across the sky
+      this.sky.update(dt);
+      this.starT -= dt;
+      if (this.starT <= 0) {
+        this.starT = 3500 + Math.random() * 6000;
+        const x0 = 140 + Math.random() * 460, y0 = 6 + Math.random() * 30;
+        const vx = -(150 + Math.random() * 90), vy = 55 + Math.random() * 35;
+        const len = Math.hypot(vx, vy);
+        for (let k = 0; k < 7; k++) {
+          this.sky.add({
+            x: x0 - (vx / len) * k * 1.6, y: y0 - (vy / len) * k * 1.6, vx, vy,
+            life: 520 - k * 30, color: '#ffffff', fade: k < 2 ? ['#ffffff', '#e8fff8', '#90f5e2'] : ['#90f5e2', '#36d0c0', '#18908a'],
+            additive: true,
+          });
+        }
+      }
+    }
     this.embers.update(dt);
+    const em = this.def.embers ?? ['#ffd060', '#fff0b0', '#ffb84a', '#f2731e', '#c8361a'];
     for (const p of this.json.props) {
       const k = this.json.kinds[p.kind];
       if (k?.fire && Math.random() < dt / 140) {
         this.embers.add({
           x: p.x - 3 + Math.random() * 6, y: p.y + k.fire.dy - 4,
           vx: (Math.random() - 0.5) * 8 + (this.def.ambient === 'sand' ? 6 : 0), vy: -18 - Math.random() * 14,
-          life: 900 + Math.random() * 700, color: '#ffd060', fade: ['#fff0b0', '#ffb84a', '#f2731e', '#c8361a'],
+          life: 900 + Math.random() * 700, color: em[0], fade: em.slice(1),
           sway: 6, additive: true,
         });
       }
@@ -155,6 +198,7 @@ export class ZoneView {
   drawBack(ctx: CanvasRenderingContext2D) {
     const bd = this.art.backdrop;
     ctx.drawImage(bd, 0, 0);
+    this.sky.draw(ctx);
     if (this.def.haze) {
       // heat shimmer: the rows around the horizon wobble a pixel side to side
       const h0 = this.json.horizon - 26, h1 = Math.min(bd.height, this.json.horizon + 14);

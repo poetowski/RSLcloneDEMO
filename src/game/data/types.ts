@@ -38,7 +38,7 @@ export type Approach = 'melee' | 'ranged' | 'center' | 'leap' | 'blink' | 'none'
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type Affinity = 'force' | 'arcane' | 'wild' | 'void';
 export type Role = 'Tank' | 'Bruiser' | 'Damage' | 'Support' | 'Control';
-export type FactionId = 'dawn' | 'clans' | 'wildwood' | 'coven' | 'temple' | 'sunscar';
+export type FactionId = 'dawn' | 'clans' | 'wildwood' | 'coven' | 'temple' | 'sunscar' | 'nyota';
 
 export interface StatusApp {
   status: StatusId;
@@ -83,6 +83,8 @@ export interface SkillDef {
   lifesteal?: number;
   /** turn meter change for targets (negative = reduce), on the last hit */
   tmTargets?: number;
+  /** turn meter change for the actor's allies (not the actor), on the last hit */
+  tmAllies?: number;
   /** the actor ends the turn with this much turn meter instead of 0 */
   selfTm?: number;
   /** bonus damage when the target is below a HP fraction */
@@ -102,9 +104,13 @@ export interface PassiveDef {
   id: string;
   name: string;
   desc: string;
-  /** undying: the first lethal hit leaves the champion at `value` x max HP instead */
-  kind: 'undying';
+  /**
+   * undying:   the first lethal hit leaves the champion at `value` x max HP instead
+   * overdrive: the first time HP drops below `value` x max HP, `statuses` are granted
+   */
+  kind: 'undying' | 'overdrive';
   value: number;
+  statuses?: { status: StatusId; turns: number }[];
 }
 
 export interface Stats {
@@ -178,7 +184,7 @@ export interface ZoneDef {
   id: string;
   name: string;
   subtitle: string;
-  ambient: 'snow' | 'sand';
+  ambient: 'snow' | 'sand' | 'motes';
   /** color of brazier light pools */
   glow: [number, number, number];
   /** unit shadows: offset away from the key light and horizontal stretch */
@@ -189,6 +195,8 @@ export interface ZoneDef {
   birds?: number;
   /** heat shimmer on the horizon rows of the backdrop */
   haze?: boolean;
+  /** brazier embers: first color, then the colors they fade through (default: firelight) */
+  embers?: string[];
 }
 
 export interface EnemySlot {

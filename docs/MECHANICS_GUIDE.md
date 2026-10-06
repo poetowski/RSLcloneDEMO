@@ -66,6 +66,7 @@ interface SkillDef {
   stripBuffs?: boolean;     // dispel: remove every buff from the targets before the first hit
   lifesteal?: number;       // fraction of damage dealt healed to the actor
   tmTargets?: number;       // turn meter change for targets, in %
+  tmAllies?: number;        // turn meter change for every ally except the actor, in % (capped at 100)
   selfTm?: number;          // actor ends the turn with this TM instead of 0
   execute?: { below: number; mult: number };
   projectile?: string; castFx?: string; actorFx?: string; shake?: number;   // presentation
@@ -73,7 +74,7 @@ interface SkillDef {
 }
 ```
 
-`ChampionDef` adds identity (`name, title, role, rarity, affinity, faction, color, lore`), `stats`, the three skills, an optional `passive` (`undying`) and, for ranged champions, a `muzzle` point where projectiles leave the sprite.
+`ChampionDef` adds identity (`name, title, role, rarity, affinity, faction, color, lore`), `stats`, the three skills, an optional `passive` (`undying` or `overdrive`) and, for ranged champions, a `muzzle` point where projectiles leave the sprite.
 
 ### 4.2 Targeting
 
@@ -155,7 +156,9 @@ Force beats Wild, Wild beats Arcane, Arcane beats Force; **Void** stands outside
 | Cleanse | removes one debuff from each ally |
 | Lifesteal | heals the actor for a fraction of damage dealt (blocked by Heal Block) |
 | Execute | `mult` bonus against targets below `below` x max HP |
+| Turn Meter boost | `tmAllies` adds to every other ally's turn meter on the last hit (Rhythm of the March: +20%); `tmTargets` drains enemies (Arrow Rain -15%, Resonance -15%) |
 | Undying (passive) | the first lethal hit leaves the champion at `value` x max HP with every debuff removed (Anhotep: 25%) |
+| Overdrive (passive) | the first time a hit leaves the champion alive below `value` x max HP, it gains the passive's `statuses` (Mwamba: below 50%, ATK Up + DEF Up 2t); a lethal hit never triggers it. Shows as a `passive` event: banner, core-flare, `OVERDRIVE!` |
 
 ## 9. Champion kits
 
@@ -171,8 +174,11 @@ Force beats Wild, Wild beats Arcane, Arcane beats Force; **Void** stands outside
 | **Kha'zir**, Tank, Force | Jackal's Bite 1.0, 30% Weaken 2t | Warden's Vigil: allies Counter 2t, self Taunt 2t | Weighing of Hearts: dispel, 1.8, Weaken 2t |
 | **Nefret**, Support, Arcane | Solar Lance 1.0, 35% Burn 2t | Blessing of Dawn: heal 15%, ATK Up 2t | Wrath of the Sun: all 0.85, Heal Block 2t, 60% Burn 2t |
 | **Anhotep**, Control, Void | Grave Touch 1.0, 40% Poison 2t | Curse of Ages: all 0.6, 40% Weaken + 40% SPD Down 2t | Eternal Tomb 1.3, Stun 1t, Heal Block 2t |
+| **Imara**, Bruiser, Force | Sunspear Flurry 2 x 0.55, 50% self Shield 10% 2t | Spiral of Spears (center): all 2 x 0.45, 40% DEF Down 2t | Sunfall Javelin (ranged) 2.0, Weaken 2t |
+| **Kwesi**, Support, Wild | Resonance (ranged) 1.1, TM -15% | Rhythm of the March: other allies TM +20%, SPD Up 2t, cleanse | Starsong Crescendo: all 1.0, heal allies 15% |
+| **Mwamba**, Tank, Arcane | Gravity Fist 1.05, 30% SPD Down 2t | Magnetic Pull: all 0.6, 50% ATK Down 2t, self Taunt 2t | Starfall Protocol (CD 5): all 1.0, 35% Stun 1t |
 
-Anhotep also has **Undying** (25%).
+Anhotep also has **Undying** (25%); Mwamba has **Overdrive** (below 50%: ATK Up + DEF Up 2t).
 
 ## 10. Difficulty guardrails
 
@@ -199,6 +205,9 @@ Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take
 | 2-2 The Sunken Colonnade | 0.88 | 72% | normal |
 | 2-3 Temple of the Burning Sun | 0.90 | 71% | normal |
 | 2-4 Tomb of Anhotep | 0.80 | 69% | boss |
+| 3-1 The Baobab Steps | 1.35 | 82% | normal |
+| 3-2 The Hall of Echoes | 0.98 | 80% | normal |
+| 3-3 Heart of the Skyforge | 0.85 | 63% | boss |
 
 ## 11. AI (`src/game/battle/ai.ts`)
 
@@ -219,6 +228,7 @@ status  { target, status, turns, hit }     resist  { target, status, hit }
 cleanse { target, status, hit }            dispel  { target, status, hit }
 expire  { target, status }                 tm      { target, delta, hit }
 revive  { target, hp, hit }                death   { target, hit }
+passive { target, name, hit }              (a passive wakes mid-fight: Overdrive)
 ```
 
 The view (`BattleScene.perform`) turns that into choreography:
@@ -229,7 +239,7 @@ The view (`BattleScene.perform`) turns that into choreography:
 4. **Animation**: every time the animation enters hit frame `k`, effects play and the events with `hit === k` are presented. Projectiles leave the champion's `muzzle` and present their events when they land; AoE effects are staggered across the line; ground-anchored effects stand on the target's feet.
 5. **Impact feel**: hit-stop (55 ms, 90 ms on crits), white flash, sprite shake, sparks, screen shake for heavy skills, floating numbers (crits larger with `CRITICAL`, `STRONG HIT` / `WEAK HIT` tags).
 6. **Lifesteal** sends soul wisps back to the actor before the heal number.
-7. The actor returns home; death and revive animations finish (Undying: fall, tomb-light helix, `UNDYING!`, `rise`).
+7. The actor returns home; death and revive animations finish (Undying: fall, tomb-light helix, `UNDYING!`, `rise`). An Overdrive shows the passive's name as a banner, the core-flare on the champion and `OVERDRIVE!` the moment the hit lands.
 8. **Counterattacks** then play in order, each with its own approach.
 9. Displayed HP snaps to the rules' state at the end of the whole action, so the view can never drift from the truth.
 
@@ -246,4 +256,4 @@ This split keeps the rules testable without a browser (`npm test`) and lets the 
 | `S` or the speed button | x1 / x2 / x3 (saved as the default) |
 | `Esc` / `P` or MENU | pause menu: resume, auto, speed, retreat |
 
-URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=2-3`, `&team=knight,monk,frostmage`, `&champion=tomblord`, `&chapter=buffs`, `?demo=<skill_id>` (loops one skill), `?unlockall=1`, `?reset=1`, and for screenshots `&hp=0.1` (scales enemy HP).
+URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=3-3`, `&team=knight,monk,frostmage`, `&champion=colossus`, `&chapter=buffs`, `?demo=<skill_id>` (loops one skill), `?unlockall=1`, `?reset=1`, and for screenshots `&hp=0.1` (scales enemy HP).
