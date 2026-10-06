@@ -19,7 +19,7 @@ A turn-based hero battler (RAID / SWGOH style) in TypeScript + Canvas. All art i
 - Rules: `src/game/battle/` (pure, tested). Content data: `src/game/data/` (champions, statuses, meta, campaign, zones, codex, norms).
 - Presentation: `src/game/view/` (battle scene, units, fx, HUD, zone), `src/game/screens/` (menus), `src/game/ui/ui.ts` (UI kit), `src/game/app.ts` + `src/main.ts` (router, deep links).
 - Art: `tools/art/champions/` (one module per champion), `tools/art/fx/` (kit + effect groups), `tools/art/zones/` (one module per background + `shared.ts` contract), `tools/art/ui/`, `tools/art/map.ts`, `tools/art/palette.ts` (every color).
-- Docs: `docs/ART_GUIDE.md`, `docs/MECHANICS_GUIDE.md`, `docs/GAME_STRUCTURE.md`, `docs/UI_GUIDE.md`.
+- Docs: `docs/ART_GUIDE.md`, `docs/MECHANICS_GUIDE.md`, `docs/GAME_STRUCTURE.md`, `docs/UI_GUIDE.md`; design intent and measured baseline in `docs/MDA.md`; domain language, invariants and change playbooks in `docs/DDD.md`.
 
 ## Skills
 
@@ -32,6 +32,7 @@ A turn-based hero battler (RAID / SWGOH style) in TypeScript + Canvas. All art i
 - No color literals in champion modules: colors come from `MAT`, `ACCENT`, `INK` in `palette.ts`.
 - Numbers stay inside `src/game/data/norms.ts`; tune stage `power` with `npm run balance`.
 - A rule change updates its test, `docs/MECHANICS_GUIDE.md` and the Academy text in `src/game/data/codex.ts` together.
+- A change to mechanics, content or the domain model fills in the MDA impact card (`docs/MDA.md` section 7) and keeps `docs/DDD.md` true (glossary, invariants, drift register).
 - Skill `hits` match the animation's hit frames; effect names must exist (content tests check both).
 - Regenerate and commit `public/assets` with the code that needs it.
 - Pixel art only: integer coordinates, no smooth gradients or anti-aliased shapes (use `ui.bands`, `ui.glow`, dithering).
