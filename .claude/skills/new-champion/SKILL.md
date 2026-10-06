@@ -85,6 +85,6 @@ Look for: silhouette and hue distinct from the lineup, weapon arcs that read, hi
 
 - The worksheet is filled and (if the user is present) approved.
 - Data and art registered; `npm run audit`, `npm test`, `npm run balance`, `npm run typecheck` pass.
-- Every skill watched in `?demo=`; card, champion page and recruit ceremony reviewed.
+- Every skill watched in `?demo=`; card, champion page and recruit ceremony reviewed; with `?unlockall=1` the new card is reachable in the collection and in the team-select roster (both scroll as the roster grows).
 - `docs/MECHANICS_GUIDE.md` section 9 (kits) and `docs/GAME_STRUCTURE.md` (roster table) updated; the Academy mentions any new mechanic.
 - Assets regenerated and committed together with the code (`public/assets` is versioned).
