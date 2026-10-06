@@ -81,6 +81,8 @@ Deep links: `?screen=campaign|team|battle|collection|champion|academy|options|re
 | [docs/MECHANICS_GUIDE.md](docs/MECHANICS_GUIDE.md) | turn meter, skills, damage, affinities, every status and mechanic, every kit, the balance norms and the difficulty curve, the presentation contract |
 | [docs/GAME_STRUCTURE.md](docs/GAME_STRUCTURE.md) | the content model: champions, categories, campaign, profile, screens and routes |
 | [docs/UI_GUIDE.md](docs/UI_GUIDE.md) | screen layout, UI parts, colors, interaction and text rules |
+| [docs/MDA.md](docs/MDA.md) | the target player experiences, the dynamics that produce them and the mechanics behind those, with measured baselines, bands and an impact card for every change |
+| [docs/DDD.md](docs/DDD.md) | the domain model: ubiquitous language, bounded contexts, invariants and what enforces them, domain events, change playbooks, a drift register and a roadmap |
 | [.claude/skills/new-champion](.claude/skills/new-champion/SKILL.md) | step-by-step recipe, worksheet and templates for a new champion |
 | [.claude/skills/new-combat-background](.claude/skills/new-combat-background/SKILL.md) | step-by-step recipe, worksheet and template for a new combat background |
 
