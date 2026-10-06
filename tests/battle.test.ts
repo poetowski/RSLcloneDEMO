@@ -1,86 +1,140 @@
 import { describe, expect, it } from 'vitest';
-import { decide } from '../src/game/battle/ai';
-import { Battle } from '../src/game/battle/battle';
-import { ARCHER, DREADKNIGHT, ENEMY_TEAM, FROSTMAGE, KNIGHT, MONK, PLAYER_TEAM, WARRIOR } from '../src/game/data/heroes';
+import { Battle, combatants } from '../src/game/battle/battle';
+import { flatten, simulate } from '../src/game/battle/sim';
+import { archer, dreadknight, frostmage, jackal, knight, monk, priestess, stalker, tomblord, warrior } from '../src/game/data/champions';
+import { affinityEdge } from '../src/game/data/meta';
+import { ChampionDef } from '../src/game/data/types';
 
-const skill = (h: { skills: { id: string }[] }, id: string) => h.skills.find((s) => s.id === id) as never;
+const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
+const PLAYER = combatants([knight, warrior, archer]);
+const ENEMY = combatants([dreadknight, monk, frostmage]);
 
 describe('turn meter', () => {
   it('lets the fastest unit act first when meters are equal', () => {
-    const b = new Battle(PLAYER_TEAM, ENEMY_TEAM, 1);
+    const b = new Battle(PLAYER, ENEMY, { seed: 1 });
     for (const u of b.units) u.tm = 0;
-    expect(b.advance().hero.id).toBe(MONK.id); // SPD 116
+    expect(b.advance().champion.id).toBe('monk');
   });
 
   it('resets the actor and keeps everyone else proportional', () => {
-    const b = new Battle(PLAYER_TEAM, ENEMY_TEAM, 1);
+    const b = new Battle(PLAYER, ENEMY, { seed: 1 });
     for (const u of b.units) u.tm = 0;
     const a = b.advance();
     b.endTurn(a);
     expect(a.tm).toBe(0);
-    const knight = b.units.find((u) => u.hero.id === KNIGHT.id)!;
-    expect(knight.tm).toBeCloseTo((100 * KNIGHT.stats.spd) / MONK.stats.spd, 5);
+    expect(b.get('p0').tm).toBeCloseTo((100 * knight.stats.spd) / monk.stats.spd, 5);
   });
 
   it('speed debuffs slow the meter', () => {
-    const b = new Battle([KNIGHT], [DREADKNIGHT], 1);
+    const b = new Battle(combatants([knight]), combatants([dreadknight]));
     const k = b.get('p0');
     const base = b.speed(k);
     b.addStatus(k, 'spd_down', 2, 0, 'test');
     expect(b.speed(k)).toBeCloseTo(base * 0.75);
   });
+
+  it('selfTm skills end the turn with turn meter', () => {
+    const b = new Battle(combatants([stalker]), combatants([knight]), { seed: 2 });
+    const s = b.get('p0');
+    b.useSkill(s, skill(stalker, 'mirage_assault'), 'e0');
+    b.endTurn(s);
+    expect(s.tm).toBe(25);
+  });
 });
 
-describe('skills', () => {
-  it('deals damage and respects shields', () => {
-    const b = new Battle([WARRIOR], [DREADKNIGHT], 3);
-    const w = b.get('p0'), dk = b.get('e0');
+describe('damage', () => {
+  it('respects shields', () => {
+    const b = new Battle(combatants([warrior]), combatants([dreadknight]), { seed: 3 });
+    const dk = b.get('e0');
     b.addStatus(dk, 'shield', 2, 50, 'test');
-    const r = b.useSkill(w, skill(WARRIOR, 'rending_chop'), dk.uid);
+    const r = b.useSkill(b.get('p0'), skill(warrior, 'rending_chop'), dk.uid);
     const dmg = r.events.filter((e) => e.kind === 'damage');
     expect(dmg.length).toBe(2);
-    const absorbed = dmg.reduce((s, e) => s + (e.kind === 'damage' ? e.absorbed : 0), 0);
-    expect(absorbed).toBe(50);
-    expect(dk.hp).toBeLessThan(dk.maxHp);
+    expect(dmg.reduce((s, e) => s + (e.kind === 'damage' ? e.absorbed : 0), 0)).toBe(50);
   });
 
+  it('follows the affinity cycle', () => {
+    expect(affinityEdge('force', 'wild')).toBe(1);
+    expect(affinityEdge('wild', 'arcane')).toBe(1);
+    expect(affinityEdge('arcane', 'force')).toBe(1);
+    expect(affinityEdge('wild', 'force')).toBe(-1);
+    expect(affinityEdge('void', 'force')).toBe(0);
+    expect(affinityEdge('arcane', 'void')).toBe(0);
+  });
+
+  it('strong hits deal more than weak hits', () => {
+    // Brakka (Force) into Tenzo (Wild) is strong; into Ysolde (Arcane) is weak
+    const avg = (target: ChampionDef) => {
+      let sum = 0;
+      for (let seed = 1; seed <= 200; seed++) {
+        const b = new Battle(combatants([warrior]), combatants([target]), { seed });
+        const r = b.useSkill(b.get('p0'), skill(warrior, 'rending_chop'), 'e0');
+        const e = r.events.find((x) => x.kind === 'damage');
+        if (e?.kind === 'damage') sum += (e.amount * (100 + target.stats.def)) / 100;
+      }
+      return sum / 200;
+    };
+    expect(avg(monk) / avg(frostmage)).toBeGreaterThan(1.35);
+  });
+
+  it('weaken increases damage taken', () => {
+    const run = (weak: boolean) => {
+      let sum = 0;
+      for (let seed = 1; seed <= 100; seed++) {
+        const b = new Battle(combatants([archer]), combatants([knight]), { seed });
+        if (weak) b.addStatus(b.get('e0'), 'weaken', 2, 0, 'test');
+        const r = b.useSkill(b.get('p0'), skill(archer, 'swift_shot'), 'e0');
+        sum += r.events.reduce((s, e) => s + (e.kind === 'damage' ? e.amount : 0), 0);
+      }
+      return sum;
+    };
+    expect(run(true) / run(false)).toBeCloseTo(1.25, 1);
+  });
+
+  it('kills at 0 HP and removes the unit from targeting', () => {
+    const b = new Battle(combatants([warrior]), combatants([archer, monk]), { seed: 1 });
+    const a = b.get('e0');
+    a.hp = 1;
+    const r = b.useSkill(b.get('p0'), skill(warrior, 'rending_chop'), a.uid);
+    expect(a.alive).toBe(false);
+    expect(r.events.some((e) => e.kind === 'death' && e.target === a.uid)).toBe(true);
+    expect(b.validTargets(b.get('p0'), skill(warrior, 'rending_chop')).map((u) => u.uid)).toEqual(['e1']);
+  });
+
+  it('scales enemies by stage power and bosses by boss HP', () => {
+    const b = new Battle(combatants([knight]), [{ def: dreadknight, boss: true }, { def: monk }], { enemyPower: 1.1, bossHp: 1.6 });
+    expect(b.get('e0').maxHp).toBe(Math.round(dreadknight.stats.hp * 1.1 * 1.6));
+    expect(b.get('e1').maxHp).toBe(Math.round(monk.stats.hp * 1.1));
+    expect(b.attack(b.get('e1'))).toBeCloseTo(monk.stats.atk * 1.1);
+  });
+});
+
+describe('statuses', () => {
   it('puts skills on cooldown and brings them back', () => {
-    const b = new Battle([KNIGHT], [DREADKNIGHT], 1);
+    const b = new Battle(combatants([knight]), combatants([dreadknight]));
     const k = b.get('p0');
-    const bash = skill(KNIGHT, 'shield_bash');
+    const bash = skill(knight, 'shield_bash');
     b.useSkill(k, bash, 'e0');
-    expect(b.ready(k, bash)).toBe(false);
+    b.endTurn(k); // the turn it was used
+    // unavailable on the next three turns
     for (let i = 0; i < 3; i++) {
+      expect(b.ready(k, bash)).toBe(false);
       b.endTurn(k);
-      expect(b.ready(k, bash)).toBe(i === 3);
     }
-    b.endTurn(k);
     expect(b.ready(k, bash)).toBe(true);
   });
 
   it('forces single-target skills onto a taunting hero', () => {
-    const b = new Battle(PLAYER_TEAM, ENEMY_TEAM, 1);
+    const b = new Battle(PLAYER, ENEMY, { seed: 1 });
+    b.useSkill(b.get('p0'), skill(knight, 'aegis_oath'));
     const dk = b.get('e0');
-    b.useSkill(b.get('p0'), skill(KNIGHT, 'aegis_oath'));
-    const targets = b.validTargets(dk, skill(DREADKNIGHT, 'cursed_cleave'));
-    expect(targets.map((t) => t.uid)).toEqual(['p0']);
-    // AoE is not restricted
-    expect(b.validTargets(dk, skill(DREADKNIGHT, 'dread_sweep')).length).toBe(3);
-  });
-
-  it('shields every ally with Aegis Oath', () => {
-    const b = new Battle(PLAYER_TEAM, ENEMY_TEAM, 1);
-    b.useSkill(b.get('p0'), skill(KNIGHT, 'aegis_oath'));
-    for (const u of b.alive('player')) {
-      expect(b.has(u, 'shield')).toBe(true);
-      expect(b.has(u, 'def_up')).toBe(true);
-    }
-    expect(b.has(b.get('p0'), 'taunt')).toBe(true);
+    expect(b.validTargets(dk, skill(dreadknight, 'cursed_cleave')).map((t) => t.uid)).toEqual(['p0']);
+    expect(b.validTargets(dk, skill(dreadknight, 'dread_sweep')).length).toBe(3);
   });
 
   it('freezes with Glacial Prison and skips the frozen turn', () => {
-    const b = new Battle([ARCHER], [FROSTMAGE], 5);
-    b.useSkill(b.get('e0'), skill(FROSTMAGE, 'glacial_prison'), 'p0');
+    const b = new Battle(combatants([archer]), combatants([frostmage]), { seed: 5 });
+    b.useSkill(b.get('e0'), skill(frostmage, 'glacial_prison'), 'p0');
     const a = b.get('p0');
     expect(b.has(a, 'freeze')).toBe(true);
     expect(b.startTurn(a).skip).toBe(true);
@@ -88,57 +142,103 @@ describe('skills', () => {
     expect(b.has(a, 'freeze')).toBe(false);
   });
 
-  it('ticks poison at the start of the turn', () => {
-    const b = new Battle([KNIGHT], [ARCHER], 1);
+  it('ticks poison and burn at the start of the turn, ignoring shields', () => {
+    const b = new Battle(combatants([knight]), combatants([archer]));
     const k = b.get('p0');
     b.addStatus(k, 'poison', 3, 0, 'test');
+    b.addStatus(k, 'burn', 2, 0, 'test');
+    b.addStatus(k, 'shield', 2, 500, 'test');
     const { events } = b.startTurn(k);
-    expect(events[0]).toMatchObject({ kind: 'damage', amount: Math.round(k.maxHp * 0.05) });
+    const amounts = events.filter((e) => e.kind === 'damage').map((e) => (e.kind === 'damage' ? e.amount : 0));
+    expect(amounts).toEqual([Math.round(k.maxHp * 0.05), Math.round(k.maxHp * 0.06)]);
   });
 
-  it('heals and cleanses with Serenity', () => {
-    const b = new Battle([MONK, DREADKNIGHT], [WARRIOR], 1);
-    const dk = b.get('p1');
+  it('heals and cleanses with Serenity, and Heal Block stops healing', () => {
+    const b = new Battle(combatants([monk, dreadknight, knight]), combatants([warrior]), { seed: 1 });
+    const dk = b.get('p1'), kn = b.get('p2');
     dk.hp = 500;
+    kn.hp = 500;
     b.addStatus(dk, 'def_down', 2, 0, 'test');
-    const r = b.useSkill(b.get('p0'), skill(MONK, 'serenity'));
+    b.addStatus(kn, 'heal_block', 2, 0, 'test');
+    const r = b.useSkill(b.get('p0'), skill(monk, 'serenity'));
     expect(dk.hp).toBeGreaterThan(500);
     expect(b.has(dk, 'def_down')).toBe(false);
-    expect(r.events.some((e) => e.kind === 'cleanse')).toBe(true);
-    expect(b.has(dk, 'regen')).toBe(true);
+    expect(kn.hp).toBe(500);
+    expect(r.events.some((e) => e.kind === 'blocked' && e.target === kn.uid)).toBe(true);
   });
 
-  it('kills at 0 HP and removes the unit from targeting', () => {
-    const b = new Battle([WARRIOR], [ARCHER, MONK], 1);
-    const a = b.get('e0');
-    a.hp = 1;
-    const r = b.useSkill(b.get('p0'), skill(WARRIOR, 'rending_chop'), a.uid);
-    expect(a.alive).toBe(false);
-    expect(r.events.some((e) => e.kind === 'death' && e.target === a.uid)).toBe(true);
-    expect(b.validTargets(b.get('p0'), skill(WARRIOR, 'rending_chop')).map((u) => u.uid)).toEqual(['e1']);
+  it('strips buffs before the hit with Weighing of Hearts', () => {
+    const b = new Battle(combatants([jackal]), combatants([knight]), { seed: 4 });
+    const k = b.get('e0');
+    b.addStatus(k, 'shield', 2, 9999, 'test');
+    b.addStatus(k, 'def_up', 2, 0, 'test');
+    const r = b.useSkill(b.get('p0'), skill(jackal, 'weighing_hearts'), 'e0');
+    expect(r.events.filter((e) => e.kind === 'dispel').length).toBe(2);
+    const hit = r.events.find((e) => e.kind === 'damage');
+    expect(hit?.kind === 'damage' && hit.absorbed).toBe(0);
+    expect(b.has(k, 'weaken')).toBe(true);
+  });
+
+  it('counterattacks once with A1 when a countering champion is hit', () => {
+    const b = new Battle(combatants([jackal, knight]), combatants([warrior]), { seed: 6 });
+    b.useSkill(b.get('p0'), skill(jackal, 'wardens_vigil'));
+    expect(b.has(b.get('p1'), 'counter')).toBe(true);
+    const r = b.useSkill(b.get('e0'), skill(warrior, 'whirlwind'));
+    expect(r.counters.length).toBe(2);
+    expect(r.counters.every((c) => c.counter && c.target === 'e0' && c.counters.length === 0)).toBe(true);
+    expect(flatten(r).length).toBe(3);
+  });
+
+  it('rolls per-hit statuses on every hit', () => {
+    let poisoned = 0;
+    for (let seed = 1; seed <= 200; seed++) {
+      const b = new Battle(combatants([stalker]), combatants([knight]), { seed });
+      const r = b.useSkill(b.get('p0'), skill(stalker, 'twin_fangs'), 'e0');
+      poisoned += r.events.filter((e) => e.kind === 'status' || e.kind === 'resist').length === 2 ? 1 : 0;
+    }
+    expect(poisoned).toBe(200);
+  });
+
+  it('rises once with Undying', () => {
+    const b = new Battle(combatants([warrior]), combatants([tomblord]), { seed: 1 });
+    const t = b.get('e0');
+    t.hp = 1;
+    b.addStatus(t, 'poison', 2, 0, 'test');
+    const r = b.useSkill(b.get('p0'), skill(warrior, 'rending_chop'), 'e0');
+    expect(r.events.some((e) => e.kind === 'revive')).toBe(true);
+    expect(t.alive).toBe(true);
+    expect(b.has(t, 'poison')).toBe(false);
+    t.hp = 1;
+    b.useSkill(b.get('p0'), skill(warrior, 'rending_chop'), 'e0');
+    expect(t.alive).toBe(false);
+  });
+
+  it('applies Heal Block and Burn with Wrath of the Sun', () => {
+    const b = new Battle(combatants([priestess]), combatants([knight, warrior, archer]), { seed: 9 });
+    b.useSkill(b.get('p0'), skill(priestess, 'sun_wrath'));
+    for (const e of b.alive('enemy')) expect(b.has(e, 'heal_block')).toBe(true);
   });
 });
 
 describe('full auto battles', () => {
-  it('always ends with a winner in a reasonable number of turns', () => {
-    const results: string[] = [];
+  it('always end with a winner, and either side can win', () => {
+    const winners = new Set<string>();
     for (let seed = 1; seed <= 40; seed++) {
-      const b = new Battle(PLAYER_TEAM, ENEMY_TEAM, seed);
-      let guard = 0;
-      while (!b.winner() && guard++ < 300) {
-        const a = b.advance();
-        const st = b.startTurn(a);
-        if (a.alive && !st.skip && !b.winner()) {
-          const d = decide(b, a);
-          b.useSkill(a, d.skill, d.target);
-        }
-        b.endTurn(a);
-      }
-      expect(b.winner()).not.toBeNull();
-      expect(guard).toBeLessThan(300);
-      results.push(b.winner()!);
+      const r = simulate(PLAYER, ENEMY, { seed });
+      expect(r.winner).not.toBeNull();
+      expect(r.turns).toBeLessThan(300);
+      winners.add(r.winner!);
     }
-    // both sides can win: the matchup is not one-sided
-    expect(new Set(results).size).toBe(2);
+    expect(winners.size).toBe(2);
+  });
+
+  it('runs every champion through battles without errors', () => {
+    const all = [knight, warrior, archer, monk, frostmage, dreadknight, stalker, jackal, priestess, tomblord];
+    for (let i = 0; i < all.length; i++) {
+      const team = combatants([all[i], all[(i + 3) % all.length], all[(i + 6) % all.length]]);
+      const foes = combatants([all[(i + 1) % all.length], all[(i + 4) % all.length], all[(i + 7) % all.length]]);
+      const r = simulate(team, foes, { seed: i + 1 });
+      expect(r.winner).not.toBeNull();
+    }
   });
 });

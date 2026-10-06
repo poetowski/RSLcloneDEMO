@@ -40,7 +40,7 @@ for (const st of steps.split(',')) {
   else if (op === 'B') {
     const [count, every] = arg.split(':').map(Number);
     for (let i = 0; i < count; i++) {
-      const data = await page.evaluate(() => (window as unknown as { scene: { screen: { buf: HTMLCanvasElement } } }).scene.screen.buf.toDataURL('image/png'));
+      const data = await page.evaluate(() => (window as unknown as { app: { canvas: { buf: HTMLCanvasElement } } }).app.canvas.buf.toDataURL('image/png'));
       const file = `${out}_${n++}.png`;
       fs.writeFileSync(file, Buffer.from(data.split(',')[1], 'base64'));
       await page.waitForTimeout(every);

@@ -1,21 +1,24 @@
 // Generates every runtime asset into public/assets. Deterministic: running it
 // twice produces byte-identical files.
-//   npm run art            (everything)
-//   npm run art -- heroes  (one group: heroes | fx | tiles | ui | font)
+//   npm run art                    (everything)
+//   npm run art -- champions       (one group: champions | fx | zones | ui | font | map)
+//   npm run art -- champions monk  (one champion)
+//   npm run art -- zones sunscar   (one zone)
 import fs from 'node:fs';
 import path from 'node:path';
 import { writeJson } from './io.ts';
 import { FRAME_H, FRAME_W, PIVOT, renderAnim } from './char.ts';
-import { HEROES } from './heroes/index.ts';
+import { HEROES } from './champions/index.ts';
 import { Bitmap, packShelves, PackItem } from './raster.ts';
-import { buildFx } from './fx.ts';
-import { buildTiles } from './tiles.ts';
-import { buildUi } from './ui.ts';
+import { buildFx } from './fx/index.ts';
+import { buildZones } from './zones/index.ts';
+import { buildUi } from './ui/index.ts';
 import { buildFont } from './font.ts';
+import { buildMap } from './map.ts';
 
 export const OUT = path.resolve('public/assets');
 
-export interface HeroAtlasJson {
+export interface ChampionAtlasJson {
   id: string;
   name: string;
   frameW: number;
@@ -27,12 +30,15 @@ export interface HeroAtlasJson {
   anims: Record<string, { loop: boolean; ms: number[]; hits: number[]; events: Record<string, string> }>;
 }
 
-function buildHeroes() {
+function buildChampions(only?: string) {
   const portraits: { id: string; bmp: Bitmap }[] = [];
   for (const [id, c] of Object.entries(HEROES)) {
+    // portrait source: idle frame 0, always facing right
+    portraits.push({ id, bmp: renderAnim(c, 'idle', 1)[0].bmp });
+    if (only && only !== id) continue;
     const items: PackItem[] = [];
     const offsets = new Map<string, [number, number]>();
-    const anims: HeroAtlasJson['anims'] = {};
+    const anims: ChampionAtlasJson['anims'] = {};
     for (const [face, facing] of [['R', 1], ['L', -1]] as const) {
       for (const name of Object.keys(c.anims)) {
         const frames = renderAnim(c, name, facing);
@@ -53,7 +59,7 @@ function buildHeroes() {
       }
     }
     const { atlas, frames } = packShelves(items, 1024);
-    const json: HeroAtlasJson = {
+    const json: ChampionAtlasJson = {
       id,
       name: c.name,
       frameW: FRAME_W,
@@ -63,24 +69,23 @@ function buildHeroes() {
       frames: Object.fromEntries(frames.map((f) => [f.key, [f.x, f.y, f.w, f.h, ...offsets.get(f.key)!]])),
       anims,
     };
-    atlas.save(path.join(OUT, 'heroes', `${id}.png`));
-    writeJson(path.join(OUT, 'heroes', `${id}.json`), json);
-    console.log(`  hero ${id}: ${items.length} frames -> ${atlas.w}x${atlas.h}`);
-
-    // portrait: head-and-shoulders crop of idle frame 0, always facing right
-    const idle = renderAnim(c, 'idle', 1)[0].bmp;
-    portraits.push({ id, bmp: idle });
+    atlas.save(path.join(OUT, 'champions', `${id}.png`));
+    writeJson(path.join(OUT, 'champions', `${id}.json`), json);
+    console.log(`  champion ${id}: ${items.length} frames -> ${atlas.w}x${atlas.h}`);
   }
   return portraits;
 }
 
-const only = process.argv[2];
+const [group, sub] = process.argv.slice(2);
+const want = (g: string) => !group || group === g;
 const t0 = Date.now();
 fs.mkdirSync(OUT, { recursive: true });
 let portraits: { id: string; bmp: Bitmap }[] = [];
-if (!only || only === 'heroes' || only === 'ui') portraits = buildHeroes();
-if (!only || only === 'fx') buildFx(OUT);
-if (!only || only === 'tiles') buildTiles(OUT);
-if (!only || only === 'font') buildFont(OUT);
-if (!only || only === 'ui') buildUi(OUT, portraits);
+// the UI needs every portrait; a UI-only run renders them without rewriting atlases
+if (want('champions') || want('ui')) portraits = buildChampions(group === 'champions' ? sub : group === 'ui' ? '-' : undefined);
+if (want('fx')) buildFx(OUT);
+if (want('zones')) buildZones(OUT, sub);
+if (want('font')) buildFont(OUT);
+if (want('ui')) buildUi(OUT, portraits);
+if (want('map')) buildMap(OUT);
 console.log(`art done in ${((Date.now() - t0) / 1000).toFixed(1)}s`);

@@ -1,7 +1,9 @@
-// Sprite gallery: plays every hero animation, effect and icon from the
+// Sprite gallery: plays every champion animation, effect and icon from the
 // generated atlases so the art can be reviewed without starting a battle.
 import './gallery.css';
-import { ALL_HEROES } from './game/data/heroes';
+import { CHAMPIONS } from './game/data/champions';
+import { FACTIONS, RARITIES } from './game/data/meta';
+import { ZONES } from './game/data/zones';
 import { Assets, loadAssets } from './game/view/assets';
 
 const root = document.getElementById('root')!;
@@ -40,9 +42,9 @@ function cell(grid: HTMLElement, label: string, w: number, h: number, draw: (g: 
 }
 
 function heroes(a: Assets) {
-  for (const h of ALL_HEROES) {
-    const art = a.heroes[h.id];
-    const grid = section(`${h.name}, ${h.title}`, `${h.role} - ${h.faction}. Sprite height ${art.json.pivotY - art.json.frames['R/idle/0'][5]}px, frame box ${art.json.frameW}x${art.json.frameH}.`, h.color);
+  for (const h of CHAMPIONS) {
+    const art = a.champions[h.id];
+    const grid = section(`${h.name}, ${h.title}`, `${RARITIES[h.rarity].name} ${h.role} - ${FACTIONS[h.faction].name}. Sprite height ${art.json.pivotY - art.json.frames['R/idle/0'][5]}px, frame box ${art.json.frameW}x${art.json.frameH}.`, h.color);
     for (const [name, an] of Object.entries(art.json.anims)) {
       const total = an.ms.reduce((s, m) => s + m, 0);
       const skill = h.skills.find((s) => s.anim === name);
@@ -88,8 +90,8 @@ function effects(a: Assets) {
 }
 
 function icons(a: Assets) {
-  const grid = section('Skill icons', 'A1 / A2 / A3 for every hero (40x40, gold frame, signature-color background).');
-  for (const h of ALL_HEROES) {
+  const grid = section('Skill icons', 'A1 / A2 / A3 for every champion (40x40, gold frame, signature-color background).');
+  for (const h of CHAMPIONS) {
     for (const s of h.skills) {
       const r = a.ui.json.icons[s.id];
       cell(grid, `${s.name} (A${s.slot})`, 48, 48, (g) => {
@@ -118,7 +120,10 @@ function applyZoom() {
 }
 
 async function main() {
-  const a = await loadAssets(ALL_HEROES.map((h) => h.id));
+  const a = await loadAssets(
+    CHAMPIONS.map((h) => h.id),
+    ZONES.map((z) => z.id),
+  );
   heroes(a);
   effects(a);
   icons(a);

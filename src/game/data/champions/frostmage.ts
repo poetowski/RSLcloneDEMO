@@ -1,0 +1,45 @@
+import { ChampionDef } from '../types';
+
+export const frostmage: ChampionDef = {
+  id: 'frostmage',
+  name: 'Ysolde',
+  title: 'the Frost Witch',
+  role: 'Control',
+  rarity: 'epic',
+  affinity: 'arcane',
+  faction: 'coven',
+  color: '#5cc4ea',
+  muzzle: [34, 47],
+  stats: { hp: 1150, atk: 108, def: 55, spd: 108, crit: 0.15 },
+  lore: 'High witch of the Frostfang Coven. Ysolde froze her own heart to keep the old ice magic alive, and can no longer remember why it mattered.',
+  skills: [
+    {
+      id: 'ice_shard', name: 'Ice Shard', tag: 'Single enemy', slot: 1, cooldown: 0,
+      desc: 'Hurls a shard of ice. 30% chance to place SPD Down for 2 turns.',
+      target: 'enemy', anim: 'attack1', approach: 'ranged',
+      hits: [{ mult: 1.0, fx: 'ice_burst' }],
+      projectile: 'ice_shard',
+      statuses: [{ status: 'spd_down', turns: 2, chance: 0.3, to: 'targets' }],
+      ai: { priority: 1 },
+    },
+    {
+      id: 'blizzard', name: 'Blizzard', tag: 'All enemies', slot: 2, cooldown: 3,
+      desc: 'Calls ice spikes beneath all enemies. 50% chance to place SPD Down for 2 turns.',
+      target: 'enemies', anim: 'attack2', approach: 'ranged',
+      hits: [{ mult: 0.75, fx: 'ice_spikes' }],
+      statuses: [{ status: 'spd_down', turns: 2, chance: 0.5, to: 'targets' }],
+      castFx: 'cast_ice',
+      shake: 3,
+      ai: { priority: 2 },
+    },
+    {
+      id: 'glacial_prison', name: 'Glacial Prison', tag: 'Single enemy', slot: 3, cooldown: 4,
+      desc: 'Encases an enemy in ice, dealing heavy damage and Freezing them for 1 turn.',
+      target: 'enemy', anim: 'attack3', approach: 'ranged',
+      hits: [{ mult: 1.5, fx: 'ice_burst' }],
+      statuses: [{ status: 'freeze', turns: 1, to: 'targets' }],
+      castFx: 'cast_ice',
+      ai: { priority: 3 },
+    },
+  ],
+};

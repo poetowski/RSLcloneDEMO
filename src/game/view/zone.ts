@@ -1,25 +1,49 @@
-// Renders the battlefield: backdrop, pre-baked tile layers, animated props
-// (banners, brazier fire, rune circle), falling snow, embers and lighting.
+// Renders a combat background: backdrop, pre-baked tile layers, props driven
+// by their kind (static, looping, pulsing, burning), the ambience of the zone
+// (falling snow or blowing sand, circling birds, heat haze), light pools, a
+// mood tint and the vignette. Everything zone-specific comes from the zone's
+// JSON (art) and ZoneDef (behaviour), so a new zone needs no code here.
 import { Particles } from '../../engine/particles';
 import { H, W } from '../../engine/screen';
-import { Assets, blit, Rect4, ZoneJson } from './assets';
+import { ZoneDef } from '../data/types';
+import { Assets, blit, Rect4, ZoneArt, ZoneJson } from './assets';
+
+interface Bird {
+  cx: number;
+  cy: number;
+  r: number;
+  ry: number;
+  a: number;
+  speed: number;
+}
 
 export class ZoneView {
   private tilesLayer: HTMLCanvasElement;
   private light: HTMLCanvasElement;
   private vignette: HTMLCanvasElement;
   private t = 0;
-  readonly snow = new Particles();
+  readonly ambient = new Particles();
   readonly embers = new Particles();
   readonly json: ZoneJson;
+  private art: ZoneArt;
+  private birds: Bird[] = [];
+  private gust = 0;
+  private gustT = 4000;
 
-  constructor(private a: Assets) {
-    this.json = a.zone.json;
+  constructor(
+    a: Assets,
+    readonly def: ZoneDef,
+  ) {
+    this.art = a.zones[def.id];
+    this.json = this.art.json;
     this.tilesLayer = this.bakeTiles();
-    this.light = makeGlow(64, 40, [255, 170, 80]);
+    this.light = makeGlow(64, 40, def.glow);
     this.vignette = makeVignette();
-    // seed ambient snow across the screen
-    for (let i = 0; i < 90; i++) this.spawnFlake(Math.random() * H);
+    const n = def.ambient === 'snow' ? 90 : 70;
+    for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
+    for (let i = 0; i < (def.birds ?? 0); i++) {
+      this.birds.push({ cx: 380 + Math.random() * 200, cy: 22 + Math.random() * 26, r: 30 + Math.random() * 40, ry: 6 + Math.random() * 6, a: Math.random() * Math.PI * 2, speed: (0.00025 + Math.random() * 0.0002) * (i % 2 ? 1 : -1) });
+    }
   }
 
   private bakeTiles(): HTMLCanvasElement {
@@ -34,107 +58,174 @@ export class ZoneView {
         for (let col = 0; col < z.cols; col++) {
           const t = layer[r * z.cols + col];
           if (t < 0) continue;
-          g.drawImage(this.a.zone.tiles, (t % z.atlasCols) * T, Math.floor(t / z.atlasCols) * T, T, T, col * T, r * T, T, T);
+          g.drawImage(this.art.tiles, (t % z.atlasCols) * T, Math.floor(t / z.atlasCols) * T, T, T, col * T, r * T, T, T);
         }
       }
     }
     return c;
   }
 
-  private spawnFlake(y = -4) {
-    const near = Math.random() < 0.35;
-    this.snow.add({
-      x: Math.random() * (W + 40) - 20,
-      y,
-      vx: -4 - Math.random() * 6,
-      vy: near ? 22 + Math.random() * 14 : 9 + Math.random() * 7,
-      life: Infinity,
-      size: near ? 2 : 1,
-      color: near ? '#f2f8ff' : '#9fb4d8',
-      sway: near ? 10 : 5,
-    });
+  private spawnAmbient(x = -4, y = -4) {
+    if (this.def.ambient === 'snow') {
+      const near = Math.random() < 0.35;
+      this.ambient.add({
+        x: x < 0 ? Math.random() * (W + 40) - 20 : x,
+        y,
+        vx: -4 - Math.random() * 6,
+        vy: near ? 22 + Math.random() * 14 : 9 + Math.random() * 7,
+        life: Infinity,
+        size: near ? 2 : 1,
+        color: near ? '#f2f8ff' : '#9fb4d8',
+        sway: near ? 10 : 5,
+      });
+    } else {
+      // blowing sand: low grains racing along the floor, a few motes high in the air
+      const low = Math.random() < 0.7;
+      this.ambient.add({
+        x: x < 0 ? -6 - Math.random() * 40 : x,
+        y: low ? 190 + Math.random() * 170 : 40 + Math.random() * 150,
+        vx: low ? 70 + Math.random() * 60 : 30 + Math.random() * 25,
+        vy: (Math.random() - 0.5) * 6,
+        life: Infinity,
+        size: Math.random() < 0.25 ? 2 : 1,
+        color: ['#f2c274', '#e0a252', '#fde4aa', '#c47e3c'][Math.floor(Math.random() * 4)],
+        sway: low ? 4 : 8,
+      });
+    }
   }
 
-  prop(kind: string, i = 0): Rect4 {
+  frame(kind: string, i: number): Rect4 {
     return this.json.propFrames[`${kind}/${i}`];
   }
 
   update(dt: number) {
     this.t += dt;
-    this.snow.update(dt);
-    for (const p of this.snow.list) if (p.y > H + 4) p.life = 0;
-    while (this.snow.list.length < 90) this.spawnFlake();
+    const amb = this.ambient;
+    const speedUp = this.def.ambient === 'sand' && this.gust > 0 ? 2.2 : 1;
+    amb.update(dt * speedUp);
+    for (const p of amb.list) if (p.y > H + 4 || p.x > W + 8 || p.x < -60) p.life = 0;
+    const target = this.def.ambient === 'snow' ? 90 : this.gust > 0 ? 150 : 70;
+    while (amb.list.length < target) this.spawnAmbient();
+    if (this.def.ambient === 'sand') {
+      // every few seconds a gust sweeps a veil of sand across the arena
+      this.gustT -= dt;
+      if (this.gustT <= 0) {
+        this.gust = 1400;
+        this.gustT = 6000 + Math.random() * 5000;
+      }
+      this.gust = Math.max(0, this.gust - dt);
+    }
     this.embers.update(dt);
-    for (const b of this.json.props) {
-      if (b.kind === 'brazier' && Math.random() < dt / 140) {
+    for (const p of this.json.props) {
+      const k = this.json.kinds[p.kind];
+      if (k?.fire && Math.random() < dt / 140) {
         this.embers.add({
-          x: b.x - 3 + Math.random() * 6, y: b.y - 34,
-          vx: (Math.random() - 0.5) * 8, vy: -18 - Math.random() * 14,
+          x: p.x - 3 + Math.random() * 6, y: p.y + k.fire.dy - 4,
+          vx: (Math.random() - 0.5) * 8 + (this.def.ambient === 'sand' ? 6 : 0), vy: -18 - Math.random() * 14,
           life: 900 + Math.random() * 700, color: '#ffd060', fade: ['#fff0b0', '#ffb84a', '#f2731e', '#c8361a'],
           sway: 6, additive: true,
         });
       }
     }
+    for (const b of this.birds) b.a += b.speed * dt;
+  }
+
+  private drawProp(ctx: CanvasRenderingContext2D, p: ZoneJson['props'][number]) {
+    const k = this.json.kinds[p.kind];
+    if (!k) return;
+    const img = this.art.props;
+    const place = (r: Rect4) => [p.x - r[2] * k.anchor[0], p.y - r[3] * k.anchor[1]] as const;
+    if (k.mode === 'loop') {
+      const f = Math.floor(this.t / (k.ms ?? 150) + p.x * 0.01) % k.frames;
+      const r = this.frame(p.kind, f);
+      blit(ctx, img, r, ...place(r));
+    } else if (k.mode === 'pulse') {
+      const dim = this.frame(p.kind, 0), bright = this.frame(p.kind, 1);
+      blit(ctx, img, dim, ...place(dim));
+      ctx.globalAlpha = 0.35 + 0.35 * Math.sin(this.t / 700);
+      blit(ctx, img, bright, ...place(bright));
+      ctx.globalAlpha = 1;
+    } else {
+      const r = this.frame(p.kind, 0);
+      blit(ctx, img, r, ...place(r));
+    }
   }
 
   /** Everything behind the units. */
   drawBack(ctx: CanvasRenderingContext2D) {
-    const img = this.a.zone.props;
-    ctx.drawImage(this.a.zone.backdrop, 0, 0);
-    ctx.drawImage(this.tilesLayer, 0, 0);
-    for (const p of this.json.props) {
-      if (p.layer === 'fg') continue;
-      if (p.kind === 'banner') {
-        const f = Math.floor(this.t / 160 + p.x * 0.01) % 4;
-        blit(ctx, img, this.prop('banner', f), p.x, p.y);
-      } else if (p.kind === 'rune') {
-        const dim = this.prop('rune', 0), bright = this.prop('rune', 1);
-        blit(ctx, img, dim, p.x - dim[2] / 2, p.y - dim[3] / 2);
-        ctx.globalAlpha = 0.35 + 0.35 * Math.sin(this.t / 700);
-        blit(ctx, img, bright, p.x - bright[2] / 2, p.y - bright[3] / 2);
-        ctx.globalAlpha = 1;
-      } else if (p.kind === 'brazier') {
-        const r = this.prop('brazier');
-        blit(ctx, img, r, p.x - r[2] / 2, p.y - r[3]);
-      } else {
-        const r = this.prop(p.kind);
-        if (r) blit(ctx, img, r, p.x - r[2] / 2, p.y - r[3]);
+    const bd = this.art.backdrop;
+    ctx.drawImage(bd, 0, 0);
+    if (this.def.haze) {
+      // heat shimmer: the rows around the horizon wobble a pixel side to side
+      const h0 = this.json.horizon - 26, h1 = Math.min(bd.height, this.json.horizon + 14);
+      for (let y = h0; y < h1; y++) {
+        const off = Math.round(Math.sin(this.t / 260 + y * 0.9) * (y > this.json.horizon - 8 ? 1.2 : 0.7));
+        if (off) ctx.drawImage(bd, 0, y, W, 1, off, y, W, 1);
       }
     }
+    if (this.birds.length && this.json.kinds.bird) {
+      for (const b of this.birds) {
+        const x = b.cx + Math.cos(b.a) * b.r, y = b.cy + Math.sin(b.a) * b.ry;
+        const f = this.frame('bird', Math.floor(this.t / 140 + b.cx) % this.json.kinds.bird.frames);
+        const left = Math.sin(b.a) * b.speed > 0;
+        ctx.save();
+        ctx.translate(Math.round(x), Math.round(y));
+        if (left) ctx.scale(-1, 1);
+        ctx.drawImage(this.art.props, f[0], f[1], f[2], f[3], -Math.round(f[2] / 2), -Math.round(f[3] / 2), f[2], f[3]);
+        ctx.restore();
+      }
+    }
+    ctx.drawImage(this.tilesLayer, 0, 0);
+    for (const layer of ['back', 'floor'] as const) for (const p of this.json.props) if (p.layer === layer) this.drawProp(ctx, p);
   }
 
   /** Fire is drawn after the units so flames glow over nearby shapes. */
   drawFire(ctx: CanvasRenderingContext2D) {
-    const img = this.a.zone.props;
+    const img = this.art.props;
+    const flame = this.json.kinds.flame;
     for (const p of this.json.props) {
-      if (p.kind !== 'brazier') continue;
-      const f = Math.floor(this.t / 90 + p.x) % 6;
-      const r = this.prop('flame', f);
-      blit(ctx, img, r, p.x - r[2] / 2, p.y - 30 - r[3] + 8);
+      const k = this.json.kinds[p.kind];
+      if (!k?.fire || !flame) continue;
+      const f = Math.floor(this.t / (flame.ms ?? 90) + p.x) % flame.frames;
+      const r = this.frame('flame', f);
+      blit(ctx, img, r, p.x - r[2] / 2, p.y + k.fire.dy - r[3] + 8);
     }
     this.embers.draw(ctx);
   }
 
   drawFront(ctx: CanvasRenderingContext2D) {
-    const img = this.a.zone.props;
-    for (const p of this.json.props) {
-      if (p.layer !== 'fg') continue;
-      const r = this.prop(p.kind);
-      blit(ctx, img, r, p.x - r[2] / 2, p.y - r[3]);
+    for (const p of this.json.props) if (p.layer === 'fg') this.drawProp(ctx, p);
+    this.ambient.draw(ctx);
+    if (this.def.ambient === 'sand' && this.gust > 0) {
+      // the gust itself: a low dithered veil that sweeps across and fades
+      const k = Math.sin((this.gust / 1400) * Math.PI);
+      ctx.globalAlpha = 0.18 * k;
+      ctx.fillStyle = '#e0a252';
+      for (let y = 200; y < H; y += 2) ctx.fillRect(0, y + (Math.floor(this.t / 60) % 2), W, 1);
+      ctx.globalAlpha = 1;
     }
-    this.snow.draw(ctx);
   }
 
   drawLighting(ctx: CanvasRenderingContext2D) {
     ctx.globalCompositeOperation = 'lighter';
     for (const p of this.json.props) {
-      if (p.kind !== 'brazier') continue;
+      const k = this.json.kinds[p.kind];
+      if (!k?.fire) continue;
       const flick = 0.75 + 0.12 * Math.sin(this.t / 70 + p.x) + 0.08 * Math.sin(this.t / 31);
       ctx.globalAlpha = flick * 0.55;
-      ctx.drawImage(this.light, p.x - this.light.width / 2, p.y - 30 - this.light.height / 2);
+      ctx.drawImage(this.light, p.x - this.light.width / 2, p.y + k.fire.dy - this.light.height / 2);
     }
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
+    const tint = this.def.tint;
+    if (tint) {
+      ctx.globalCompositeOperation = tint.op;
+      ctx.globalAlpha = tint.alpha;
+      ctx.fillStyle = tint.color;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
     ctx.drawImage(this.vignette, 0, 0);
   }
 }

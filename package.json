@@ -1,8 +1,8 @@
 {
   "name": "rsl-clone-demo",
   "private": true,
-  "version": "0.1.0",
-  "description": "Proof of concept of a turn-based hero battler in the style of RAID: Shadow Legends / SWGOH, with procedurally generated pixel-art sprites.",
+  "version": "0.2.0",
+  "description": "Oathbound: a turn-based hero battler in the style of RAID: Shadow Legends / SWGOH, with a campaign, a champion collection, an in-game Academy and procedurally generated pixel art.",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +11,9 @@
     "art": "tsx tools/art/build.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tools/tsconfig.json",
-    "shots": "tsx tools/shots.ts"
+    "shots": "tsx tools/shots.ts",
+    "balance": "tsx tools/balance.ts",
+    "audit": "tsx tools/art/audit.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",

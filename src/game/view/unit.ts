@@ -1,8 +1,8 @@
-// Visual state of one hero on the battlefield: sprite playback with hit and
-// event callbacks, position (including jump height), flashes, displayed HP
-// and the overlays that follow the unit (ice prison, stun stars).
-import { StatusId, TeamId, HeroDef } from '../data/types';
-import { Assets, HeroArt } from './assets';
+// Visual state of one champion on the battlefield: sprite playback with hit
+// and event callbacks, position (including jump height), flashes, displayed
+// HP and the overlays that follow the unit (ice prison, stun stars).
+import { ChampionDef, StatusId, TeamId } from '../data/types';
+import { Assets, ChampionArt } from './assets';
 
 export type Facing = 'R' | 'L';
 
@@ -44,22 +44,24 @@ export class UnitView {
   private iceMode: 'form' | 'hold' | 'shatter' | 'none' = 'none';
   stunned = false;
   private stunT = 0;
-  private readonly art: HeroArt;
+  private readonly art: ChampionArt;
   readonly spriteH: number;
 
   constructor(
     readonly uid: string,
-    readonly hero: HeroDef,
+    readonly champion: ChampionDef,
     readonly team: TeamId,
     private a: Assets,
     x: number,
     y: number,
+    maxHp: number,
+    readonly boss = false,
   ) {
-    this.art = a.heroes[hero.id];
+    this.art = a.champions[champion.id];
     this.x = this.homeX = x;
     this.y = this.homeY = y;
     this.facing = this.homeFacing = team === 'player' ? 'R' : 'L';
-    this.hp = this.lagHp = this.maxHp = hero.stats.hp;
+    this.hp = this.lagHp = this.maxHp = maxHp;
     const f = this.art.json.frames[`${this.facing}/idle/0`];
     this.spriteH = this.art.json.pivotY - f[5];
     // desync idle loops
@@ -134,7 +136,6 @@ export class UnitView {
     // HP lag bar drains after a short delay
     if (this.lagHp > this.hp) this.lagHp = Math.max(this.hp, this.lagHp - this.maxHp * (dt / 900));
     else this.lagHp = this.hp;
-    // ice block overlay
     if (this.iceMode !== 'none') {
       this.iceT += dt;
       const fxa = this.a.fx.json.anims.ice_prison;
@@ -189,7 +190,7 @@ export class UnitView {
   draw(ctx: CanvasRenderingContext2D) {
     const j = this.art.json;
     const f = j.frames[`${this.facing}/${this.anim}/${this.frame}`];
-    if (!f) return;
+    if (!f || this.alpha <= 0) return;
     const sx = this.shake > 0 ? Math.round(Math.sin(this.shake * 9) * 2 * Math.min(1, this.shake)) : 0;
     const dx = Math.round(this.x - j.pivotX + f[4] + sx);
     const dy = Math.round(this.y - this.h - j.pivotY + f[5]);
@@ -219,4 +220,32 @@ export class UnitView {
       ctx.drawImage(fx.img, r[0], r[1], r[2], r[3], Math.round(hd.x - an.w * an.ax + r[4]), Math.round(hd.y - 4 - an.h * an.ay + r[5]), r[2], r[3]);
     }
   }
+}
+
+/**
+ * Draws one frame of a champion animation outside of battle (menus,
+ * collection cards, the detail screen). `scale` 2 is used for showcases.
+ */
+export function drawChampion(ctx: CanvasRenderingContext2D, art: ChampionArt, anim: string, frame: number, x: number, y: number, o: { facing?: Facing; scale?: number; shadow?: boolean; alpha?: number } = {}) {
+  const j = art.json;
+  const a = j.anims[anim] ?? j.anims.idle;
+  const fi = Math.min(frame, a.ms.length - 1);
+  const f = j.frames[`${o.facing ?? 'R'}/${j.anims[anim] ? anim : 'idle'}/${fi}`];
+  if (!f) return;
+  const s = o.scale ?? 1;
+  ctx.globalAlpha = o.alpha ?? 1;
+  ctx.drawImage(o.shadow ? art.shadow : art.img, f[0], f[1], f[2], f[3], Math.round(x + (f[4] - j.pivotX) * s), Math.round(y + (f[5] - j.pivotY) * s), f[2] * s, f[3] * s);
+  ctx.globalAlpha = 1;
+}
+
+/** Frame index for a looping animation at time `t` (ms). */
+export function frameAt(art: ChampionArt, anim: string, t: number): number {
+  const a = art.json.anims[anim] ?? art.json.anims.idle;
+  const total = a.ms.reduce((s, m) => s + m, 0);
+  let k = ((t % total) + total) % total;
+  for (let i = 0; i < a.ms.length; i++) {
+    if (k < a.ms[i]) return i;
+    k -= a.ms[i];
+  }
+  return 0;
 }

@@ -1,4 +1,6 @@
-// Data schema for heroes, skills and status effects. See docs/MECHANICS_GUIDE.md.
+// Content model: champions, skills, statuses, meta-categories, zones and the
+// campaign. Everything the game knows about its content is described by these
+// types; see docs/GAME_STRUCTURE.md and docs/MECHANICS_GUIDE.md.
 
 export type TeamId = 'player' | 'enemy';
 
@@ -9,12 +11,16 @@ export type StatusId =
   | 'shield'
   | 'taunt'
   | 'regen'
+  | 'counter'
   | 'stun'
   | 'freeze'
   | 'poison'
+  | 'burn'
   | 'def_down'
   | 'spd_down'
-  | 'atk_down';
+  | 'atk_down'
+  | 'weaken'
+  | 'heal_block';
 
 export type TargetKind = 'enemy' | 'enemies' | 'ally' | 'allies' | 'self';
 
@@ -23,10 +29,16 @@ export type TargetKind = 'enemy' | 'enemies' | 'ally' | 'allies' | 'self';
  *  melee  - runs up to the target, attacks, runs back
  *  ranged - advances part of the way, attacks from range, returns
  *  center - runs to the middle of the enemy line (AoE melee)
- *  leap   - jumps to the target in an arc, lands with the hit, hops back
+ *  leap   - jumps to the target in an arc, lands with the hit, runs back
+ *  blink  - vanishes in a puff and reappears at the target, then blinks back
  *  none   - performs in place (casts, buffs)
  */
-export type Approach = 'melee' | 'ranged' | 'center' | 'leap' | 'none';
+export type Approach = 'melee' | 'ranged' | 'center' | 'leap' | 'blink' | 'none';
+
+export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+export type Affinity = 'force' | 'arcane' | 'wild' | 'void';
+export type Role = 'Tank' | 'Bruiser' | 'Damage' | 'Support' | 'Control';
+export type FactionId = 'dawn' | 'clans' | 'wildwood' | 'coven' | 'temple' | 'sunscar';
 
 export interface StatusApp {
   status: StatusId;
@@ -36,6 +48,8 @@ export interface StatusApp {
   to: 'targets' | 'self' | 'allies';
   /** shield amount as a fraction of the caster's max HP */
   value?: number;
+  /** roll on every damaging hit instead of once on the last hit (targets only) */
+  perHit?: boolean;
 }
 
 export interface HitDef {
@@ -48,7 +62,7 @@ export interface HitDef {
 export interface SkillDef {
   id: string;
   name: string;
-  /** Short line for the tooltip header ("Single target", "All enemies"). */
+  /** Short line for the tooltip header ("Single enemy", "All enemies"). */
   tag: string;
   desc: string;
   slot: 1 | 2 | 3;
@@ -63,30 +77,60 @@ export interface SkillDef {
   healAllies?: number;
   /** removes one debuff from each ally */
   cleanse?: boolean;
+  /** removes every buff from the targets before the first hit */
+  stripBuffs?: boolean;
   /** heals the actor by this fraction of damage dealt */
   lifesteal?: number;
   /** turn meter change for targets (negative = reduce), on the last hit */
   tmTargets?: number;
+  /** the actor ends the turn with this much turn meter instead of 0 */
+  selfTm?: number;
   /** bonus damage when the target is below a HP fraction */
   execute?: { below: number; mult: number };
   /** presentation */
   projectile?: string;
+  /** ground circle under the actor while the skill plays */
   castFx?: string;
+  /** effect at the actor's head on the animation's `cast` event (a howl, a flare) */
+  actorFx?: string;
   shake?: number;
   /** AI preference: higher = earlier; 'allyHurt' only when an ally needs help */
   ai?: { priority: number; when?: 'allyHurt' };
 }
 
-export interface HeroDef {
+export interface PassiveDef {
+  id: string;
+  name: string;
+  desc: string;
+  /** undying: the first lethal hit leaves the champion at `value` x max HP instead */
+  kind: 'undying';
+  value: number;
+}
+
+export interface Stats {
+  hp: number;
+  atk: number;
+  def: number;
+  spd: number;
+  crit: number;
+}
+
+export interface ChampionDef {
   id: string;
   name: string;
   title: string;
-  role: 'Tank' | 'Bruiser' | 'Damage' | 'Support' | 'Control';
-  faction: string;
-  /** signature color for UI accents */
+  role: Role;
+  rarity: Rarity;
+  affinity: Affinity;
+  faction: FactionId;
+  /** signature color for UI accents (also the hero's art signature hue) */
   color: string;
-  stats: { hp: number; atk: number; def: number; spd: number; crit: number };
+  /** where projectiles leave the sprite: [forward, up] px from the feet (ranged champions) */
+  muzzle?: [number, number];
+  stats: Stats;
   skills: [SkillDef, SkillDef, SkillDef];
+  passive?: PassiveDef;
+  lore: string;
 }
 
 export interface StatusDef {
@@ -96,4 +140,88 @@ export interface StatusDef {
   desc: string;
   /** floating text color */
   color: string;
+}
+
+export interface RarityDef {
+  id: Rarity;
+  name: string;
+  color: string;
+  /** dark tone for card frames */
+  deep: string;
+  /** rank used for sorting, 1 = common */
+  rank: number;
+}
+
+export interface AffinityDef {
+  id: Affinity;
+  name: string;
+  color: string;
+  /** the affinity this one deals strong hits against */
+  beats?: Affinity;
+  desc: string;
+}
+
+export interface FactionDef {
+  id: FactionId;
+  name: string;
+  color: string;
+  desc: string;
+}
+
+export interface RoleDef {
+  id: Role;
+  desc: string;
+}
+
+/** A combat background: art lives in public/assets/zones/<id>/, behaviour here. */
+export interface ZoneDef {
+  id: string;
+  name: string;
+  subtitle: string;
+  ambient: 'snow' | 'sand';
+  /** color of brazier light pools */
+  glow: [number, number, number];
+  /** unit shadows: offset away from the key light and horizontal stretch */
+  shadow: { dx: number; stretch: number };
+  /** full-screen mood tint drawn over the world (not the HUD) */
+  tint?: { color: string; alpha: number; op: GlobalCompositeOperation };
+  /** vultures or other birds circling in the sky */
+  birds?: number;
+  /** heat shimmer on the horizon rows of the backdrop */
+  haze?: boolean;
+}
+
+export interface EnemySlot {
+  champion: string;
+  /** bosses get extra HP and a crown */
+  boss?: boolean;
+}
+
+export interface StageDef {
+  /** "1-3" style id, unique across the campaign */
+  id: string;
+  name: string;
+  blurb: string;
+  /** formation order: front, back-top, back-bottom */
+  enemies: EnemySlot[];
+  /** enemy stat multiplier (HP and ATK) */
+  power: number;
+  /** champion recruited on the first clear */
+  recruit?: string;
+  /** node position on the world map (640x360 space) */
+  map: { x: number; y: number };
+}
+
+export interface LocationDef {
+  id: string;
+  /** chapter numeral shown in the UI */
+  chapter: string;
+  name: string;
+  zone: string;
+  blurb: string;
+  /** stage that must be cleared before this location opens */
+  requires?: string;
+  /** label position on the world map */
+  map: { x: number; y: number };
+  stages: StageDef[];
 }

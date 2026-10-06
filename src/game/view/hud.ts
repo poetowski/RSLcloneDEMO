@@ -1,24 +1,13 @@
-// Heads-up display. Everything is drawn in the 640x360 buffer with the pixel
-// font and generated UI parts. Clickable regions are rebuilt every frame.
-import { TextStyle } from '../../engine/font';
+// Battle heads-up display, built on the shared UI kit: turn meter, unit bars
+// and status rows, the active champion panel, skill slots, banners, the
+// title cards, the pause menu and the results panel.
 import { H, W } from '../../engine/screen';
+import { RARITIES } from '../data/meta';
 import { STATUSES } from '../data/statuses';
-import { SkillDef } from '../data/types';
-import { Assets, blit, nine, Rect4 } from './assets';
+import { ChampionDef, SkillDef } from '../data/types';
+import { COLORS, Ui } from '../ui/ui';
+import { Assets, blit, nine } from './assets';
 import { UnitView } from './unit';
-
-export interface Region {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  click?: () => void;
-  hover?: () => void;
-  /** tooltip content shown while hovered */
-  tip?: () => { title: string; sub?: string; body: string; color?: string };
-  /** place the tooltip under the region instead of above it */
-  tipBelow?: boolean;
-}
 
 export interface SkillSlot {
   skill: SkillDef;
@@ -26,80 +15,40 @@ export interface SkillSlot {
   selected: boolean;
 }
 
-const TINY: Record<string, string[]> = {
-  '0': ['###', '#.#', '#.#', '#.#', '###'],
-  '1': ['.#.', '##.', '.#.', '.#.', '###'],
-  '2': ['###', '..#', '###', '#..', '###'],
-  '3': ['###', '..#', '.##', '..#', '###'],
-  '4': ['#.#', '#.#', '###', '..#', '..#'],
-  '5': ['###', '#..', '###', '..#', '###'],
-  '6': ['###', '#..', '###', '#.#', '###'],
-  '7': ['###', '..#', '.#.', '.#.', '.#.'],
-  '8': ['###', '#.#', '###', '#.#', '###'],
-  '9': ['###', '#.#', '###', '..#', '###'],
-};
+export interface ResultsInfo {
+  victory: boolean;
+  stars: number;
+  stageId?: string;
+  stageName?: string;
+  /** champion recruited by this first clear */
+  recruit?: ChampionDef;
+  firstClear?: boolean;
+  turns: number;
+}
 
-export class Hud {
-  regions: Region[] = [];
-  mouse = { x: -1, y: -1 };
+export class Hud extends Ui {
   bannerText = '';
   bannerT = -1;
   bannerColor = '#ffe9a0';
   title: { text: string; sub?: string; color: string; grad: string; t: number } | null = null;
 
-  constructor(private a: Assets) {}
-
-  part(name: string): Rect4 {
-    return this.a.ui.json.parts[name];
+  constructor(a: Assets) {
+    super(a);
   }
 
-  text(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, st: TextStyle = {}) {
-    return this.a.font.draw(ctx, s, x, y, { outline: '#07080e', ...st });
-  }
-
-  tinyNum(ctx: CanvasRenderingContext2D, n: number, x: number, y: number, color = '#ffffff') {
-    const s = String(n);
-    let cx = x;
-    for (const ch of s) {
-      const g = TINY[ch];
-      if (!g) continue;
-      ctx.fillStyle = '#07080e';
-      ctx.fillRect(cx - 1, y - 1, 5, 7);
-      ctx.fillStyle = color;
-      g.forEach((row, yy) => [...row].forEach((c, xx) => c === '#' && ctx.fillRect(cx + xx, y + yy, 1, 1)));
-      cx += 4;
-    }
-  }
-
-  beginFrame() {
-    this.regions = [];
-  }
-
-  hit(x: number, y: number): Region | undefined {
-    for (let i = this.regions.length - 1; i >= 0; i--) {
-      const r = this.regions[i];
-      if (x >= r.x && y >= r.y && x < r.x + r.w && y < r.y + r.h) return r;
-    }
-    return undefined;
-  }
-
-  // ---------------------------------------------------------------------------
-
-  /** Turn meter track with sliding hero chips (allies above, enemies below). */
+  /** Turn meter track with sliding champion chips (allies above, enemies below). */
   drawTurnMeter(ctx: CanvasRenderingContext2D, units: UnitView[], active?: UnitView) {
     const x0 = 196, x1 = 444, y = 30;
     const w = x1 - x0;
-    ctx.fillStyle = '#07080e';
+    ctx.fillStyle = COLORS.ink;
     ctx.fillRect(x0 - 2, y - 2, w + 4, 6);
     ctx.fillStyle = '#1c2438';
     ctx.fillRect(x0 - 1, y - 1, w + 2, 4);
-    // graduated fill toward the action end
     for (let i = 0; i < w; i += 2) {
       const k = i / w;
       ctx.fillStyle = k > 0.92 ? '#f0c650' : k > 0.6 ? '#3e5682' : '#2a3a5a';
       ctx.fillRect(x0 + i, y, 1, 2);
     }
-    // gold end cap
     const ui = this.a.ui.img;
     blit(ctx, ui, this.part('chevron_gold'), x1 - 5, y - 11);
     const order = [...units].filter((u) => !u.dead).sort((a, b) => a.tm - b.tm);
@@ -108,54 +57,53 @@ export class Hud {
       const cx = Math.round(x0 + (Math.min(100, u.tm) / 100) * w);
       const cy = above ? y - 27 : y + 6;
       const isActive = u === active;
-      const p = this.a.ui.json.portraits[u.hero.id];
-      // 20x20 face crop of the portrait inside a colored rim
+      const p = this.a.ui.json.portraits[u.champion.id];
       const border = isActive ? '#ffe070' : above ? '#4f8ae6' : '#d84a4a';
-      ctx.fillStyle = '#07080e';
+      ctx.fillStyle = COLORS.ink;
       ctx.fillRect(cx - 12, cy - 1, 24, 24);
       ctx.fillStyle = border;
       ctx.fillRect(cx - 11, cy, 22, 22);
       ctx.drawImage(ui, p[0] + 4, p[1] + 1, 20, 20, cx - 10, cy + 1, 20, 20);
-      // stem to the track
+      if (u.boss) blit(ctx, ui, this.part('crown'), cx - 6, above ? cy - 8 : cy + 15);
       ctx.fillStyle = border;
       if (above) ctx.fillRect(cx, cy + 23, 1, y - cy - 23);
       else ctx.fillRect(cx, y + 3, 1, cy - y - 4);
     }
   }
 
-  drawTopBar(ctx: CanvasRenderingContext2D, zone: string, turn: number) {
-    this.text(ctx, zone.toUpperCase(), 8, 6, { color: '#f0c650', variant: 'bold' });
-    this.text(ctx, `Stage 1-1   Turn ${turn}`, 8, 18, { color: '#9fb0cc' });
+  drawTopBar(ctx: CanvasRenderingContext2D, zone: string, stage: string, turn: number) {
+    this.text(ctx, zone.toUpperCase(), 8, 6, { color: COLORS.gold, variant: 'bold' });
+    this.text(ctx, `${stage}   Turn ${turn}`, 8, 18, { color: COLORS.dim });
   }
 
   /** Small icon buttons in the top-right corner. */
   drawControls(ctx: CanvasRenderingContext2D, state: { auto: boolean; speed: number; paused: boolean }, on: { auto: () => void; speed: () => void; pause: () => void }) {
-    const btn = (x: number, label: string, glyph: string, lit: boolean, click: () => void, tip: string) => {
+    const btn = (id: string, x: number, label: string, glyph: string, lit: boolean, click: () => void, tip: string) => {
       const w = 40, h = 16, y = 6;
-      const hov = this.inside(x, y, w, h);
-      nine(ctx, this.a.ui.img, this.part(lit ? 'btn_hover' : hov ? 'btn_hover' : 'btn_up'), x, y, w, h, 4);
-      const g = this.part('g_' + glyph);
-      blit(ctx, this.a.ui.img, g, x + 5, y + 4);
-      this.text(ctx, label, x + 14, y + 4, { color: lit ? '#ffe070' : '#d8e2f4' });
-      this.regions.push({ x, y, w, h, click, tip: () => ({ title: tip, body: '' }) });
+      const hot = this.hot(id, x, y, w, h);
+      nine(ctx, this.a.ui.img, this.part(lit || hot ? 'btn_hover' : 'btn_up'), x, y, w, h, 4);
+      blit(ctx, this.a.ui.img, this.part('g_' + glyph), x + 5, y + 4);
+      this.text(ctx, label, x + 14, y + 4, { color: lit ? COLORS.goldHi : '#d8e2f4' });
+      this.regions.push({ id, x, y, w, h, click, tip: () => ({ title: tip, body: '' }) });
     };
-    btn(W - 136, 'AUTO', 'auto', state.auto, on.auto, 'Auto battle (A)');
-    btn(W - 92, `x${state.speed}`, 'speed', state.speed > 1, on.speed, 'Battle speed (S)');
-    btn(W - 48, state.paused ? 'PLAY' : 'STOP', state.paused ? 'play' : 'pause', state.paused, on.pause, 'Pause (P)');
+    btn('ctl_auto', W - 136, 'AUTO', 'auto', state.auto, on.auto, 'Auto battle (A)');
+    btn('ctl_speed', W - 92, `x${state.speed}`, 'speed', state.speed > 1, on.speed, 'Battle speed (S)');
+    btn('ctl_pause', W - 48, 'MENU', 'pause', state.paused, on.pause, 'Pause menu (Esc)');
   }
 
-  inside(x: number, y: number, w: number, h: number) {
-    return this.mouse.x >= x && this.mouse.y >= y && this.mouse.x < x + w && this.mouse.y < y + h;
-  }
-
-  /** HP / shield / TM bars and status icons above a unit. */
+  /** HP / shield / TM bars and status icons above a unit; bosses get a wider, crowned bar. */
   drawUnitBars(ctx: CanvasRenderingContext2D, u: UnitView) {
     if (u.dead && u.alpha <= 0.05) return;
-    const w = 34;
+    const w = u.boss ? 48 : 34;
     const x = Math.round(u.x - w / 2);
     const y = Math.round(u.y - u.h - u.spriteH - 10);
     ctx.globalAlpha = u.dead ? u.alpha : 1;
-    ctx.fillStyle = '#07080e';
+    if (u.boss) {
+      ctx.fillStyle = '#a8701e';
+      ctx.fillRect(x - 2, y - 2, w + 4, 9);
+      blit(ctx, this.a.ui.img, this.part('crown'), u.x - 6, y - 25);
+    }
+    ctx.fillStyle = COLORS.ink;
     ctx.fillRect(x - 1, y - 1, w + 2, 7);
     ctx.fillStyle = '#2a1018';
     ctx.fillRect(x, y, w, 4);
@@ -171,15 +119,13 @@ export class Hud {
       const sw = Math.min(w, Math.round((u.shield / u.maxHp) * w));
       ctx.fillStyle = '#ffe48a';
       ctx.fillRect(x, y - 3, sw, 2);
-      ctx.fillStyle = '#07080e';
+      ctx.fillStyle = COLORS.ink;
       ctx.fillRect(x - 1, y - 4, sw + 2, 1);
     }
-    // turn meter
     ctx.fillStyle = '#1a2a44';
     ctx.fillRect(x, y + 4, w, 1);
     ctx.fillStyle = '#5ab4ff';
     ctx.fillRect(x, y + 4, Math.round((Math.min(100, u.tm) / 100) * w), 1);
-    // statuses (buffs first)
     const sts = [...u.statuses].sort((a, b) => Number(STATUSES[b.id].buff) - Number(STATUSES[a.id].buff)).slice(0, 5);
     const ix = Math.round(u.x - (sts.length * 12) / 2);
     sts.forEach((s, i) => {
@@ -197,25 +143,26 @@ export class Hud {
     if (hovered && kind !== 'active') {
       const c = this.part(kind === 'heal' ? 'chevron_green' : 'chevron_red');
       const bob = Math.round(Math.sin(t / 120) * 2);
-      blit(ctx, this.a.ui.img, c, u.x - c[2] / 2, u.y - u.spriteH - 30 + bob);
+      blit(ctx, this.a.ui.img, c, u.x - c[2] / 2, u.y - u.spriteH - 30 + bob - (u.boss ? 10 : 0));
     }
   }
 
-  /** Active hero panel (bottom-left). */
+  /** Active champion panel (bottom-left). */
   drawHeroPanel(ctx: CanvasRenderingContext2D, u: UnitView) {
     const x = 6, y = H - 58, w = 186, h = 52;
     nine(ctx, this.a.ui.img, this.part(u.team === 'player' ? 'panel' : 'panel_red'), x, y, w, h, 6);
-    const p = this.a.ui.json.portraits[u.hero.id];
-    ctx.fillStyle = '#07080e';
+    const c = u.champion;
+    const p = this.a.ui.json.portraits[c.id];
+    ctx.fillStyle = COLORS.ink;
     ctx.fillRect(x + 6, y + 6, 32, 32);
-    ctx.fillStyle = u.hero.color;
+    ctx.fillStyle = RARITIES[c.rarity].color;
     ctx.fillRect(x + 7, y + 7, 30, 30);
     blit(ctx, this.a.ui.img, p, x + 8, y + 8);
-    this.text(ctx, u.hero.name, x + 44, y + 6, { color: u.hero.color, variant: 'bold' });
-    this.text(ctx, `${u.hero.title}`, x + 44, y + 17, { color: '#9fb0cc' });
-    // HP bar
+    blit(ctx, this.a.ui.img, this.part('gem_' + c.affinity), x + 30, y + 30);
+    this.text(ctx, c.name, x + 44, y + 6, { color: c.color, variant: 'bold' });
+    this.text(ctx, c.title, x + 44, y + 17, { color: COLORS.dim });
     const bx = x + 44, by = y + 29, bw = 134;
-    ctx.fillStyle = '#07080e';
+    ctx.fillStyle = COLORS.ink;
     ctx.fillRect(bx - 1, by - 1, bw + 2, 7);
     ctx.fillStyle = '#2a1018';
     ctx.fillRect(bx, by, bw, 5);
@@ -224,7 +171,6 @@ export class Hud {
     ctx.fillStyle = u.team === 'player' ? '#3ccf5a' : '#e0453a';
     ctx.fillRect(bx, by, Math.round((u.hp / u.maxHp) * bw), 5);
     this.text(ctx, `${Math.max(0, Math.round(u.hp))} / ${u.maxHp}`, bx + bw, by + 7, { color: '#d8e2f4', align: 'right' });
-    // statuses (with hover tips) under the HP bar, role in the top-right corner
     u.statuses.slice(0, 5).forEach((s, i) => {
       const r = this.a.ui.json.status[s.id].rect;
       const sx = bx + i * 13, sy = by + 8;
@@ -232,19 +178,18 @@ export class Hud {
       if (s.turns < 9) this.tinyNum(ctx, s.turns, sx + 8, sy + 7);
       this.regions.push({ x: sx, y: sy, w: 12, h: 12, tip: () => ({ title: STATUSES[s.id].name, sub: `${s.turns} turn${s.turns === 1 ? '' : 's'}`, body: STATUSES[s.id].desc, color: STATUSES[s.id].color }) });
     });
-    this.text(ctx, u.hero.role.toUpperCase(), x + w - 7, y + 6, { color: '#6f7f9c', align: 'right' });
+    blit(ctx, this.a.ui.img, this.part('role_' + c.role), x + w - 16, y + 6);
   }
 
-  /** Skill slots for the hero whose turn it is. */
+  /** Skill slots for the champion whose turn it is. */
   drawSkills(ctx: CanvasRenderingContext2D, slots: SkillSlot[], onPick: (s: SkillDef) => void, t: number) {
     const S = 48, gap = 4;
     const x0 = W - 8 - slots.length * S - (slots.length - 1) * gap, y0 = H - 8 - S;
     slots.forEach((sl, i) => {
       const x = x0 + i * (S + gap);
-      const lift = sl.selected ? -3 : 0;
-      const y = y0 + lift;
+      const y = y0 + (sl.selected ? -3 : 0);
       const icon = this.a.ui.json.icons[sl.skill.id];
-      ctx.fillStyle = '#07080e';
+      ctx.fillStyle = COLORS.ink;
       ctx.fillRect(x + 3, y + 3, S - 6, S - 6);
       blit(ctx, this.a.ui.img, icon, x + 4, y + 4);
       const off = sl.cooldown > 0;
@@ -253,63 +198,33 @@ export class Hud {
         ctx.fillRect(x + 4, y + 4, 40, 40);
         this.text(ctx, String(sl.cooldown), x + S / 2, y + 16, { color: '#ffffff', variant: 'bold', scale: 2, align: 'center' });
       }
-      const hov = this.inside(x, y, S, S);
+      const hov = this.hot('skill' + i, x, y, S, S);
       blit(ctx, this.a.ui.img, this.part(off ? 'frame_off' : sl.selected ? 'frame_sel' : 'frame_idle'), x, y);
       if (sl.selected && !off) {
-        // shimmering corner sparkle
         const k = Math.floor(t / 90) % 4;
         ctx.fillStyle = '#fff6c0';
         ctx.fillRect(x + [2, S - 3, S - 3, 2][k], y + [2, 2, S - 3, S - 3][k], 1, 1);
       }
-      // key badge
-      this.text(ctx, String(i + 1), x + 5, y + S - 12, { color: hov ? '#ffe070' : '#c0cbe0' });
+      this.text(ctx, String(i + 1), x + 5, y + S - 12, { color: hov ? COLORS.goldHi : '#c0cbe0' });
       this.regions.push({
+        id: 'skill' + i,
         x, y, w: S, h: S,
         click: () => !off && onPick(sl.skill),
         tip: () => ({
           title: sl.skill.name,
           sub: `${sl.skill.tag}${sl.skill.cooldown ? `  -  Cooldown ${sl.skill.cooldown}` : ''}${off ? `  (ready in ${sl.cooldown})` : ''}`,
           body: sl.skill.desc,
-          color: '#ffe070',
+          color: COLORS.goldHi,
         }),
       });
     });
   }
 
   drawPrompt(ctx: CanvasRenderingContext2D, text: string) {
-    const w = this.a.font.measure(text) + 16;
+    const w = this.measure(text) + 16;
     const x = W - 8 - w, y = H - 74;
     nine(ctx, this.a.ui.img, this.part('panel'), x, y, w, 15, 5);
     this.text(ctx, text, x + 8, y + 3, { color: '#d8e2f4' });
-  }
-
-  /** Tooltip for whatever region the mouse is over. */
-  drawTooltip(ctx: CanvasRenderingContext2D) {
-    const r = this.hit(this.mouse.x, this.mouse.y);
-    if (!r?.tip) return;
-    const tip = r.tip();
-    const font = this.a.font;
-    const maxW = 210;
-    const lines = tip.body ? font.wrap(tip.body, maxW - 14) : [];
-    const w = Math.max(font.measure(tip.title, 'bold'), tip.sub ? font.measure(tip.sub) : 0, ...lines.map((l) => font.measure(l))) + 14;
-    const h = 12 + (tip.sub ? 10 : 0) + lines.length * 10 + (lines.length ? 4 : 0) + 6;
-    let x = Math.round(r.x + r.w / 2 - w / 2), y = r.tipBelow ? r.y + r.h + 4 : r.y - h - 4;
-    x = Math.max(4, Math.min(W - w - 4, x));
-    if (y < 4) y = r.y + r.h + 4;
-    if (y + h > H - 4) y = H - 4 - h;
-    nine(ctx, this.a.ui.img, this.part('panel_gold'), x, y, w, h, 6);
-    let cy = y + 5;
-    this.text(ctx, tip.title, x + 7, cy, { color: tip.color ?? '#ffe070', variant: 'bold' });
-    cy += 11;
-    if (tip.sub) {
-      this.text(ctx, tip.sub, x + 7, cy, { color: '#8fa0c0' });
-      cy += 10;
-    }
-    if (lines.length) cy += 3;
-    for (const l of lines) {
-      this.text(ctx, l, x + 7, cy, { color: '#e8eef8' });
-      cy += 10;
-    }
   }
 
   showBanner(text: string, color = '#ffe9a0') {
@@ -326,14 +241,12 @@ export class Hud {
       this.bannerT = -1;
       return;
     }
-    const font = this.a.font;
-    const tw = font.measure(this.bannerText, 'bold');
+    const tw = this.measure(this.bannerText, 'bold');
     const w = tw + 44;
     const slide = t < 160 ? 1 - t / 160 : t > 1300 ? (t - 1300) / 200 : 0;
     const x = Math.round(W / 2 - w / 2), y = 64;
     ctx.globalAlpha = 1 - slide;
     const b = this.part('banner');
-    // 3-slice: 12px caps
     ctx.drawImage(this.a.ui.img, b[0], b[1], 12, b[3], x, y, 12, b[3]);
     ctx.drawImage(this.a.ui.img, b[0] + 12, b[1], 8, b[3], x + 12, y, w - 24, b[3]);
     ctx.drawImage(this.a.ui.img, b[0] + b[2] - 12, b[1], 12, b[3], x + w - 12, y, 12, b[3]);
@@ -345,27 +258,83 @@ export class Hud {
     this.title = { text, sub, color, grad, t: 0 };
   }
 
-  drawTitle(ctx: CanvasRenderingContext2D, dt: number, button?: { label: string; click: () => void }) {
+  drawTitle(ctx: CanvasRenderingContext2D, dt: number) {
     if (!this.title) return;
     const tt = this.title;
     tt.t += dt;
     const scale = 4;
     const pop = tt.t < 180 ? 0.6 + (tt.t / 180) * 0.4 : 1;
     const y = 120;
-    if (button) {
-      ctx.fillStyle = 'rgba(4,6,14,0.55)';
-      ctx.fillRect(0, 0, W, H);
-    }
     ctx.globalAlpha = Math.min(1, tt.t / 120);
-    this.a.font.draw(ctx, tt.text, W / 2, y - (scale * 9 * pop) / 2, { color: tt.color, gradient: tt.grad, variant: 'bold', scale: Math.max(1, Math.round(scale * pop)), align: 'center', outline: '#07080e', shadow: '#3a1e06' });
+    this.a.font.draw(ctx, tt.text, W / 2, y - (scale * 9 * pop) / 2, { color: tt.color, gradient: tt.grad, variant: 'bold', scale: Math.max(1, Math.round(scale * pop)), align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
     if (tt.sub) this.text(ctx, tt.sub, W / 2, y + 26, { color: '#d8e2f4', align: 'center' });
     ctx.globalAlpha = 1;
-    if (button && tt.t > 500) {
-      const w = 96, h = 20, x = W / 2 - w / 2, by = y + 46;
-      const hov = this.inside(x, by, w, h);
-      nine(ctx, this.a.ui.img, this.part(hov ? 'panel_gold' : 'panel'), x, by, w, h, 6);
-      this.text(ctx, button.label, W / 2, by + 6, { color: hov ? '#ffe070' : '#e8eef8', variant: 'bold', align: 'center' });
-      this.regions.push({ x, y: by, w, h, click: button.click });
+  }
+
+  /** Pause menu. */
+  drawPause(ctx: CanvasRenderingContext2D, on: { resume: () => void; retreat: () => void; auto: () => void; speed: () => void }, state: { auto: boolean; speed: number }, canRetreat: boolean) {
+    this.dim(ctx, 0.62);
+    const w = 180, h = canRetreat ? 150 : 124, x = W / 2 - w / 2, y = H / 2 - h / 2;
+    this.panel(ctx, 'gold', x, y, w, h);
+    this.text(ctx, 'PAUSED', W / 2, y + 10, { color: COLORS.goldHi, variant: 'bold', align: 'center', scale: 2 });
+    this.divider(ctx, x + 14, y + 32, w - 28);
+    let by = y + 44;
+    this.button(ctx, 'p_resume', x + 20, by, w - 40, 22, 'RESUME', { click: on.resume, icon: 'mi_play' });
+    by += 26;
+    this.button(ctx, 'p_auto', x + 20, by, (w - 44) / 2, 22, state.auto ? 'AUTO ON' : 'AUTO OFF', { click: on.auto, kind: 'small', active: state.auto });
+    this.button(ctx, 'p_speed', x + 24 + (w - 44) / 2, by, (w - 44) / 2, 22, `SPEED x${state.speed}`, { click: on.speed, kind: 'small' });
+    by += 26;
+    if (canRetreat) {
+      this.button(ctx, 'p_retreat', x + 20, by, w - 40, 22, 'RETREAT', { click: on.retreat, icon: 'mi_back', color: COLORS.bad });
+      by += 26;
+    }
+    this.text(ctx, 'Esc to resume', W / 2, by + 4, { color: COLORS.faint, align: 'center' });
+  }
+
+  /** Victory / defeat panel with stars, the first-clear recruit and the way out. */
+  drawResults(ctx: CanvasRenderingContext2D, r: ResultsInfo, t: number, on: { next: () => void; retry: () => void; map: () => void }) {
+    this.dim(ctx, Math.min(0.55, t / 600));
+    if (t < 300) return;
+    const w = 260, h = r.victory ? (r.recruit ? 176 : 150) : 142;
+    const x = W / 2 - w / 2, y = 64;
+    this.panel(ctx, r.victory ? 'gold' : 'red', x, y, w, h);
+    const pop = Math.min(1, (t - 300) / 200);
+    this.a.font.draw(ctx, r.victory ? 'VICTORY' : 'DEFEAT', W / 2, y + 8, { color: r.victory ? '#fff6c0' : '#ffd0c0', gradient: r.victory ? '#f0a020' : '#c02020', variant: 'bold', scale: pop < 1 ? 2 : 3, align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
+    let cy = y + 42;
+    if (r.stageName) {
+      this.text(ctx, `${r.stageId}  ${r.stageName}`, W / 2, cy, { color: COLORS.dim, align: 'center' });
+      cy += 14;
+    }
+    if (r.victory) {
+      // stars pop in one by one
+      for (let i = 0; i < 3; i++) {
+        const due = 600 + i * 260;
+        const got = i < r.stars && t > due;
+        const sx = W / 2 - 46 + i * 34, sy = cy + (i === 1 ? -4 : 0);
+        blit(ctx, this.a.ui.img, this.part(got ? 'star_l' : 'star_l_off'), sx, sy);
+      }
+      cy += 32;
+      this.text(ctx, r.stars === 3 ? 'Flawless: nobody fell.' : r.stars === 2 ? 'One champion fell.' : 'Several champions fell.', W / 2, cy, { color: COLORS.text, align: 'center' });
+      cy += 14;
+      if (r.recruit && t > 1500) {
+        const c = r.recruit;
+        this.text(ctx, 'FIRST CLEAR REWARD', W / 2, cy, { color: COLORS.goldHi, variant: 'bold', align: 'center' });
+        cy += 11;
+        this.text(ctx, `${c.name} joins your cause!`, W / 2, cy, { color: RARITIES[c.rarity].color, align: 'center' });
+        cy += 14;
+      } else if (r.recruit) cy += 25;
+    } else {
+      this.para(ctx, 'Your champions have fallen. Check affinities and buffs in the Academy, pick a different team and try again.', x + 18, cy + 4, w - 36, { color: COLORS.text });
+      cy += 44;
+    }
+    if (t > 900) {
+      const bw = 104;
+      if (r.victory) {
+        this.button(ctx, 'r_next', W / 2 - bw / 2 - (r.recruit ? 0 : 0), y + h - 30, bw, 22, r.recruit ? 'MEET THEM' : 'CONTINUE', { click: on.next, icon: 'mi_play' });
+      } else {
+        this.button(ctx, 'r_retry', W / 2 - bw - 4, y + h - 30, bw, 22, 'RETRY', { click: on.retry, icon: 'mi_fight' });
+        this.button(ctx, 'r_map', W / 2 + 4, y + h - 30, bw, 22, 'MAP', { click: on.map, icon: 'mi_back' });
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 // Prints each hero's standing height (feet to top of head/helmet, weapons
 // excluded) for idle frame 0, plus the full sprite bounding box.
 import { renderFrame, PIVOT } from './char.ts';
-import { HEROES } from './heroes/index.ts';
+import { HEROES } from './champions/index.ts';
 import { solve } from './rig.ts';
 
 for (const [id, c] of Object.entries(HEROES)) {

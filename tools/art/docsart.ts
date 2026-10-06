@@ -1,15 +1,15 @@
 // Generates the images used by README.md and the guides:
 //   docs/images/palette.png        every material ramp
-//   docs/images/lineup.png         all heroes, idle frame, 3x
-//   docs/images/lineup.gif         all heroes idling, 2x
-//   docs/images/reel_<hero>.gif    each hero's full animation reel, 3x
-//   docs/images/tileset.png        the zone tileset, 2x
+//   docs/images/lineup.png         all champions, idle frame, 3x
+//   docs/images/lineup.gif         all champions idling, 2x
+//   docs/images/reel_<id>.gif      each champion's full animation reel, 2x
+//   docs/images/tileset_<zone>.png each zone's tileset, 2x
 //   npx tsx tools/art/docsart.ts
 import fs from 'node:fs';
 import path from 'node:path';
 import { writeGif } from '../gifwrite.ts';
 import { PIVOT, renderAnim, renderFrame } from './char.ts';
-import { HEROES } from './heroes/index.ts';
+import { HEROES } from './champions/index.ts';
 import { MAT } from './palette.ts';
 import { Bitmap, hex } from './raster.ts';
 
@@ -33,7 +33,7 @@ function gif(file: string, frames: { bmp: Bitmap; ms: number }[]) {
 
 // --- lineup (static + idle gif)
 const ids = Object.keys(HEROES);
-const cellW = 84, cellH = 100;
+const cellW = 84, cellH = 104;
 function lineupFrame(t: number): Bitmap {
   const b = new Bitmap(cellW * ids.length + 16, cellH + 8).fill(BG);
   b.rect(0, cellH - 4, b.w, 12, FLOOR);
@@ -54,7 +54,7 @@ gif(path.join(OUT, 'lineup.gif'), Array.from({ length: 24 }, (_, i) => ({ bmp: l
 // --- per-hero reels
 for (const [id, c] of Object.entries(HEROES)) {
   const frames: { bmp: Bitmap; ms: number }[] = [];
-  const W = 176, H = 132;
+  const W = 200, H = 150;
   const facing = ids.indexOf(id) < 3 ? 1 : -1;
   for (const name of Object.keys(c.anims)) {
     const reps = c.anims[name].loop ? 2 : 1;
@@ -72,6 +72,6 @@ for (const [id, c] of Object.entries(HEROES)) {
   gif(path.join(OUT, `reel_${id}.gif`), frames);
 }
 
-// --- tileset at 2x
-Bitmap.load('public/assets/zone/tiles.png').scaled(2).save(path.join(OUT, 'tileset.png'));
+// --- tilesets at 2x
+for (const z of fs.readdirSync('public/assets/zones')) Bitmap.load(`public/assets/zones/${z}/tiles.png`).scaled(2).save(path.join(OUT, `tileset_${z}.png`));
 console.log('docs art done');

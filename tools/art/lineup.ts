@@ -2,7 +2,7 @@
 // so proportions, palette and value structure can be compared at a glance.
 //   npx tsx tools/art/lineup.ts <out.png> [scale] [anim] [frame]
 import { PIVOT, renderFrame } from './char.ts';
-import { HEROES } from './heroes/index.ts';
+import { HEROES } from './champions/index.ts';
 import { Bitmap, hex } from './raster.ts';
 
 const [out = 'lineup.png', scaleArg = '3', anim = 'idle', frameArg = '0'] = process.argv.slice(2);

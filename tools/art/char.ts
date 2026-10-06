@@ -1,13 +1,14 @@
 // Character definitions: a skeleton, a shape builder and a set of animations.
+import { INK, Material } from './palette.ts';
 import { Bitmap } from './raster.ts';
 import { Frame, RenderOptions } from './render.ts';
 import { Dims, Draw, lerpPose, Pose, Skel, solve, v } from './rig.ts';
 
 /** Fixed frame box for every hero (see docs/ART_GUIDE.md "Sprite frames"). */
-export const FRAME_W = 192;
-export const FRAME_H = 144;
+export const FRAME_W = 208;
+export const FRAME_H = 160;
 /** Feet pivot inside the frame. */
-export const PIVOT = v(96, 134);
+export const PIVOT = v(104, 140);
 
 export interface FrameDef {
   pose: Pose;
@@ -43,6 +44,18 @@ export interface CharDef {
   render?: RenderOptions;
 }
 
+/**
+ * One champion's complete art module: rig + animations + skill icons. Adding a
+ * champion means adding one of these (see .claude/skills/new-champion).
+ */
+export interface ChampionArt {
+  char: CharDef;
+  /** signature ramp behind the skill icons */
+  iconBg: Material;
+  /** skill id -> 40x40 icon painter (tools/art/icons.ts toolkit) */
+  icons: Record<string, () => Bitmap>;
+}
+
 export interface RenderedFrame {
   bmp: Bitmap;
   def: FrameDef;
@@ -57,7 +70,18 @@ export function renderFrame(c: CharDef, anim: string, i: number, facing: 1 | -1)
   const d = new Draw(f, def.pose.p.turn ? (-facing as 1 | -1) : facing, PIVOT);
   const s = solve(def.pose, c.dims);
   c.build(d, s, { anim, index: i, def, prev: prevDef ? solve(prevDef.pose, c.dims) : undefined });
-  return f.render(c.render);
+  const bmp = f.render(c.render);
+  if (anim === 'death' || anim === 'rise') groundClip(bmp, PIVOT.y + GROUND_CLIP);
+  return bmp;
+}
+
+/** A fallen body rests on the ground plane: capes and sashes never hang more than this below the feet line. */
+export const GROUND_CLIP = 8;
+
+function groundClip(b: Bitmap, y0: number) {
+  for (let y = y0 + 1; y < b.h; y++) for (let x = 0; x < b.w; x++) b.set(x, y, 0);
+  // close the cut like any other silhouette edge
+  for (let x = 0; x < b.w; x++) if (b.get(x, y0) & 255) b.set(x, y0, INK.black);
 }
 
 export function renderAnim(c: CharDef, anim: string, facing: 1 | -1): RenderedFrame[] {
