@@ -6,7 +6,7 @@ import path from 'node:path';
 import { writeJson } from '../io.ts';
 import { Bitmap, hex, packShelves, PackItem } from '../raster.ts';
 import { COMMON_FX } from './common.ts';
-import { FxDef, FxJson } from './kit.ts';
+import { fxBox, FxDef, FxJson, renderFx } from './kit.ts';
 import { NYOTA_FX } from './nyota.ts';
 import { SUNSCAR_FX } from './sunscar.ts';
 
@@ -21,8 +21,7 @@ export function buildFx(out: string) {
   const offsets = new Map<string, [number, number]>();
   for (const [name, d] of Object.entries(FX)) {
     for (let i = 0; i < d.n; i++) {
-      const b = new Bitmap(d.w, d.h);
-      d.draw(b, d.n > 1 ? i / (d.n - 1) : 0, i);
+      const b = renderFx(d, i);
       const bb = b.bounds() ?? { x: 0, y: 0, w: 1, h: 1 };
       const key = `${name}/${i}`;
       items.push({ key, bmp: b.crop(bb) });
@@ -32,8 +31,9 @@ export function buildFx(out: string) {
   const { atlas, frames } = packShelves(items, 1024);
   const byKey = new Map(frames.map((f) => [f.key, f]));
   for (const [name, d] of Object.entries(FX)) {
+    const box = fxBox(d);
     meta.anims[name] = {
-      w: d.w, h: d.h, ax: d.ax, ay: d.ay, ms: d.ms, loop: !!d.loop,
+      w: box.w, h: box.h, ax: box.ax, ay: box.ay, ms: d.ms, loop: !!d.loop,
       frames: Array.from({ length: d.n }, (_, i) => {
         const f = byKey.get(`${name}/${i}`)!;
         const [ox, oy] = offsets.get(`${name}/${i}`)!;
@@ -49,18 +49,14 @@ export function buildFx(out: string) {
 /** Dev preview: every effect as a row of frames on a dark backdrop. */
 export function fxPreview(names?: string[]): Bitmap {
   const rows = Object.entries(FX).filter(([n]) => !names || names.includes(n));
-  const cellW = Math.max(...rows.map(([, d]) => d.w)) + 4;
+  const cellW = Math.max(...rows.map(([, d]) => fxBox(d).w)) + 4;
   const maxN = Math.max(...rows.map(([, d]) => d.n));
-  const rowH = rows.map(([, d]) => d.h + 4);
+  const rowH = rows.map(([, d]) => fxBox(d).h + 4);
   const sheet = new Bitmap(maxN * cellW, rowH.reduce((a, b) => a + b, 0));
   sheet.fill(hex('#2a3344'));
   let y = 0;
   rows.forEach(([, d], ri) => {
-    for (let i = 0; i < d.n; i++) {
-      const b = new Bitmap(d.w, d.h);
-      d.draw(b, d.n > 1 ? i / (d.n - 1) : 0, i);
-      sheet.blit(b, i * cellW + 2, y + 2);
-    }
+    for (let i = 0; i < d.n; i++) sheet.blit(renderFx(d, i), i * cellW + 2, y + 2);
     y += rowH[ri];
   });
   return sheet;

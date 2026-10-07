@@ -132,7 +132,7 @@ export const SUNSCAR_FX: Record<string, FxDef> = {
 
   // Wrath of the Sun: a sun sigil scorches the ground, then a column of sunfire erupts
   fire_pillar: {
-    w: 60, h: 128, n: 10, ms: 60, ax: 0.5, ay: 0.95,
+    w: 60, h: 128, n: 10, ms: 60, ax: 0.5, ay: 0.95, pad: [0, 0, 9, 0],
     draw: (b, t, i) => {
       const base = 121;
       const sig = [0.6, 1, 1, 1, 1, 0.9, 0.7, 0.5, 0.3, 0.15][i];
@@ -147,9 +147,10 @@ export const SUNSCAR_FX: Record<string, FxDef> = {
       const top = i >= 7 ? (i - 6) * 34 : 0;
       for (let y = top; y <= base; y++) {
         const wob = half * (0.85 + 0.15 * Math.sin(y * 0.3 + i * 1.7));
+        const fade = top === 0 ? Math.min(1, y / 32) : Math.min(1, (y - top) / 14);
         for (let x = Math.floor(30 - wob - 1); x <= Math.ceil(30 + wob + 1); x++) {
           const dx = Math.abs(x + 0.5 - 30) / Math.max(0.6, wob);
-          if (dx > 1) continue;
+          if (dx > 1 || !dith(x, y, fade)) continue;
           const v = 4.6 - dx * 2.4 - (y < 24 ? (24 - y) / 12 : 0) + (hash2(x, y, i) - 0.5) * 0.5;
           if (v < 0.5) continue;
           b.set(x, y, rampDither(i < 4 ? ramps.gold : ramps.fire, v, x, y));
@@ -178,7 +179,7 @@ export const SUNSCAR_FX: Record<string, FxDef> = {
 
   // Blink approach: Akhet vanishes into a puff of sand and reappears in another
   sand_puff: {
-    w: 60, h: 44, n: 7, ms: 55, ax: 0.5, ay: 0.9,
+    w: 60, h: 44, n: 7, ms: 55, ax: 0.5, ay: 0.9, pad: [12, 0, 8, 0],
     draw: (b, t, i) => {
       const r = rng(91);
       for (let k = 0; k < 7; k++) {
@@ -240,7 +241,7 @@ export const SUNSCAR_FX: Record<string, FxDef> = {
 
   // Curse of Ages: hieroglyphs ignite around the feet, tendrils coil upward
   curse: {
-    w: 72, h: 76, n: 9, ms: 70, ax: 0.5, ay: 0.95,
+    w: 72, h: 76, n: 9, ms: 70, ax: 0.5, ay: 0.95, pad: [0, 0, 10, 0],
     draw: (b, t, i) => {
       const base = 70;
       const k = Math.min(1, t * 3);
@@ -324,7 +325,7 @@ export const SUNSCAR_FX: Record<string, FxDef> = {
 
   // Undying: twin spirals of tomb-light climb the body, an ankh flares overhead
   revive: {
-    w: 64, h: 104, n: 12, ms: 70, ax: 0.5, ay: 0.95,
+    w: 64, h: 104, n: 12, ms: 70, ax: 0.5, ay: 0.95, pad: [0, 0, 10, 0],
     draw: (b, t, i) => {
       const base = 99;
       ellipseRing(b, 32, base, 10 + t * 18, 3 + t * 5, 1.6, (x, y, a) => rampDither(ramps.tomb, 3.4 - t * 1.5 + Math.sin(a) * 0.6, x, y));
@@ -360,7 +361,7 @@ export const SUNSCAR_FX: Record<string, FxDef> = {
 
   // Blessing of Dawn: shafts of morning light slant in from the key light (top-left)
   heal_sun: {
-    w: 60, h: 100, n: 10, ms: 65, ax: 0.5, ay: 0.95,
+    w: 60, h: 100, n: 10, ms: 65, ax: 0.5, ay: 0.95, pad: [0, 0, 9, 0],
     draw: (b, t, i) => {
       const base = 95;
       const k = [0.3, 0.7, 1, 1, 1, 1, 0.8, 0.6, 0.35, 0.15][i];
@@ -389,7 +390,7 @@ export const SUNSCAR_FX: Record<string, FxDef> = {
 
   // Warden's Vigil: a ward ring at each ally's feet, light pillars, the counter sigil
   vigil: {
-    w: 56, h: 84, n: 9, ms: 65, ax: 0.5, ay: 0.95,
+    w: 56, h: 84, n: 9, ms: 65, ax: 0.5, ay: 0.95, pad: [0, 0, 10, 0],
     draw: (b, t, i) => {
       const base = 79;
       ellipseRing(b, 28, base, 8 + t * 18, 3 + t * 5, 2, (x, y, a) => rampDither(ramps.turquoise, 3.6 - t * 1.6 + Math.sin(a) * 0.6, x, y));
@@ -433,7 +434,7 @@ export const SUNSCAR_FX: Record<string, FxDef> = {
     },
   },
   dispel: {
-    w: 60, h: 60, n: 7, ms: 50, ax: 0.5, ay: 0.5,
+    w: 60, h: 60, n: 7, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 4, 10, 4],
     draw: (b, t, i) => {
       if (i < 2) ellipseRing(b, 30, 30, 15 - i * 3, 18 - i * 3, 1.8, (x, y, a) => rampDither(ramps.steel, 3.5 + Math.sin(a * 3) * 0.6, x, y));
       if (i >= 1) {

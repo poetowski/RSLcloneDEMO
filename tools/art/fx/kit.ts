@@ -3,8 +3,7 @@
 // Effects are grouped by origin in sibling modules and merged in ./index.ts.
 import { ACCENT, FXR } from '../palette.ts';
 import { disc, dith, ellipseRing, line, polyFill, rampDither } from '../paint.ts';
-import { Bitmap, hash2, RGBA, rng, withAlpha } from '../raster.ts';
-
+import { A, Bitmap, hash2, RGBA, rng, withAlpha } from '../raster.ts';
 
 export interface FxJson {
   /** name -> frames [x, y, w, h, ox, oy] (offset of trimmed rect inside the logical box) */
@@ -21,7 +20,83 @@ export interface FxDef {
   ax: number;
   ay: number;
   loop?: boolean;
+  /**
+   * Extra room around the drawing box, [top, right, bottom, left] px, for
+   * effects that grow past it (rings at the feet, spikes, bursts). The drawing
+   * keeps its own coordinates; the built box and the anchor include the room,
+   * so the effect still lands on the same spot.
+   */
+  pad?: [number, number, number, number];
   draw: Drawer;
+}
+
+/** A bitmap seen through a shifted origin: padding never moves an effect's own coordinates. */
+class Padded extends Bitmap {
+  constructor(
+    w: number,
+    h: number,
+    private ox: number,
+    private oy: number,
+  ) {
+    super(w, h);
+  }
+  get(x: number, y: number): RGBA {
+    return super.get((x | 0) + this.ox, (y | 0) + this.oy);
+  }
+  set(x: number, y: number, c: RGBA): void {
+    super.set((x | 0) + this.ox, (y | 0) + this.oy, c);
+  }
+  blend(x: number, y: number, c: RGBA): void {
+    // opaque colors go through set (which shifts); translucent ones blend at the shifted spot
+    if (A(c) === 255) this.set(x, y, c);
+    else super.blend((x | 0) + this.ox, (y | 0) + this.oy, c);
+  }
+}
+
+/** An effect's built box and anchor, padding included. */
+export function fxBox(d: FxDef) {
+  if (!d.pad) return { w: d.w, h: d.h, ax: d.ax, ay: d.ay, ox: 0, oy: 0 };
+  const [t, r, b, l] = d.pad;
+  const w = d.w + l + r, h = d.h + t + b;
+  const k = (n: number) => Math.round(n * 1e4) / 1e4;
+  return { w, h, ax: k((d.ax * d.w + l) / w), ay: k((d.ay * d.h + t) / h), ox: l, oy: t };
+}
+
+/**
+ * Frames of an effect that run into the edge of their box (more than one
+ * pixel on an edge: the shape is cut off there) or draw nothing at all.
+ */
+export function fxEdges(d: FxDef): { frame: number; empty: boolean; cut: Partial<Record<'top' | 'right' | 'bottom' | 'left', number>> }[] {
+  const out: { frame: number; empty: boolean; cut: Partial<Record<'top' | 'right' | 'bottom' | 'left', number>> }[] = [];
+  for (let i = 0; i < d.n; i++) {
+    const b = renderFx(d, i);
+    const n = { top: 0, right: 0, bottom: 0, left: 0 };
+    let any = false;
+    for (let y = 0; y < b.h; y++) {
+      for (let x = 0; x < b.w; x++) {
+        if (!A(b.get(x, y))) continue;
+        any = true;
+        if (y === 0) n.top++;
+        if (x === b.w - 1) n.right++;
+        if (y === b.h - 1) n.bottom++;
+        if (x === 0) n.left++;
+      }
+    }
+    const cut = Object.fromEntries(Object.entries(n).filter(([, k]) => k > 1));
+    if (!any || Object.keys(cut).length) out.push({ frame: i, empty: !any, cut });
+  }
+  return out;
+}
+
+/** Frame `i` of an effect, drawn into a bitmap of its padded box. */
+export function renderFx(d: FxDef, i: number): Bitmap {
+  const box = fxBox(d);
+  const b = new Padded(box.w, box.h, box.ox, box.oy);
+  d.draw(b, d.n > 1 ? i / (d.n - 1) : 0, i);
+  // hand back a plain bitmap: trimming and packing read it in box coordinates
+  const out = new Bitmap(box.w, box.h);
+  out.data.set(b.data);
+  return out;
 }
 
 export const W = ACCENT.white;

@@ -24,7 +24,7 @@ Rules that are not negotiable:
 1. **The key light is in the upper-left** (sun, moon, fire). Every tile, prop and carving is lit from there: top/left edges bright, bottom/right edges dark; in sunk relief the upper-left lip is in shadow.
 2. **The floor (rows 6-11) is mid value and low contrast.** Champions are outlined and high contrast; the floor must never compete. Put bright, saturated set pieces on the wall, in the backdrop or at the edges.
 3. **Formation spots are fixed** (player 216,250 / 152,216 / 136,284; enemy 424,250 / 488,216 / 504,284). No tall `back` prop directly behind them, no `fg` prop near them.
-4. **Openings earn their keep**: every transparent gap in the wall shows something composed in the backdrop (the Sunscar gate frames the great pyramid).
+4. **Openings earn their keep**: every transparent gap in the wall shows something composed in the backdrop (the Sunscar gate frames the great pyramid). Check the backdrop against the wall: an element the architecture half hides (a beam rising from behind a pylon, the sliver of an island beside a tower) reads as a glitch, so move it into an opening or leave it out.
 5. **No smooth gradients, no anti-aliasing**: ramps with 4x4 Bayer dithering (`rampDither`, `dith`).
 6. **Seamless tiles**: joints on the right/bottom edges, bevel light on the top/left, so any tiles can sit side by side.
 
@@ -34,7 +34,7 @@ Rules that are not negotiable:
 2. Palette block at the top of the module: every color of the zone is declared there as a ramp (sky, stone, ground, accents, fire). Reuse `flames(ramp)` from `shared.ts` for fires.
 3. **Backdrop** (640x200): sky ramp top to `horizon`, the light source upper-left with a dithered halo, then distance layers from far (low contrast, hazy, cooler) to near (warmer, more contrast). Set `horizon` to where land meets sky.
 4. **Tiles** (32x32 painters `(b, seed) => void`): floor variants (6-9 so the grid does not repeat visibly), edge transitions (drifts, rubble), wall pieces (plain, dark, crown, base, special pieces), multi-tile set pieces cut from a 64x64 painting (see `quarter()` in `sunscar.ts`). Each tile is painted once and repeated wherever it is placed: a crack or stain in a common floor variant shows up all over the arena, so keep damage to one rarely placed variant.
-5. **Props**: one bitmap list per kind; describe each in `kinds` with an `anchor` and a `mode` (`static`, `loop` with `ms`, `pulse` = frame 1 breathes over frame 0) and `fire: { dy }` for anything that burns (needs a `flame` kind). Characters-like props (statues, urns) can use the champion renderer (`sprite()` in `sunscar.ts`) so they share the champions' shading.
+5. **Props**: one bitmap list per kind; describe each in `kinds` with an `anchor` and a `mode` (`static`, `loop` with `ms`, `pulse` = frame 1 breathes over frame 0) and `fire: { dy }` for anything that burns (needs a `flame` kind). Characters-like props (statues, urns) can use the champion renderer (`sprite()` in `sunscar.ts`) so they share the champions' shading. When a prop gets a dark `outline()`, outline the solid parts only and paint water, spray, smoke and light after it: an outline around every dithered droplet turns a waterfall into a chain.
 6. **Layout**: fill `ground` rows 6-11 and `wall` rows 1-5 by tile name; place props with layers `back` (on the wall), `floor` (under units), `fg` (edges only).
 
 ## 3. Behaviour entry

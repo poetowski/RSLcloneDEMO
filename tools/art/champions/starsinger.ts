@@ -8,7 +8,7 @@ import { BuildInfo, ChampionArt, CharDef, cycle, keys } from '../char.ts';
 import { C, compose, glyph } from '../icons.ts';
 import { ACCENT, Material, MAT } from '../palette.ts';
 import { ellipseRing } from '../paint.ts';
-import { foldTex, torsoPts } from '../parts.ts';
+import { foldTex, robe, RobeCfg, torsoPts, upRobe } from '../parts.ts';
 import { withAlpha } from '../raster.ts';
 import { at, D2R, Dims, Draw, lerpPose, lerpV, pose, Pose, Skel, tweak, V, v } from '../rig.ts';
 import { face } from './common.ts';
@@ -48,7 +48,7 @@ function build(d: Draw, s: Skel, info: BuildInfo) {
     d.poly({ mat: CB, z: z + 0.2, group: 'leg' + side, shade }, [f(-2.4, 2.2), f(-3, -0.5), f(-2.6, -3), f(5.8, -3), f(7.6, -1.4), f(4.2, -0.2), f(1.4, 1.6)], { kind: 'bevel', w: 1.6 });
   }
 
-  robe(d, s, wave);
+  agbada(d, s, wave);
   arm(d, s, 'F', 20, -1);
 
   // the agbada over the chest, with its embroidered panel
@@ -113,30 +113,15 @@ function sleeve(d: Draw, s: Skel, side: 'N' | 'F', z: number, shade: number, wav
   d.ribbon({ mat: GD, z: z + 0.1, group: 'sleeve' + side, shade, line: 'none' }, hem.slice(2), hem.slice(2).map(() => 0.7));
 }
 
-/** Ankle-length robe whose hem follows the legs. */
-function robe(d: Draw, s: Skel, wave: number) {
-  const back = s.ankN.x < s.ankF.x ? s.ankN : s.ankF;
-  const front = back === s.ankN ? s.ankF : s.ankN;
-  const kneeF = Math.max(s.kneeN.x, s.kneeF.x);
-  const kneeB = Math.min(s.kneeN.x, s.kneeF.x);
-  const waistB = s.T(2, -6.8), waistF = s.T(2, 7.4);
-  const hemY = (a: V) => Math.max(7, a.y + 5);
-  const hemB = v(Math.min(back.x - 7.5, waistB.x - 5), hemY(back));
-  const hemF = v(Math.max(front.x + 5, waistF.x + 3.4), hemY(front));
-  const midF = v(Math.max(kneeF + 4.2, waistF.x + 1.6), lerpV(waistF, hemF, 0.5).y);
-  const midB = v(Math.min(kneeB - 5, waistB.x - 3), lerpV(waistB, hemB, 0.5).y);
-  const hem: V[] = [];
-  const n = 8;
-  for (let i = 0; i <= n; i++) {
-    const t = i / n;
-    const p = lerpV(hemF, hemB, t);
-    hem.push(v(p.x, p.y + Math.sin(wave + t * 9) * 0.7));
-  }
-  const axisA = lerpV(waistB, waistF, 0.5), axisB = lerpV(hemB, hemF, 0.5);
-  d.poly({ mat: TL, z: 15, group: 'robe', tex: foldTex(10, wave * 0.6, 0.66) }, [waistB, waistF, midF, ...hem, midB], { kind: 'cyl', a: axisA, b: axisB, r: Math.max(6, (hemF.x - hemB.x) / 2), bevel: 1.2 });
+const AGBADA: RobeCfg = { waist: [2, 6.8, 7.4], hemDrop: -5, hemFloor: 7, hemBack: [7.5, 5], hemFront: [5, 3.4], midBack: [5, 3], midFront: [4.2, 1.6], ripple: 0.7 };
+
+/** The agbada: a wide robe to mid-shin, so the trousers and slippers show below it. */
+function agbada(d: Draw, s: Skel, wave: number) {
+  const r = robe(s, AGBADA, wave);
+  d.poly({ mat: TL, z: 15, group: 'robe', tex: foldTex(10, wave * 0.6, 0.66) }, r.outline, { kind: 'cyl', a: r.axisA, b: r.axisB, r: Math.max(6, r.halfWidth), bevel: 1.2 });
   // embroidered hem: gold band with a row of glowing stitches above it
-  d.ribbon({ mat: GD, z: 15.2, group: 'robe', line: 'none' }, hem.map((p) => v(p.x, p.y + 0.8)), hem.map(() => 0.9));
-  d.pixels({ mat: TL, z: 15.3, group: 'robe' }, hem.filter((_, i) => i % 2 === 1).map((p) => ({ p: v(p.x, p.y + 2.6), c: HL.ramp[4] })));
+  d.ribbon({ mat: GD, z: 15.2, group: 'robe', line: 'none' }, upRobe(r, r.hem, 0.8), r.hem.map(() => 0.9));
+  d.pixels({ mat: TL, z: 15.3, group: 'robe' }, upRobe(r, r.hem.filter((_, i) => i % 2 === 1), 2.6).map((p) => ({ p, c: HL.ramp[4] })));
 }
 
 /** Gold embroidery on the agbada front: a shield-shaped panel of scrolls with light stitched in. */

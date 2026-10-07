@@ -41,7 +41,7 @@ Read first: `docs/MECHANICS_GUIDE.md` (sections 4-10), `docs/ART_GUIDE.md` (sect
 
 1. Copy `templates/champion-art.template.ts` to `tools/art/champions/<id>.ts` (or the closest existing champion, see the worksheet) and register it in `tools/art/champions/index.ts`.
 2. Dims within the proportions of ART_GUIDE 2.2; materials only from `MAT`, `ACCENT`, `INK` — **no color literals** in the module.
-3. Build order in `build()`: things behind the body (cape, wings, back weapon) -> far leg and arm (`shade: -1`) -> torso and costume -> head -> near leg -> weapon (+ `smear` on frames flagged `smear`) -> near arm. Use `parts.ts` (`leg`, `arm`, `torsoPts`, `cape`, `sword`, `smear`) and `common.ts` (`face`, `glint`).
+3. Build order in `build()`: things behind the body (cape, wings, back weapon) -> far leg and arm (`shade: -1`) -> torso and costume -> head -> near leg -> weapon (+ `smear` on frames flagged `smear`) -> near arm. Use `parts.ts` (`leg`, `arm`, `torsoPts`, `cape`, `sword`, `smear`, and `robe` for long robes and dresses, which also stays right when the champion falls) and `common.ts` (`face`, `glint`).
 4. The silhouette feature must survive a solid-black fill; check it in the collection (locked cards) or by filling the lineup.
    Check the details at pixel level with `npx tsx tools/art/zoom.ts <id> idle 0 out.png 9`. Typical problems it catches: a band drawn as a capsule along a limb turns into a blob (draw thin rings across the limb instead), jewellery hidden behind the jaw, a hat that reads as a different hat.
 5. Animations: `idle` (6-8 frames, whole-pixel breathing), `run` (8), every `anim` the skills name, `hurt` (3), `death` (6, last frame 600 ms; capes below the feet are clipped automatically), plus `rise` if the champion has Undying. Attacks follow anticipation -> strike (`hit: true`, `smear: true`) -> follow-through -> recovery. Events: `shoot`, `jump`, `cast`; pose channel `turn: 1` flips one frame.
@@ -72,6 +72,9 @@ Visual review — look at every image before calling it done:
 
 ```bash
 npx tsx tools/art/preview.ts <id> 2 out.png all both      # every animation, both facings
+npx tsx tools/art/review.ts <id> out.png 3 both           # the same, cropped tight, with hit and event ticks
+npx tsx tools/art/groundcheck.ts                          # feet, robes or gear sinking through the floor
+npx tsx tools/art/fxcheck.ts                              # new effects cut off at their box (give them pad)
 npx tsx tools/art/lineup.ts lineup.png 3                  # next to the other champions
 npm run dev                                               # then, in another shell:
 npx tsx tools/shots.ts "http://localhost:5173/?demo=<skill_id>" out "w3500,B12:150"

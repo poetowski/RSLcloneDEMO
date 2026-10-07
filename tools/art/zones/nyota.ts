@@ -517,12 +517,13 @@ function backdrop(W = 640, Hh = 200): Bitmap {
   disc(b, STAR_X, STAR_Y, 8, (x, y, d) => rampDither(H(['#ffc070', '#ffe0a0', '#fff6e0', '#ffffff']), 3.6 - d * 2.4, x, y));
   // the ringed world in the upper right, lit from the star
   ringedWorld(b, 548, 46);
-  // the sky-tower: a needle on the far plateau with a beam of hard light into the sky
-  skyTower(b, 470, 150);
+  // the sky-tower: a needle on the far plateau, framed by the gap between the gate tower and the first pylon
+  skyTower(b, 432, 150);
   // the mesas of the city, lights in the cliffs
   mesas(b);
   // floating islands drifting above the plain (distant ones; a near one is a prop)
-  for (const [x, y, s] of [[404, 104, 0.6], [612, 92, 0.75], [520, 120, 0.45]] as const) farIsland(b, x, y, s);
+  // (only where the architecture leaves the sky open: one hidden behind a tower or the near island just leaves a stray sliver)
+  for (const [x, y, s] of [[612, 92, 0.75]] as const) farIsland(b, x, y, s);
   return b;
 }
 
@@ -553,12 +554,14 @@ function ringedWorld(b: Bitmap, cx: number, cy: number) {
 }
 
 function skyTower(b: Bitmap, cx: number, base: number) {
-  // the beam first, fading as it climbs
-  for (let y = 0; y < base - 70; y++) {
-    const k = y / (base - 70);
+  // a beacon of hard light rising from the tip and dissolving into the sky
+  const tip = base - 73, reach = 52;
+  for (let y = tip - reach; y < tip; y++) {
+    const k = (tip - y) / reach; // 0 at the tip .. 1 where it fades out
     for (let x = cx - 1; x <= cx + 1; x++) {
-      if (!dith(x, y, 0.25 + k * 0.75 - Math.abs(x - cx) * 0.3)) continue;
-      b.set(x, y, x === cx ? HL[k > 0.5 ? 4 : 3] : HL[2]);
+      const side = x !== cx;
+      if (!dith(x, y, (1 - k) * (side ? 0.45 : 1.15))) continue;
+      b.set(x, y, side ? HL[1] : HL[k < 0.3 ? 4 : k < 0.65 ? 3 : 2]);
     }
   }
   // the needle: slender, flaring at the base, rings of light along it
@@ -622,8 +625,13 @@ function farIsland(b: Bitmap, cx: number, cy: number, s: number) {
     b.set(x, cy, GRASS[1]);
     b.set(x, cy - 1, GRASS[hash2(x, 1, 3) > 0.5 ? 1 : 0]);
   }
-  // a thread of falling water
-  for (let y = Math.round(cy + 2); y < cy + h + 18 * s; y++) if (dith(Math.round(cx + w * 0.55), y, 1 - (y - cy) / (h + 18 * s))) b.set(Math.round(cx + w * 0.55), y, hex('#a8d8f0'));
+  // a thread of falling water, solid where it leaves the rock, thinning into spray
+  const wx = Math.round(cx + w * 0.55), len = h + 14 * s;
+  for (let k = 1; k < len; k++) {
+    const y = Math.round(cy + k);
+    if (k / len > 0.55 && !dith(wx, y, 1 - (k / len - 0.55) / 0.45)) continue;
+    b.set(wx, y, hex(k < 4 ? '#e8f8ff' : '#a8d8f0'));
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -742,21 +750,36 @@ function island(n = 4): Bitmap[] {
     // a flat-topped acacia
     for (let y = top - 18; y < top; y++) b.set(24 + Math.round((y - top) * -0.15), y, BARK[2]);
     ellipseFill(b, 22, top - 20, 13, 3.2, (x, y, d) => rampDither(GR, 3 - (x - 10) / 16 - (y - (top - 22)) / 4 - d * 0.4, x, y));
-    // the waterfall: off the right lip, breaking into mist below the rock
-    for (let y = top + 2; y < 100; y++) {
-      const spread = 1 + Math.max(0, y - top - 30) / 9;
-      const cx = 56 + (y - top) * 0.05;
-      for (let x = Math.floor(cx - spread); x <= Math.ceil(cx + spread); x++) {
-        const u = Math.abs(x + 0.5 - cx) / spread;
-        if (u > 1) continue;
-        const fade = Math.max(0, (y - top - 40) / 50);
-        if (!dith(x, y, 1 - fade - u * 0.4 + (((y + i * 5) % 7) < 2 ? -0.4 : 0))) continue;
-        b.set(x, y, WATER[u < 0.4 ? 3 : u < 0.8 ? 2 : 1]);
-      }
-    }
-    out.push(outline(b, ROCK[0]));
+    const solid = outline(b, ROCK[0]);
+    waterfall(solid, top, i, WATER);
+    out.push(solid);
   }
   return out;
+}
+
+/**
+ * Water pouring off the island's right lip: a ribbon that arcs away from the
+ * rock with streaks running down it frame by frame, thinning out as it falls
+ * and breaking up into a cloud of spray. Drawn without an outline, like light.
+ */
+function waterfall(b: Bitmap, top: number, frame: number, WATER: RGBA[]) {
+  const x0 = 57, fall = 46;
+  for (let y = top + 1; y <= top + fall; y++) {
+    const k = (y - top) / fall; // 0 at the lip .. 1 where it breaks up
+    const cx = x0 + Math.sqrt(k) * 2.5;
+    const half = 1.1 + k * 1.3;
+    for (let x = Math.floor(cx - half - 1); x <= Math.ceil(cx + half + 1); x++) {
+      const u = Math.abs(x + 0.5 - cx) / half;
+      if (u > 1) continue;
+      if (k > 0.6 && !dith(x, y, 1 - (k - 0.6) / 0.4)) continue;
+      const streak = (((y - frame * 3 + (x & 1) * 2) % 5) + 5) % 5 === 0;
+      b.set(x, y, u > 0.72 ? WATER[1] : streak ? WATER[2] : WATER[3]);
+    }
+  }
+  const sy = top + fall + 3;
+  ellipseFill(b, x0 + 3, sy, 8, 3.5, (x, y, d) => (dith(x, y, (1 - d) * 1.4) ? WATER[d < 0.5 ? 3 : 2] : 0));
+  const r = rng(frame * 7 + 3);
+  for (let k = 0; k < 6; k++) b.set(Math.round(x0 + 3 + (r() - 0.5) * 16), Math.round(sy - 2 + (r() - 0.5) * 8), WATER[3]);
 }
 
 /** Drums of the griots: two djembes and a talking drum on its side. */

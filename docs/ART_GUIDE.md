@@ -54,6 +54,8 @@ Heroic stylisation: slightly large head and hands for readability, broad shoulde
 - **Near limbs** are drawn in front of the torso. **Far limbs** are drawn behind it and shaded **one ramp step darker** (`shade: -1`).
 - A shield or second weapon on the far arm sits between the torso and the near arm, so the near (weapon) arm always reads on top.
 - Capes, manes, wings and quivers sit behind everything; tabards, aprons and kilts sit between the legs.
+- Long robes and dresses use `robe()` (`parts.ts`): standing, the cloth hangs straight down with the hem just off the ground; once the wearer tips over (torso under 55 degrees: falling, lying dead) it follows the legs, so it never smears along the floor or leaves the feet behind. Anything else that hangs (sashes, tassels) hangs the same way as the robe.
+- Feet stay on the floor: a kneeling back foot rests on its toes, heel up; only a weapon striking or planted may go below the feet line.
 
 ### 2.4 Silhouette and hue
 
@@ -172,6 +174,8 @@ Weapon smears are crescents drawn between the previous and current weapon angle:
 - Every effect uses `FXR` ramps ending in a near-white core.
 - 40-80 ms per frame; impacts are 5-8 frames, set pieces up to 12 (the sarcophagus), looping cues (stun stars, cast circles, projectiles) loop.
 - Each effect has an **anchor**: chest-level impacts are centered (`ay 0.5`), ground effects are anchored at the feet (`ay 0.9-1.0`); the battle places any effect with `ay > 0.8` on the target's feet automatically.
+- Nothing is cut off by its box. An effect that grows past it (rings at the feet, spikes, bursts, sparks) gets room with `pad: [top, right, bottom, left]`: the drawing keeps its own coordinates, and the built box and anchor include the room, so the effect lands on the same spot. `npm run audit` fails any frame that runs into its box edge, and padding that would move a ground effect's anchor to 0.8 or below.
+- Beams from the sky (holy light, sunfire) dissolve toward the top with dithering instead of ending in a straight line.
 - Draw layers: `ground` (cast circles, cracks, shockwaves), `world` (depth-sorted with units: ice spikes), `top` (slashes, beams, pillars, numbers).
 - Additive blending only for light (holy beams, heal sparkles, hit stars, fire bursts, the revive helix). Solid effects (ice, sand, smoke, the sarcophagus) are drawn normally.
 - Hit effects are designed facing right; the battle flips them when the attacker faces left.
@@ -237,7 +241,7 @@ Frame rects are `[x, y, w, h, ox, oy]` where `ox, oy` is the trimmed rect's offs
 | Command | What |
 | --- | --- |
 | `npm run art` | build everything (`-- champions <id>`, `-- zones <id>`, `-- fx`, `-- ui`, `-- map`) |
-| `npm run audit` | palette, heights, frame-box clipping, literals, zone color budgets, icon sizes |
+| `npm run audit` | palette, heights, frame-box clipping, literals, zone color budgets, effects cut off by their box, icon sizes |
 | `npx tsx tools/art/preview.ts <id> 2 out.png all both` | contact sheet of every animation, both facings |
 | `npx tsx tools/art/lineup.ts out.png 3` | every champion side by side |
 | `npx tsx tools/art/fxpreview.ts out.png 2 name,name` | effect frames |
@@ -245,4 +249,9 @@ Frame rects are `[x, y, w, h, ox, oy]` where `ox, oy` is the trimmed rect's offs
 | `npx tsx tools/art/iconpreview.ts <id>[,<id>] out.png 6` | a champion's three skill icons, enlarged |
 | `npx tsx tools/art/measure.ts [<id> <anim>]` | standing heights; with an animation, hand positions at hit frames (for `muzzle`) |
 | `npx tsx tools/art/uipreview.ts out.png 3 [prefix]` | UI parts and status icons |
+| `npx tsx tools/art/review.ts <id> out.png 2 [right\|left\|both] [anim,anim]` | every animation as a row, frames cropped tight, hit (red) and event (cyan) ticks: the sheet to review a champion with |
+| `npx tsx tools/art/groundcheck.ts` | frames with pixels below the floor line (feet, robes or gear sinking through it) |
+| `npx tsx tools/art/framediff.ts save\|diff <dir> <id,id>` | snapshot every frame, then list the frames a change touched: proves a refactor changes only what it means to |
+| `npx tsx tools/art/fxcheck.ts` | effect frames cut off at their box edge (the audit's rule) |
+| `npx tsx tools/art/fxzoom.ts <name> out.png 4 [frames]` | effect frames inside an outline of their box, with the anchor marked |
 | `gallery.html` | every animation, effect and icon looping in the browser |

@@ -6,9 +6,9 @@ import { BuildInfo, ChampionArt, CharDef, cycle, keys } from '../char.ts';
 import { C, compose, glyph, sunDisc } from '../icons.ts';
 import { ACCENT, Material, MAT } from '../palette.ts';
 import { ellipseRing, line } from '../paint.ts';
-import { foldTex, torsoPts } from '../parts.ts';
+import { foldTex, robe, RobeCfg, torsoPts, upRobe } from '../parts.ts';
 import { withAlpha } from '../raster.ts';
-import { at, D2R, dir, Dims, Draw, lerpPose, lerpV, pose, Pose, Skel, tweak, V, v } from '../rig.ts';
+import { angleOf, at, D2R, dir, Dims, Draw, lerpPose, lerpV, pose, Pose, Skel, tweak, V, v } from '../rig.ts';
 import { face } from './common.ts';
 
 const D: Dims = {
@@ -47,7 +47,7 @@ function build(d: Draw, s: Skel, info: BuildInfo) {
     d.line({ mat: SK, z: z + 0.1, group: 'foot' + side, line: 'none' }, f(-1, -2.4), f(5.6, -2.4), GD.ramp[3]);
   }
 
-  dress(d, s, wave);
+  const hang = angleOf(dress(d, s, wave));
 
   arm(d, s, 'F', 20, -1);
 
@@ -66,7 +66,8 @@ function build(d: Draw, s: Skel, info: BuildInfo) {
   // gold belt with a long red sash falling in front
   d.poly({ mat: GD, z: 33, group: 'body' }, [s.T(2.8, -5.2), s.T(3.0, 5.7), s.T(0.8, 5.5), s.T(0.6, -5.0)], { kind: 'cyl', a: s.T(0, 0), b: s.T(3, 0), r: 5.6 });
   const k = s.T(1.6, 5.0);
-  d.ribbon({ mat: RD, z: 33.1, group: 'sash' }, [k, at(k, -96 + Math.sin(wave) * 4, 10), at(k, -92 + Math.sin(wave + 1) * 6, 20)], [1.6, 1.5, 1.2], 0.35);
+  // the sash hangs with the dress: straight down while she stands, along the dress once she falls
+  d.ribbon({ mat: RD, z: 33.1, group: 'sash' }, [k, at(k, hang - 6 + Math.sin(wave) * 4, 10), at(k, hang - 2 + Math.sin(wave + 1) * 6, 20)], [1.6, 1.5, 1.2], 0.35);
 
   head(d, s, P);
 
@@ -129,27 +130,15 @@ function wing(d: Draw, s: Skel, side: 'N' | 'F', z: number, shade: number, sprea
   });
 }
 
-function dress(d: Draw, s: Skel, wave: number) {
-  const back = s.ankN.x < s.ankF.x ? s.ankN : s.ankF;
-  const front = back === s.ankN ? s.ankF : s.ankN;
-  const kneeF = Math.max(s.kneeN.x, s.kneeF.x);
-  const kneeB = Math.min(s.kneeN.x, s.kneeF.x);
-  const waistB = s.T(1.6, -5.0), waistF = s.T(1.6, 5.4);
-  const hemB = v(Math.min(back.x - 5, waistB.x - 3), Math.max(1.4, back.y - 1.4));
-  const hemF = v(Math.max(front.x + 3.2, waistF.x + 2), Math.max(1.4, front.y - 1.4));
-  const midF = v(Math.max(kneeF + 2.8, waistF.x + 0.8), lerpV(waistF, hemF, 0.5).y);
-  const midB = v(Math.min(kneeB - 3.4, waistB.x - 1.8), lerpV(waistB, hemB, 0.5).y);
-  const hem: V[] = [];
-  const n = 8;
-  for (let i = 0; i <= n; i++) {
-    const t = i / n;
-    const p = lerpV(hemF, hemB, t);
-    hem.push(v(p.x, p.y + Math.sin(wave + t * 9) * 0.7));
-  }
-  const axisA = lerpV(waistB, waistF, 0.5), axisB = lerpV(hemB, hemF, 0.5);
-  d.poly({ mat: LN, z: 15, group: 'dress', tex: foldTex(10, wave * 0.6, 0.66) }, [waistB, waistF, midF, ...hem, midB], { kind: 'cyl', a: axisA, b: axisB, r: Math.max(6, (hemF.x - hemB.x) / 2), bevel: 1.2 });
-  d.ribbon({ mat: GD, z: 15.2, group: 'dress', line: 'none' }, hem.map((p) => v(p.x, p.y + 0.8)), hem.map(() => 0.9));
-  d.ribbon({ mat: LP, z: 15.15, group: 'dress', line: 'none' }, hem.map((p) => v(p.x, p.y + 2.2)), hem.map(() => 0.7));
+const DRESS: RobeCfg = { waist: [1.6, 5.0, 5.4], hemDrop: 1.4, hemFloor: 1.4, hemBack: [5, 3], hemFront: [3.2, 2], midBack: [3.4, 1.8], midFront: [2.8, 0.8], ripple: 0.7 };
+
+/** The linen sheath dress with its gold and lapis hem; returns which way the dress hangs. */
+function dress(d: Draw, s: Skel, wave: number): V {
+  const r = robe(s, DRESS, wave);
+  d.poly({ mat: LN, z: 15, group: 'dress', tex: foldTex(10, wave * 0.6, 0.66) }, r.outline, { kind: 'cyl', a: r.axisA, b: r.axisB, r: Math.max(6, r.halfWidth), bevel: 1.2 });
+  d.ribbon({ mat: GD, z: 15.2, group: 'dress', line: 'none' }, upRobe(r, r.hem, 0.8), r.hem.map(() => 0.9));
+  d.ribbon({ mat: LP, z: 15.15, group: 'dress', line: 'none' }, upRobe(r, r.hem, 2.2), r.hem.map(() => 0.7));
+  return r.down;
 }
 
 function collar(d: Draw, s: Skel, z: number) {

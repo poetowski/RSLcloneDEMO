@@ -45,7 +45,7 @@ function soundRings(b: Bitmap, cx: number, cy: number, maxR: number, t: number, 
 export const NYOTA_FX: Record<string, FxDef> = {
   // Imara's Sunspear Flurry: a lance of hard light punches through, magenta sparks fly
   spear_thrust: {
-    w: 64, h: 36, n: 6, ms: 45, ax: 0.5, ay: 0.5,
+    w: 64, h: 36, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [8, 0, 12, 0],
     draw: (b, t, i) => {
       if (i < 4) lance(b, [14, 4, 8, 16][i], [40, 56, 58, 54][i], 18, [1.5, 2.6, 2, 1.2][i], HL, [1.3, 1.2, 1, 0.7][i]);
       if (i >= 1 && i < 4) burst(b, 40, 18, 8, [3, 3, 2][i - 1], [12, 15, 9][i - 1], 1.6, HL, 0.39);
@@ -136,7 +136,7 @@ export const NYOTA_FX: Record<string, FxDef> = {
     draw: (b, t, i) => {
       // two beats: each sends a pair of rings out
       for (const [t0, ramp] of [[0, HL], [0.45, GO]] as const) {
-        const tt = (t - t0) / 0.55;
+        const tt = (t - t0) / 0.6;
         if (tt < 0 || tt > 1) continue;
         soundRings(b, 44, 32, 40, tt, ramp, 0.62, 2);
       }
@@ -145,7 +145,7 @@ export const NYOTA_FX: Record<string, FxDef> = {
   },
   // ...and at each ally's feet a beat ring and chevrons racing upward (Turn Meter + SPD Up)
   rhythm: {
-    w: 48, h: 72, n: 9, ms: 60, ax: 0.5, ay: 0.95,
+    w: 48, h: 72, n: 9, ms: 60, ax: 0.5, ay: 0.95, pad: [0, 0, 8, 0],
     draw: (b, t, i) => {
       const base = 68;
       const beat = i < 4 ? i / 3 : (i - 4) / 4;
@@ -167,7 +167,7 @@ export const NYOTA_FX: Record<string, FxDef> = {
 
   // Starsong Crescendo: a star kindles above the target and pours down as light and sound
   crescendo: {
-    w: 64, h: 104, n: 10, ms: 60, ax: 0.5, ay: 0.95,
+    w: 64, h: 104, n: 10, ms: 60, ax: 0.5, ay: 0.95, pad: [0, 0, 12, 0],
     draw: (b, t, i) => {
       const base = 99;
       const k = [0.4, 0.8, 1, 1, 1, 0.9, 0.7, 0.5, 0.3, 0.15][i];
@@ -233,7 +233,7 @@ export const NYOTA_FX: Record<string, FxDef> = {
 
   // Starfall Protocol: forged stars streak down onto the target and burst at its feet
   starfall: {
-    w: 80, h: 120, n: 11, ms: 55, ax: 0.5, ay: 0.95,
+    w: 80, h: 120, n: 11, ms: 55, ax: 0.5, ay: 0.95, pad: [0, 0, 11, 0],
     draw: (b, t, i) => {
       const base = 114;
       const stars: [number, number, number][] = [
@@ -269,7 +269,7 @@ export const NYOTA_FX: Record<string, FxDef> = {
 
   // Overdrive (passive): the guardian's core overloads, gold-white rays break from its chest
   overdrive: {
-    w: 80, h: 104, n: 10, ms: 60, ax: 0.5, ay: 0.95,
+    w: 80, h: 104, n: 10, ms: 60, ax: 0.5, ay: 0.95, pad: [0, 8, 10, 8],
     draw: (b, t, i) => {
       const base = 99, cy = 52;
       if (i < 4) burst(b, 40, cy, 12, [3, 6, 7, 5][i], [12, 26, 34, 24][i], 2.6, CO, i * 0.08);

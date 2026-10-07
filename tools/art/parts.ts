@@ -173,6 +173,83 @@ export function cape(d: Draw, s: Skel, c: CapeCfg) {
 }
 
 // ---------------------------------------------------------------------------
+// Robes
+// ---------------------------------------------------------------------------
+
+export interface RobeCfg {
+  /** waist band: torso-local height, and how far it reaches back and front */
+  waist: [u: number, back: number, front: number];
+  /** how far the hem reaches past the ankles (negative: it stops above them) */
+  hemDrop: number;
+  /** standing, the hem never dips below this height above the ground */
+  hemFloor: number;
+  /** at the hem: room beyond the back / front ankle, and the least beyond the waist band */
+  hemBack: [ankle: number, waist: number];
+  hemFront: [ankle: number, waist: number];
+  /** the same halfway down, measured from the knees */
+  midBack: [knee: number, waist: number];
+  midFront: [knee: number, waist: number];
+  /** hem wobble, and a zigzag on every other hem point (fur, fringe) */
+  ripple: number;
+  zigzag?: number;
+}
+
+export interface Robe {
+  /** waist back and front, the front edge, the hem front to back, the back edge */
+  outline: V[];
+  hem: V[];
+  waistB: V;
+  waistF: V;
+  hemB: V;
+  hemF: V;
+  /** shading axis from the waist to the hem, and the hem's half width */
+  axisA: V;
+  axisB: V;
+  halfWidth: number;
+  /** unit vector from the waist toward the hem: straight down while standing */
+  down: V;
+}
+
+/**
+ * A long robe or dress from the waist to the hem. Standing, the cloth hangs
+ * straight down and the hem keeps just off the ground; once the wearer tips
+ * over (falling, lying dead) the robe follows the legs instead, so it never
+ * smears along the floor and never leaves the feet behind.
+ */
+export function robe(s: Skel, c: RobeCfg, wave: number): Robe {
+  const waistB = s.T(c.waist[0], -c.waist[1]), waistF = s.T(c.waist[0], c.waist[2]);
+  const o = lerpV(waistB, waistF, 0.5);
+  const fallen = s.torso < 55;
+  let down = v(0, -1);
+  if (fallen) {
+    const d = sub(lerpV(s.ankN, s.ankF, 0.5), o);
+    down = mul(d, 1 / (Math.hypot(d.x, d.y) || 1));
+  }
+  // u runs down the robe, w across it (toward the front while standing)
+  const across = v(-down.y, down.x);
+  const U = (p: V) => (p.x - o.x) * down.x + (p.y - o.y) * down.y;
+  const W = (p: V) => (p.x - o.x) * across.x + (p.y - o.y) * across.y;
+  const P = (u: number, w: number) => v(o.x + down.x * u + across.x * w, o.y + down.y * u + across.y * w);
+  const [back, front] = W(s.ankN) < W(s.ankF) ? [s.ankN, s.ankF] : [s.ankF, s.ankN];
+  const kneeF = Math.max(W(s.kneeN), W(s.kneeF)), kneeB = Math.min(W(s.kneeN), W(s.kneeF));
+  const hemU = (a: V) => (fallen ? U(a) + c.hemDrop : Math.min(U(a) + c.hemDrop, o.y - c.hemFloor));
+  const hemB = P(hemU(back), Math.min(W(back) - c.hemBack[0], W(waistB) - c.hemBack[1]));
+  const hemF = P(hemU(front), Math.max(W(front) + c.hemFront[0], W(waistF) + c.hemFront[1]));
+  const midF = P((U(waistF) + U(hemF)) / 2, Math.max(kneeF + c.midFront[0], W(waistF) + c.midFront[1]));
+  const midB = P((U(waistB) + U(hemB)) / 2, Math.min(kneeB - c.midBack[0], W(waistB) - c.midBack[1]));
+  const hem: V[] = [];
+  for (let i = 0; i <= 8; i++) {
+    const t = i / 8;
+    const lift = Math.sin(wave + t * 9) * c.ripple + (i % 2 ? (c.zigzag ?? 0) : 0);
+    hem.push(sub(lerpV(hemF, hemB, t), mul(down, lift)));
+  }
+  return { outline: [waistB, waistF, midF, ...hem, midB], hem, waistB, waistF, hemB, hemF, axisA: o, axisB: lerpV(hemB, hemF, 0.5), halfWidth: (W(hemF) - W(hemB)) / 2, down };
+}
+
+/** Moves points toward the waist of a robe by `k` px (hem bands, trims). */
+export const upRobe = (r: Robe, pts: V[], k: number) => pts.map((p) => sub(p, mul(r.down, k)));
+
+// ---------------------------------------------------------------------------
 // Weapons
 // ---------------------------------------------------------------------------
 

@@ -249,7 +249,8 @@ const KNEEL = pose({
   y: -11,
   torso: 84,
   head: 90,
-  legN: { ik: v(-13, 3) },
+  // back foot: heel up, toes tucked on the floor (lower and the toes sink through it)
+  legN: { ik: v(-13, 6) },
   legF: { ik: v(9, 3) },
   footN: -70,
   p: { cape: 0.1, wave: 0.4, braid: 0 },

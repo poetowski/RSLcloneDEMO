@@ -3,7 +3,7 @@
 // shards. Signature color: ice blue + cyan glow.
 import { BuildInfo, ChampionArt, CharDef, cycle, keys } from '../char.ts';
 import { ACCENT, INK, MAT } from '../palette.ts';
-import { foldTex, torsoPts } from '../parts.ts';
+import { foldTex, robe, RobeCfg, torsoPts, upRobe } from '../parts.ts';
 import { hex } from '../raster.ts';
 import { at, Dims, Draw, ease, lerpPose, lerpV, pose, Pose, Skel, tweak, V, v } from '../rig.ts';
 import { face } from './common.ts';
@@ -105,33 +105,19 @@ function sleeveArm(d: Draw, s: Skel, side: 'N' | 'F', z: number, shade: number) 
   d.ellipse({ mat: SK, z: z - 0.05, group: g + 'h', shade, line: 'soft' }, at(ha, lo, 0.8), 2.2, 1.9, lo);
 }
 
+const ROBE: RobeCfg = { waist: [1.6, 5.4, 5.6], hemDrop: 1.6, hemFloor: 1.2, hemBack: [6.5, 4.5], hemFront: [3.8, 2.5], midBack: [4.2, 2.5], midFront: [3.5, 1.4], ripple: 0.9, zigzag: 0.6 };
+
 function robeSkirt(d: Draw, s: Skel, wave: number) {
-  const back = s.ankN.x < s.ankF.x ? s.ankN : s.ankF;
-  const front = back === s.ankN ? s.ankF : s.ankN;
-  const kneeF = Math.max(s.kneeN.x, s.kneeF.x);
-  const kneeB = Math.min(s.kneeN.x, s.kneeF.x);
-  const waistB = s.T(1.6, -5.4), waistF = s.T(1.6, 5.6);
-  const hemB = v(Math.min(back.x - 6.5, waistB.x - 4.5), Math.max(1.2, back.y - 1.6));
-  const hemF = v(Math.max(front.x + 3.8, waistF.x + 2.5), Math.max(1.2, front.y - 1.6));
-  const midF = v(Math.max(kneeF + 3.5, waistF.x + 1.4), lerpV(waistF, hemF, 0.5).y);
-  const midB = v(Math.min(kneeB - 4.2, waistB.x - 2.5), lerpV(waistB, hemB, 0.5).y);
-  const hem: V[] = [];
-  const n = 8;
-  for (let i = 0; i <= n; i++) {
-    const t = i / n;
-    const p = lerpV(hemF, hemB, t);
-    hem.push(v(p.x, p.y + Math.sin(wave + t * 9) * 0.9 + (i % 2 ? 0.6 : 0)));
-  }
-  const axisA = lerpV(waistB, waistF, 0.5), axisB = lerpV(hemB, hemF, 0.5);
+  const r = robe(s, ROBE, wave);
   d.poly(
     { mat: IC, z: 15, group: 'skirt', tex: foldTex(9, wave * 0.6, 0.62) },
-    [waistB, waistF, midF, ...hem, midB],
-    { kind: 'cyl', a: axisA, b: axisB, r: Math.max(7, (hemF.x - hemB.x) / 2), bevel: 1.2 },
+    r.outline,
+    { kind: 'cyl', a: r.axisA, b: r.axisB, r: Math.max(7, r.halfWidth), bevel: 1.2 },
   );
   // fur hem
-  d.ribbon({ mat: FW, z: 15.2, group: 'skirt', tex: (h, x, y) => ((x * 5 + y * 3) % 6 === 0 ? -1 : 0) }, hem.map((p) => v(p.x, p.y + 0.6)), hem.map(() => 1.5));
+  d.ribbon({ mat: FW, z: 15.2, group: 'skirt', tex: (h, x, y) => ((x * 5 + y * 3) % 6 === 0 ? -1 : 0) }, upRobe(r, r.hem, 0.6), r.hem.map(() => 1.5));
   // front opening trim
-  d.capsule({ mat: SV, z: 15.3, group: 'skirt', line: 'none' }, lerpV(waistF, waistB, 0.25), lerpV(hemF, hemB, 0.2), 0.6, 0.6);
+  d.capsule({ mat: SV, z: 15.3, group: 'skirt', line: 'none' }, lerpV(r.waistF, r.waistB, 0.25), lerpV(r.hemF, r.hemB, 0.2), 0.6, 0.6);
 }
 
 function hairBack(d: Draw, s: Skel, sway: number) {

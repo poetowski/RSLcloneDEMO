@@ -5,6 +5,8 @@
 //              idle height >= 64 px, no frame touches the frame box edges,
 //              no hex literals in tools/art/champions/*.ts
 //   zones      backdrop 640x200, tiles on the 32px grid, color budgets
+//   effects    no frame is cut off at the edge of its box; padding keeps
+//              ground effects (anchor ay > 0.8) planted on the feet
 //   ui         skill icons 40x40, status icons 12x12
 // Exits with code 1 when anything fails.
 import fs from 'node:fs';
@@ -14,6 +16,8 @@ import { CHAMPION_ART } from './champions/index.ts';
 import { ACCENT, INK, MAT } from './palette.ts';
 import { A, Bitmap } from './raster.ts';
 import { ZONE_ART } from './zones/index.ts';
+import { FX } from './fx/index.ts';
+import { fxBox, fxEdges } from './fx/kit.ts';
 
 const MIN_HEIGHT = 64;
 const MAX_HEIGHT = 96;
@@ -89,6 +93,22 @@ for (const z of Object.values(ZONE_ART)) {
   if (nt > TILESET_COLORS) fail(`${z.id}: tileset uses ${nt} colors (budget ${TILESET_COLORS})`);
   else ok(`${z.id}: tileset ${tiles.w / 32}x${tiles.h / 32} tiles, ${nt} colors`);
 }
+
+console.log('effects');
+let fxBad = 0;
+for (const [name, d] of Object.entries(FX)) {
+  const cut = fxEdges(d);
+  if (cut.length) {
+    fxBad++;
+    fail(`${name}: ${cut.map((e) => `frame ${e.frame} ${e.empty ? 'is empty' : `cut off at the ${Object.keys(e.cut).join(', ')}`}`).join('; ')} (give it room with \`pad\`)`);
+  }
+  // the battle plants effects with ay > 0.8 on the target's feet: padding must not move one across that line
+  if ((d.ay > 0.8) !== (fxBox(d).ay > 0.8)) {
+    fxBad++;
+    fail(`${name}: padding moves the anchor across ay 0.8 (${d.ay} -> ${fxBox(d).ay}); pad the other side too`);
+  }
+}
+if (!fxBad) ok(`${Object.keys(FX).length} effects inside their boxes`);
 
 console.log('ui');
 const ui = JSON.parse(fs.readFileSync('public/assets/ui/ui.json', 'utf8'));

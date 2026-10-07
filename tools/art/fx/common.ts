@@ -14,7 +14,7 @@ export const COMMON_FX: Record<string, FxDef> = {
   slash_fire: slash(ramps.fire),
   slash_violet: slash(ramps.violet, -1),
   hit: {
-    w: 40, h: 40, n: 5, ms: 45, ax: 0.5, ay: 0.5,
+    w: 40, h: 40, n: 5, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 4, 4, 4],
     draw: (b, t, i) => {
       if (i < 3) burst(b, 20, 20, 8, [2, 3, 2][i], [9, 16, 12][i], [2.2, 2.6, 1.6][i], ramps.gold, i * 0.2);
       if (i >= 1) sparks(b, 20, 20, 10, 18, t, ramps.gold, 3);
@@ -22,7 +22,7 @@ export const COMMON_FX: Record<string, FxDef> = {
     },
   },
   bash: {
-    w: 64, h: 64, n: 6, ms: 50, ax: 0.5, ay: 0.5,
+    w: 64, h: 64, n: 6, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 4, 10, 4],
     draw: (b, t, i) => {
       ring(b, 32, 32, 8 + t * 24, 8 + t * 24, 4 - t * 3, ramps.gold, 1.2 - t * 0.6);
       if (i < 3) burst(b, 32, 32, 6, 3, [12, 20, 14][i], 3, ramps.gold, 0.3);
@@ -39,7 +39,7 @@ export const COMMON_FX: Record<string, FxDef> = {
           const w = width * (0.75 + 0.25 * (y / 132));
           if (dx > w) continue;
           const k = 1 - dx / w;
-          if (!dith(x, y, Math.min(1, k * 1.6))) continue;
+          if (!dith(x, y, Math.min(1, k * 1.6) * Math.min(1, y / 40))) continue;
           b.set(x, y, rampDither(ramps.gold, 1.4 + k * 3, x, y));
         }
       }
@@ -53,7 +53,7 @@ export const COMMON_FX: Record<string, FxDef> = {
     },
   },
   shield_up: {
-    w: 56, h: 76, n: 7, ms: 60, ax: 0.5, ay: 1,
+    w: 56, h: 76, n: 7, ms: 60, ax: 0.5, ay: 1, pad: [0, 0, 3, 0],
     draw: (b, t, i) => {
       const k = [0.3, 0.7, 1, 1, 1, 0.8, 0.5][i];
       ellipseRing(b, 28, 40, 24 * k + 2, 34 * k + 2, 2, (x, y, a) => (dith(x, y, 0.8) ? rampDither(ramps.gold, 2.5 - Math.sin(a), x, y) : 0));
@@ -143,7 +143,7 @@ export const COMMON_FX: Record<string, FxDef> = {
     },
   },
   ice_prison: {
-    w: 60, h: 88, n: 8, ms: 70, ax: 0.5, ay: 0.95,
+    w: 60, h: 88, n: 8, ms: 70, ax: 0.5, ay: 0.95, pad: [12, 0, 0, 0],
     draw: (b, t, i) => {
       // frames 0-4 form, 5 = hold (loop while frozen), 6-7 shatter
       if (i >= 6) {
@@ -180,7 +180,7 @@ export const COMMON_FX: Record<string, FxDef> = {
     },
   },
   shockwave: {
-    w: 140, h: 44, n: 7, ms: 55, ax: 0.5, ay: 0.5,
+    w: 140, h: 44, n: 7, ms: 55, ax: 0.5, ay: 0.5, pad: [6, 4, 6, 4],
     draw: (b, t) => {
       const rx = 12 + t * 56, ry = rx * 0.28;
       ellipseRing(b, 70, 22, rx, ry, 4 - t * 2.5, (x, y, a) => rampDither(ramps.violet, 3.3 - t * 1.6 + Math.sin(a) * 0.6, x, y));
@@ -216,7 +216,7 @@ export const COMMON_FX: Record<string, FxDef> = {
     },
   },
   dust: {
-    w: 40, h: 20, n: 5, ms: 60, ax: 0.5, ay: 0.85,
+    w: 40, h: 20, n: 5, ms: 60, ax: 0.5, ay: 0.85, pad: [0, 4, 0, 4],
     draw: (b, t) => {
       for (const s of [-1, 1]) {
         const cx = 20 + s * (4 + t * 12), cy = 14 - t * 4;
@@ -233,7 +233,7 @@ export const COMMON_FX: Record<string, FxDef> = {
     },
   },
   heal: {
-    w: 52, h: 76, n: 9, ms: 70, ax: 0.5, ay: 0.95,
+    w: 52, h: 76, n: 9, ms: 70, ax: 0.5, ay: 0.95, pad: [0, 0, 10, 0],
     draw: (b, t) => {
       ellipseRing(b, 26, 70, 12 + t * 12, 4 + t * 3, 1.6, (x, y, a) => rampDither(ramps.green, 3.4 - t * 2 + Math.sin(a) * 0.6, x, y));
       const r = rng(51);
@@ -298,7 +298,7 @@ export const COMMON_FX: Record<string, FxDef> = {
   cast_violet: castCircle(ramps.violet),
   cast_green: castCircle(ramps.green),
   taunt: {
-    w: 48, h: 48, n: 6, ms: 60, ax: 0.5, ay: 0.5,
+    w: 48, h: 48, n: 6, ms: 60, ax: 0.5, ay: 0.5, pad: [3, 3, 3, 3],
     draw: (b, t, i) => {
       ring(b, 24, 24, 6 + t * 18, 6 + t * 18, 3 - t * 2, ramps.fire, 1.1 - t * 0.5);
       if (i < 4) {
