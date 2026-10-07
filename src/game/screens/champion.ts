@@ -123,8 +123,8 @@ export class ChampionScreen extends BaseScreen {
     // --- card
     const px = 268, py = 38, pw = W - px - 8, ph = H - py - 8;
     ui.panel(ctx, 'gold', px, py, pw, ph);
-    ui.text(ctx, c.name, px + 12, py + 10, { color: c.color, variant: 'bold', scale: 2 });
-    ui.text(ctx, c.title, px + 14 + ui.measure(c.name, 'bold', 2) + 6, py + 19, { color: COLORS.dim });
+    ui.text(ctx, c.name, px + 12, py + 10, { color: c.color, variant: 'display' });
+    ui.text(ctx, c.title, px + 12 + ui.measure(c.name, 'display') + 6, py + 16, { color: COLORS.dim });
     let lx = px + 12;
     const ly = py + 34;
     const chip = (part: string, label: string, color: string, tip: () => { title: string; body: string; color?: string }) => {

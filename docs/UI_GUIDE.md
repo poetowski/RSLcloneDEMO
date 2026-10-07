@@ -59,6 +59,7 @@ Every text is drawn with a 1 px dark outline (`ink`), so it reads on any backgro
 
 ## 5. Text rules
 
+- Three faces of one font: `regular` for running text, `bold` for names, labels and headings, `display` for titles, a champion's name in its header or ceremony, and big numbers (cooldowns, critical hits). Display text is always capitals. Never draw `regular` or `bold` at a scale above 1; reach for `display` instead.
 - Headings in caps, body in sentence case. Numbers as digits (`3 turns`, `+25% Attack`).
 - Name what the player sees: "Clear stage 2-3", "Heal Block", "STRONG HIT"; never internal ids.
 - Status names and numbers in the UI come from `statuses.ts` and the Academy text from `codex.ts`; keep them identical to the rules in `battle.ts`.

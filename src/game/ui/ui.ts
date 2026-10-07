@@ -3,7 +3,7 @@
 // parts; clickable regions are rebuilt every frame. Mouse hover and keyboard
 // focus are the same state, so every menu works with arrows + Enter.
 // Layout rules and part names: docs/UI_GUIDE.md.
-import { TextStyle } from '../../engine/font';
+import { TextStyle, Variant } from '../../engine/font';
 import { H, W } from '../../engine/screen';
 import { Assets, blit, nine, Rect4 } from '../view/assets';
 
@@ -92,7 +92,7 @@ export class Ui {
     return this.a.font.draw(ctx, s, x, y, { outline: COLORS.ink, ...st });
   }
 
-  measure(s: string, variant: 'regular' | 'bold' = 'regular', scale = 1) {
+  measure(s: string, variant: Variant = 'regular', scale = 1) {
     return this.a.font.measure(s, variant, scale);
   }
 

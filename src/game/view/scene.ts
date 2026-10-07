@@ -647,7 +647,7 @@ export class BattleScene {
           else if (e.edge < 0) this.fx.text(v.uid, v.x, top() - 10, 'WEAK HIT', { color: '#8fa0c0' });
         }
         if (e.amount > 0) {
-          this.fx.text(v.uid, v.x, top(), String(e.amount), e.crit ? { color: '#ffe060', gradient: '#ff8a20', variant: 'bold', scale: 2, outline: '#2a0a04' } : { color: !skill ? (e.dot === 'burn' ? '#ffb070' : '#b6ff7a') : e.edge > 0 ? '#ffd0a0' : '#ffffff', variant: 'bold', outline: '#2a0a10' });
+          this.fx.text(v.uid, v.x, top(), String(e.amount), e.crit ? { color: '#ffe060', gradient: '#ff8a20', variant: 'display', outline: '#2a0a04' } : { color: !skill ? (e.dot === 'burn' ? '#ffb070' : '#b6ff7a') : e.edge > 0 ? '#ffd0a0' : '#ffffff', variant: 'bold', outline: '#2a0a10' });
         }
         if (e.absorbed) this.fx.text(v.uid, v.x, top(), `ABSORB ${e.absorbed}`, { color: '#ffe48a' });
         break;
@@ -708,7 +708,7 @@ export class BattleScene {
           v.lagHp = e.hp;
           this.syncStatuses(v);
           void this.fx.spawn('revive', v.x, v.y + 1, { layer: 'top', additive: true });
-          this.fx.text(v.uid, v.x, top() - 6, 'UNDYING!', { color: '#a2f56a', variant: 'bold', scale: 2, outline: '#06280e' });
+          this.fx.text(v.uid, v.x, top() - 6, 'UNDYING!', { color: '#a2f56a', variant: 'display', outline: '#06280e' });
           this.shake(2);
           if (v.hasAnim('rise')) await v.play('rise');
           v.play('idle');
@@ -718,7 +718,7 @@ export class BattleScene {
         // a passive wakes mid-fight (Overdrive): banner, the burst on the body, its name over the head
         this.hud.showBanner(e.name, v.team === 'player' ? '#ffe9a0' : '#ffc0b0');
         void this.fx.spawn('overdrive', v.x, v.y + 1, { layer: 'top', additive: true });
-        this.fx.text(v.uid, v.x, top() - 6, 'OVERDRIVE!', { color: '#ffd860', variant: 'bold', scale: 2, outline: '#3a1a06' });
+        this.fx.text(v.uid, v.x, top() - 6, 'OVERDRIVE!', { color: '#ffd860', variant: 'display', outline: '#3a1a06' });
         this.flash = Math.max(this.flash, 0.12);
         this.shake(3);
         break;

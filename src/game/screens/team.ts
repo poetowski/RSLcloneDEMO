@@ -90,7 +90,7 @@ export class TeamScreen extends BaseScreen {
       const [x, y] = sp.player[i];
       const id = this.team[i];
       if (!id) {
-        ui.text(ctx, '+', x, y - 34, { color: COLORS.goldHi, variant: 'bold', scale: 2, align: 'center' });
+        ui.text(ctx, '+', x, y - 34, { color: COLORS.goldHi, variant: 'display', align: 'center' });
         ui.text(ctx, 'EMPTY', x, y - 12, { color: COLORS.dim, align: 'center' });
         continue;
       }

@@ -274,7 +274,7 @@ Lean = enemies each attacking affinity hits strong (+) or weak (-); only the not
 | Flash | the sprite flashes white on every damage; the screen flashes on crits (0.18) and Overdrive (0.12) | `UnitView.flash`, `BattleScene.flash` |
 | Shake | the sprite shakes on every damage; the screen shakes by the skill's `shake` (2-6) | `BattleScene.shake` |
 | Sparks | 6 particles per damage, 10 on a crit | `BattleScene.applyEvent` |
-| Numbers and words | white numbers; crits gold at 2x with `CRITICAL`; `STRONG HIT`, `WEAK HIT`, `ABSORB n`, green `+n`; texts on one unit stack upward | `BattleScene.applyEvent`, `FxLayer.text` |
+| Numbers and words | white numbers; crits gold in the title face with `CRITICAL`; `STRONG HIT`, `WEAK HIT`, `ABSORB n`, green `+n`; texts on one unit stack upward | `BattleScene.applyEvent`, `FxLayer.text` |
 | HP lag | the lost part of a bar stays pale, then drains (about 0.9 s for a full bar) | `UnitView.update` |
 | Banners and titles | skill name on every A2/A3 and `COUNTERATTACK` (1.5 s); `BOSS`, `FIGHT!`, `VICTORY`, `DEFEAT` | `Hud`, `BattleScene.intro` |
 | Approach | melee stops 38 px in front; `center` to the middle of the line; ranged steps 72 px forward; leap arcs 46 px high and lands on the hit frame; blink reappears behind the target | `BattleScene.perform` |

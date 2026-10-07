@@ -76,7 +76,7 @@ export class AcademyScreen extends BaseScreen {
     // page
     const px = 180, py = 38, pw = W - px - 8, ph = H - py - 8;
     ui.panel(ctx, 'gold', px, py, pw, ph);
-    ui.text(ctx, this.ch.title.toUpperCase(), px + 14, py + 10, { color: COLORS.goldHi, variant: 'bold', scale: 2 });
+    ui.text(ctx, this.ch.title.toUpperCase(), px + 14, py + 10, { color: COLORS.goldHi, variant: 'display' });
     ui.divider(ctx, px + 10, py + 30, pw - 20);
     const cx = px + 16, cw = pw - 40;
     const top = py + 40, bottom = py + ph - (this.ch.demo ? 36 : 10);
@@ -221,7 +221,7 @@ export class AcademyScreen extends BaseScreen {
             if (i === 1) {
               ctx.fillStyle = 'rgba(6,8,14,0.7)';
               ctx.fillRect(sx + 1, y + 1, 40, 40);
-              ui.text(ctx, '2', sx + 21, y + 13, { color: '#ffffff', variant: 'bold', scale: 2, align: 'center' });
+              ui.text(ctx, '2', sx + 21, y + 13, { color: '#ffffff', variant: 'display', align: 'center' });
             }
             ui.text(ctx, `A${i + 1} ${s.name}`, sx + 48, y + 8, { color: COLORS.goldHi, variant: 'bold' });
             ui.text(ctx, i === 0 ? 'always ready' : i === 1 ? 'ready in 2 turns' : `cooldown ${s.cooldown}`, sx + 48, y + 20, { color: COLORS.dim });

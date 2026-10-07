@@ -117,6 +117,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Key light | the single top-left light of every pixel | `LIGHT_DIR` |
 | Frame box, pivot | 208x160 frame for every champion frame; feet at (104, 140) | `FRAME_W`, `FRAME_H`, `PIVOT` |
 | Atlas | packed frames plus metadata for one champion | `public/assets/champions/<id>.png/.json` |
+| Font face | `regular` and `bold` for running text, `display` for titles, names in headers and big numbers; one family | `Variant`, `FontJson.faces`, `tools/art/font.ts` |
 | Chapter, block, figure (Academy) | a page of the Academy, its parts, a live illustration | `Chapter`, `Block`, `FigureId` |
 
 ### 2.5 Homonyms
@@ -352,6 +353,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-G4 | The art build is deterministic and committed | convention: no check rebuilds and compares (R-15) |
 | INV-G5 | Each asset JSON has one schema for producer and consumer | not true today (DR-3, R-4) |
 | INV-G6 | No effect frame is cut off at the edge of its box; padding (`FxDef.pad`) never moves a ground effect's anchor across `ay` 0.8 | audit |
+| INV-G7 | Every character of the game text has a glyph in `regular` and `bold`; every title, champion name and big number has one in `display`; body faces keep cap 7 / cell 9 and the display cell is two body cells | test |
 
 ## 7. Policies: where decisions live
 
@@ -426,7 +428,7 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | --- | --- | --- | --- | --- |
 | DR-1 | medium | `src/game/data/codex.ts` (Special Mechanics) | the Academy says Resonance drains 10% turn meter; the data (`starsinger.ts`) and MECHANICS_GUIDE say 15% | correct the text; R-1 |
 | DR-2 | medium | `tests/battle.test.ts` | "runs every champion through battles" lists 10 champions by hand: Imara, Kwesi and Mwamba never run | iterate `CHAMPIONS` |
-| DR-3 | medium | `tools/art/build.ts`, `tools/art/fx/kit.ts`, `tools/art/zones/shared.ts`, `tools/art/ui/index.ts` vs `src/game/view/assets.ts` | `ChampionAtlasJson`, `FxJson`, `ZoneJson` with `PropKind`, and `UiJson` are each declared twice, producer and consumer | R-4 |
+| DR-3 | medium | `tools/art/build.ts`, `tools/art/fx/kit.ts`, `tools/art/zones/shared.ts`, `tools/art/ui/index.ts`, `tools/art/font.ts` vs `src/game/view/assets.ts`, `src/engine/font.ts` | `ChampionAtlasJson`, `FxJson`, `ZoneJson` with `PropKind`, `UiJson` and `FontJson` are each declared twice, producer and consumer | R-4 |
 | DR-4 | medium | `src/game/battle/sim.ts`, `src/game/view/scene.ts` | the turn structure is written twice; the balance numbers come from one copy, play from the other | R-7 |
 | DR-5 | low | `statuses.ts`, `codex.ts`, `screens/academy.ts`, `screens/champion.ts` | rule numbers restated by hand: status texts, the Academy damage figure (4.8, ±20%, x1.25, x1.5, 0.92-1.08), the turn-meter figure's SPD values, the stat tips, the list of factions | R-1, R-8 |
 | DR-6 | low | `.claude/skills/new-champion/templates/` | worksheet and data template list factions without `nyota`; the worksheet says only `undying` exists as a passive (`overdrive` does too) | update the lists |

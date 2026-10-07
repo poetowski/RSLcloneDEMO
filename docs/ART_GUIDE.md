@@ -184,7 +184,7 @@ Weapon smears are crescents drawn between the previous and current weapon angle:
 
 | Element | Spec |
 | --- | --- |
-| Font | custom pixel font: caps 7 px, x-height 5, descenders 2 (cell 9 px), `bold` variant by 1px dilation; titles are bold at x2-x4 with a two-tone fill |
+| Font | one hand-drawn pixel family (`tools/art/font.ts`) in three faces. `regular`: caps 7 px, x-height 5, descenders 2 (cell 9 px). `bold`: the same letters redrawn with 2 px stems, so the counters of m, w, M and W stay open. `display`: the title face, caps 13 px drawn at full size (cell 18 px, two body cells), capitals only, for titles, champion names in headers and ceremonies, cooldowns and critical hits. Text is never scaled up from the body faces; only the display face is drawn at 2x (battle titles, results). Titles take a two-tone fill (lower half of the capitals) |
 | Logo | OATHBOUND: letters rasterized from strokes and shaded as cast gold (lit bevel top-left, dark bevel bottom-right, hard face bands), over the oath-blade |
 | Skill icon | **40 x 40**, 2px gold bevel frame, radial dithered background in the champion's `iconBg` ramp, glyph rendered with the champion renderer (an icon's glaive is the glaive the champion holds) |
 | Status icon | **12 x 12**, buff = blue rim, debuff = red rim, 8x8 symbol, optional up/down badge or a second strike-through glyph (Heal Block) |

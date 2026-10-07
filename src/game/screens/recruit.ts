@@ -87,8 +87,8 @@ export class RecruitScreen extends BaseScreen {
     // the card
     const a = Math.min(1, Math.max(0, (bt - 800) / 300));
     ctx.globalAlpha = a;
-    this.a.font.draw(ctx, 'NEW CHAMPION', W / 2, 18, { color: '#fff6c0', gradient: '#f0a020', variant: 'bold', scale: 2, align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
-    ui.text(ctx, c.name, W / 2, 268, { color: c.color, variant: 'bold', scale: 2, align: 'center' });
+    this.a.font.draw(ctx, 'NEW CHAMPION', W / 2, 18, { color: '#fff6c0', gradient: '#f0a020', variant: 'display', align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
+    ui.text(ctx, c.name, W / 2, 268, { color: c.color, variant: 'display', align: 'center' });
     ui.text(ctx, c.title, W / 2, 288, { color: COLORS.dim, align: 'center' });
     const aff = AFFINITIES[c.affinity], fac = FACTIONS[c.faction];
     const line = `${rar.name}   ${aff.name}   ${c.role}   ${fac.name}`;

@@ -150,6 +150,40 @@ describe('academy', () => {
   });
 });
 
+describe('font', () => {
+  const font = json('public/assets/ui/font.json') as { faces: Record<'regular' | 'bold' | 'display', { cellH: number; cap: number; caps: boolean; glyphs: Record<string, unknown> }> };
+  const missing = (face: 'regular' | 'bold' | 'display', texts: string[]) => {
+    const f = font.faces[face];
+    const chars = new Set(texts.flatMap((t) => [...(f.caps ? t.toUpperCase() : t)]));
+    return [...chars].filter((ch) => !f.glyphs[ch]);
+  };
+
+  it('has a glyph in regular and bold for every character of the game text', () => {
+    const texts = [
+      ...CHAMPIONS.flatMap((c) => [c.name, c.title, c.lore, ...c.skills.flatMap((s) => [s.name, s.tag, s.desc]), c.passive?.name ?? '', c.passive?.desc ?? '']),
+      ...Object.values(STATUSES).flatMap((s) => [s.name, s.desc]),
+      ...[RARITIES, AFFINITIES, FACTIONS].flatMap((m) => Object.values(m).flatMap((d) => [d.name, 'desc' in d ? d.desc : ''])),
+      ...Object.values(ROLES).flatMap((r) => [r.id, r.desc]),
+      ...LOCATIONS.flatMap((l) => [l.chapter, l.name, l.blurb, ...l.stages.flatMap((s) => [s.id, s.name, s.blurb])]),
+      ...ZONES.flatMap((z) => [z.name, z.subtitle]),
+      ...CHAPTERS.flatMap((ch) => [ch.title, ch.demo?.label ?? '', ...ch.blocks.flatMap((b) => ('text' in b ? [b.text] : b.kind === 'list' ? b.items : []))]),
+    ];
+    expect(missing('regular', texts)).toEqual([]);
+    expect(missing('bold', texts)).toEqual([]);
+  });
+
+  it('has a title-face glyph for every title, name and big number', () => {
+    const titles = [...CHAMPIONS.map((c) => c.name), ...CHAPTERS.map((ch) => ch.title), 'NEW CHAMPION', 'VICTORY', 'DEFEAT', 'BOSS', 'FIGHT!', 'PAUSED', 'UNDYING!', 'OVERDRIVE!', '0123456789+'];
+    expect(missing('display', titles)).toEqual([]);
+  });
+
+  it('keeps the metrics the screens are laid out for', () => {
+    for (const f of [font.faces.regular, font.faces.bold]) expect([f.cap, f.cellH]).toEqual([7, 9]);
+    // a title occupies exactly the cell of bold text drawn at 2x
+    expect(font.faces.display.cellH).toBe(2 * font.faces.bold.cellH);
+  });
+});
+
 describe('profile', () => {
   it('opens stages in order and recruits on the first clear only', () => {
     const p = defaultProfile();

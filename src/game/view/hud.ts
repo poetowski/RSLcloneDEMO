@@ -196,7 +196,7 @@ export class Hud extends Ui {
       if (off) {
         ctx.fillStyle = 'rgba(6,8,14,0.72)';
         ctx.fillRect(x + 4, y + 4, 40, 40);
-        this.text(ctx, String(sl.cooldown), x + S / 2, y + 16, { color: '#ffffff', variant: 'bold', scale: 2, align: 'center' });
+        this.text(ctx, String(sl.cooldown), x + S / 2, y + 16, { color: '#ffffff', variant: 'display', align: 'center' });
       }
       const hov = this.hot('skill' + i, x, y, S, S);
       blit(ctx, this.a.ui.img, this.part(off ? 'frame_off' : sl.selected ? 'frame_sel' : 'frame_idle'), x, y);
@@ -262,11 +262,11 @@ export class Hud extends Ui {
     if (!this.title) return;
     const tt = this.title;
     tt.t += dt;
-    const scale = 4;
+    const scale = 2;
     const pop = tt.t < 180 ? 0.6 + (tt.t / 180) * 0.4 : 1;
     const y = 120;
     ctx.globalAlpha = Math.min(1, tt.t / 120);
-    this.a.font.draw(ctx, tt.text, W / 2, y - (scale * 9 * pop) / 2, { color: tt.color, gradient: tt.grad, variant: 'bold', scale: Math.max(1, Math.round(scale * pop)), align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
+    this.a.font.draw(ctx, tt.text, W / 2, y - (scale * this.a.font.height('display') * pop) / 2, { color: tt.color, gradient: tt.grad, variant: 'display', scale: Math.max(1, Math.round(scale * pop)), align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
     if (tt.sub) this.text(ctx, tt.sub, W / 2, y + 26, { color: '#d8e2f4', align: 'center' });
     ctx.globalAlpha = 1;
   }
@@ -276,7 +276,7 @@ export class Hud extends Ui {
     this.dim(ctx, 0.62);
     const w = 180, h = canRetreat ? 150 : 124, x = W / 2 - w / 2, y = H / 2 - h / 2;
     this.panel(ctx, 'gold', x, y, w, h);
-    this.text(ctx, 'PAUSED', W / 2, y + 10, { color: COLORS.goldHi, variant: 'bold', align: 'center', scale: 2 });
+    this.text(ctx, 'PAUSED', W / 2, y + 10, { color: COLORS.goldHi, variant: 'display', align: 'center' });
     this.divider(ctx, x + 14, y + 32, w - 28);
     let by = y + 44;
     this.button(ctx, 'p_resume', x + 20, by, w - 40, 22, 'RESUME', { click: on.resume, icon: 'mi_play' });
@@ -299,7 +299,7 @@ export class Hud extends Ui {
     const x = W / 2 - w / 2, y = 64;
     this.panel(ctx, r.victory ? 'gold' : 'red', x, y, w, h);
     const pop = Math.min(1, (t - 300) / 200);
-    this.a.font.draw(ctx, r.victory ? 'VICTORY' : 'DEFEAT', W / 2, y + 8, { color: r.victory ? '#fff6c0' : '#ffd0c0', gradient: r.victory ? '#f0a020' : '#c02020', variant: 'bold', scale: pop < 1 ? 2 : 3, align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
+    this.a.font.draw(ctx, r.victory ? 'VICTORY' : 'DEFEAT', W / 2, y + 8, { color: r.victory ? '#fff6c0' : '#ffd0c0', gradient: r.victory ? '#f0a020' : '#c02020', variant: 'display', scale: pop < 1 ? 1 : 2, align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
     let cy = y + 42;
     if (r.stageName) {
       this.text(ctx, `${r.stageId}  ${r.stageName}`, W / 2, cy, { color: COLORS.dim, align: 'center' });

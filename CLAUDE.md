@@ -36,3 +36,4 @@ A turn-based hero battler (RAID / SWGOH style) in TypeScript + Canvas. All art i
 - Skill `hits` match the animation's hit frames; effect names must exist (content tests check both).
 - Regenerate and commit `public/assets` with the code that needs it.
 - Pixel art only: integer coordinates, no smooth gradients or anti-aliased shapes (use `ui.bands`, `ui.glow`, dithering).
+- Text uses the three faces of the one pixel font: `regular`, `bold`, and `display` for titles, names in headers and big numbers; never scale `regular` or `bold` up. A new character in any text needs a glyph (content tests check).

@@ -88,7 +88,7 @@ export class FxLayer {
     this.textSlots.set(key, now + delay);
     // lift above texts of the same unit that are still young
     const live = this.texts.filter((t) => t.key === key && t.t - t.delay < 520);
-    const lift = live.length * 10 * ((style.scale ?? 1) > 1 ? 1.6 : 1);
+    const lift = live.length * 10 * (style.variant === 'display' || (style.scale ?? 1) > 1 ? 1.6 : 1);
     this.texts.push({ key, text, x, y: y - lift, t: 0, delay, dur: opts.dur ?? 1050, rise: opts.rise ?? 14, style });
   }
 

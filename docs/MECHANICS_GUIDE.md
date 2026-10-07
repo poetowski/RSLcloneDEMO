@@ -237,7 +237,7 @@ The view (`BattleScene.perform`) turns that into choreography:
 2. **Approach** according to `approach`; dispel events land before the first hit.
 3. **Cast circle** under the actor if `castFx` is set; `actorFx` at the head on the `cast` event.
 4. **Animation**: every time the animation enters hit frame `k`, effects play and the events with `hit === k` are presented. Projectiles leave the champion's `muzzle` and present their events when they land; AoE effects are staggered across the line; ground-anchored effects stand on the target's feet.
-5. **Impact feel**: hit-stop (55 ms, 90 ms on crits), white flash, sprite shake, sparks, screen shake for heavy skills, floating numbers (crits larger with `CRITICAL`, `STRONG HIT` / `WEAK HIT` tags).
+5. **Impact feel**: hit-stop (55 ms, 90 ms on crits), white flash, sprite shake, sparks, screen shake for heavy skills, floating numbers (crits in the larger title face with `CRITICAL`, `STRONG HIT` / `WEAK HIT` tags).
 6. **Lifesteal** sends soul wisps back to the actor before the heal number.
 7. The actor returns home; death and revive animations finish (Undying: fall, tomb-light helix, `UNDYING!`, `rise`). An Overdrive shows the passive's name as a banner, the core-flare on the champion and `OVERDRIVE!` the moment the hit lands.
 8. **Counterattacks** then play in order, each with its own approach.
