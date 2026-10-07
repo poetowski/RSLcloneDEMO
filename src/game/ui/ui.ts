@@ -307,6 +307,9 @@ export class Ui {
   drawTooltip(ctx: CanvasRenderingContext2D) {
     const r = this.keyboard ? this.regions.find((x) => x.id && x.id === this.focusId) : this.hit(this.mouse.x, this.mouse.y);
     if (!r?.tip) return;
+    // a focused item scrolled out of its window keeps its focus but shows no tooltip
+    const c = r.clip;
+    if (c && (r.x + r.w <= c[0] || r.y + r.h <= c[1] || r.x >= c[0] + c[2] || r.y >= c[1] + c[3])) return;
     const tip = r.tip();
     const font = this.a.font;
     const maxW = 220;

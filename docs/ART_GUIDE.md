@@ -231,7 +231,7 @@ Floor tiles repeat across the arena, so a crack or a stain painted into a common
 | Champion atlas | `public/assets/champions/<id>.png/.json` | `R/attack1/3` = facing / animation / frame |
 | Effects | `public/assets/fx/fx.png/.json` | `anims.<name>.frames[i]` |
 | Zone | `public/assets/zones/<id>/tiles.png, backdrop.png, props.png, zone.json` | tile ids index `zone.json:tiles`, props by `kinds` |
-| World map | `public/assets/map/world.png` | stage nodes come from `campaign.ts` |
+| World map | `public/assets/map/world.png` (1920x720), `overview.png` (640x240) | one generator renders both from the same geography (a 640x360 design sheet); surface detail is drawn in each render's own pixels, never scaled; stage nodes and the road come from `campaign.ts` |
 | UI | `public/assets/ui/ui.png/.json, font.png/.json` | `icons.<skillId>`, `status.<statusId>`, `parts.<name>`, `portraits.<championId>` |
 
 Frame rects are `[x, y, w, h, ox, oy]` where `ox, oy` is the trimmed rect's offset inside the 208x160 frame box.

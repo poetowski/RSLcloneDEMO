@@ -57,9 +57,10 @@ The roster today:
 ## 3. The campaign (`src/game/data/campaign.ts`)
 
 - A **location** is a chapter with one combat background, a label on the world map and an optional `requires` stage that opens it.
-- A **stage** lists up to three enemies in formation order (front, back-top, back-bottom), a `power` multiplier for their HP and ATK, an optional boss flag per enemy (x1.6 HP, a crown), a map position and the champion it **recruits** on the first clear. Only champions the player actually faced in that stage can be recruited there.
+- A **stage** lists up to three enemies in formation order (front, back-top, back-bottom), a `power` multiplier for their HP and ATK, an optional boss flag per enemy (x1.6 HP, a crown), a map position (world pixels, see below) and the champion it **recruits** on the first clear. Only champions the player actually faced in that stage can be recruited there.
 - A stage opens when the previous stage of its location is cleared; the first stage of a location opens when the location does.
 - Difficulty follows the curve in [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) section 10; tune `power` with `npm run balance`.
+- The **world map** is `WORLD_MAP` (1920x720, three screens wide and two tall). Stage and location `map` positions are in its pixels. The campaign screen scrolls it under a camera: drag to move (a click fires on release), arrows jump between stages and the camera keeps the focused stage in view, `W` `A` `S` `D` or `Shift` + arrows slide it, and `M` (or WHOLE MAP) shows the overview, the same world drawn at a third of the size on one screen; clicking the overview goes there.
 
 | Location | Zone | Stages |
 | --- | --- | --- |

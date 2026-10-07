@@ -25,6 +25,12 @@ export class Scroller {
     this.target = this.clamp(px);
   }
 
+  /** Moves at once, without easing (dragging). */
+  shift(px: number) {
+    this.target = this.clamp(this.target + px);
+    this.pos = this.target;
+  }
+
   /** Scrolls the least distance that shows [start, start + size) in a window of `view`. */
   reveal(start: number, size: number, view: number) {
     if (start < this.target) this.to(start);

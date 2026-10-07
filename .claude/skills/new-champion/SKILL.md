@@ -53,7 +53,7 @@ New `fx` names go into `tools/art/fx/<faction>.ts` (or `common.ts`), built from 
 
 ## 5. Campaign placement
 
-Put the champion into a stage's `enemies` and set that stage's `recruit` to its id (`src/game/data/campaign.ts`); a champion can only be recruited where the player fought it. A boss gets `boss: true` (x1.6 HP, crown, boss intro). A new stage needs a `map` position on the world map that does not overlap other nodes; the road follows the stage order automatically after `npm run art -- map`.
+Put the champion into a stage's `enemies` and set that stage's `recruit` to its id (`src/game/data/campaign.ts`); a champion can only be recruited where the player fought it. A boss gets `boss: true` (x1.6 HP, crown, boss intro). A new stage needs a `map` position on the world map (`WORLD_MAP` pixels, 1920x720) that does not overlap other nodes, also on the overview at a third of the size; the road follows the stage order automatically after `npm run art -- map`.
 
 ## 6. Build and verify (all must pass)
 

@@ -1,17 +1,31 @@
-// The campaign world map (640x360): the realm seen from above, lit from the
-// top-left like everything else. Snowfields and peaks in the north-west
+// The campaign world map: the realm seen from above, lit from the top-left
+// like everything else. The world (WORLD_MAP, 1920x720) is three screens wide
+// and two tall and scrolls under the campaign screen; the overview is the same
+// world drawn again at a third of the size, so it fits one screen. Snowfields and peaks in the north-west
 // around the Frostfang temple, green hills and a river through the middle,
 // the sea in the south-west, the Sunscar desert in the south-east and, above
 // a laterite escarpment in the north-east, the golden highland of Nyota. The
 // road and the location landmarks are placed from the campaign data
-// (src/game/data/campaign.ts), so new stages extend the road automatically;
-// stage nodes and labels are drawn by the runtime on top.
+// (src/game/data/campaign.ts, world pixels), so new stages extend the road
+// automatically; stage nodes and labels are drawn by the runtime on top.
+// The geography is laid out on a 640x360 design sheet (the river, the
+// streams, the escarpment, the pyramids) and mapped onto each render; surface
+// detail (shading, dithering, scattered icons) is drawn in the render's own
+// pixels, so the big world gets more detail instead of bigger pixels.
 import path from 'node:path';
-import { LOCATIONS } from '../../src/game/data/campaign.ts';
+import { LOCATIONS, WORLD_MAP } from '../../src/game/data/campaign.ts';
 import { dith, ellipseFill, outline, polyFill, rampDither } from './paint.ts';
 import { Bitmap, hash2, hex, RGBA, rng } from './raster.ts';
 
-const W = 640, H = 360;
+/** The design sheet the geography is laid out on. */
+const DW = 640, DH = 360;
+
+/** The render in progress: its size, the design-to-pixel scale and a stroke scale for water and roads. */
+let W = DW, H = DH, SX = 1, SY = 1, K = 1;
+/** design sheet -> render pixels */
+const px = ([x, y]: [number, number]): [number, number] => [x * SX, y * SY];
+/** world pixels (campaign data) -> render pixels */
+const wp = (x: number, y: number): [number, number] => [(x * W) / WORLD_MAP.w, (y * H) / WORLD_MAP.h];
 const ramp = (list: string[]) => list.map((h) => hex(h));
 
 const SNOW = ramp(['#4a5878', '#7a8cb0', '#a8bad6', '#d0deee', '#eef5fc']);
@@ -52,26 +66,34 @@ function fbm(x: number, y: number, seed: number): number {
 }
 
 /** 0 = far north-west (frost) .. 1 = far south-east (desert). */
-const climate = (x: number, y: number) => (x / W) * 0.55 + (y / H) * 0.45 + (fbm(x, y, 3) - 0.5) * 0.16;
-const seaLevel = (x: number, y: number) => x / W + (1 - y / H) * 0.85 + (fbm(x, y, 11) - 0.5) * 0.18;
+const climate = (x: number, y: number) => (x / W) * 0.55 + (y / H) * 0.45 + (fbm(x / SX, y / SY, 3) - 0.5) * 0.16;
+const seaLevel = (x: number, y: number) => x / W + (1 - y / H) * 0.85 + (fbm(x / SX, y / SY, 11) - 0.5) * 0.18;
 const isSea = (x: number, y: number) => seaLevel(x, y) < 0.36;
 const height = (x: number, y: number) => fbm(x, y, 21);
 
 /** The Nyota escarpment: the plateau lies north-east of this edge (y of the rim at x). */
-const rimY = (x: number) => 40 + (x - 400) * 0.83 + (vnoise(x, 0, 18, 41) - 0.5) * 14;
+const rimY = (x: number) => {
+  const d = x / SX;
+  return (40 + (d - 400) * 0.83 + (vnoise(d, 0, 18, 41) - 0.5) * 14) * SY;
+};
 /** > 0 on the plateau (px above the rim), <= 0 below it. */
 const plateau = (x: number, y: number) => rimY(x) - y;
-/** The cliff face: the band of rock just below the rim. */
-const CLIFF = 11;
+/** The cliff face: the band of rock just below the rim (render pixels). */
+let CLIFF = 11;
+/** West edge of the escarpment country (render pixels). */
+let EAST = 330;
 
-/** Streams of the highland that pour off the escarpment. */
-const STREAMS: [number, number][][] = [
+/** Streams of the highland that pour off the escarpment (design sheet). */
+const STREAMS_D: [number, number][][] = [
   [[560, 0], [552, 26], [530, 52], [506, 80], [490, 106], [484, 124]],
   [[640, 150], [628, 170], [614, 196], [606, 214]],
 ];
 
-/** The river: from the mountains in the north down to the sea in the south-west. */
-const RIVER: [number, number][] = [[318, 0], [312, 30], [296, 58], [300, 92], [286, 128], [256, 156], [236, 190], [200, 214], [168, 238], [128, 262], [96, 290]];
+/** The river: from the mountains in the north down to the sea in the south-west (design sheet). */
+const RIVER_D: [number, number][] = [[318, 0], [312, 30], [296, 58], [300, 92], [286, 128], [256, 156], [236, 190], [200, 214], [168, 238], [128, 262], [96, 290]];
+
+let STREAMS: [number, number][][] = [];
+let RIVER: [number, number][] = [];
 
 function nearPolyline(x: number, y: number, pts: [number, number][]): number {
   let best = Infinity;
@@ -86,7 +108,7 @@ function nearPolyline(x: number, y: number, pts: [number, number][]): number {
 
 /** Stage nodes in campaign order: the road visits each of them. */
 function roadPoints(): [number, number][] {
-  return LOCATIONS.flatMap((l) => l.stages.map((s) => [s.map.x, s.map.y] as [number, number]));
+  return LOCATIONS.flatMap((l) => l.stages.map((s) => wp(s.map.x, s.map.y)));
 }
 
 // ---------------------------------------------------------------------------
@@ -116,7 +138,7 @@ function ground(b: Bitmap) {
         const laterite = fbm(x, y, 51) > 0.6;
         col = laterite ? rampDither(LATERITE, 2.8 + sh * 0.6 + (vnoise(x, y, 5, 53) - 0.5) * 0.6, x, y) : rampDither(SAVANNA, 2.6 + sh * 0.8 + (vnoise(x, y, 6, 55) - 0.5) * 0.8, x, y);
         if (pl < 1.5) col = SAVANNA[4];
-      } else if (pl > -CLIFF && x > 330) {
+      } else if (pl > -CLIFF && x > EAST) {
         // the cliff face: laterite strata cut by vertical flutes, darker toward the foot
         const k = -pl / CLIFF;
         const flute = Math.sin(x * 1.1 + vnoise(x, y, 4, 57) * 4) > 0.45 ? -0.9 : 0;
@@ -135,8 +157,8 @@ function ground(b: Bitmap) {
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
       if (isSea(x, y)) continue;
-      const d = nearPolyline(x + (vnoise(x, y, 10, 8) - 0.5) * 6, y, RIVER);
-      const w = 1.4 + (y / H) * 1.8;
+      const d = nearPolyline(x + (vnoise(x, y, 10, 8) - 0.5) * 6 * K, y, RIVER);
+      const w = (1.4 + (y / H) * 1.8) * K;
       if (d < w) b.set(x, y, rampDither(SEA, d < w * 0.4 ? 4.2 : 3.2, x, y));
       else if (d < w + 1) b.set(x, y, climate(x, y) < 0.38 ? SNOW[4] : SEA[1]);
     }
@@ -144,20 +166,21 @@ function ground(b: Bitmap) {
   // highland streams, each ending in a waterfall down the escarpment and a pool of spray
   for (const st of STREAMS) {
     for (let y = 0; y < H; y++) {
-      for (let x = 330; x < W; x++) {
+      for (let x = Math.floor(EAST); x < W; x++) {
         if (plateau(x, y) <= 0) continue;
-        const d = nearPolyline(x + (vnoise(x, y, 8, 61) - 0.5) * 4, y, st);
-        if (d < 1.3) b.set(x, y, rampDither(SEA, d < 0.6 ? 4.4 : 3.4, x, y));
-        else if (d < 2.2) b.set(x, y, ACACIA[1]);
+        const d = nearPolyline(x + (vnoise(x, y, 8, 61) - 0.5) * 4 * K, y, st);
+        if (d < 1.3 * K) b.set(x, y, rampDither(SEA, d < 0.6 * K ? 4.4 : 3.4, x, y));
+        else if (d < 2.2 * K) b.set(x, y, ACACIA[1]);
       }
     }
-    const [ex] = st[st.length - 1];
+    const ex = Math.round(st[st.length - 1][0]);
     const top = Math.round(rimY(ex));
+    const fw = Math.max(1, Math.round(K));
     for (let y = top - 1; y < top + CLIFF + 1; y++) {
-      b.set(ex, y, y % 3 === 0 ? SEA[5] : SEA[4]);
-      b.set(ex + 1, y, SEA[3]);
+      for (let k = 0; k < fw; k++) b.set(ex + k, y, (y + k) % 3 === 0 ? SEA[5] : SEA[4]);
+      b.set(ex + fw, y, SEA[3]);
     }
-    ellipseFill(b, ex + 0.5, top + CLIFF + 2, 3.4, 1.6, (x, y, d) => (d < 0.55 ? SEA[5] : SEA[3]));
+    ellipseFill(b, ex + fw / 2, top + CLIFF + 2, 3.4 * K, 1.6 * K, (x, y, d) => (d < 0.55 ? SEA[5] : SEA[3]));
   }
 }
 
@@ -303,18 +326,18 @@ function scatter(b: Bitmap, clear: (x: number, y: number) => boolean) {
     for (let gx = 4; gx < W - 4; gx += 13) {
       const x = Math.round(gx + (r() - 0.5) * 9), y = Math.round(gy + (r() - 0.5) * 9);
       if (isSea(x, y) || isSea(x, y + 6) || !clear(x, y)) continue;
-      if (nearPolyline(x, y, RIVER) < 7) continue;
+      if (nearPolyline(x, y, RIVER) < 7 * K) continue;
       const c = climate(x, y);
       const n = fbm(x, y, 31);
       const pl = plateau(x, y);
       if (pl > -CLIFF - 4 && pl < 3) continue;
       if (pl > 0) {
-        if (STREAMS.some((st) => nearPolyline(x, y, st) < 5)) continue;
+        if (STREAMS.some((st) => nearPolyline(x, y, st) < 5 * K)) continue;
         if (n > 0.6) icons.push({ y, draw: () => baobabIcon(b, x, y) });
         else if (n > 0.4) icons.push({ y, draw: () => acacia(b, x, y) });
         continue;
       }
-      if (y < 34 || (c < 0.33 && n > 0.56)) {
+      if (y < 34 * SY || (c < 0.33 && n > 0.56)) {
         const hgt = 12 + r() * 12;
         icons.push({ y, draw: () => mountain(b, x, y, hgt, hgt * 0.95, ROCK, c < 0.5) });
       } else if (c < 0.42 && n > 0.42) {
@@ -340,7 +363,7 @@ function scatter(b: Bitmap, clear: (x: number, y: number) => boolean) {
 function roadSegment(a: [number, number], c: [number, number], i: number): [number, number][] {
   const [ax, ay] = a, [bx, by] = c;
   const len = Math.hypot(bx - ax, by - ay);
-  const nx = -(by - ay) / len, ny = (bx - ax) / len, bend = (i % 2 ? 1 : -1) * Math.min(14, len * 0.12);
+  const nx = -(by - ay) / len, ny = (bx - ax) / len, bend = (i % 2 ? 1 : -1) * Math.min(14 * K, len * 0.12);
   const out: [number, number][] = [];
   for (let s = 0; s <= len; s += 0.5) {
     const t = s / len;
@@ -365,13 +388,13 @@ function road(b: Bitmap) {
   // steps cut into the cliff where the road climbs the escarpment
   for (const [x, y] of all) {
     const pl = plateau(x, y);
-    if (pl > 1 || pl < -CLIFF - 1 || x < 330) continue;
+    if (pl > 1 || pl < -CLIFF - 1 || x < EAST) continue;
     const X = Math.round(x), Y = Math.round(y);
     for (let k = -2; k <= 2; k++) b.set(X + k, Y, Y % 2 ? LATERITE[4] : LATERITE[1]);
   }
   // a plank bridge where the road crosses the river
   for (const [x, y] of all) {
-    if (nearPolyline(x, y, RIVER) > 2.2) continue;
+    if (nearPolyline(x, y, RIVER) > 2.2 * K) continue;
     for (let k = -4; k <= 4; k++) {
       const X = Math.round(x) + k, Y = Math.round(y);
       b.set(X, Y - 2, ROAD[0]);
@@ -406,24 +429,47 @@ function frame(b: Bitmap) {
   }
 }
 
-export function buildMap(out: string) {
+/** Draws the whole world into a w x h bitmap. */
+function renderMap(w: number, h: number): Bitmap {
+  W = w;
+  H = h;
+  SX = w / DW;
+  SY = h / DH;
+  K = Math.max(1, Math.min(SX, SY) * 0.9);
+  CLIFF = Math.round(11 * Math.max(SY, 0.7));
+  EAST = 330 * SX;
+  RIVER = RIVER_D.map(px);
+  STREAMS = STREAMS_D.map((st) => st.map(px));
   const b = new Bitmap(W, H);
   ground(b);
   const nodes = roadPoints();
-  const marks = LOCATIONS.map((l) => [l.map.x, l.map.y] as [number, number]);
+  const marks = LOCATIONS.map((l) => wp(l.map.x, l.map.y));
   const roadPts = nodes.slice(0, -1).flatMap((p, i) => roadSegment(p, nodes[i + 1], i));
   const clear = (x: number, y: number) =>
     nodes.every(([nx, ny]) => Math.hypot(x - nx, y - ny) > 18) && marks.every(([mx, my]) => Math.hypot(x - mx, y - my + 8) > 26) && roadPts.every(([rx, ry]) => Math.hypot(x - rx, y - ry) > 8);
   scatter(b, clear);
   road(b);
   const landmark: Record<string, (b: Bitmap, x: number, y: number) => void> = { frostfang: frostTemple, sunscar: sunTemple, nyota: skyCity };
-  for (const l of LOCATIONS) (landmark[l.zone] ?? frostTemple)(b, l.map.x, l.map.y);
-  pyramid(b, 600, 262, 9);
-  pyramid(b, 616, 270, 6);
-  pyramid(b, 520, 304, 7);
-  compass(b, 50, 300);
+  for (const l of LOCATIONS) {
+    const [x, y] = wp(l.map.x, l.map.y);
+    (landmark[l.zone] ?? frostTemple)(b, Math.round(x), Math.round(y));
+  }
+  for (const [x, y, size] of [[600, 262, 9], [616, 270, 6], [520, 304, 7]]) {
+    const [X, Y] = px([x, y]);
+    pyramid(b, Math.round(X), Math.round(Y), size);
+  }
+  const [cx, cy] = px([50, 300]);
+  compass(b, Math.round(cx), Math.round(cy));
   frame(b);
-  b.save(path.join(out, 'map', 'world.png'));
-  b.save(path.join('docs', 'images', 'world_map.png'));
-  console.log(`  map: world ${W}x${H}, ${nodes.length} road stops`);
+  return b;
+}
+
+/** The scrolling world, and the overview: the same world at a fraction of the size, so it fits one screen. */
+export function buildMap(out: string) {
+  const world = renderMap(WORLD_MAP.w, WORLD_MAP.h);
+  world.save(path.join(out, 'map', 'world.png'));
+  world.save(path.join('docs', 'images', 'world_map.png'));
+  const overview = renderMap(WORLD_MAP.w / WORLD_MAP.overview, WORLD_MAP.h / WORLD_MAP.overview);
+  overview.save(path.join(out, 'map', 'overview.png'));
+  console.log(`  map: world ${world.w}x${world.h}, overview ${overview.w}x${overview.h}, ${roadPoints().length} road stops`);
 }

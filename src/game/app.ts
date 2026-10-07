@@ -13,10 +13,17 @@ export interface Screen {
   /** returns true when the pointer is over something clickable */
   pointerMove(x: number, y: number): boolean;
   click(x: number, y: number): void;
-  key(k: string): void;
+  key(k: string, mods?: KeyMods): void;
   /** mouse wheel in pixels (scrolling lists); dx for horizontal wheels and trackpads */
   wheel?(dy: number, dx: number): void;
+  /** the pointer was dragged by (dx, dy); a screen that has it gets its click on release, and only when the pointer did not move */
+  drag?(dx: number, dy: number): void;
   leave?(): void;
+}
+
+/** Modifier keys held with a key press. */
+export interface KeyMods {
+  shift: boolean;
 }
 
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];

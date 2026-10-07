@@ -216,7 +216,7 @@ export interface StageDef {
   power: number;
   /** champion recruited on the first clear */
   recruit?: string;
-  /** node position on the world map (640x360 space) */
+  /** node position on the world map (`WORLD_MAP` pixels, 1920x720) */
   map: { x: number; y: number };
 }
 
@@ -229,7 +229,7 @@ export interface LocationDef {
   blurb: string;
   /** stage that must be cleared before this location opens */
   requires?: string;
-  /** label position on the world map */
+  /** label position on the world map (`WORLD_MAP` pixels) */
   map: { x: number; y: number };
   stages: StageDef[];
 }

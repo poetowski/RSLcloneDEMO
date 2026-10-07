@@ -94,6 +94,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Collection | every champion, owned or locked | `CollectionScreen` |
 | Open / cleared / locked | a stage the player may fight / has won / may not fight yet | `stageOpen`, `cleared` |
 | Frontier | the newest playable stage | `frontier()` |
+| World map, overview | the campaign map in world pixels (1920x720), scrolled under a camera; the overview draws the same world on one screen | `WORLD_MAP`, `CampaignScreen` |
 | Stars | 3, 2 or 1 by champions lost; the best is kept | `starsFor`, `Profile.stars` |
 | Profile | the save game | `Profile`, `loadProfile`, `saveProfile` |
 | Fresh (NEW) | recruited, not yet opened on the champion page | `Profile.fresh` |
@@ -330,7 +331,8 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 
 | ID | Invariant | Enforced by |
 | --- | --- | --- |
-| INV-P1 | Stage ids are unique; 1-3 enemies, all known champions; zones known; map positions inside the map | test |
+| INV-P1 | Stage ids are unique; 1-3 enemies, all known champions; zones known; map positions inside the world, clear of its frame | test |
+| INV-P9 | The world map and its overview have the sizes `WORLD_MAP` declares | test |
 | INV-P2 | Every location ends on a boss stage; `requires` names an existing stage | test |
 | INV-P3 | Every non-starter is recruited by exactly one stage, and only where it is fought | test |
 | INV-P4 | A stage opens when its location is open and the previous stage there is cleared | test (profile); the battle route does not check it (DR-11) |
@@ -413,7 +415,7 @@ The project skills cover the two most common changes. The others touch several c
 | New skill field (a mechanic) | `SkillDef` with a doc comment → its place in the resolution order (4.1) and its events → presentation → norms (does it count toward a budget?) → AI (does `decide` need to understand it?) → test → Academy → MECHANICS_GUIDE 4.1 and 8 | test, balance re-baseline |
 | New passive kind | `PassiveDef.kind` → the rule (in `applyDamage` or a new hook) with a once-flag on `Unit`, reset in `BattleScene.demo` → an event (make `passive` carry its kind, DR-14) → a required animation in the content test (like `rise`) → Academy → tests: fires once, lethal hits, ticks, Undying interplay | test, balance |
 | New event kind | the `BattleEvent` union → its place in the order (section 5) → a case in `applyEvent` (and in `playTicks` for start-of-turn events) → MECHANICS_GUIDE 12, section 5 here | test, captures |
-| New stage or location | `campaign.ts` (enemies in formation order, `recruit` among them, map position) → `npm run art -- map` → tune `power` with `npm run balance` → [MDA.md](MDA.md) ME4 lean and DY9 shape → GAME_STRUCTURE 3 | test, balance |
+| New stage or location | `campaign.ts` (enemies in formation order, `recruit` among them, map position in `WORLD_MAP` pixels) → `npm run art -- map` (check the world and the overview) → tune `power` with `npm run balance` → [MDA.md](MDA.md) ME4 lean and DY9 shape → GAME_STRUCTURE 3 | test, balance |
 | New faction | `FactionId`, `FACTIONS` → `UIR.faction` ramp and `emblem()` (`tools/art/ui/menu.ts`), `npm run art -- ui` → `homeZone()` → the Academy `champions` chapter (it names every faction) → the champion template and worksheet lists → ART_GUIDE 2.4 | test, audit |
 | A rule constant | the constant → every copy listed in [MDA.md](MDA.md) ME1 → tests that assert the number → balance, and stage `power` re-tuned if the curve moved → [MDA.md](MDA.md) section 6 | test, balance |
 | Rename an id | data and art modules and registries → `npm run art` → stages, `STARTERS`, tests, docs, URLs → a profile migration for stored ids (champion, stage) → special cases keyed by id in `scene.ts` | test, audit, typecheck |

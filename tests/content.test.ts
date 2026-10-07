@@ -4,7 +4,7 @@
 // rely on; a failure here names exactly what is missing.
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { allStages, LOCATIONS, recruitStage, STARTERS } from '../src/game/data/campaign';
+import { allStages, LOCATIONS, recruitStage, STARTERS, WORLD_MAP } from '../src/game/data/campaign';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { CHAPTERS } from '../src/game/data/codex';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../src/game/data/meta';
@@ -103,11 +103,21 @@ describe('campaign', () => {
       expect(s.enemies.length).toBeLessThanOrEqual(3);
       for (const e of s.enemies) expect(ids.has(e.champion), `${s.id} enemy ${e.champion}`).toBe(true);
       if (s.recruit) expect(ids.has(s.recruit), `${s.id} recruit`).toBe(true);
-      expect(s.map.x).toBeGreaterThan(16);
-      expect(s.map.x).toBeLessThan(624);
-      expect(s.map.y).toBeGreaterThan(40);
-      expect(s.map.y).toBeLessThan(344);
+      // inside the world, clear of its frame and of the header when scrolled to the top
+      expect(s.map.x, `${s.id} map x`).toBeGreaterThan(24);
+      expect(s.map.x, `${s.id} map x`).toBeLessThan(WORLD_MAP.w - 24);
+      expect(s.map.y, `${s.id} map y`).toBeGreaterThan(48);
+      expect(s.map.y, `${s.id} map y`).toBeLessThan(WORLD_MAP.h - 24);
     }
+  });
+
+  it('has a world map and an overview of the size the campaign data assumes', () => {
+    const size = (f: string) => {
+      const b = fs.readFileSync(f);
+      return [b.readUInt32BE(16), b.readUInt32BE(20)];
+    };
+    expect(size('public/assets/map/world.png')).toEqual([WORLD_MAP.w, WORLD_MAP.h]);
+    expect(size('public/assets/map/overview.png')).toEqual([WORLD_MAP.w / WORLD_MAP.overview, WORLD_MAP.h / WORLD_MAP.overview]);
   });
 
   it('only recruits champions the player faced in that stage', () => {

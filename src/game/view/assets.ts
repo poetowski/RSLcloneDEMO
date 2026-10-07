@@ -74,7 +74,10 @@ export interface Assets {
   fx: { json: FxJson; img: HTMLImageElement };
   zones: Record<string, ZoneArt>;
   ui: { json: UiJson; img: HTMLImageElement };
+  /** the campaign world, larger than the screen */
   map: HTMLImageElement;
+  /** the same world drawn small enough to fit one screen */
+  overview: HTMLImageElement;
   font: BitmapFont;
 }
 
@@ -103,7 +106,7 @@ export async function loadAssets(championIds: string[], zoneIds: string[], progr
     ]);
     zones[id] = { json, tiles, backdrop, props };
   });
-  const [fxJson, fxImg, uiJson, uiImg, fontJson, fontImg, map] = await Promise.all([
+  const [fxJson, fxImg, uiJson, uiImg, fontJson, fontImg, map, overview] = await Promise.all([
     track(loadJson<FxJson>('assets/fx/fx.json')),
     track(loadImage('assets/fx/fx.png')),
     track(loadJson<UiJson>('assets/ui/ui.json')),
@@ -111,6 +114,7 @@ export async function loadAssets(championIds: string[], zoneIds: string[], progr
     track(loadJson<FontJson>('assets/ui/font.json')),
     track(loadImage('assets/ui/font.png')),
     track(loadImage('assets/map/world.png')),
+    track(loadImage('assets/map/overview.png')),
   ]);
   await Promise.all([...championJobs, ...zoneJobs]);
   return {
@@ -119,6 +123,7 @@ export async function loadAssets(championIds: string[], zoneIds: string[], progr
     zones,
     ui: { json: uiJson, img: uiImg },
     map,
+    overview,
     font: new BitmapFont(fontImg, fontJson),
   };
 }

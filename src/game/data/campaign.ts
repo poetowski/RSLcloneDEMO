@@ -4,6 +4,13 @@
 // `npm run balance` (see docs/MECHANICS_GUIDE.md, "Difficulty curve").
 import { LocationDef, StageDef } from './types';
 
+/**
+ * The campaign world map in pixels: three screens wide, two tall. Stage and
+ * location `map` positions are in this space; `overview` is how many times
+ * smaller the whole-world overview is drawn.
+ */
+export const WORLD_MAP = { w: 1920, h: 720, overview: 3 };
+
 /** Champions the player owns from the start. */
 export const STARTERS = ['knight', 'warrior', 'archer'];
 
@@ -14,7 +21,7 @@ export const LOCATIONS: LocationDef[] = [
     name: 'Frostfang Ruins',
     zone: 'frostfang',
     blurb: 'A temple of the old Oath, swallowed by ice. The Frostfang Coven holds its broken halls.',
-    map: { x: 178, y: 70 },
+    map: { x: 534, y: 140 },
     stages: [
       {
         id: '1-1',
@@ -23,7 +30,7 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'monk' }, { champion: 'frostmage' }],
         power: 0.85,
         recruit: 'monk',
-        map: { x: 150, y: 116 },
+        map: { x: 450, y: 232 },
       },
       {
         id: '1-2',
@@ -32,7 +39,7 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'dreadknight' }, { champion: 'monk' }, { champion: 'frostmage' }],
         power: 0.92,
         recruit: 'frostmage',
-        map: { x: 218, y: 96 },
+        map: { x: 654, y: 192 },
       },
       {
         id: '1-3',
@@ -41,7 +48,7 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'dreadknight', boss: true }, { champion: 'monk' }, { champion: 'frostmage' }],
         power: 0.95,
         recruit: 'dreadknight',
-        map: { x: 262, y: 62 },
+        map: { x: 786, y: 124 },
       },
     ],
   },
@@ -52,7 +59,7 @@ export const LOCATIONS: LocationDef[] = [
     zone: 'sunscar',
     blurb: 'The necropolis of the sun kings rises from the dunes. Something under the sand is waking.',
     requires: '1-3',
-    map: { x: 452, y: 214 },
+    map: { x: 1356, y: 428 },
     stages: [
       {
         id: '2-1',
@@ -61,7 +68,7 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'jackal' }, { champion: 'stalker' }],
         power: 1.35,
         recruit: 'stalker',
-        map: { x: 404, y: 252 },
+        map: { x: 1212, y: 504 },
       },
       {
         id: '2-2',
@@ -70,7 +77,7 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'jackal' }, { champion: 'stalker' }, { champion: 'stalker' }],
         power: 0.88,
         recruit: 'jackal',
-        map: { x: 466, y: 270 },
+        map: { x: 1398, y: 540 },
       },
       {
         id: '2-3',
@@ -79,7 +86,7 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'jackal' }, { champion: 'priestess' }, { champion: 'stalker' }],
         power: 0.9,
         recruit: 'priestess',
-        map: { x: 520, y: 236 },
+        map: { x: 1560, y: 472 },
       },
       {
         id: '2-4',
@@ -88,7 +95,7 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'tomblord', boss: true }, { champion: 'jackal' }, { champion: 'priestess' }],
         power: 0.8,
         recruit: 'tomblord',
-        map: { x: 566, y: 196 },
+        map: { x: 1698, y: 392 },
       },
     ],
   },
@@ -99,7 +106,7 @@ export const LOCATIONS: LocationDef[] = [
     zone: 'nyota',
     blurb: 'Above the desert rises the high plateau of the Free City of Nyota, where star-smiths forge with fallen starlight. Its guardians test everyone who climbs.',
     requires: '2-4',
-    map: { x: 474, y: 88 },
+    map: { x: 1422, y: 176 },
     stages: [
       {
         id: '3-1',
@@ -108,7 +115,7 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'sunspear' }, { champion: 'starsinger' }],
         power: 1.35,
         recruit: 'sunspear',
-        map: { x: 526, y: 152 },
+        map: { x: 1578, y: 304 },
       },
       {
         id: '3-2',
@@ -117,7 +124,7 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'sunspear' }, { champion: 'starsinger' }, { champion: 'starsinger' }],
         power: 0.98,
         recruit: 'starsinger',
-        map: { x: 568, y: 112 },
+        map: { x: 1704, y: 224 },
       },
       {
         id: '3-3',
@@ -126,7 +133,7 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'colossus', boss: true }, { champion: 'sunspear' }, { champion: 'starsinger' }],
         power: 0.85,
         recruit: 'colossus',
-        map: { x: 604, y: 70 },
+        map: { x: 1812, y: 140 },
       },
     ],
   },

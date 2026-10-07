@@ -110,16 +110,41 @@ async function boot() {
   }
 
   const pos = (e: PointerEvent | WheelEvent) => canvas.toVirtual(e.clientX, e.clientY);
+  // on screens that can be dragged (the campaign map) a press becomes a click on
+  // release, unless the pointer travelled more than a few pixels: then it was a drag
+  let press: { x: number; y: number; moved: boolean } | null = null;
   canvas.display.addEventListener('pointermove', (e) => {
     const p = pos(e);
+    if (press && app.scene?.drag) {
+      if (!press.moved && Math.hypot(p.x - press.x, p.y - press.y) > 3) press.moved = true;
+      if (press.moved) {
+        app.scene.drag(p.x - press.x, p.y - press.y);
+        press.x = p.x;
+        press.y = p.y;
+        canvas.display.style.cursor = 'grabbing';
+        return;
+      }
+    }
     const hot = app.scene?.pointerMove(p.x, p.y) ?? false;
     canvas.display.style.cursor = hot ? 'pointer' : 'default';
   });
   canvas.display.addEventListener('pointerdown', (e) => {
     const p = pos(e);
     app.scene?.pointerMove(p.x, p.y);
-    app.scene?.click(p.x, p.y);
+    if (app.scene?.drag) {
+      press = { x: p.x, y: p.y, moved: false };
+      canvas.display.setPointerCapture(e.pointerId);
+    } else app.scene?.click(p.x, p.y);
   });
+  const release = (e: PointerEvent, cancelled: boolean) => {
+    if (!press) return;
+    const p = pos(e);
+    if (!press.moved && !cancelled) app.scene?.click(p.x, p.y);
+    press = null;
+    canvas.display.style.cursor = (app.scene?.pointerMove(p.x, p.y) ?? false) ? 'pointer' : 'default';
+  };
+  canvas.display.addEventListener('pointerup', (e) => release(e, false));
+  canvas.display.addEventListener('pointercancel', (e) => release(e, true));
   canvas.display.addEventListener('wheel', (e) => {
     e.preventDefault();
     // some browsers report lines or pages instead of pixels
@@ -128,7 +153,7 @@ async function boot() {
   }, { passive: false });
   window.addEventListener('keydown', (e) => {
     if (e.key.startsWith('Arrow') || e.key === ' ' || e.key === 'PageUp' || e.key === 'PageDown' || e.key === 'Backspace') e.preventDefault();
-    app.scene?.key(e.key.length === 1 ? e.key.toLowerCase() : e.key);
+    app.scene?.key(e.key.length === 1 ? e.key.toLowerCase() : e.key, { shift: e.shiftKey });
   });
 
   const loop = (now: number) => {

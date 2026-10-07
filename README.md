@@ -6,7 +6,7 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 
 - **13 champions** in 7 factions, each with idle, run, three attacks, hurt and death (Anhotep also rises from the dead), rendered for both facings.
 - **3 combat backgrounds**: the snowbound *Frostfang Ruins*, the sunset necropolis of the *Sunscar Ruins* and the afrofuturist *Nyota Skyforge* on the high plateau.
-- **A campaign** of 10 stages in three chapters on a painted world map; every enemy you defeat can be **recruited** on the first clear.
+- **A campaign** of 10 stages in three chapters on a painted world map three screens wide (drag it, jump between stages with the arrows, or press `M` for the whole world); every enemy you defeat can be **recruited** on the first clear.
 - **A collection** of champions with locked silhouettes, rarities, affinities, factions and roles, and a detail page with every animation and skill.
 - **The Academy**: an in-game codex that teaches combat, the turn meter, damage, affinities, all buffs, debuffs and special mechanics, with live demonstrations.
 - **Real mechanics**: turn meter, A1/A2/A3 cooldowns, 16 statuses, affinity cycle, counterattacks, dispels, lifesteal, execute, turn meter boosts, Undying, Overdrive, bosses, stars, auto battle and speed controls.
@@ -33,6 +33,7 @@ Open http://localhost:5173. The sprite gallery (every animation, effect and icon
 | mouse | everything: click skills, targets and buttons; hover anything for a tooltip |
 | `1` `2` `3`, arrows, `Enter` | pick a skill, cycle targets, confirm |
 | `A`, `S`, `Esc` | auto battle, speed x1/x2/x3, pause menu (and back in menus) |
+| campaign map | drag to move; arrows jump between stages; `W` `A` `S` `D` or `Shift` + arrows slide the map; `M` shows the whole world |
 | arrows + `Enter` in menus | move between buttons, activate |
 
 Deep links: `?screen=campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=3-3`, `&team=knight,monk,frostmage`, `&champion=colossus`, `&chapter=buffs`; `?demo=<skill_id>` loops one skill; `?unlockall=1`, `?progress=2-1` (clear up to a stage), `?reset=1`.
