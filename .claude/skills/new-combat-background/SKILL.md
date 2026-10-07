@@ -17,7 +17,7 @@ The contract (`ZoneArt`, `PropKind`, rows, spawns) is in `tools/art/zones/shared
 
 ## 1. Design (worksheet first)
 
-Copy `templates/worksheet.md` into your notes and fill it in. When the user is in the conversation, show them the composition and palette before painting. Be ambitious with the set dressing — the reference zones each carry a story (offering reliefs, a toppled colossus, a frozen throne room) — but never at the cost of the floor's readability.
+Copy `templates/worksheet.md` into your notes and fill it in. Show Jakub the name, composition and palette and wait for his yes before painting; without his answer, stop at the worksheet (CLAUDE.md, Content approval). Be ambitious with the set dressing — the reference zones each carry a story (offering reliefs, a toppled colossus, a frozen throne room) — but never at the cost of the floor's readability.
 
 Rules that are not negotiable:
 
@@ -74,7 +74,7 @@ Pick a test team with a light, a dark and a saturated champion (Sir Aldric, Vorh
 
 ## 5. Done means
 
-- Worksheet filled (and approved when the user is present).
+- Worksheet filled and approved by Jakub.
 - Art module and `ZoneDef` registered; a location uses it; `npm run audit`, `npm test`, `npm run typecheck` pass.
 - Preview, battle and team-select captures reviewed at 2x.
 - `docs/ART_GUIDE.md` section 10 shows the new preview next to the others; `docs/GAME_STRUCTURE.md` lists the location.

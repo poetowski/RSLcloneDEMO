@@ -38,7 +38,7 @@ Ranked. When two targets conflict, the higher one wins.
 | AE5 | A crafted, coherent world | Sensation, Fantasy, Narrative | "One hand painted all of this, and every place has a story." | 2 |
 | AE6 | Respect for my time | Submission | "The game never wastes my time or fights my hands." | 3 |
 
-**Not targeted, on purpose:** Fellowship (no multiplayer, no PvP), Expression beyond team building (no gear, no skins) and every monetisation dynamic (no currency, energy, gacha or pay walls: champions are recruited by play). A proposal that brings one of these in changes this table first.
+**Not targeted, on purpose:** Fellowship (no multiplayer, no PvP), Expression beyond team building (no gear, no skins) and every monetisation dynamic (no currency, energy, gacha or pay walls: champions are recruited by play). A proposal that brings one of these in changes this table first. These exclusions were made for the proof of concept; for the real game they are open questions (section 8, T11-T18).
 
 ### AE1 Tactical mastery
 
@@ -62,7 +62,7 @@ Ranked. When two targets conflict, the higher one wins.
 
 - **Built from:** the Academy (12 chapters, 5 live demos), tooltips on every unit, skill and status, on-screen keywords (`RESIST`, `STRONG HIT`, `HEAL BLOCKED`, `ABSORB`, `COUNTER`, `UNDYING!`, `OVERDRIVE!`), matchup counts in team select, deterministic rules, the balance norms, the campaign curve, stars as a mastery goal and a defeat panel that points to the Academy.
 - **Working when:** the numbers taught equal the numbers used; the campaign stays inside its bands; difficulty rises in steps the player can see coming (the stage panel shows the enemy line-up and its power).
-- **Broken when:** text and rules drift (one open case: [DDD.md](DDD.md) DR-1); a stage spikes outside its band; a rule acts without a visible word.
+- **Broken when:** text and rules drift ([DDD.md](DDD.md) DR-1, closed 2026-10-07; DR-5 open); a stage spikes outside its band; a rule acts without a visible word.
 
 ### AE5 A crafted, coherent world
 
@@ -177,7 +177,7 @@ Debuffs on the player's team (SPD Down from 1-1, DEF Down from 1-2, Poison and W
 
 - **Happens:** the player learns each rule from the screen at the moment it applies, and can look anything up.
 - **Driven by:** a number or keyword for every event, tooltips on units, skills and statuses, the Academy with demos that replay real skills, NEW badges and the count of unread chapters, matchup counts.
-- **Baseline:** 16 of 16 statuses are taught (content test). Every battle event has a cue, and all except `expire` (the icon disappears) and `death` (an animation) carry a word. A failed buff roll (Imara's 50% Shield) is silent while a failed debuff shows `RESIST` (T9). One number in the Academy has drifted from the rules (DR-1).
+- **Baseline:** 16 of 16 statuses are taught (content test). Every battle event has a cue, and all except `expire` (the icon disappears) and `death` (an animation) carry a word. A failed buff roll (Imara's 50% Shield) is silent while a failed debuff shows `RESIST` (T9). The turn-meter numbers the Academy quotes match the skills (content test since 2026-10-07, DR-1 closed); its other numbers are restated by hand (DR-5).
 - **Band:** every rule the player can trigger shows a word or an icon when it happens; every number in the Academy equals the rule.
 - **Serves:** AE4, AE1.
 
@@ -231,6 +231,8 @@ Every skill is data (`SkillDef` in `types.ts`); these are the levers a kit can p
 
 ### ME3 The roster
 
+Proof-of-concept content: every champion here is a placeholder until it is reviewed.
+
 | Champion (`id`) | Role, rarity, affinity | SPD | Signature idea | Met / recruited |
 | --- | --- | --- | --- | --- |
 | Sir Aldric (`knight`) | Tank, epic, Arcane | 100 | team Shield and DEF Up with a self Taunt | starter |
@@ -250,6 +252,8 @@ Every skill is data (`SkillDef` in `types.ts`); these are the levers a kit can p
 Spread: roles Tank 3, Damage 3, Support 3, Control 2, Bruiser 2; affinities Force 4, Arcane 4, Wild 3, Void 2; rarities epic 6, rare 4, legendary 3 (common and uncommon have budgets but no champions, T8).
 
 ### ME4 The campaign
+
+Proof-of-concept content: locations, stages and their numbers are placeholders until reviewed.
 
 Lean = enemies each attacking affinity hits strong (+) or weak (-); only the notable ones are listed.
 
@@ -490,6 +494,14 @@ Paste it into the pull request description.
 | T8 | Latent vocabulary: targets `ally` and `self` and the rarities common and uncommon exist in the model with no content, so they are untested in play. | content using them gets a presentation review (ally markers, prompts) and rules tests |
 | T9 | A failed buff roll (Imara's 50% Shield) is silent while a failed debuff shows `RESIST`. | decide whether the player should see it |
 | T10 | Control can chain: a chance stun on an A2 and a guaranteed A3 stun on the same team can lock one enemy; there is no immunity window. The skipped share is fine today (at most 11.5%). | watch the skipped share whenever control is added; an immunity rule if it rises |
+| T11 | Champion growth: champions never grow (no levels, ranks, skill upgrades or gear); every champion is fixed. This decides the meta and the balance model. | keep a fixed-stat tactics game; or add growth (levels, ascension, skill books, gear with sets) |
+| T12 | Acquisition: one recruit per first clear ties the size of the roster to the size of the campaign. | keep it; shards, summoning, fixed rewards or events |
+| T13 | Team size is 3 (RSL 4-5, SWGOH 5). Formation slots, zone spawns, the HUD and every balance number depend on it. | decide early; 3, 4 or 5 |
+| T14 | Team-building levers are few: no leader skills or auras, and formation is visual only (the front row does not protect the back). | leader skills or auras; positional rules |
+| T15 | Five stats: no Accuracy or Resistance (a debuff lands on a flat chance) and no crit damage stat. | add Accuracy/Resistance, crit damage; or keep five on purpose |
+| T16 | Status variety: no immunities, no revives, ally-target skills unused (T8), two passive kinds. | grow the vocabulary with the roster; every new protection needs an answer (DY6) |
+| T17 | Modes: the campaign is the only mode; no dungeons, boss modes or events; PvP is excluded. | decide which modes the game has |
+| T18 | Platform: a 640x360 web canvas with mouse and keyboard; RSL and SWGOH are phone games (touch, short sessions). | web only; or phones too (touch-first input, layout) |
 
 ## 9. Decision log
 

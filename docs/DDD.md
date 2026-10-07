@@ -118,7 +118,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Key light | the single top-left light of every pixel | `LIGHT_DIR` |
 | Frame box, pivot | 208x160 frame for every champion frame; feet at (104, 140) | `FRAME_W`, `FRAME_H`, `PIVOT` |
 | Atlas | packed frames plus metadata for one champion | `public/assets/champions/<id>.png/.json` |
-| Font face | `regular` and `bold` for running text, `display` for titles, names in headers and big numbers; one family | `Variant`, `FontJson.faces`, `tools/art/font.ts` |
+| Font face | `regular` and `bold` for running text, `display` for titles, names in headers and big numbers, `micro` digits for counters on status icons; one family | `Variant`, `FontJson.faces`, `tools/art/font.ts` |
 | Chapter, block, figure (Academy) | a page of the Academy, its parts, a live illustration | `Chapter`, `Block`, `FigureId` |
 
 ### 2.5 Homonyms
@@ -323,7 +323,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-K10 | Effect names are unique across effect modules (a later module would silently override an earlier one) | convention, true today: 63 names (R-6) |
 | INV-K11 | Every faction has a deliberate home zone | convention: `homeZone()` falls back to Frostfang (DR-12) |
 | INV-K12 | Numbers in skill descriptions equal the data | convention, true today for all 39 skills (R-1) |
-| INV-K13 | Numbers in the Academy, its figures and the stat tips equal the rules | convention, one drift today (DR-1, DR-5, R-1) |
+| INV-K13 | Numbers in the Academy, its figures and the stat tips equal the rules | test for the turn-meter numbers it quotes; the rest by convention (DR-5, R-1) |
 | INV-K14 | Definitions do not change at runtime | convention: objects are not frozen |
 | INV-K15 | The interface ramps repeat the category colours: `UIR.rarity` and `UIR.affinity` base entries and `UIR.faction` glyphs (`palette.ts`) equal the colours in `meta.ts` | convention, true today for all 16 (R-6) |
 
@@ -355,7 +355,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-G4 | The art build is deterministic and committed | convention: no check rebuilds and compares (R-15) |
 | INV-G5 | Each asset JSON has one schema for producer and consumer | not true today (DR-3, R-4) |
 | INV-G6 | No effect frame is cut off at the edge of its box; padding (`FxDef.pad`) never moves a ground effect's anchor across `ay` 0.8 | audit |
-| INV-G7 | Every character of the game text has a glyph in `regular` and `bold`; every title, champion name and big number has one in `display`; body faces keep cap 7 / cell 9 and the display cell is two body cells | test |
+| INV-G7 | Every character of the game text has a glyph in `regular` and `bold`; every title, champion name and big number has one in `display`; `micro` has every digit and fits a status-icon badge; body faces keep cap 7 / cell 9 and the display cell is two body cells | test |
 
 ## 7. Policies: where decisions live
 
@@ -428,7 +428,7 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 
 | ID | Severity | Where | What | Fix |
 | --- | --- | --- | --- | --- |
-| DR-1 | medium | `src/game/data/codex.ts` (Special Mechanics) | the Academy says Resonance drains 10% turn meter; the data (`starsinger.ts`) and MECHANICS_GUIDE say 15% | correct the text; R-1 |
+| DR-1 | medium | `src/game/data/codex.ts` (Special Mechanics) | the Academy says Resonance drains 10% turn meter; the data (`starsinger.ts`) and MECHANICS_GUIDE say 15% | closed 2026-10-07: the text says 15%, and a content test compares every turn-meter number the Academy quotes with the skill (the first piece of R-1) |
 | DR-2 | medium | `tests/battle.test.ts` | "runs every champion through battles" lists 10 champions by hand: Imara, Kwesi and Mwamba never run | iterate `CHAMPIONS` |
 | DR-3 | medium | `tools/art/build.ts`, `tools/art/fx/kit.ts`, `tools/art/zones/shared.ts`, `tools/art/ui/index.ts`, `tools/art/font.ts` vs `src/game/view/assets.ts`, `src/engine/font.ts` | `ChampionAtlasJson`, `FxJson`, `ZoneJson` with `PropKind`, `UiJson` and `FontJson` are each declared twice, producer and consumer | R-4 |
 | DR-4 | medium | `src/game/battle/sim.ts`, `src/game/view/scene.ts` | the turn structure is written twice; the balance numbers come from one copy, play from the other | R-7 |
@@ -448,6 +448,11 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | DR-18 | low | `tools/balance.ts` | re-implements the mulberry32 generator instead of using `Rng` | import `Rng` |
 | DR-19 | trivial | `src/main.ts` | `?? STARTERS.join(',')` is unreachable (`join` never returns nullish) | simplify |
 | DR-20 | trivial | MECHANICS_GUIDE 2 | says the actor's meter resets to `selfTm`; the code caps it at 99 | add "(at most 99)" |
+| DR-21 | medium | `src/main.ts`, `src/game/screens/academy.ts`, `src/game/screens/options.ts` | placeholder content is named in engine code: the deep-link defaults (`knight`, `monk`), the Academy demo cast and figures (`knight`, `monk`, `frostmage`, `tomblord`), the default zone `frostfang`; replacing the content breaks them | derive them from the data (first champion, first zone, the skill's owner) before the content changes; R-6, R-9 |
+| DR-22 | medium | `src/game/battle/battle.ts` (`speed`, `attack`, `defense`) | status sizes (ATK Up/Down 25%, DEF Up 40%, DEF Down 30%, SPD Up/Down 25%) live in rule code instead of `StatusDef`; the status texts restate them | R-8: sizes as status data, texts built from them |
+| DR-23 | low | `src/game/profile.ts` | the save key `oathbound.profile.v1` carries the placeholder name; renaming the game, or a champion (DR-15), loses or breaks saves | a neutral key and a migration (R-11) before the name changes |
+| DR-24 | low | `src/game/view/fx.ts` (`FxLayer.text`) | floating battle words stack by count, not by size: `RESIST` and `CRITICAL` can print over a damage number (seen with critical hits and resisted debuffs) | stack by each text's height, or give words and numbers their own lanes |
+| DR-25 | low | `tools/art/font.ts` | bold made by a 1 px dilation filled m, w, M and W; `%` read as X; titles were bold scaled 2x-4x | closed 2026-10-07 (font A, e943256): hand-drawn bold, a redrawn `%`, a display face, micro digits |
 
 ## 11. Evolution roadmap
 

@@ -152,6 +152,15 @@ describe('academy', () => {
     for (const ch of CHAPTERS) if (ch.demo) expect(skills.has(ch.demo.skill), `${ch.id} demo ${ch.demo.skill}`).toBe(true);
   });
 
+  it('quotes the turn-meter numbers of the skills it names ("Resonance: -15%")', () => {
+    const text = CHAPTERS.flatMap((ch) => ch.blocks.flatMap((b) => ('text' in b ? [b.text] : b.kind === 'list' ? b.items : []))).join(' ');
+    for (const s of CHAMPIONS.flatMap((c) => c.skills)) {
+      const tm = s.tmTargets ?? s.tmAllies;
+      const quoted = text.match(new RegExp(`${s.name}: ([+-]\\d+)%`));
+      if (tm !== undefined && quoted) expect(Number(quoted[1]), `${s.name} in the Academy`).toBe(tm);
+    }
+  });
+
   it('uses icons that exist', () => {
     for (const ch of CHAPTERS) {
       const ok = ch.icon.startsWith('status_') ? !!ui.status[ch.icon.slice(7)] : !!ui.parts[ch.icon];
@@ -161,8 +170,9 @@ describe('academy', () => {
 });
 
 describe('font', () => {
-  const font = json('public/assets/ui/font.json') as { faces: Record<'regular' | 'bold' | 'display', { cellH: number; cap: number; caps: boolean; glyphs: Record<string, unknown> }> };
-  const missing = (face: 'regular' | 'bold' | 'display', texts: string[]) => {
+  type FaceId = 'regular' | 'bold' | 'display' | 'micro';
+  const font = json('public/assets/ui/font.json') as { faces: Record<FaceId, { cellH: number; cap: number; caps: boolean; glyphs: Record<string, unknown> }> };
+  const missing = (face: FaceId, texts: string[]) => {
     const f = font.faces[face];
     const chars = new Set(texts.flatMap((t) => [...(f.caps ? t.toUpperCase() : t)]));
     return [...chars].filter((ch) => !f.glyphs[ch]);
@@ -185,6 +195,12 @@ describe('font', () => {
   it('has a title-face glyph for every title, name and big number', () => {
     const titles = [...CHAMPIONS.map((c) => c.name), ...CHAPTERS.map((ch) => ch.title), 'NEW CHAMPION', 'VICTORY', 'DEFEAT', 'BOSS', 'FIGHT!', 'PAUSED', 'UNDYING!', 'OVERDRIVE!', '0123456789+'];
     expect(missing('display', titles)).toEqual([]);
+  });
+
+  it('has micro digits that fit the status icon counters', () => {
+    expect(missing('micro', ['0123456789'])).toEqual([]);
+    // a badge (digit + 1 px border) must fit the lower corner of a 12 px status icon
+    expect(font.faces.micro.cellH + 2).toBeLessThanOrEqual(7);
   });
 
   it('keeps the metrics the screens are laid out for', () => {

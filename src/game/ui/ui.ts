@@ -42,19 +42,6 @@ export const COLORS = {
   panel: '#0d1220',
 };
 
-const TINY: Record<string, string[]> = {
-  '0': ['###', '#.#', '#.#', '#.#', '###'],
-  '1': ['.#.', '##.', '.#.', '.#.', '###'],
-  '2': ['###', '..#', '###', '#..', '###'],
-  '3': ['###', '..#', '.##', '..#', '###'],
-  '4': ['#.#', '#.#', '###', '..#', '..#'],
-  '5': ['###', '#..', '###', '..#', '###'],
-  '6': ['###', '#..', '###', '#.#', '###'],
-  '7': ['###', '..#', '.#.', '.#.', '.#.'],
-  '8': ['###', '#.#', '###', '#.#', '###'],
-  '9': ['###', '#.#', '###', '..#', '###'],
-};
-
 export interface ButtonOpts {
   click: () => void;
   /** small = 16px HUD button, big = menu button with the gold bevel */
@@ -103,17 +90,13 @@ export class Ui {
     return lines.length * lineH;
   }
 
+  /** A small number on a dark badge (turn counters on status icons), in the font's micro digits. */
   tinyNum(ctx: CanvasRenderingContext2D, n: number, x: number, y: number, color = '#ffffff') {
-    let cx = x;
-    for (const ch of String(n)) {
-      const g = TINY[ch];
-      if (!g) continue;
-      ctx.fillStyle = COLORS.ink;
-      ctx.fillRect(cx - 1, y - 1, 5, 7);
-      ctx.fillStyle = color;
-      g.forEach((row, yy) => [...row].forEach((c, xx) => c === '#' && ctx.fillRect(cx + xx, y + yy, 1, 1)));
-      cx += 4;
-    }
+    const s = String(n);
+    const w = this.a.font.measure(s, 'micro'), h = this.a.font.height('micro');
+    ctx.fillStyle = COLORS.ink;
+    ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
+    this.a.font.draw(ctx, s, x, y, { color, variant: 'micro' });
   }
 
   beginFrame() {

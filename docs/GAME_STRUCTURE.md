@@ -2,6 +2,8 @@
 
 How Oathbound's content fits together: champions and their categories, the campaign, combat backgrounds, the Academy, the player's profile and the screens that present them. Rules of combat: [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md). Pixels: [ART_GUIDE.md](ART_GUIDE.md). Screens: [UI_GUIDE.md](UI_GUIDE.md).
 
+> **Status: proof of concept.** The name, champions, factions, world, stages, lore, numbers and art are placeholders, to be replaced by content Jakub reviews and approves. The engine, the tools and the guardrails stay.
+
 ---
 
 ## 1. The content model

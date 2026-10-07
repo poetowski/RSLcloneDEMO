@@ -1,10 +1,12 @@
-// Hand-designed pixel font: one family in three faces.
+// Hand-designed pixel font: one family in four faces.
 //   regular  caps 7 px, x-height 5, descenders 2 (cell 9 px)
 //   bold     the same letters drawn by hand with 2 px stems (cell 9 px), so
 //            counters stay open in m, w, M and W
 //   display  the title face: caps 13 px drawn at full size (cell 18 px, two
 //            body cells), for titles, names and critical hits; capitals only,
 //            the runtime upper-cases display text
+//   micro    3x5 digits for the turn counters on 12 px status icons, where
+//            the body digits do not fit; the same rounded shapes
 // Rows run from the cap line down; '#' is ink. Glyphs are white; the runtime
 // tints them. Layout and usage: docs/ART_GUIDE.md section 9.
 import path from 'node:path';
@@ -903,6 +905,20 @@ const DISPLAY = blocks(`
 ..####..###
 `);
 
+// prettier-ignore
+const MICRO = rows({
+  '0': '.#.|#.#|#.#|#.#|.#.',
+  '1': '.#.|##.|.#.|.#.|###',
+  '2': '##.|..#|.#.|#..|###',
+  '3': '##.|..#|.#.|..#|##.',
+  '4': '#.#|#.#|###|..#|..#',
+  '5': '###|#..|##.|..#|##.',
+  '6': '.##|#..|##.|#.#|.#.',
+  '7': '###|..#|.#.|.#.|.#.',
+  '8': '.#.|#.#|.#.|#.#|.#.',
+  '9': '.#.|#.#|.##|..#|##.',
+});
+
 /** Blocks: a line "=X" names the glyph, the lines after it are its rows. */
 function blocks(src: string): Record<string, string[]> {
   const o: Record<string, string[]> = {};
@@ -915,7 +931,7 @@ function blocks(src: string): Record<string, string[]> {
   return o;
 }
 
-export type FaceId = 'regular' | 'bold' | 'display';
+export type FaceId = 'regular' | 'bold' | 'display' | 'micro';
 
 interface FaceSpec {
   glyphs: Record<string, string[]>;
@@ -933,6 +949,7 @@ const FACES: Record<FaceId, FaceSpec> = {
   regular: { glyphs: REGULAR, cap: 7, cellH: 9, gap: 1, space: 3, caps: false },
   bold: { glyphs: BOLD, cap: 7, cellH: 9, gap: 1, space: 3, caps: false },
   display: { glyphs: DISPLAY, cap: 13, cellH: 18, gap: 2, space: 5, caps: true },
+  micro: { glyphs: MICRO, cap: 5, cellH: 5, gap: 1, space: 2, caps: false },
 };
 
 export const LINE_H = 11;

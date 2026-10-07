@@ -1,9 +1,10 @@
 // Bitmap font renderer for the generated pixel font (public/assets/ui/font.*).
-// Three faces of one family: regular and bold for running text, display for
+// Four faces of one family: regular and bold for running text, display for
 // titles, names and critical hits (drawn at full size, never by doubling the
-// body pixels). Glyphs are white in the atlas; colored copies are cached per color.
+// body pixels), and micro digits for counters on status icons. Glyphs are
+// white in the atlas; colored copies are cached per color.
 
-export type Variant = 'regular' | 'bold' | 'display';
+export type Variant = 'regular' | 'bold' | 'display' | 'micro';
 
 export interface FaceJson {
   /** top of this face's row in the atlas */

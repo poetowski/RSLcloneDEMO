@@ -130,7 +130,7 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'h', text: 'Dispel and Cleanse' },
       { kind: 'p', text: 'Dispel strips every buff from an enemy. Cleanse removes one debuff from each ally (Serenity).' },
       { kind: 'h', text: 'Lifesteal, Execute, Turn Meter' },
-      { kind: 'list', items: ['Lifesteal heals the attacker for a share of the damage dealt (Soul Rend: 60%). Heal Block stops it.', 'Execute deals bonus damage to targets below a HP threshold (Skullsplitter, Mirage Assault).', 'Turn Meter effects push enemies back (Arrow Rain: -15%, Resonance: -10%), let a champion act again sooner (Mirage Assault ends with 25%) or speed up the whole team (Rhythm of the March: +20% to every other ally).'] },
+      { kind: 'list', items: ['Lifesteal heals the attacker for a share of the damage dealt (Soul Rend: 60%). Heal Block stops it.', 'Execute deals bonus damage to targets below a HP threshold (Skullsplitter, Mirage Assault).', 'Turn Meter effects push enemies back (Arrow Rain: -15%, Resonance: -15%), let a champion act again sooner (Mirage Assault ends with 25%) or speed up the whole team (Rhythm of the March: +20% to every other ally).'] },
       { kind: 'h', text: 'Undying' },
       { kind: 'p', text: 'Anhotep\'s passive: the first time he falls he rises again with 25% HP and every debuff removed. Plan for two kills, and save Heal Block and burst for the second.' },
       { kind: 'h', text: 'Overdrive' },

@@ -18,7 +18,7 @@ Read first: `docs/MECHANICS_GUIDE.md` (sections 4-10), `docs/ART_GUIDE.md` (sect
 
 ## 1. Design (worksheet first)
 
-1. Copy `templates/worksheet.md` into your notes and fill every line. When the user is in the conversation, show them the worksheet and get a yes on concept, kit and placement before building.
+1. Copy `templates/worksheet.md` into your notes and fill every line. Show Jakub the worksheet (name, concept, stats, kit, numbers, placement, art direction) and wait for his yes before building; without his answer, stop at the worksheet (CLAUDE.md, Content approval).
 2. Pick the **role** first, then shape the kit around it:
    - Tank: a taunt or shield A2/A3, high HP/DEF, A1 with a defensive rider (DEF Down, Weaken).
    - Bruiser: sustain (lifesteal, shields) plus a big A3.
@@ -86,7 +86,7 @@ Look for: silhouette and hue distinct from the lineup, weapon arcs that read, hi
 
 ## 7. Done means
 
-- The worksheet is filled and (if the user is present) approved.
+- The worksheet is filled and approved by Jakub.
 - Data and art registered; `npm run audit`, `npm test`, `npm run balance`, `npm run typecheck` pass.
 - Every skill watched in `?demo=`; card, champion page and recruit ceremony reviewed; with `?unlockall=1` the new card is reachable in the collection and in the team-select roster (both scroll as the roster grows).
 - `docs/MECHANICS_GUIDE.md` section 9 (kits) and `docs/GAME_STRUCTURE.md` (roster table) updated; the Academy mentions any new mechanic.
