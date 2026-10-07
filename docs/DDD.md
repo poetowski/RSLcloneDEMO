@@ -350,8 +350,8 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-G2 | Backdrop 640x200; tiles on the 32 px grid; colour budgets 220 / 160; prop kinds have frames (pulse 2+, fire needs `flame`, birds need `bird`); 3 + 3 spawns | audit, test |
 | INV-G3 | Skill icons 40x40, status icons 12x12 | audit |
 | INV-G4 | The art build is deterministic and committed | convention: no check rebuilds and compares (R-15) |
-| INV-G5 | No effect frame is cut off at the edge of its box; padding (`FxDef.pad`) never moves a ground effect's anchor across `ay` 0.8 | audit |
 | INV-G5 | Each asset JSON has one schema for producer and consumer | not true today (DR-3, R-4) |
+| INV-G6 | No effect frame is cut off at the edge of its box; padding (`FxDef.pad`) never moves a ground effect's anchor across `ay` 0.8 | audit |
 
 ## 7. Policies: where decisions live
 
