@@ -8,9 +8,10 @@ The game is **The Loom: Reliquary of Legends** (code name TLROL), high fantasy w
 
 - the name; "Reliquary of Legends" is the subtitle, and heroes stay *champions*;
 - the domain lexicon: Master Archivist, Reliquary, Hero Soul File, Weaver Matrix, Thread Spool, Weave Pattern ([docs/DDD.md](docs/DDD.md) 2.6); the Spindle of Fate is a placeholder name with no meaning yet;
+- the logo: a gothic rose window (six jewelled lobes, as the Weaver Matrix holds six spools) before THE LOOM in cast gold, with RELIQUARY OF LEGENDS beneath in the `display` face;
 - the Weaver Matrix outline: six slots whose stat nodes are fixed (one stat) or variable (one of a list); 2- and 4-piece Weave Patterns counted wherever their spools sit; a 2-piece pattern can be woven up to three times.
 
-Everything else is proof-of-concept placeholder: the logo, the champions, factions, zones, stages, lore, Academy text, rule numbers, norms, effects and art, and the matrix layout, spools and patterns. Jakub, the game's designer, approves or rejects every piece of real content before it is built: names, stats, numbers, mechanics, texts and art.
+Everything else is proof-of-concept placeholder: the champions, factions, zones, stages, lore, Academy text, rule numbers, norms, effects and art, and the matrix layout, spools and patterns. Jakub, the game's designer, approves or rejects every piece of real content before it is built: names, stats, numbers, mechanics, texts and art.
 
 - Propose first: options with a recommendation, and rendered previews or captures for anything visual. Then wait for his answer.
 - Never build unapproved content, also in a session he is not part of: stop at the proposal.

@@ -1,4 +1,4 @@
-// Menu and meta-game art: the OATHBOUND logo, big buttons, rarity card
+// Menu and meta-game art: the logo (THE LOOM and its rose window), big buttons, rarity card
 // frames, affinity gems, faction emblems, role icons, stars, locks, crowns,
 // campaign map nodes, tabs and menu glyphs. Same rules as the battle art:
 // light from the top-left, 1px dark outlines, ramps from palette.ts (UIR).
@@ -19,27 +19,32 @@ function mask(b: Bitmap, x: number, y: number, rows: string[], c: RGBA) {
 }
 
 // ---------------------------------------------------------------------------
-// Logo: OATHBOUND in shaded gold strokes over a sworn blade
+// Logo: a gothic rose window before THE LOOM, in cast gold
 // ---------------------------------------------------------------------------
 
-type Stroke = V[];
+/** A stroke in pixel space (y down) and its radius. */
+interface Stroke {
+  pts: V[];
+  r: number;
+}
+
 const arc = (cx: number, cy: number, rx: number, ry: number, a0: number, a1: number, n = 10): V[] =>
   Array.from({ length: n + 1 }, (_, i) => {
     const a = ((a0 + ((a1 - a0) * i) / n) * Math.PI) / 180;
     return v(cx + Math.cos(a) * rx, cy + Math.sin(a) * ry);
   });
 
-// letter cells are 10 wide, 14 tall, y up
-const LETTERS: Record<string, Stroke[]> = {
+// letter cells are 10 wide (M 11.6), 14 tall, y up
+const LETTERS: Record<string, V[][]> = {
   O: [arc(5, 7, 4.4, 6.4, 0, 360, 28)],
-  A: [[v(0.6, 0), v(5, 14)], [v(5, 14), v(9.4, 0)], [v(2.6, 5), v(7.4, 5)]],
   T: [[v(0, 13.4), v(10, 13.4)], [v(5, 13.4), v(5, 0)]],
   H: [[v(0.8, 0), v(0.8, 14)], [v(9.2, 0), v(9.2, 14)], [v(0.8, 7), v(9.2, 7)]],
-  B: [[v(0.8, 0), v(0.8, 14)], [v(0.8, 13.6), v(5.4, 13.6), ...arc(5.4, 10.45, 3.15, 3.15, 90, -90, 8), v(0.8, 7.3)], [v(0.8, 7.3), v(5.8, 7.3), ...arc(5.8, 3.85, 3.45, 3.45, 90, -90, 8), v(0.8, 0.4)]],
-  U: [[v(0.8, 14), ...arc(5, 4.6, 4.2, 4.2, 180, 360, 12), v(9.2, 14)]],
-  N: [[v(0.8, 0), v(0.8, 14)], [v(0.8, 14), v(9.2, 0)], [v(9.2, 0), v(9.2, 14)]],
-  D: [[v(0.8, 0), v(0.8, 14)], [v(0.8, 13.6), v(3.6, 13.6), ...arc(3.6, 7, 5.6, 6.6, 90, -90, 14), v(0.8, 0.4)]],
+  E: [[v(0.8, 0.6), v(0.8, 13.4)], [v(0.8, 13.4), v(9, 13.4)], [v(0.8, 7.2), v(7.4, 7.2)], [v(0.8, 0.6), v(9, 0.6)]],
+  L: [[v(0.8, 14), v(0.8, 0.6)], [v(0.8, 0.6), v(9, 0.6)]],
+  M: [[v(0.8, 0), v(0.8, 14)], [v(0.8, 14), v(5.8, 4.2)], [v(5.8, 4.2), v(10.8, 14)], [v(10.8, 14), v(10.8, 0)]],
 };
+const LETTER_W: Record<string, number> = { M: 11.6, ' ': 3.2 };
+const LETTER_GAP = 2.4;
 
 /** Distance from p to segment ab. */
 function segDist(px: number, py: number, a: V, b: V): number {
@@ -49,63 +54,108 @@ function segDist(px: number, py: number, a: V, b: V): number {
   return Math.hypot(px - a.x - dx * t, py - a.y - dy * t);
 }
 
+/** Width of a word in letter cells. */
+function cells(word: string): number {
+  return [...word].reduce((w, ch, i) => w + (LETTER_W[ch] ?? 10) + (i ? LETTER_GAP : 0), 0);
+}
+
+/** The strokes of a word with its cap line at `top`, scaled by S, from x. */
+function wordStrokes(word: string, x: number, top: number, S: number, r: number): Stroke[] {
+  const base = top + 14 * S;
+  const out: Stroke[] = [];
+  let cx = x;
+  for (const ch of word) {
+    for (const st of LETTERS[ch] ?? []) out.push({ pts: st.map((p) => v(cx + p.x * S, base - p.y * S)), r });
+    cx += ((LETTER_W[ch] ?? 10) + LETTER_GAP) * S;
+  }
+  return out;
+}
+
 /**
- * The title: letters rasterized from strokes into a crisp mask, then shaded
- * like cast gold — a lit bevel on the top-left edges, a dark bevel on the
- * bottom-right, a face that darkens downward with a specular band — over the
- * oath-blade, with a drop shadow away from the key light.
+ * Cast gold: strokes rasterized into a crisp mask, then shaded like metal: a
+ * lit bevel on the top-left edges, a dark bevel on the bottom-right, a face in
+ * hard bands from `top` (bright) to `base` (dark), and an outline in the
+ * darkest gold.
  */
-export function logo(word = 'OATHBOUND'): Bitmap {
-  const S = 2.15, adv = 12.4, R = 2.9;
-  const pad = 14;
-  const w = Math.ceil(word.length * adv * S + pad * 2), h = 58;
-  const top = 8, base = top + 14 * S; // letter cap line and baseline in px
+function castGold(w: number, h: number, strokes: Stroke[], top: number, base: number): Bitmap {
   const m = new Uint8Array(w * h);
-  [...word].forEach((ch, i) => {
-    const strokes = (LETTERS[ch] ?? []).map((st) => st.map((p) => v(pad + i * adv * S + p.x * S, base - p.y * S)));
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        for (const st of strokes) {
-          for (let k = 0; k < st.length - 1; k++) {
-            if (segDist(x + 0.5, y + 0.5, st[k], st[k + 1]) <= R) m[y * w + x] = 1;
-          }
+  for (const st of strokes) {
+    const xs = st.pts.map((p) => p.x), ys = st.pts.map((p) => p.y);
+    const x0 = Math.max(0, Math.floor(Math.min(...xs) - st.r - 1)), x1 = Math.min(w - 1, Math.ceil(Math.max(...xs) + st.r + 1));
+    const y0 = Math.max(0, Math.floor(Math.min(...ys) - st.r - 1)), y1 = Math.min(h - 1, Math.ceil(Math.max(...ys) + st.r + 1));
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+      if (m[y * w + x]) continue;
+      for (let k = 0; k < st.pts.length - 1; k++) {
+        if (segDist(x + 0.5, y + 0.5, st.pts[k], st.pts[k + 1]) <= st.r) {
+          m[y * w + x] = 1;
+          break;
         }
       }
     }
-  });
-  const at = (x: number, y: number) => (x >= 0 && y >= 0 && x < w && y < h ? m[y * w + x] : 0);
-  const letters = new Bitmap(w, h);
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      if (!at(x, y)) continue;
-      const litEdge = !at(x - 1, y) || !at(x, y - 1) || !at(x - 1, y - 1);
-      const darkEdge = !at(x + 1, y) || !at(x, y + 1) || !at(x + 1, y + 1);
-      const lit2 = !at(x - 2, y) || !at(x, y - 2);
-      const dark2 = !at(x + 2, y) || !at(x, y + 2);
-      const k = (y - top) / (base - top); // 0 cap line .. 1 baseline
-      let c: RGBA;
-      if (litEdge && !darkEdge) c = G[4];
-      else if (darkEdge && !litEdge) c = G[1];
-      else if (litEdge && darkEdge) c = G[2];
-      else if (lit2 && !dark2) c = MAT.gold.ramp[4];
-      else if (dark2 && !lit2) c = MAT.gold.ramp[2];
-      else {
-        // face: hard bands, bright at the cap line, a specular streak, darker toward the baseline
-        c = k < 0.22 ? MAT.gold.ramp[4] : k < 0.36 ? G[4] : k < 0.66 ? MAT.gold.ramp[3] : MAT.gold.ramp[2];
-      }
-      letters.set(x, y, c);
-    }
   }
-  const outlined = outline(letters, G[0]);
-  // the oath-blade lies under the word, point to the right
-  const f = new Frame(w, h);
-  const d = new Draw(f, 1, v(0, h));
-  sword(d, v(4, h - base - 3), 0, { blade: MAT.silver, guard: MAT.gold, grip: MAT.leather, pommel: MAT.gold, len: w - 16, width: 3.6, guardW: 8, gripLen: 7, z: 1 });
-  const blade = f.render({ selout: true });
-  const out = new Bitmap(w, h);
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (outlined.get(x - 2, y - 2) & 255) out.set(x, y, withAlpha(UIR.ink[0], 190));
-  out.blit(blade, 0, 0);
-  out.blit(outlined, 0, 0);
+  const at = (x: number, y: number) => (x >= 0 && y >= 0 && x < w && y < h ? m[y * w + x] : 0);
+  const b = new Bitmap(w, h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    if (!at(x, y)) continue;
+    const litEdge = !at(x - 1, y) || !at(x, y - 1) || !at(x - 1, y - 1);
+    const darkEdge = !at(x + 1, y) || !at(x, y + 1) || !at(x + 1, y + 1);
+    const lit2 = !at(x - 2, y) || !at(x, y - 2);
+    const dark2 = !at(x + 2, y) || !at(x, y + 2);
+    const k = (y - top) / (base - top);
+    let c: RGBA;
+    if (litEdge && !darkEdge) c = G[4];
+    else if (darkEdge && !litEdge) c = G[1];
+    else if (litEdge && darkEdge) c = G[2];
+    else if (lit2 && !dark2) c = MAT.gold.ramp[4];
+    else if (dark2 && !lit2) c = MAT.gold.ramp[2];
+    else c = k < 0.22 ? MAT.gold.ramp[4] : k < 0.36 ? G[4] : k < 0.66 ? MAT.gold.ramp[3] : MAT.gold.ramp[2];
+    b.set(x, y, c);
+  }
+  return outline(b, G[0]);
+}
+
+/** An arcane jewel lit from the top-left: a dark rim, a dithered body, one glint. */
+function jewel(b: Bitmap, cx: number, cy: number, r: number) {
+  const J = UIR.affinity.arcane;
+  for (let y = Math.floor(cy - r - 1); y <= Math.ceil(cy + r + 1); y++) for (let x = Math.floor(cx - r - 1); x <= Math.ceil(cx + r + 1); x++) {
+    const dx = x + 0.5 - cx, dy = y + 0.5 - cy;
+    const d = Math.hypot(dx, dy);
+    if (d > r + 0.5) continue;
+    if (d > r - 0.6) b.set(x, y, J[0]);
+    else b.set(x, y, rampDither(J, 3.3 - ((dx + dy) / r) * 1.25 - (d / r) * 0.5, x, y));
+  }
+  b.set(Math.round(cx - r * 0.45 - 0.5), Math.round(cy - r * 0.45 - 0.5), J[4]);
+}
+
+/**
+ * The title: a gothic rose window (six gold lobes in a ring, each holding an
+ * arcane jewel as the Weaver Matrix holds six spools, a seventh jewel at the
+ * centre) before THE LOOM, with a drop shadow away from the key light. The
+ * subtitle RELIQUARY OF LEGENDS is text in the display face (screens/menu.ts).
+ */
+export function logo(): Bitmap {
+  const S = 2.15, R = 2.9;
+  const ring = 23, lobe = 6.8, lobeAt = 13.2;
+  const ex = ring + 4, w = Math.ceil(ex + ring + 12 + cells('THE LOOM') * S + 2 * R + 4), h = ring * 2 + 10;
+  const cy = h / 2 - 1;
+  const top = cy - 7 * S, base = cy + 7 * S;
+  // slot 0 at the top, then clockwise
+  const lobes = Array.from({ length: 6 }, (_, i) => {
+    const a = ((i * 60 - 90) * Math.PI) / 180;
+    return v(ex + Math.cos(a) * lobeAt, cy + Math.sin(a) * lobeAt);
+  });
+  const strokes: Stroke[] = [
+    { pts: arc(ex, cy, ring, ring, 0, 360, 48), r: 1.8 },
+    ...lobes.map((p) => ({ pts: arc(p.x, p.y, lobe, lobe, 0, 360, 24), r: 1.2 })),
+    { pts: arc(ex, cy, 4.2, 4.2, 0, 360, 16), r: 1.2 },
+    ...wordStrokes('THE LOOM', ex + ring + 12 + R, top, S, R),
+  ];
+  const b = castGold(w, h, strokes, top, base);
+  for (const p of lobes) jewel(b, p.x, p.y, 3.4);
+  jewel(b, ex, cy, 2.6);
+  const out = new Bitmap(w + 2, h + 2);
+  for (let y = 0; y < out.h; y++) for (let x = 0; x < out.w; x++) if (b.get(x - 2, y - 2) & 255) out.set(x, y, withAlpha(UIR.ink[0], 190));
+  out.blit(b, 0, 0);
   return out;
 }
 

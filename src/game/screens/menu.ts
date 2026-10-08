@@ -31,9 +31,9 @@ export class MainMenu extends BaseScreen {
   protected draw(ctx: CanvasRenderingContext2D) {
     this.diorama.draw(ctx, this.t, 0.4);
     const ui = this.ui;
-    // logo with a slow shine sweeping across
+    // logo with a slow shine sweeping across, the subtitle between two dividers
     const logo = ui.part('logo');
-    const lx = Math.round(W / 2 - logo[2] / 2), ly = 14;
+    const lx = Math.round(W / 2 - logo[2] / 2), ly = 12;
     ui.blit(ctx, 'logo', lx, ly);
     const sweep = (this.t / 9) % (logo[2] + 400) - 40;
     if (sweep < logo[2]) {
@@ -46,7 +46,11 @@ export class MainMenu extends BaseScreen {
       ui.blit(ctx, 'logo', lx, ly);
       ctx.restore();
     }
-    ui.text(ctx, 'RUINS OF THE BROKEN OATH', W / 2, ly + logo[3] + 4, { color: '#c8a050', align: 'center' });
+    const sub = 'RELIQUARY OF LEGENDS';
+    const sy = ly + logo[3] + 3, sw = ui.measure(sub, 'display');
+    ui.text(ctx, sub, W / 2, sy, { color: COLORS.gold, align: 'center', variant: 'display' });
+    ui.divider(ctx, Math.round(W / 2 - sw / 2 - 52), sy + 6, 44);
+    ui.divider(ctx, Math.round(W / 2 + sw / 2 + 8), sy + 6, 44);
 
     const fr = frontier(this.archivist);
     const owned = CHAMPIONS.filter((c) => isUnlocked(this.archivist, c.id)).length;

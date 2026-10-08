@@ -2,7 +2,7 @@
 
 How the content of The Loom: Reliquary of Legends fits together: champions and their categories, the campaign, combat backgrounds, the Academy, the player's save and the screens that present them. Rules of combat: [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md). Pixels: [ART_GUIDE.md](ART_GUIDE.md). Screens: [UI_GUIDE.md](UI_GUIDE.md).
 
-> **Status: proof of concept.** The name is final: **The Loom: Reliquary of Legends** (code name TLROL), high fantasy with a gothic arcane look. The logo, champions, factions, world, stages, lore, numbers and art are still placeholders, to be replaced by content Jakub reviews and approves. The engine, the tools and the guardrails stay.
+> **Status: proof of concept.** The name and the logo are final: **The Loom: Reliquary of Legends** (code name TLROL), high fantasy with a gothic arcane look. The champions, factions, world, stages, lore, numbers and art are still placeholders, to be replaced by content Jakub reviews and approves. The engine, the tools and the guardrails stay.
 
 ---
 
