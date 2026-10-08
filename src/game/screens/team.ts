@@ -5,11 +5,11 @@
 // keyboard focus).
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
+import { isFresh, isUnlocked, roster } from '../archivist';
 import { locationOf, stage } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
 import { affinityEdge, AFFINITIES, RARITIES } from '../data/meta';
 import { ChampionDef, StageDef } from '../data/types';
-import { isUnlocked, roster } from '../profile';
 import { Scroller } from '../ui/scroll';
 import { COLORS } from '../ui/ui';
 import { blit, nine, Rect4 } from '../view/assets';
@@ -25,8 +25,8 @@ export class TeamScreen extends BaseScreen {
     super(app);
     this.s = stage(stageId);
     this.diorama = new Diorama(app, locationOf(stageId).zone);
-    const own = roster(this.profile);
-    this.team = this.profile.team.filter((id) => own.includes(id)).slice(0, 3);
+    const own = roster(this.archivist);
+    this.team = this.archivist.team.filter((id) => own.includes(id)).slice(0, 3);
     if (!this.team.length) this.team = own.slice(0, 3);
     this.ui.focusId = 'fight';
   }
@@ -64,7 +64,7 @@ export class TeamScreen extends BaseScreen {
 
   private fight() {
     if (!this.team.length) return;
-    this.profile.team = [...this.team];
+    this.archivist.team = [...this.team];
     this.app.save();
     this.app.router.battle(this.s.id, this.team);
   }
@@ -111,7 +111,7 @@ export class TeamScreen extends BaseScreen {
     this.header(ctx, 'PREPARE', `${this.s.id}  ${this.s.name}`);
 
     // roster strip: centered when it fits, otherwise a window that scrolls between two arrows
-    const own = CHAMPIONS.filter((c) => isUnlocked(this.profile, c.id));
+    const own = CHAMPIONS.filter((c) => isUnlocked(this.archivist, c.id));
     const cw = 40, chh = 48, gap = 6;
     const stripW = own.length * (cw + gap) - gap;
     // the title row has its own band so cards never cover it
@@ -148,7 +148,7 @@ export class TeamScreen extends BaseScreen {
         ctx.strokeStyle = COLORS.goldHi;
         ctx.strokeRect(x + 0.5, top + 0.5, cw - 1, chh - 1);
       }
-      if (this.profile.fresh.includes(c.id)) ui.blit(ctx, 'new', x + cw - 16, top - 5);
+      if (isFresh(this.archivist, c.id)) ui.blit(ctx, 'new', x + cw - 16, top - 5);
       ui.regions.push({
         id, x, y: top, w: cw, h: chh, clip: win,
         click: () => this.toggle(c.id),

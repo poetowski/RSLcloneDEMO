@@ -1,8 +1,8 @@
 # Game Structure
 
-How Oathbound's content fits together: champions and their categories, the campaign, combat backgrounds, the Academy, the player's profile and the screens that present them. Rules of combat: [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md). Pixels: [ART_GUIDE.md](ART_GUIDE.md). Screens: [UI_GUIDE.md](UI_GUIDE.md).
+How the content of The Loom: Reliquary of Legends fits together: champions and their categories, the campaign, combat backgrounds, the Academy, the player's save and the screens that present them. Rules of combat: [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md). Pixels: [ART_GUIDE.md](ART_GUIDE.md). Screens: [UI_GUIDE.md](UI_GUIDE.md).
 
-> **Status: proof of concept.** The name, champions, factions, world, stages, lore, numbers and art are placeholders, to be replaced by content Jakub reviews and approves. The engine, the tools and the guardrails stay.
+> **Status: proof of concept.** The name is final: **The Loom: Reliquary of Legends** (code name TLROL), high fantasy with a gothic arcane look. The logo, champions, factions, world, stages, lore, numbers and art are still placeholders, to be replaced by content Jakub reviews and approves. The engine, the tools and the guardrails stay.
 
 ---
 
@@ -70,20 +70,23 @@ The roster today:
 | II. Sunscar Ruins (after 1-3) | `sunscar` | 2-1 Dunes of Ash, 2-2 The Sunken Colonnade, 2-3 Temple of the Burning Sun, 2-4 Tomb of Anhotep (boss Anhotep) |
 | III. Nyota Highlands (after 2-4) | `nyota` | 3-1 The Baobab Steps, 3-2 The Hall of Echoes, 3-3 Heart of the Skyforge (boss Mwamba) |
 
-## 4. The profile (`src/game/profile.ts`)
+## 4. The save: the Master Archivist and the Reliquary
 
-Saved in `localStorage` under `oathbound.profile.v1`; every access is guarded so the game runs without storage.
+The Master Archivist (`src/game/archivist.ts`) is the player and their save, stored in `localStorage` under `tlrol.save.v2`; every access is guarded so the game runs without storage.
 
 | Field | Meaning |
 | --- | --- |
-| `unlocked` | recruited champions (starters are implied) |
 | `stars` | best stars per stage id |
 | `team` | last team, restored in team select and shown on the main menu |
-| `fresh` | recruited champions not yet opened (NEW badges) |
 | `read` | Academy chapters read |
 | `settings` | default battle speed and auto |
+| `reliquary` | the champions owned, starters included |
 
-Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `recordClear` (stars + first-clear recruit), `unlockEverything` (Options, demo use).
+The Reliquary (`src/game/reliquary/`) holds one Hero Soul File per owned champion, with its NEW badge (recruited, not yet opened on the champion page) and its Weaver Matrix of six slots, and the loose Thread Spools. The matrix has no content yet: its slot rules are a placeholder (`src/game/data/matrix.ts`), and no spools or Weave Patterns exist until they are approved.
+
+Loading drops champion and stage ids the catalog no longer has. A proof-of-concept save (`oathbound.profile.v1`) is migrated once into the new one and left in place.
+
+Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `recordClear` (stars + first-clear recruit), `isFresh`, `unlockEverything` (Options, demo use).
 
 ## 5. Screens and flow
 
@@ -116,4 +119,4 @@ Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `r
 | Recruit ceremony | `screens/recruit.ts` | `?screen=recruit&champion=jackal` |
 | Skill demo | `screens/battle.ts` (demo mode) | `?demo=eternal_tomb` |
 
-All navigation goes through `app.router` (`src/main.ts`), which wraps each switch in a dithered dissolve. `?unlockall=1` and `?reset=1` change the profile before the first screen opens.
+All navigation goes through `app.router` (`src/main.ts`), which wraps each switch in a dithered dissolve. `?unlockall=1` and `?reset=1` change the save before the first screen opens.

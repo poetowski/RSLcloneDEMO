@@ -3,9 +3,9 @@
 // living diorama of a combat background to stand behind the menus.
 import { H, W } from '../../engine/screen';
 import { App, Screen } from '../app';
+import { totalStars } from '../archivist';
 import { allStages } from '../data/campaign';
 import { zone } from '../data/zones';
-import { totalStars } from '../profile';
 import { COLORS, Ui } from '../ui/ui';
 import { drawChampion, Facing, frameAt } from '../view/unit';
 import { ZoneView } from '../view/zone';
@@ -27,8 +27,8 @@ export abstract class BaseScreen implements Screen {
     return this.app.ctx;
   }
 
-  get profile() {
-    return this.app.profile;
+  get archivist() {
+    return this.app.archivist;
   }
 
   frame(now: number) {
@@ -81,7 +81,7 @@ export abstract class BaseScreen implements Screen {
     this.ui.button(ctx, 'back', 6, 5, 64, 20, 'BACK', { click: () => this.back(), icon: 'mi_back', kind: 'small' });
     this.ui.text(ctx, title, 82, 7, { color: COLORS.goldHi, variant: 'bold', scale: 1 });
     if (sub) this.ui.text(ctx, sub, 82 + this.ui.measure(title, 'bold') + 10, 7, { color: COLORS.dim });
-    const stars = `${totalStars(this.profile)} / ${allStages().length * 3}`;
+    const stars = `${totalStars(this.archivist)} / ${allStages().length * 3}`;
     const sw = this.ui.measure(stars);
     this.ui.blit(ctx, 'star_m', W - 18 - sw - 16, 8);
     this.ui.text(ctx, stars, W - 12 - sw, 10, { color: COLORS.text });

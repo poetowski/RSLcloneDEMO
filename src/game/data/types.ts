@@ -1,6 +1,7 @@
-// Content model: champions, skills, statuses, meta-categories, zones and the
-// campaign. Everything the game knows about its content is described by these
-// types; see docs/GAME_STRUCTURE.md and docs/MECHANICS_GUIDE.md.
+// Content model: champions, skills, statuses, meta-categories, zones, the
+// campaign and the Weaver Matrix catalog. Everything the game knows about its
+// content is described by these types; see docs/GAME_STRUCTURE.md and
+// docs/MECHANICS_GUIDE.md.
 
 export type TeamId = 'player' | 'enemy';
 
@@ -232,4 +233,34 @@ export interface LocationDef {
   /** label position on the world map (`WORLD_MAP` pixels) */
   map: { x: number; y: number };
   stages: StageDef[];
+}
+
+// --- Weaver Matrix -----------------------------------------------------------
+// The catalog side of the Reliquary (src/game/reliquary): the stats a spool
+// can carry, the six stat nodes of a matrix and the Weave Patterns.
+
+/** A combat stat a Thread Spool can carry. */
+export type StatId = keyof Stats;
+
+/** Catalog id of a Weave Pattern ('tension', 'fray_bite'). */
+export type PatternId = string;
+
+/** What a matrix slot accepts as a spool's main stat: one stat, or one from a list. */
+export type StatNode =
+  | { readonly kind: 'fixed'; readonly stat: StatId }
+  | { readonly kind: 'variable'; readonly stats: readonly StatId[] };
+
+/** The six stat nodes of every Weaver Matrix: slot 0 at the top, then clockwise. */
+export type MatrixLayout = readonly [StatNode, StatNode, StatNode, StatNode, StatNode, StatNode];
+
+/**
+ * A Weave Pattern: woven by `pieces` spools of this pattern, in any slots.
+ * What a woven pattern gives is not modelled yet: it waits for the approved
+ * Weaver Matrix proposal (docs/DDD.md 4.7).
+ */
+export interface WeavePatternDef {
+  id: PatternId;
+  name: string;
+  pieces: 2 | 4;
+  desc: string;
 }

@@ -5,12 +5,11 @@
 // the roster outgrows the screen.
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
-import { frontier } from '../profile';
+import { frontier, isFresh, isUnlocked } from '../archivist';
 import { locationOf, recruitStage } from '../data/campaign';
 import { CHAMPIONS } from '../data/champions';
 import { AFFINITIES, RARITIES } from '../data/meta';
 import { Affinity, ChampionDef } from '../data/types';
-import { isUnlocked } from '../profile';
 import { Scroller } from '../ui/scroll';
 import { COLORS } from '../ui/ui';
 import { nine, Rect4 } from '../view/assets';
@@ -33,7 +32,7 @@ export class CollectionScreen extends BaseScreen {
 
   constructor(app: App) {
     super(app);
-    this.diorama = new Diorama(app, locationOf(frontier(this.profile)).zone);
+    this.diorama = new Diorama(app, locationOf(frontier(this.archivist)).zone);
     this.ui.focusId = 'card_' + CHAMPIONS[0].id;
   }
 
@@ -66,7 +65,7 @@ export class CollectionScreen extends BaseScreen {
   protected draw(ctx: CanvasRenderingContext2D) {
     const ui = this.ui;
     this.diorama.draw(ctx, this.t, 0.72);
-    const owned = CHAMPIONS.filter((c) => isUnlocked(this.profile, c.id)).length;
+    const owned = CHAMPIONS.filter((c) => isUnlocked(this.archivist, c.id)).length;
     this.header(ctx, 'CHAMPIONS', `${owned} / ${CHAMPIONS.length} recruited`);
 
     // affinity filter tabs
@@ -155,7 +154,7 @@ export class CollectionScreen extends BaseScreen {
   private card(ctx: CanvasRenderingContext2D, c: ChampionDef, x: number, y: number, w: number, h: number, list: ChampionDef[]) {
     const ui = this.ui;
     const id = 'card_' + c.id;
-    const own = isUnlocked(this.profile, c.id);
+    const own = isUnlocked(this.archivist, c.id);
     const hot = ui.hot(id, x, y, w, h, VIEW);
     // cards scrolled out of the window are not drawn, but keep their region so arrow keys can reach them
     if (y + h + 4 < VIEW[1] || y - 4 > VIEW[1] + VIEW[3]) {
@@ -197,7 +196,7 @@ export class CollectionScreen extends BaseScreen {
       ui.text(ctx, c.name, x + w / 2, y + 104, { color: '#8a90a0', variant: 'bold', align: 'center' });
       ui.text(ctx, st ? `Clear stage ${st.id}` : 'Locked', x + w / 2, y + 117, { color: COLORS.bad, align: 'center' });
     }
-    if (this.profile.fresh.includes(c.id)) ui.blit(ctx, 'new', x + w - 24, y - 3);
+    if (isFresh(this.archivist, c.id)) ui.blit(ctx, 'new', x + w - 24, y - 3);
     if (hot) {
       ctx.strokeStyle = COLORS.goldHi;
       ctx.strokeRect(x - 0.5, y - 0.5, w + 1, h + 1);

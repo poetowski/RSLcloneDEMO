@@ -2,7 +2,7 @@
   "name": "rsl-clone-demo",
   "private": true,
   "version": "0.2.0",
-  "description": "Oathbound: a turn-based hero battler in the style of RAID: Shadow Legends / SWGOH, with a campaign, a champion collection, an in-game Academy and procedurally generated pixel art.",
+  "description": "The Loom: Reliquary of Legends, a turn-based hero battler in the style of RAID: Shadow Legends / SWGOH, with a campaign, a champion collection, an in-game Academy and procedurally generated pixel art.",
   "type": "module",
   "scripts": {
     "dev": "vite",

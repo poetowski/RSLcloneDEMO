@@ -1,11 +1,11 @@
 // Wraps the battle scene for the app: builds the setup from a campaign stage
-// (or an Academy demonstration), records the result in the profile and
+// (or an Academy demonstration), records the result in the save and
 // routes onward — recruit ceremony, next stage, retry or back to the map.
 import { App, Screen } from '../app';
+import { recordClear } from '../archivist';
 import { allStages, locationOf, stage } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
 import { homeZone, zone } from '../data/zones';
-import { recordClear } from '../profile';
 import { BattleScene, BattleSetup } from '../view/scene';
 
 export class BattleScreen implements Screen {
@@ -16,7 +16,7 @@ export class BattleScreen implements Screen {
     private app: App,
     o: { stageId: string; team: string[] } | { demo: string; back: () => void },
   ) {
-    const p = app.profile;
+    const p = app.archivist;
     if ('stageId' in o) {
       const st = stage(o.stageId);
       const setup: BattleSetup = {

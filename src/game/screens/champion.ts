@@ -4,13 +4,13 @@
 // recruits them; their kit can still be studied.
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
+import { isUnlocked } from '../archivist';
 import { recruitStage, STARTERS } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../data/meta';
 import { STAT_LIMITS } from '../data/norms';
 import { ChampionDef } from '../data/types';
 import { homeZone } from '../data/zones';
-import { isUnlocked } from '../profile';
 import { COLORS } from '../ui/ui';
 import { blit, nine } from '../view/assets';
 import { drawChampion, frameAt } from '../view/unit';
@@ -37,11 +37,7 @@ export class ChampionScreen extends BaseScreen {
   }
 
   private seen() {
-    const p = this.profile;
-    if (p.fresh.includes(this.c.id)) {
-      p.fresh = p.fresh.filter((x) => x !== this.c.id);
-      this.app.save();
-    }
+    if (this.archivist.reliquary.markSeen(this.c.id)) this.app.save();
   }
 
   protected back() {
@@ -74,7 +70,7 @@ export class ChampionScreen extends BaseScreen {
   protected draw(ctx: CanvasRenderingContext2D) {
     const ui = this.ui;
     const c = this.c;
-    const own = isUnlocked(this.profile, c.id);
+    const own = isUnlocked(this.archivist, c.id);
     this.diorama.draw(ctx, this.t, 0.66);
     this.header(ctx, 'CHAMPION', `${this.list.indexOf(c.id) + 1} / ${this.list.length}`);
 

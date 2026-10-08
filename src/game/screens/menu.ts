@@ -2,10 +2,10 @@
 // last team on the left, the next stage's enemies waiting on the right.
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
+import { anyFresh, cleared, frontier, isUnlocked } from '../archivist';
 import { locationOf, stage, STARTERS } from '../data/campaign';
 import { CHAMPIONS } from '../data/champions';
 import { CHAPTERS } from '../data/codex';
-import { cleared, frontier, isUnlocked } from '../profile';
 import { COLORS } from '../ui/ui';
 import { BaseScreen, Diorama } from './base';
 
@@ -14,11 +14,11 @@ export class MainMenu extends BaseScreen {
 
   constructor(app: App) {
     super(app);
-    const next = stage(frontier(this.profile));
+    const next = stage(frontier(this.archivist));
     this.diorama = new Diorama(app, locationOf(next.id).zone);
     // the formation steps out to the sides so the menu column stays clear
     const left: [number, number][] = [[156, 262], [96, 226], [84, 302]];
-    const team = (this.profile.team.length ? this.profile.team : STARTERS).filter((id) => isUnlocked(this.profile, id)).slice(0, 3);
+    const team = (this.archivist.team.length ? this.archivist.team : STARTERS).filter((id) => isUnlocked(this.archivist, id)).slice(0, 3);
     team.forEach((id, i) => this.diorama.figures.push({ id, x: left[i][0], y: left[i][1], facing: 'R', phase: i * 333 }));
     next.enemies.forEach((e, i) => this.diorama.figures.push({ id: e.champion, x: W - left[i][0], y: left[i][1], facing: 'L', phase: i * 251 + 100 }));
     this.ui.focusId = 'm_campaign';
@@ -48,9 +48,9 @@ export class MainMenu extends BaseScreen {
     }
     ui.text(ctx, 'RUINS OF THE BROKEN OATH', W / 2, ly + logo[3] + 4, { color: '#c8a050', align: 'center' });
 
-    const fr = frontier(this.profile);
-    const owned = CHAMPIONS.filter((c) => isUnlocked(this.profile, c.id)).length;
-    const unread = CHAPTERS.filter((c) => !this.profile.read.includes(c.id)).length;
+    const fr = frontier(this.archivist);
+    const owned = CHAMPIONS.filter((c) => isUnlocked(this.archivist, c.id)).length;
+    const unread = CHAPTERS.filter((c) => !this.archivist.read.includes(c.id)).length;
     const bw = 172, bh = 26, bx = Math.round(W / 2 - bw / 2);
     let by = 112;
     const row = (id: string, label: string, icon: string, click: () => void, right?: string, badge?: boolean) => {
@@ -59,8 +59,8 @@ export class MainMenu extends BaseScreen {
       if (badge) ui.blit(ctx, 'new', bx + bw - 14, by - 4);
       by += bh + 6;
     };
-    row('m_campaign', 'CAMPAIGN', 'mi_campaign', () => this.app.router.campaign(), cleared(this.profile, fr) ? 'replay' : fr);
-    row('m_champions', 'CHAMPIONS', 'mi_champions', () => this.app.router.collection(), `${owned}/${CHAMPIONS.length}`, this.profile.fresh.length > 0);
+    row('m_campaign', 'CAMPAIGN', 'mi_campaign', () => this.app.router.campaign(), cleared(this.archivist, fr) ? 'replay' : fr);
+    row('m_champions', 'CHAMPIONS', 'mi_champions', () => this.app.router.collection(), `${owned}/${CHAMPIONS.length}`, anyFresh(this.archivist));
     row('m_academy', 'ACADEMY', 'mi_academy', () => this.app.router.academy(), unread ? `${unread} new` : undefined);
     row('m_options', 'OPTIONS', 'mi_options', () => this.app.router.options());
     ui.text(ctx, 'Mouse, or arrows + Enter.  Esc goes back.', W / 2, H - 14, { color: COLORS.faint, align: 'center' });

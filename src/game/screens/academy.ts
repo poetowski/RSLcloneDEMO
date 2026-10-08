@@ -22,15 +22,15 @@ export class AcademyScreen extends BaseScreen {
 
   constructor(app: App, id?: string) {
     super(app);
-    this.ch = id ? chapter(id) : (CHAPTERS.find((c) => !this.profile.read.includes(c.id)) ?? CHAPTERS[0]);
+    this.ch = id ? chapter(id) : (CHAPTERS.find((c) => !this.archivist.read.includes(c.id)) ?? CHAPTERS[0]);
     this.diorama = new Diorama(app, 'frostfang');
     this.markRead();
     this.ui.focusId = 'ch_' + this.ch.id;
   }
 
   private markRead() {
-    if (!this.profile.read.includes(this.ch.id)) {
-      this.profile.read.push(this.ch.id);
+    if (!this.archivist.read.includes(this.ch.id)) {
+      this.archivist.read.push(this.ch.id);
       this.app.save();
     }
   }
@@ -56,7 +56,7 @@ export class AcademyScreen extends BaseScreen {
   protected draw(ctx: CanvasRenderingContext2D) {
     const ui = this.ui;
     this.diorama.draw(ctx, this.t, 0.8);
-    const read = CHAPTERS.filter((c) => this.profile.read.includes(c.id)).length;
+    const read = CHAPTERS.filter((c) => this.archivist.read.includes(c.id)).length;
     this.header(ctx, 'ACADEMY', `${read} / ${CHAPTERS.length} chapters read`);
 
     // chapter list
@@ -68,7 +68,7 @@ export class AcademyScreen extends BaseScreen {
       nine(ctx, this.a.ui.img, ui.part(on ? 'btn_hover' : hot ? 'btn_hover' : 'btn_up'), 8, y, 164, 20, 4);
       this.icon(ctx, c.icon, 13, y + 4, 12);
       ui.text(ctx, c.title, 30, y + 6, { color: on ? COLORS.goldHi : hot ? '#ffffff' : COLORS.text });
-      if (this.profile.read.includes(c.id)) ui.blit(ctx, 'check', 159, y + 6);
+      if (this.archivist.read.includes(c.id)) ui.blit(ctx, 'check', 159, y + 6);
       ui.regions.push({ id, x: 8, y, w: 164, h: 20, click: () => this.open(c) });
       y += 22;
     }

@@ -1,9 +1,9 @@
-// The application shell: owns the canvas, the loaded assets and the player's
-// profile, routes input to the current screen and switches screens with a
-// dithered dissolve. Screens are created through the navigation helpers at
+// The application shell: owns the canvas, the loaded assets and the Master
+// Archivist (the player's save), routes input to the current screen and
+// switches screens with a dithered dissolve. Screens are created through the navigation helpers at
 // the bottom so every route (and every URL deep link) goes through one place.
 import { H, Screen as Canvas, W } from '../engine/screen';
-import { loadProfile, Profile, saveProfile } from './profile';
+import { loadArchivist, MasterArchivist, saveArchivist } from './archivist';
 import { Assets } from './view/assets';
 
 /** One full-screen state of the game (menu, map, battle...). */
@@ -30,7 +30,7 @@ const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 
 export class App {
   scene: Screen | null = null;
-  profile: Profile;
+  archivist: MasterArchivist;
   private pending: (() => Screen) | null = null;
   private trans = 0; // 0 = idle, >0 = covering (ms), <0 = revealing (ms)
   private patterns: CanvasPattern[] = [];
@@ -42,7 +42,7 @@ export class App {
     readonly canvas: Canvas,
     readonly a: Assets,
   ) {
-    this.profile = loadProfile();
+    this.archivist = loadArchivist();
     const ctx = canvas.ctx;
     for (let k = 0; k <= 16; k++) {
       const c = document.createElement('canvas');
@@ -59,7 +59,7 @@ export class App {
   }
 
   save() {
-    saveProfile(this.profile);
+    saveArchivist(this.archivist);
   }
 
   /** Switch screens through a dissolve (instant when `now` is true). */

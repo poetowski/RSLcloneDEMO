@@ -1,10 +1,10 @@
 import './style.css';
 import { H, Screen as Canvas, W } from './engine/screen';
 import { App } from './game/app';
+import { newArchivist, recordClear, saveArchivist, unlockEverything } from './game/archivist';
 import { CHAMPIONS } from './game/data/champions';
 import { allStages, STARTERS } from './game/data/campaign';
 import { ZONES } from './game/data/zones';
-import { defaultProfile, recordClear, saveProfile, unlockEverything } from './game/profile';
 import { AcademyScreen } from './game/screens/academy';
 import { BattleScreen } from './game/screens/battle';
 import { CampaignScreen } from './game/screens/campaign';
@@ -46,15 +46,15 @@ async function boot() {
   const app = new App(canvas, assets);
   const params = new URLSearchParams(location.search);
   if (params.get('reset') === '1') {
-    Object.assign(app.profile, defaultProfile());
-    saveProfile(app.profile);
+    Object.assign(app.archivist, newArchivist());
+    saveArchivist(app.archivist);
   }
-  if (params.get('unlockall') === '1') unlockEverything(app.profile);
+  if (params.get('unlockall') === '1') unlockEverything(app.archivist);
   // ?progress=2-1 clears every stage up to and including 2-1 (3 stars, recruits included)
   const upTo = params.get('progress');
   if (upTo) {
     for (const s of allStages()) {
-      recordClear(app.profile, s.id, 3);
+      recordClear(app.archivist, s.id, 3);
       if (s.id === upTo) break;
     }
   }
@@ -88,7 +88,7 @@ async function boot() {
       r.team(stageId);
       break;
     case 'battle':
-      r.battle(stageId, (params.get('team') ?? app.profile.team.join(',') ?? STARTERS.join(',')).split(',').filter(Boolean));
+      r.battle(stageId, (params.get('team') ?? app.archivist.team.join(',') ?? STARTERS.join(',')).split(',').filter(Boolean));
       break;
     case 'collection':
       r.collection();

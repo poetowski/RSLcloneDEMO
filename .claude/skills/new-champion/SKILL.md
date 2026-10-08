@@ -1,6 +1,6 @@
 ---
 name: new-champion
-description: Design and add a new champion (hero, enemy or boss) to Oathbound — kit and stats inside the balance norms, procedural pixel-art sprite with every animation, skill icons, effects, campaign placement, and verification of mechanics, difficulty, graphics and in-battle presentation. Use whenever the user asks for a new champion, hero, enemy, boss or skill kit, or wants to rework an existing one.
+description: Design and add a new champion (hero, enemy or boss) to The Loom: Reliquary of Legends — kit and stats inside the balance norms, procedural pixel-art sprite with every animation, skill icons, effects, campaign placement, and verification of mechanics, difficulty, graphics and in-battle presentation. Use whenever the user asks for a new champion, hero, enemy, boss or skill kit, or wants to rework an existing one.
 ---
 
 # New champion

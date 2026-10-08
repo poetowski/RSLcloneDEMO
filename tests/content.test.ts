@@ -12,7 +12,8 @@ import { auditChampion } from '../src/game/data/norms';
 import { STATUSES } from '../src/game/data/statuses';
 import { StatusId } from '../src/game/data/types';
 import { ZONES } from '../src/game/data/zones';
-import { cleared, defaultProfile, frontier, isUnlocked, locationOpen, recordClear, stageOpen } from '../src/game/profile';
+import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, stageOpen, writeSave } from '../src/game/archivist';
+import { threadSpool } from '../src/game/reliquary/matrix';
 
 const json = (p: string) => JSON.parse(fs.readFileSync(p, 'utf8'));
 const fx = json('public/assets/fx/fx.json').anims as Record<string, unknown>;
@@ -210,9 +211,9 @@ describe('font', () => {
   });
 });
 
-describe('profile', () => {
+describe('save', () => {
   it('opens stages in order and recruits on the first clear only', () => {
-    const p = defaultProfile();
+    const p = newArchivist();
     const stages = allStages();
     expect(frontier(p)).toBe(stages[0].id);
     expect(stageOpen(p, stages[0].id)).toBe(true);
@@ -220,7 +221,7 @@ describe('profile', () => {
     const recruit = recordClear(p, stages[0].id, 2);
     expect(recruit).toBe(stages[0].recruit);
     expect(isUnlocked(p, recruit!)).toBe(true);
-    expect(p.fresh).toContain(recruit);
+    expect(isFresh(p, recruit!)).toBe(true);
     expect(recordClear(p, stages[0].id, 3)).toBeUndefined();
     expect(p.stars[stages[0].id]).toBe(3);
     expect(recordClear(p, stages[0].id, 1)).toBeUndefined();
@@ -230,12 +231,77 @@ describe('profile', () => {
   });
 
   it('opens a location only after the stage it requires', () => {
-    const p = defaultProfile();
+    const p = newArchivist();
     const second = LOCATIONS[1];
     expect(locationOpen(p, second)).toBe(false);
     for (const s of LOCATIONS[0].stages) recordClear(p, s.id, 1);
     expect(locationOpen(p, second)).toBe(true);
     expect(cleared(p, LOCATIONS[0].stages[0].id)).toBe(true);
     expect(recruitStage(second.stages[0].recruit!)?.id).toBe(second.stages[0].id);
+  });
+
+  it('starts with a soul file and an empty Weaver Matrix for every starter', () => {
+    const p = newArchivist();
+    expect(p.reliquary.files().map((f) => f.champion)).toEqual(STARTERS);
+    for (const f of p.reliquary.files()) {
+      expect(f.fresh, f.champion).toBe(false);
+      expect(f.matrix.slots).toHaveLength(6);
+      expect(f.matrix.spools()).toEqual([]);
+    }
+  });
+
+  it('migrates a proof-of-concept save once and drops ids the catalog lacks', () => {
+    const [first, second] = allStages();
+    const recruit = first.recruit!;
+    const v1 = JSON.stringify({
+      version: 1,
+      unlocked: [recruit, 'nobody'],
+      stars: { [first.id]: 3, '9-9': 2 },
+      team: [STARTERS[0], recruit, 'nobody'],
+      fresh: [recruit],
+      read: [CHAPTERS[0].id],
+      settings: { speed: 3, auto: true },
+    });
+    const p = readSave(null, v1);
+    for (const id of [...STARTERS, recruit]) expect(isUnlocked(p, id), id).toBe(true);
+    expect(isUnlocked(p, 'nobody')).toBe(false);
+    expect(isFresh(p, recruit)).toBe(true);
+    expect(isFresh(p, STARTERS[0])).toBe(false);
+    expect(p.stars).toEqual({ [first.id]: 3 });
+    expect(p.team).toEqual([STARTERS[0], recruit]);
+    expect(p.read).toEqual([CHAPTERS[0].id]);
+    expect(p.settings).toEqual({ speed: 3, auto: true });
+    expect(stageOpen(p, second.id)).toBe(true);
+    // once a current save exists, the old one is never read again
+    expect(readSave(writeSave(newArchivist()), v1).stars).toEqual({});
+  });
+
+  it('keeps everything through a save and a load, spools included', () => {
+    const p = newArchivist();
+    recordClear(p, allStages()[0].id, 2);
+    p.read.push(CHAPTERS[0].id);
+    p.settings = { speed: 2, auto: true };
+    const spool = threadSpool('test', 'spd', 8);
+    p.reliquary.addSpool(spool);
+    p.reliquary.addSpool(threadSpool('test', 'hp', 120));
+    p.reliquary.equip(STARTERS[0], 3, spool);
+    const text = writeSave(p);
+    const q = readSave(text);
+    expect(writeSave(q)).toBe(text);
+    expect(q.reliquary.file(STARTERS[0]).matrix.slots[3].spool).toEqual(spool);
+    expect(q.reliquary.spools()).toHaveLength(1);
+  });
+
+  it('starts a new game from another version or unreadable text', () => {
+    const fresh = writeSave(newArchivist());
+    const saves: [string | null, string | null][] = [
+      [JSON.stringify({ version: 3 }), null],
+      ['{oops', null],
+      [JSON.stringify({ version: 2, team: 5 }), null],
+      [null, JSON.stringify({ version: 1, unlocked: 7 })],
+      [null, JSON.stringify({ version: 7 })],
+      [null, null],
+    ];
+    for (const [raw, rawV1] of saves) expect(writeSave(readSave(raw, rawV1)), `${raw} ${rawV1}`).toBe(fresh);
   });
 });

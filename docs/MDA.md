@@ -1,6 +1,6 @@
 # MDA: Mechanics, Dynamics, Aesthetics
 
-Oathbound is designed backwards from the experience it has to create. This document names the experiences the game is built for (**aesthetics**), the patterns that emerge when its rules run (**dynamics**), and the rules, numbers, content and presentation that produce them (**mechanics**). Every claim is traced to the code and every dynamic is measured, so a change can be judged before it ships. A change is good when it serves a target aesthetic, keeps every dynamic inside its band and passes the guardrails.
+The Loom: Reliquary of Legends is designed backwards from the experience it has to create. This document names the experiences the game is built for (**aesthetics**), the patterns that emerge when its rules run (**dynamics**), and the rules, numbers, content and presentation that produce them (**mechanics**). Every claim is traced to the code and every dynamic is measured, so a change can be judged before it ships. A change is good when it serves a target aesthetic, keeps every dynamic inside its band and passes the guardrails.
 
 Rules in detail: [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md). Domain model, invariants and change playbooks: [DDD.md](DDD.md). Pixels: [ART_GUIDE.md](ART_GUIDE.md). Screens: [UI_GUIDE.md](UI_GUIDE.md).
 
@@ -38,7 +38,7 @@ Ranked. When two targets conflict, the higher one wins.
 | AE5 | A crafted, coherent world | Sensation, Fantasy, Narrative | "One hand painted all of this, and every place has a story." | 2 |
 | AE6 | Respect for my time | Submission | "The game never wastes my time or fights my hands." | 3 |
 
-**Not targeted, on purpose:** Fellowship (no multiplayer, no PvP), Expression beyond team building (no gear, no skins) and every monetisation dynamic (no currency, energy, gacha or pay walls: champions are recruited by play). A proposal that brings one of these in changes this table first. These exclusions were made for the proof of concept; for the real game they are open questions (section 8, T11-T18).
+**Not targeted, on purpose:** Fellowship (no multiplayer, no PvP), Expression beyond team building (no skins; gear comes with the Weaver Matrix, T11) and every monetisation dynamic (no currency, energy, gacha or pay walls: champions are recruited by play). A proposal that brings one of these in changes this table first. These exclusions were made for the proof of concept; for the real game they are open questions (section 8, T11-T18).
 
 ### AE1 Tactical mastery
 
@@ -291,12 +291,12 @@ Lean = enemies each attacking affinity hits strong (+) or weak (-); only the not
 | Mechanic | Rule | Where |
 | --- | --- | --- |
 | Starters | Sir Aldric, Brakka, Sylwen: one per cycle affinity | `STARTERS` |
-| Recruit | the first clear recruits the stage's champion; ceremony; NEW badge until the champion page is opened | `recordClear`, `RecruitScreen`, `Profile.fresh` |
+| Recruit | the first clear recruits the stage's champion; ceremony; NEW badge until the champion page is opened | `recordClear`, `RecruitScreen`, `HeroSoulFile.fresh` |
 | Unlocks | a stage opens after the previous stage of its location; a location after its `requires` stage | `stageOpen`, `locationOpen` |
 | Frontier | the newest playable stage: map focus, menu diorama, collection backdrop | `frontier` |
-| Stars | best per stage; the total shows in every header | `Profile.stars`, `totalStars` |
-| Academy | 12 chapters, read marks, "n new" on the menu | `CHAPTERS`, `Profile.read` |
-| Settings | auto and speed, saved as defaults from battle and Options | `Profile.settings` |
+| Stars | best per stage; the total shows in every header | `MasterArchivist.stars`, `totalStars` |
+| Academy | 12 chapters, read marks, "n new" on the menu | `CHAPTERS`, `MasterArchivist.read` |
+| Settings | auto and speed, saved as defaults from battle and Options | `MasterArchivist.settings` |
 | Shortcuts | `?unlockall=1`, `?progress=<stage>`, `?reset=1`, `?demo=<skill>`, `?hp=<k>` | `main.ts`, `screens/battle.ts` |
 
 ## 4. Traceability
@@ -447,7 +447,7 @@ Auto battles in headless Chromium at 1280x720, timed from page load to the resul
 
 - `npm run balance`: section 6.1 impact and the win column of 6.2.
 - The other columns come from a copy of the `simulate()` loop (`src/game/battle/sim.ts`) that counts the events of every `startTurn` and of every `SkillResult` (counterattacks included, through `flatten`): skips are `startTurn().skip` on a living unit; double turns are the same `uid` returned by `advance()` twice in a row; the resisted share is `resist / (resist + status)`; stars use `starsFor`. Use the balance tool's teams and seeds (`seed` 1-20 per team) so the win column matches `npm run balance` exactly, which also proves the copy is faithful.
-- Pacing: run `npm run dev`, save a profile with `settings: { auto: true, speed: 1 }` (or 3), open `?unlockall=1&screen=battle&stage=<id>&team=<ids>` and time until `window.app.scene.scene.results` is set.
+- Pacing: run `npm run dev`, set auto on and speed x1 (or x3) in Options, open `?unlockall=1&screen=battle&stage=<id>&team=<ids>` and time until `window.app.scene.scene.results` is set.
 
 ## 7. MDA review for every change
 
@@ -494,7 +494,7 @@ Paste it into the pull request description.
 | T8 | Latent vocabulary: targets `ally` and `self` and the rarities common and uncommon exist in the model with no content, so they are untested in play. | content using them gets a presentation review (ally markers, prompts) and rules tests |
 | T9 | A failed buff roll (Imara's 50% Shield) is silent while a failed debuff shows `RESIST`. | decide whether the player should see it |
 | T10 | Control can chain: a chance stun on an A2 and a guaranteed A3 stun on the same team can lock one enemy; there is no immunity window. The skipped share is fine today (at most 11.5%). | watch the skipped share whenever control is added; an immunity rule if it rises |
-| T11 | Champion growth: champions never grow (no levels, ranks, skill upgrades or gear); every champion is fixed. This decides the meta and the balance model. | keep a fixed-stat tactics game; or add growth (levels, ascension, skill books, gear with sets) |
+| T11 | Champion growth: gear is decided (the Weaver Matrix, section 9); champions still have no levels, ranks or skill upgrades. Gear moves every balance band: the curve will need an expected matrix per stage. | gear alone; or also levels, ascension, skill books |
 | T12 | Acquisition: one recruit per first clear ties the size of the roster to the size of the campaign. | keep it; shards, summoning, fixed rewards or events |
 | T13 | Team size is 3 (RSL 4-5, SWGOH 5). Formation slots, zone spawns, the HUD and every balance number depend on it. | decide early; 3, 4 or 5 |
 | T14 | Team-building levers are few: no leader skills or auras, and formation is visual only (the front row does not protect the back). | leader skills or auras; positional rules |
@@ -510,6 +510,7 @@ Record every change that moves a dynamic out of its band, changes a band, or cha
 | Date | Change | Serves | Moves | Before -> after | Decision |
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-06 | MDA baseline established (this document) | - | - | section 6 | reference point for later changes |
+| 2026-10-08 | Final name and domain lexicon (The Loom: Reliquary of Legends); T11 decided in part: champions grow through gear, the Weaver Matrix | AE1, AE3 | none yet: the layout is a placeholder and no spools exist | - | outline approved by Jakub: six slots with fixed or variable stat nodes, Thread Spools, 2- and 4-piece Weave Patterns counted wherever their spools sit, a 2-piece pattern up to three times. Layout, spools, pattern bonuses and spool sources wait for the Weaver Matrix proposal |
 
 ## 10. Keeping this document true
 

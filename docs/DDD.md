@@ -1,10 +1,10 @@
 # Domain Model (DDD)
 
-How Oathbound's domain is cut into bounded contexts, what every term means and which identifier carries it, which objects own which rules, which invariants must always hold and what enforces them, and how to extend the model without breaking it. [MDA.md](MDA.md) says what the game must make the player feel; this document says how the code must stay shaped so that it keeps doing so, iteration after iteration.
+How the domain of The Loom: Reliquary of Legends (code name TLROL) is cut into bounded contexts, what every term means and which identifier carries it, which objects own which rules, which invariants must always hold and what enforces them, and how to extend the model without breaking it. [MDA.md](MDA.md) says what the game must make the player feel; this document says how the code must stay shaped so that it keeps doing so, iteration after iteration.
 
 Companion guides: [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) (the rules), [GAME_STRUCTURE.md](GAME_STRUCTURE.md) (content and screens), [ART_GUIDE.md](ART_GUIDE.md), [UI_GUIDE.md](UI_GUIDE.md).
 
-Snapshot: commit `8dd9a26`, 2026-10-06. Every dependency rule in section 8 and every "true today" in section 6 was checked against that commit.
+Snapshot: commit `8dd9a26`, 2026-10-06. Every dependency rule in section 8 and every "true today" in section 6 was checked against that commit. The save, the Reliquary and their rules (sections 2.3, 2.6, 3, 4.4, 4.7, 6.3, 6.5, 8) were checked again on 2026-10-08.
 
 ---
 
@@ -18,11 +18,12 @@ Snapshot: commit `8dd9a26`, 2026-10-06. Every dependency rule in section 8 and e
 | Content design: kits, stages, norms | core | the game's variety lives in the kits; the norms hold their quality | `src/game/data/`, `norms.ts`, `tools/balance.ts` |
 | Battle presentation | core (experience) | turns rule events into spectacle ([MDA.md](MDA.md) AE2) | `src/game/view/` |
 | Procedural art | supporting, strategic | the entire look, generated and versioned | `tools/art/`, `public/assets/` |
-| Progression and collection | supporting | the recruit loop, stars, unlocks | `src/game/profile.ts`, `campaign.ts`, `src/game/screens/` |
+| Progression and collection | supporting | the recruit loop, stars, unlocks | `src/game/archivist.ts`, `src/game/reliquary/`, `campaign.ts`, `src/game/screens/` |
+| Growth: the Weaver Matrix | supporting | how champions grow through gear; outline approved, content not yet | `src/game/reliquary/`, `src/game/data/matrix.ts` |
 | Teaching (the Academy) | supporting | learnability ([MDA.md](MDA.md) AE4) | `codex.ts`, `screens/academy.ts` |
 | Quality tooling | supporting | the guardrails | `tests/`, `tools/balance.ts`, `tools/art/audit.ts`, `tools/shots.ts` |
 | Engine and UI kit | generic | canvas scaling, game clock, font, particles, immediate-mode UI | `src/engine/`, `src/game/ui/` |
-| Persistence | generic | the save game | `profile.ts` (`localStorage`) |
+| Persistence | generic | the save game | `archivist.ts` (`localStorage`) |
 
 ## 2. Ubiquitous language
 
@@ -88,16 +89,16 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | --- | --- | --- |
 | Location (chapter) | a campaign chapter with one zone, opened by a `requires` stage | `LocationDef` |
 | Stage | one battle of the campaign, id `"<chapter>-<n>"` | `StageDef` |
-| Recruit, first clear | the first win of a stage recruits its champion | `StageDef.recruit`, `recordClear` |
+| Recruit, first clear | the first win of a stage recruits its champion | `StageDef.recruit`, `recordClear`, `Reliquary.recruit` |
 | Starters | the champions owned from the start | `STARTERS` |
 | Roster | the champions the player owns | `roster()` |
 | Collection | every champion, owned or locked | `CollectionScreen` |
 | Open / cleared / locked | a stage the player may fight / has won / may not fight yet | `stageOpen`, `cleared` |
 | Frontier | the newest playable stage | `frontier()` |
 | World map, overview | the campaign map in world pixels (1920x720), scrolled under a camera; the overview draws the same world on one screen | `WORLD_MAP`, `CampaignScreen` |
-| Stars | 3, 2 or 1 by champions lost; the best is kept | `starsFor`, `Profile.stars` |
-| Profile | the save game | `Profile`, `loadProfile`, `saveProfile` |
-| Fresh (NEW) | recruited, not yet opened on the champion page | `Profile.fresh` |
+| Stars | 3, 2 or 1 by champions lost; the best is kept | `starsFor`, `MasterArchivist.stars` |
+| Master Archivist | the player and their save: stars, last team, Academy chapters read, settings, and the Reliquary | `MasterArchivist`, `loadArchivist`, `saveArchivist`, `readSave`, `writeSave` |
+| Fresh (NEW) | recruited, not yet opened on the champion page | `HeroSoulFile.fresh`, `isFresh`, `Reliquary.markSeen` |
 
 ### 2.4 World, presentation and art
 
@@ -127,7 +128,7 @@ The same word means different things in different contexts. That is legitimate i
 
 | Word | Meanings | Rule |
 | --- | --- | --- |
-| Champion | `ChampionDef` (catalog), `Unit` (battle), `UnitView` (screen), `Figure` (diorama) | rules code speaks of units; content code of champions |
+| Champion | `ChampionDef` (catalog), `HeroSoulFile` (owned, in the Reliquary), `Unit` (battle), `UnitView` (screen), `Figure` (diorama) | rules code speaks of units; content code of champions |
 | `ChampionArt` | the art module (`tools/art/char.ts`) vs the loaded atlas (`src/game/view/assets.ts`) | qualify by context: "art module" vs "atlas" |
 | `ZoneArt` | the painter module (`tools/art/zones/shared.ts`) vs the loaded images (`src/game/view/assets.ts`) | same |
 | Figure | an Academy illustration (`FigureId`) vs a champion in a diorama (`Figure`) | say "Academy figure" or "diorama figure" |
@@ -136,20 +137,42 @@ The same word means different things in different contexts. That is legitimate i
 | Effect | a visual effect (fx) vs a status effect | say "status" for rules, "effect" or "fx" for visuals |
 | Hit | a `HitDef`, a hit frame, the `hit` index of an event | they are one concept seen from three sides and must stay equal in number |
 | Power | stage `power` vs balance "impact" vs stat score | never call a stat score "power" |
+| Slot | formation slot (0-2, `Unit.slot`), skill slot (A1-A3, `SkillDef.slot`), matrix slot (0-5, `MatrixSlot`) | always say which: formation slot, skill slot, matrix slot |
+
+### 2.6 Reliquary and the Weaver Matrix
+
+The language of the final game (approved 2026-10-08). Heroes keep the word *champion*: "Reliquary of Legends" is the game's subtitle, not a rename.
+
+| Term | Meaning | In code |
+| --- | --- | --- |
+| The Loom: Reliquary of Legends | the game; *The Loom* for short; code name TLROL | `tlrol.save.v2` |
+| Master Archivist | the player; in code, the player's save | `MasterArchivist` |
+| Reliquary | the vault of everything the archivist owns: one soul file per champion and the loose spools; the aggregate root of both | `Reliquary` |
+| Hero Soul File | one owned champion's record: which champion, its NEW badge, its Weaver Matrix | `HeroSoulFile` |
+| Weaver Matrix | a champion's gear: six slots in a hexagon | `WeaverMatrix` |
+| Matrix slot | one of the six, numbered 0 (top) clockwise to 5; holds at most one spool | `MatrixSlot`, `SlotIndex` |
+| Stat node | a slot's rule for a spool's main stat: fixed (one stat) or variable (one of a list) | `StatNode` |
+| Matrix layout | the six stat nodes, the same for every champion; a placeholder today (every slot takes every stat) | `MatrixLayout`, `MATRIX_LAYOUT` |
+| Thread Spool | a piece of gear: a pattern and a main stat; a value, never changed in place | `ThreadSpool`, `threadSpool()`, `sameSpool()` |
+| Stock | the spools in the Reliquary that sit in no slot | `Reliquary.spools()` |
+| Weave Pattern | a set bonus woven by 2 or 4 spools of one pattern, wherever they sit | `WeavePatternDef` |
+| Woven | a pattern complete in a matrix, and how many times (6 spools of a 2-piece pattern: 3 times) | `WovenPattern`, `WeavePatternEvaluator` |
+| Spindle of Fate | named in the brief as what the archivist works; a placeholder with no meaning or code yet | - |
 
 ## 3. Bounded contexts
 
 | Context | Responsibility | Owns | Code | Must not |
 | --- | --- | --- | --- | --- |
-| C1 Combat | resolve battles | `Battle`, `Unit`, `StatusInst`, `SkillResult`, `BattleEvent`, `decide`, `simulate`, `Rng` | `src/game/battle/` | import view, screens, profile or engine; read `Math.random` or the clock |
+| C1 Combat | resolve battles | `Battle`, `Unit`, `StatusInst`, `SkillResult`, `BattleEvent`, `decide`, `simulate`, `Rng` | `src/game/battle/` | import view, screens, the archivist, the Reliquary or engine; read `Math.random` or the clock |
 | C2 Catalog | define content | `ChampionDef`, `SkillDef`, `StatusDef`, categories, `LocationDef`, `StageDef`, `ZoneDef`, `Chapter` | `src/game/data/` | import anything but `types.ts` (ARCH-1); hold behaviour beyond lookups and pure helpers |
 | C3 Balance governance | keep content inside the norms | norms, impact and curve bands | `norms.ts`, `tests/content.test.ts`, `tools/balance.ts` | change content by itself; it only judges |
-| C4 Progression | the player's state and what it unlocks | `Profile` and its policies | `src/game/profile.ts` | know about rendering |
-| C5 Battle presentation | play rule events as choreography | `BattleScene`, `UnitView`, `FxLayer`, `Hud`, `ZoneView`, `Assets` | `src/game/view/` | decide outcomes; import screens, app or profile |
+| C4 Progression | the Master Archivist: the save and what it unlocks | `MasterArchivist` and its policies, the save repository and its migration | `src/game/archivist.ts` | know about rendering |
+| C5 Battle presentation | play rule events as choreography | `BattleScene`, `UnitView`, `FxLayer`, `Hud`, `ZoneView`, `Assets` | `src/game/view/` | decide outcomes; import screens, app, the archivist or the Reliquary |
 | C6 Application and screens | routes, input, flow between screens | `App`, `Router`, screens, `Ui`, `Scroller` | `src/game/app.ts`, `src/main.ts`, `src/game/screens/`, `src/game/ui/` | duplicate rules |
 | C7 Academy | teach the rules | chapters and figures | `codex.ts`, `screens/academy.ts` | invent numbers (it restates C1 and C2) |
 | C8 Art pipeline | generate every pixel | `CharDef`, `ChampionArt`, `FxDef`, `ZoneArt`, palette, renderer, build, audit | `tools/art/` | be imported by `src/` |
 | C9 Engine | generic runtime services | `Screen`, `Clock`, `BitmapFont`, `Particles` | `src/engine/` | import anything from `src/game` |
+| C10 Reliquary | what the archivist owns and how champions grow | `Reliquary`, `HeroSoulFile`, `WeaverMatrix`, `MatrixSlot`, `ThreadSpool`, `WeavePatternEvaluator` | `src/game/reliquary/` | import anything but `src/game/data` and its own modules; reach battles except through a combatant's stats (phase 3) |
 
 ### 3.1 Context map
 
@@ -170,10 +193,16 @@ The same word means different things in different contexts. That is legitimate i
            │ BattleScene + BattleHooks
         ┌──▼───────────────────────────────┐      ┌──────────────────────┐
         │ C6 Application and screens       ├─────►│ C4 Progression       │
-        └──────────────────────────────────┘      │ (profile.ts)         │
+        └──────────────────────────────────┘      │ (archivist.ts)       │
+                                                   └──────────┬───────────┘
+                                                              │ holds
+                                                   ┌──────────▼───────────┐
+                                                   │ C10 Reliquary        │
+                                                   │ (reliquary/)         │
                                                    └──────────────────────┘
    C7 Academy restates C1 and C2 in text and figures (conformist copy).
    C9 Engine serves C5 and C6.
+   C2 gives C10 the matrix catalog; C10 will reach C1 only through a combatant's stats (phase 3, not built).
 ```
 
 ### 3.2 Relationships
@@ -186,8 +215,10 @@ The same word means different things in different contexts. That is legitimate i
 | C8 → C5 | published language | atlas, fx, zone and UI JSON | content tests check presence only | every schema is declared twice, producer and consumer (DR-3) |
 | C1, C2 → C7 | conformist copy | numbers written into prose and figures | "every status is taught" test only | drift (DR-1, DR-5) |
 | C2, C1 → C3 | policy reads the model | `auditChampion`, `simulate` | `npm test`, `npm run balance` | the bands are calibrated on the AI (see [MDA.md](MDA.md) T2) |
-| C6 → C4 | application service → domain + repository | `stageOpen`, `recordClear`, `saveProfile` | content tests (profile) | screens also mutate `Profile` fields directly (DR-15) |
-| C6 → C5 | anti-corruption seam | `BattleHooks` (`finish`, `next`, `retry`, `exit`, `settings`) | design | none: the scene knows nothing of profiles or routes, keep it so |
+| C6 → C4 | application service → domain + repository | `stageOpen`, `recordClear`, `saveArchivist` | content tests (save) | screens also write `team`, `read` and `settings` directly (DR-15) |
+| C4 → C10 | the archivist holds the Reliquary; one save document | `Reliquary` methods, `ReliquaryJson` | tests (round trip, migration, salvage) | a layout change strands spools: loading moves every spool its slot no longer takes to the stock (INV-R5) |
+| C2 → C10 | catalog | `StatNode`, `MatrixLayout`, `MATRIX_LAYOUT`, `WeavePatternDef`, `STAT_IDS` | typecheck | the layout is a placeholder until approved |
+| C6 → C5 | anti-corruption seam | `BattleHooks` (`finish`, `next`, `retry`, `exit`, `settings`) | design | none: the scene knows nothing of the save or routes, keep it so |
 
 ## 4. Tactical model
 
@@ -231,11 +262,11 @@ winner()           checked before choosing and after every action
 
 | Id | Joins |
 | --- | --- |
-| champion id | data module, art module, atlas file, portrait, `Profile.unlocked/team/fresh`, `STARTERS`, stage `enemies` and `recruit`, URLs (`&team=`, `&champion=`) |
+| champion id | data module, art module, atlas file, portrait, `HeroSoulFile.champion`, `MasterArchivist.team`, `STARTERS`, stage `enemies` and `recruit`, URLs (`&team=`, `&champion=`) |
 | skill id | skill icon, Academy demo, `?demo=`, special cases in `scene.ts` (`arrow_rain`) |
 | fx name | `hits[].fx`, `projectile`, `castFx`, `actorFx`, the `ADDITIVE` set and special cases in `scene.ts` |
 | zone id | `ZoneDef`, `ZoneArt`, `public/assets/zones/<id>/`, `LocationDef.zone`, `homeZone()` |
-| stage id | `Profile.stars` keys, `LocationDef.requires`, URLs (`&stage=`, `?progress=`) |
+| stage id | `MasterArchivist.stars` keys, `LocationDef.requires`, URLs (`&stage=`, `?progress=`) |
 | status id | `StatusId`, status icon, Academy `statuses` blocks, `status_<id>` chapter icons |
 
 ### 4.3 Balance governance (C3)
@@ -245,10 +276,10 @@ winner()           checked before choosing and after every action
 
 ### 4.4 Progression (C4)
 
-- **Aggregate root: `Profile`** (`version: 1`): `unlocked`, `stars`, `team`, `fresh`, `read`, `settings`.
-- **Policies:** `isUnlocked` (starters are implied), `roster`, `cleared`, `locationOpen`, `stageOpen`, `frontier`, `recordClear` (stars only go up; recruit on the first clear only), `totalStars`, `unlockEverything`.
-- **Repository:** `loadProfile` and `saveProfile` under `oathbound.profile.v1`; every access is guarded; missing fields take defaults; another version resets the profile.
-- **Writers:** `recordClear` saves by itself; screens write `team`, `fresh`, `read` and `settings` directly and call `app.save()` (DR-15).
+- **Aggregate root: `MasterArchivist`**: `stars`, `team`, `read`, `settings`, and the `reliquary` it holds (C10).
+- **Policies:** `isUnlocked` (the champion has a soul file), `isFresh`, `anyFresh`, `roster`, `cleared`, `locationOpen`, `stageOpen`, `frontier`, `recordClear` (stars only go up; recruit on the first clear only), `totalStars`, `unlockEverything`.
+- **Repository:** `loadArchivist` and `saveArchivist` under `tlrol.save.v2`, through the pure `readSave` and `writeSave`; every access is guarded. A version 1 save (`oathbound.profile.v1`) is migrated once and left in place; another version, or unreadable text, starts a new game. Loading drops champion and stage ids the catalog lacks and gives every starter its soul file.
+- **Writers:** `recordClear` saves by itself; the champion page clears the NEW badge through `Reliquary.markSeen`; screens write `team`, `read` and `settings` directly and call `app.save()` (DR-15).
 
 ### 4.5 Presentation (C5)
 
@@ -262,6 +293,15 @@ winner()           checked before choosing and after every action
 - **Models:** `CharDef` (rig, dims, animations, `build`), `ChampionArt` (`char`, `iconBg`, icons keyed by skill id), `FxDef`, `ZoneArt` (tiles, backdrop, props, `kinds`, `layout`, `horizon`), the palette tables (`MAT`, `ACCENT`, `INK`, `FXR`, `UIR`) and `LIGHT_DIR`.
 - **Products:** `build.ts` writes atlases and JSON to `public/assets/` (and zone previews to `docs/images/`); the output is meant to be byte-identical between runs and is committed with the code that needs it.
 - **Proof:** `audit.ts` checks the products against [ART_GUIDE.md](ART_GUIDE.md).
+
+### 4.7 Reliquary (C10)
+
+- **Aggregate root: `Reliquary`.** It holds the soul files and the stock and is their only writer: `recruit`, `markSeen`, `keepOnly`, `addSpool`, `equip`, `unequip`. A spool moves between the stock and a slot in one step, so it is never lost or copied.
+- **Entity: `HeroSoulFile`.** Identity: the champion id, one file per champion. Frozen; the Reliquary replaces it on every change.
+- **Value objects:** `ThreadSpool` and `StatBonus` (frozen, equal when their fields are equal: `sameSpool`), `MatrixSlot`, `WeaverMatrix` (every change returns a new matrix), `WovenPattern`.
+- **Domain service: `WeavePatternEvaluator`.** Counts spools per pattern over the whole matrix, never by slot; a pattern is woven `floor(count / pieces)` times; results follow catalog order; an unknown pattern throws.
+- **Persistence:** `toJSON` and `fromJSON` (`ReliquaryJson`) keep spools by slot index. Loading puts a spool back into its slot when the slot still takes it, otherwise into the stock, and drops malformed entries.
+- **Waiting for approval, not built:** the matrix layout (a placeholder in `data/matrix.ts`: every slot takes every stat), spool stats, the pattern catalog and its bonuses, where spools come from, the matrix screen, and the bridge into combat (a champion's stats plus its matrix, handed to `Combatant`; phase 3).
 
 ## 5. Domain events
 
@@ -335,11 +375,11 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-P9 | The world map and its overview have the sizes `WORLD_MAP` declares | test |
 | INV-P2 | Every location ends on a boss stage; `requires` names an existing stage | test |
 | INV-P3 | Every non-starter is recruited by exactly one stage, and only where it is fought | test |
-| INV-P4 | A stage opens when its location is open and the previous stage there is cleared | test (profile); the battle route does not check it (DR-11) |
+| INV-P4 | A stage opens when its location is open and the previous stage there is cleared | test (save); the battle route does not check it (DR-11) |
 | INV-P5 | A recruit happens on the first clear only, and only if not owned; stars only go up | test |
-| INV-P6 | Every id stored in the profile exists in the catalog | convention: an unknown id makes `champion()` throw (DR-15) |
+| INV-P6 | Every champion and stage id in the save exists in the catalog | test: loading drops unknown ids (`readSave`) |
 | INV-P7 | A team holds 1-3 different owned champions | the team screen only |
-| INV-P8 | The profile has schema version 1; missing fields take defaults; another version resets it | code (`loadProfile`) |
+| INV-P8 | The save has version 2 under `tlrol.save.v2`; a version 1 save is migrated once and left in place; missing fields take defaults; another version starts a new game | test |
 
 ### 6.4 Presentation and art
 
@@ -357,6 +397,17 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-G6 | No effect frame is cut off at the edge of its box; padding (`FxDef.pad`) never moves a ground effect's anchor across `ay` 0.8 | audit |
 | INV-G7 | Every character of the game text has a glyph in `regular` and `bold`; every title, champion name and big number has one in `display`; `micro` has every digit and fits a status-icon badge; body faces keep cap 7 / cell 9 and the display cell is two body cells | test |
 
+### 6.5 Reliquary
+
+| ID | Invariant | Enforced by |
+| --- | --- | --- |
+| INV-R1 | A Weaver Matrix has six slots; a slot holds at most one spool, and only one its stat node takes | type (`MatrixLayout`), code (`equip`), test |
+| INV-R2 | A Weave Pattern counts its spools wherever they sit and is woven `floor(count / pieces)` times: a 2-piece pattern up to three times, a 4-piece pattern once | test (every arrangement over the six slots) |
+| INV-R3 | A spool is in exactly one place, the stock or one slot; only the Reliquary moves spools | code, test (2000 random moves) |
+| INV-R4 | One soul file per champion; every starter has one | code (`recruit`, `readSave`), test |
+| INV-R5 | A save never loses a valid spool: one its slot no longer takes goes to the stock on load | test |
+| INV-R6 | Thread Spools never change: frozen, and equal fields make the same spool | code (`threadSpool`), test |
+
 ## 7. Policies: where decisions live
 
 | Policy | Decides | Lives in |
@@ -370,7 +421,9 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | AI | skill and target | `ai.ts`: highest `ai.priority` ready skill (Serenity's 4 puts healing above the A3 when an ally is hurt); `allyHurt` below 70% HP or with a debuff; control aims at the uncontrolled with the highest ATK; dispel at the most buffed; otherwise 70% lowest HP%, 30% random |
 | Stars | 3 / 2 / 1 | `starsFor` |
 | Unlocks | open stages and locations | `stageOpen`, `locationOpen`, `frontier` |
-| Rewards | recruit on first clear | `recordClear` |
+| Rewards | recruit on first clear | `recordClear`, `Reliquary.recruit` |
+| Spool placement | which slot takes a spool | `fits`, `StatNode`, `MATRIX_LAYOUT` |
+| Pattern completion | which Weave Patterns a matrix weaves, and how often | `WeavePatternEvaluator` |
 | Difficulty | enemy scaling | `Battle` constructor (`power` on HP and ATK, `bossHp`), `campaign.ts` |
 | Home zone | where a faction stands outside battle | `homeZone()` |
 | Demo casting | who demonstrates a skill | `screens/battle.ts`: the owner and two companions against three from the far end of the roster, seed 7 |
@@ -383,22 +436,24 @@ All true on the snapshot commit. Each rule is a fitness function: a check that f
 | ID | Rule |
 | --- | --- |
 | ARCH-1 | Catalog modules import only `types.ts`; the champion registry also imports its champion modules. Catalog modules do not import each other. |
-| ARCH-2 | `src/game/battle` imports only `src/game/data` and its own modules: no view, screens, UI, app, profile or engine. |
+| ARCH-2 | `src/game/battle` imports only `src/game/data` and its own modules: no view, screens, UI, app, archivist, Reliquary or engine. |
 | ARCH-3 | The rules read no global randomness and no clock: only `Rng` draws numbers. |
-| ARCH-4 | `src/game/view` never imports screens, the app or the profile; it talks back through `BattleHooks`. |
+| ARCH-4 | `src/game/view` never imports screens, the app, the archivist or the Reliquary; it talks back through `BattleHooks`. |
 | ARCH-5 | `src/engine` imports nothing from the game. |
 | ARCH-6 | `src/` never imports `tools/`. Tools may import `src/game/data` and `src/game/battle` (the balance tool, the world map). |
 | ARCH-7 | Files in `public/assets` and the generated `docs/images` are rebuilt by `npm run art`, never edited by hand, and committed with the code that needs them. |
+| ARCH-8 | `src/game/reliquary` imports only `src/game/data` and its own modules. |
 
-Checks for ARCH-1 to ARCH-6; each prints nothing when the rule holds (verified to catch a planted violation):
+Checks for ARCH-1 to ARCH-6 and ARCH-8; each prints nothing when the rule holds (verified to catch a planted violation):
 
 ```bash
 grep -rnE "^import" src/game/data | grep -vE "from '\.\.?/types'|champions/index\.ts:"   # ARCH-1
-grep -rnE "from '\.\./(view|screens|ui|app|profile)|engine/" src/game/battle               # ARCH-2
+grep -rnE "from '\.\./(view|screens|ui|app|archivist|reliquary)|engine/" src/game/battle   # ARCH-2
 grep -rnE "Math\.random|Date\.now|performance\.now" src/game/battle src/game/data          # ARCH-3
-grep -rnE "from '\.\./(screens|app|profile)" src/game/view                                 # ARCH-4
+grep -rnE "from '\.\./(screens|app|archivist|reliquary)" src/game/view                     # ARCH-4
 grep -rnE "^import .* from '\.\./game" src/engine                                          # ARCH-5
 grep -rnE "^import .*tools/" src                                                           # ARCH-6
+grep -rnE "^import" src/game/reliquary | grep -vE "from '(\.\./data/|\./)"                 # ARCH-8
 ```
 
 Run them before merging structural changes. R-2 proposes moving them into a test file so that `npm test` fails when a rule breaks.
@@ -418,9 +473,10 @@ The project skills cover the two most common changes. The others touch several c
 | New stage or location | `campaign.ts` (enemies in formation order, `recruit` among them, map position in `WORLD_MAP` pixels) → `npm run art -- map` (check the world and the overview) → tune `power` with `npm run balance` → [MDA.md](MDA.md) ME4 lean and DY9 shape → GAME_STRUCTURE 3 | test, balance |
 | New faction | `FactionId`, `FACTIONS` → `UIR.faction` ramp and `emblem()` (`tools/art/ui/menu.ts`), `npm run art -- ui` → `homeZone()` → the Academy `champions` chapter (it names every faction) → the champion template and worksheet lists → ART_GUIDE 2.4 | test, audit |
 | A rule constant | the constant → every copy listed in [MDA.md](MDA.md) ME1 → tests that assert the number → balance, and stage `power` re-tuned if the curve moved → [MDA.md](MDA.md) section 6 | test, balance |
-| Rename an id | data and art modules and registries → `npm run art` → stages, `STARTERS`, tests, docs, URLs → a profile migration for stored ids (champion, stage) → special cases keyed by id in `scene.ts` | test, audit, typecheck |
+| Rename an id | data and art modules and registries → `npm run art` → stages, `STARTERS`, tests, docs, URLs → a rename in `readSave` for stored ids (champion, stage); without one, loading drops the old id and its progress → special cases keyed by id in `scene.ts` | test, audit, typecheck |
 | New AI behaviour | `ai.ts` → a test → MECHANICS_GUIDE 11 → full re-baseline: every band is calibrated on the AI | test, balance |
 | New screen | [UI_GUIDE.md](UI_GUIDE.md) section 6 | typecheck, captures |
+| Change the matrix layout | after approval, `MATRIX_LAYOUT` (`data/matrix.ts`) → tests → saved spools a slot no longer takes move to the stock on load (INV-R5) → the matrix screen → GAME_STRUCTURE 4, section 2.6 here | test, typecheck |
 
 ## 10. Drift register
 
@@ -442,7 +498,7 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | DR-12 | low | `src/game/data/zones.ts` | `homeZone()` maps factions in code; a new faction silently gets Frostfang | R-6 |
 | DR-13 | low | `src/game/view/scene.ts` | choreography keyed by id: the Arrow Rain volley, projectile trails as hex literals, arcs, slow projectiles, `crack` / `holy` / `ice_spikes`, the `ADDITIVE` list; each new projectile or light effect needs a code edit | R-9 |
 | DR-14 | low | `src/game/view/scene.ts` | `applyEvent` is not exhaustive: a new event kind compiles and shows nothing; `passive` always reads `OVERDRIVE!` whatever the passive | R-5 |
-| DR-15 | low | `src/game/profile.ts`, screens | profile fields are written from several screens and stored ids are never validated: a renamed champion makes `champion()` throw on load | R-10, R-11 |
+| DR-15 | low | `src/game/profile.ts` (now `archivist.ts`), screens | profile fields are written from several screens and stored ids are never validated: a renamed champion makes `champion()` throw on load | R-10, R-11; in part 2026-10-08: loading drops unknown ids, and the NEW badge goes through `Reliquary.markSeen` |
 | DR-16 | low | `src/game/screens/base.ts` | menu dioramas draw shadows with `ctx.ellipse` (anti-aliased); battle shadows are built pixel by pixel | build the diorama shadow the same way |
 | DR-17 | low | `src/game/screens/battle.ts` | battle seeds come from `Math.random` and are never shown: a reported battle cannot be replayed | R-12 |
 | DR-18 | low | `tools/balance.ts` | re-implements the mulberry32 generator instead of using `Rng` | import `Rng` |
@@ -450,7 +506,7 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | DR-20 | trivial | MECHANICS_GUIDE 2 | says the actor's meter resets to `selfTm`; the code caps it at 99 | add "(at most 99)" |
 | DR-21 | medium | `src/main.ts`, `src/game/screens/academy.ts`, `src/game/screens/options.ts` | placeholder content is named in engine code: the deep-link defaults (`knight`, `monk`), the Academy demo cast and figures (`knight`, `monk`, `frostmage`, `tomblord`), the default zone `frostfang`; replacing the content breaks them | derive them from the data (first champion, first zone, the skill's owner) before the content changes; R-6, R-9 |
 | DR-22 | medium | `src/game/battle/battle.ts` (`speed`, `attack`, `defense`) | status sizes (ATK Up/Down 25%, DEF Up 40%, DEF Down 30%, SPD Up/Down 25%) live in rule code instead of `StatusDef`; the status texts restate them | R-8: sizes as status data, texts built from them |
-| DR-23 | low | `src/game/profile.ts` | the save key `oathbound.profile.v1` carries the placeholder name; renaming the game, or a champion (DR-15), loses or breaks saves | a neutral key and a migration (R-11) before the name changes |
+| DR-23 | low | `src/game/profile.ts` (now `archivist.ts`) | the save key `oathbound.profile.v1` carries the placeholder name; renaming the game, or a champion (DR-15), loses or breaks saves | closed 2026-10-08: the name is final and the save moved to `tlrol.save.v2`; a version 1 save is migrated once |
 | DR-24 | low | `src/game/view/fx.ts` (`FxLayer.text`) | floating battle words stack by count, not by size: `RESIST` and `CRITICAL` can print over a damage number (seen with critical hits and resisted debuffs) | stack by each text's height, or give words and numbers their own lanes |
 | DR-25 | low | `tools/art/font.ts` | bold made by a 1 px dilation filled m, w, M and W; `%` read as X; titles were bold scaled 2x-4x | closed 2026-10-07 (font A, e943256): hand-drawn bold, a redrawn `%`, a display face, micro digits |
 
@@ -469,8 +525,8 @@ Small steps, each closing a gap from sections 6 and 10. Higher rows first: they 
 | R-7 | One turn runner shared by `simulate()` and `BattleScene`, split where the player may need time: for example `Battle.beginTurn()` (advance, ticks, skip) and `Battle.finishTurn(decision)` (resolve, end of turn), so the interactive loop awaits the player between the two | DR-4 |
 | R-8 | Rule constants in one exported module; status texts, Academy figures and stat tips built from them | DR-5, [MDA.md](MDA.md) ME1 |
 | R-9 | Presentation metadata as data in `FxDef` / `fx.json` (additive, trail, arc, speed, anchor policy); the Arrow Rain volley as a projectile pattern instead of an id check | DR-13 |
-| R-10 | Profile methods (`setTeam`, `markSeen`, `markRead`, `setSettings`) and `Battle` methods for the demo reset, so writes go through their aggregates | DR-15, section 4.1 |
-| R-11 | Profile validation on load (drop unknown ids) and a migration hook for version 2 and id renames | INV-P6 |
+| R-10 | Archivist methods (`setTeam`, `markRead`, `setSettings`; `markSeen` is done, on the Reliquary) and `Battle` methods for the demo reset, so writes go through their aggregates | DR-15, section 4.1 |
+| R-11 | Save validation on load (drop unknown ids) and a migration hook for version 2 and id renames; done 2026-10-08 except renames (a rename table in `readSave`) | INV-P6 |
 | R-12 | Show the seed on the results panel and accept `&seed=` for replays and bug reports | DR-17, [MDA.md](MDA.md) T7 |
 | R-13 | Guard the battle route (stage open, team owned) unless a debug flag is set | DR-11, INV-P4 |
 | R-14 | Add the dynamics KPIs of [MDA.md](MDA.md) 5.2 to `npm run balance` as section 5 | [MDA.md](MDA.md) 5.2 |

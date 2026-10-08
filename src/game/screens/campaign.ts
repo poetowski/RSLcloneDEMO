@@ -6,11 +6,11 @@
 // way into team select.
 import { H, W } from '../../engine/screen';
 import { App, KeyMods } from '../app';
+import { cleared, frontier, isUnlocked, locationOpen, stageOpen } from '../archivist';
 import { allStages, LOCATIONS, locationOf, stage } from '../data/campaign';
 import { champion } from '../data/champions';
 import { AFFINITIES, RARITIES } from '../data/meta';
 import { LocationDef, StageDef } from '../data/types';
-import { cleared, frontier, isUnlocked, locationOpen, stageOpen } from '../profile';
 import { Scroller } from '../ui/scroll';
 import { COLORS } from '../ui/ui';
 import { blit, Rect4 } from '../view/assets';
@@ -37,7 +37,7 @@ export class CampaignScreen extends BaseScreen {
     super(app);
     this.camX.extent(this.a.map.width, W);
     this.camY.extent(this.a.map.height, H);
-    const s = stage(stageId ?? frontier(this.profile));
+    const s = stage(stageId ?? frontier(this.archivist));
     this.center(s);
     this.ui.focusId = this.followed = 'node_' + s.id;
     // open on the stage without a glide
@@ -132,7 +132,7 @@ export class CampaignScreen extends BaseScreen {
       this.drawOverview(ctx);
       return;
     }
-    const p = this.profile;
+    const p = this.archivist;
     const front = frontier(p);
 
     // location banners, under their landmarks
@@ -176,7 +176,7 @@ export class CampaignScreen extends BaseScreen {
   /** A location's name on a banner centered at (cx, y); dimmed and locked until the location opens. */
   private banner(ctx: CanvasRenderingContext2D, loc: LocationDef, cx: number, y: number) {
     const ui = this.ui;
-    const open = locationOpen(this.profile, loc);
+    const open = locationOpen(this.archivist, loc);
     const label = `${loc.chapter}. ${loc.name}`;
     const w = ui.measure(label, 'bold') + 30;
     const x = Math.round(cx - w / 2);
@@ -226,7 +226,7 @@ export class CampaignScreen extends BaseScreen {
     ctx.fillRect(fx, fy, 1, fh);
     ctx.fillRect(fx + fw - 1, fy, 1, fh);
     // locations above their landmarks (the stages crowd the space under them at this size), then the stages
-    const p = this.profile;
+    const p = this.archivist;
     const banner = ui.part('banner');
     for (const loc of LOCATIONS) this.banner(ctx, loc, Math.round(x0 + loc.map.x * k), Math.round(y0 + loc.map.y * k) - 26 - banner[3]);
     for (const s of allStages()) {
@@ -257,7 +257,7 @@ export class CampaignScreen extends BaseScreen {
 
   private drawPanel(ctx: CanvasRenderingContext2D, s: StageDef) {
     const ui = this.ui;
-    const p = this.profile;
+    const p = this.archivist;
     const w = PANEL_W, h = PANEL_H;
     const x = this.panelLeft ? 12 : W - w - 12, y = 40;
     const open = stageOpen(p, s.id);

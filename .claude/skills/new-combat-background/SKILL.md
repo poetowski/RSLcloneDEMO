@@ -1,6 +1,6 @@
 ---
 name: new-combat-background
-description: Paint and add a new combat background (zone / battle arena / location backdrop) to Oathbound — procedural tiles, backdrop, animated props and ambience that follow the game's light, palette and readability rules, wired into the campaign and verified in battle. Use whenever the user asks for a new battle background, arena, zone, location or environment, or wants to rework one.
+description: Paint and add a new combat background (zone / battle arena / location backdrop) to The Loom: Reliquary of Legends — procedural tiles, backdrop, animated props and ambience that follow the game's light, palette and readability rules, wired into the campaign and verified in battle. Use whenever the user asks for a new battle background, arena, zone, location or environment, or wants to rework one.
 ---
 
 # New combat background
