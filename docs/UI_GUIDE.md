@@ -29,7 +29,8 @@ Every screen is drawn into the same 640x360 buffer as the battle, with the pixel
 | `gem_<affinity>`, `emblem_<faction>`, `role_<role>` | category glyphs; always next to their name the first time a screen shows them |
 | `star_s/m/l(_off)` | stage stars on the map (s), panels (m), results (l) |
 | `lock`, `crown`, `check`, `new` | locked content, bosses, finished items, unseen recruits |
-| `node_open/cleared/locked/boss`, `node_glow_0-2` | world map nodes and the pulsing frontier ring |
+| `camp_open/cleared/locked`, `camp_glow_0-2` | campaign nodes on the world map (33x33 medallions; the runtime writes the numeral) and the pulsing ring around the current area |
+| `node_open/cleared/locked/boss`, `node_glow_0-2` | stages in an area's stage list, and the pulsing ring around the selected stage |
 | `logo`, `divider`, `podium`, `arrow_l/r`, `banner` | title, section rules, formation and showcase podiums, paging, location and skill banners |
 | `mi_*` | 16x16 menu glyphs: campaign, champions, academy, options, back, fight, play |
 | `matrix_rose`, `lobe_sel`, `lobe_attune` | the MATRIX tab: the 144 px rose (gold rods join the fixed slots, a thread of arcane light the choice slots), the ring of the chosen slot, the dotted rings of the slots that attune it |

@@ -6,7 +6,7 @@
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
 import { isFresh, isUnlocked, roster } from '../archivist';
-import { locationOf, stage } from '../data/campaign';
+import { stage, zoneOf } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
 import { affinityEdge, AFFINITIES, RARITIES } from '../data/meta';
 import { ChampionDef, StageDef } from '../data/types';
@@ -24,7 +24,7 @@ export class TeamScreen extends BaseScreen {
   constructor(app: App, stageId: string) {
     super(app);
     this.s = stage(stageId);
-    this.diorama = new Diorama(app, locationOf(stageId).zone);
+    this.diorama = new Diorama(app, zoneOf(stageId));
     const own = roster(this.archivist);
     this.team = this.archivist.team.filter((id) => own.includes(id)).slice(0, 3);
     if (!this.team.length) this.team = own.slice(0, 3);
@@ -108,7 +108,7 @@ export class TeamScreen extends BaseScreen {
       ui.regions.push({ x: x - 24, y: y - 72, w: 48, h: 80, tip: () => ({ title: c.name + (e.boss ? ' (Boss)' : ''), sub: `${RARITIES[c.rarity].name} ${c.role}, ${AFFINITIES[c.affinity].name}`, body: c.skills.map((k) => `${k.name}: ${k.desc}`).join(' '), color: c.color }) });
     });
 
-    this.header(ctx, 'PREPARE', `${this.s.id}  ${this.s.name}`);
+    this.header(ctx, 'PREPARE', `Stage ${this.s.id}`);
 
     // roster strip: centered when it fits, otherwise a window that scrolls between two arrows
     const own = CHAMPIONS.filter((c) => isUnlocked(this.archivist, c.id));

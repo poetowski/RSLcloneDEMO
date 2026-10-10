@@ -112,7 +112,7 @@ for (const loc of LOCATIONS) {
     const w = wins / total;
     const kind = loc === LOCATIONS[0] && si === 0 ? 'first' : s.enemies.some((e) => e.boss) ? 'boss' : 'normal';
     const [lo, hi] = CURVE_BANDS[kind];
-    console.log(`${flag(w >= lo && w <= hi)} ${s.id} ${s.name.padEnd(28)} power ${s.power.toFixed(2)}  avg ${pct(w)}  best team ${pct(best)}  (${kind} band ${pct(lo)}-${pct(hi)}, ${teams.length} teams)`);
+    console.log(`${flag(w >= lo && w <= hi)} ${s.id.padEnd(6)} power ${s.power.toFixed(2)}  avg ${pct(w)}  best team ${pct(best)}  (${kind} band ${pct(lo)}-${pct(hi)}, ${teams.length} teams)`);
     if (s.recruit && !owned.includes(s.recruit)) owned.push(s.recruit);
   });
 }

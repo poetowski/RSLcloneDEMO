@@ -3,7 +3,7 @@
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
 import { anyFresh, cleared, frontier, isUnlocked } from '../archivist';
-import { locationOf, stage, STARTERS } from '../data/campaign';
+import { stage, STARTERS, zoneOf } from '../data/campaign';
 import { CHAMPIONS } from '../data/champions';
 import { CHAPTERS } from '../data/codex';
 import { COLORS } from '../ui/ui';
@@ -15,7 +15,7 @@ export class MainMenu extends BaseScreen {
   constructor(app: App) {
     super(app);
     const next = stage(frontier(this.archivist));
-    this.diorama = new Diorama(app, locationOf(next.id).zone);
+    this.diorama = new Diorama(app, zoneOf(next.id));
     // the formation steps out to the sides so the menu column stays clear
     const left: [number, number][] = [[156, 262], [96, 226], [84, 302]];
     const team = (this.archivist.team.length ? this.archivist.team : STARTERS).filter((id) => isUnlocked(this.archivist, id)).slice(0, 3);

@@ -6,7 +6,7 @@
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
 import { frontier, isFresh, isUnlocked } from '../archivist';
-import { locationOf, recruitStage } from '../data/campaign';
+import { recruitStage, zoneOf } from '../data/campaign';
 import { CHAMPIONS } from '../data/champions';
 import { AFFINITIES, RARITIES } from '../data/meta';
 import { Affinity, ChampionDef } from '../data/types';
@@ -32,7 +32,7 @@ export class CollectionScreen extends BaseScreen {
 
   constructor(app: App) {
     super(app);
-    this.diorama = new Diorama(app, locationOf(frontier(this.archivist)).zone);
+    this.diorama = new Diorama(app, zoneOf(frontier(this.archivist)));
     this.ui.focusId = 'card_' + CHAMPIONS[0].id;
   }
 

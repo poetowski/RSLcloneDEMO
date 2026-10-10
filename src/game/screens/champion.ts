@@ -140,7 +140,7 @@ export class ChampionScreen extends BaseScreen {
       ui.panel(ctx, 'red', sx - 96, 54, 192, 34);
       ui.blit(ctx, 'lock', sx - 88, 64);
       ui.text(ctx, 'NOT YET RECRUITED', sx + 6, 60, { color: '#ffd0c0', variant: 'bold', align: 'center' });
-      ui.text(ctx, st ? `Clear ${st.id} ${st.name}` : '', sx + 6, 72, { color: COLORS.dim, align: 'center' });
+      ui.text(ctx, st ? `Clear stage ${st.id}` : '', sx + 6, 72, { color: COLORS.dim, align: 'center' });
     }
     // animation preview buttons
     const anims: [string, string][] = [['IDLE', 'idle'], ['RUN', 'run'], ...c.skills.map((s, i) => [`A${i + 1}`, s.anim] as [string, string])];
@@ -411,7 +411,7 @@ export class ChampionScreen extends BaseScreen {
     if (fac.standard) cy += ui.para(ctx, `Standard: ${fac.standard}`, x, cy, w, { color: COLORS.dim }) + 6;
     else cy += 6;
     const st = recruitStage(this.c.id);
-    ui.text(ctx, STARTERS.includes(this.c.id) ? 'Joins you from the start.' : st ? `Recruited by the first clear of stage ${st.id}, ${st.name}.` : '', x, cy, { color: COLORS.faint });
+    ui.text(ctx, STARTERS.includes(this.c.id) ? 'Joins you from the start.' : st ? `Joins on the first clear of stage ${st.id}.` : '', x, cy, { color: COLORS.faint });
   }
 
   key(k: string) {

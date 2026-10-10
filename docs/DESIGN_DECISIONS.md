@@ -392,6 +392,16 @@ fragments of champions would be known to be.
 4. Does the arena change the Archivist's goal, or just provide the next step?
 5. Does Court of Root want the loom fixed?
 
+### 5.4a Map and campaign nodes (decided 2026-10-10)
+
+- The world map is the edge of a continent: a band of land running west to
+  east; north and south of it there is nothing to see, only its edges.
+- In the west, a rift.
+- Going east, the land turns to jungle.
+- Stages are not dots on the map: each area is one campaign node, and its
+  stages open from it (a popup). A second node stands in the jungle.
+- Stages are not named.
+
 ### 5.5 Visual throughline
 
 Zone 1 and Zone 2 should contrast clearly so the horizontal scroll reads as

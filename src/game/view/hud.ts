@@ -19,7 +19,6 @@ export interface ResultsInfo {
   victory: boolean;
   stars: number;
   stageId?: string;
-  stageName?: string;
   /** champion recruited by this first clear */
   recruit?: ChampionDef;
   firstClear?: boolean;
@@ -301,8 +300,8 @@ export class Hud extends Ui {
     const pop = Math.min(1, (t - 300) / 200);
     this.a.font.draw(ctx, r.victory ? 'VICTORY' : 'DEFEAT', W / 2, y + 8, { color: r.victory ? '#fff6c0' : '#ffd0c0', gradient: r.victory ? '#f0a020' : '#c02020', variant: 'display', scale: pop < 1 ? 1 : 2, align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
     let cy = y + 42;
-    if (r.stageName) {
-      this.text(ctx, `${r.stageId}  ${r.stageName}`, W / 2, cy, { color: COLORS.dim, align: 'center' });
+    if (r.stageId) {
+      this.text(ctx, `Stage ${r.stageId}`, W / 2, cy, { color: COLORS.dim, align: 'center' });
       cy += 14;
     }
     if (r.victory) {

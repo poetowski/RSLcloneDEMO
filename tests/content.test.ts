@@ -89,15 +89,21 @@ describe('statuses', () => {
 });
 
 describe('campaign', () => {
-  it('has unique stage ids, known champions and zones, and sane map positions', () => {
+  it('has unique stage ids, known champions and zones, and campaign nodes inside the world', () => {
     const stages = allStages();
     expect(new Set(stages.map((s) => s.id)).size).toBe(stages.length);
     const ids = new Set(CHAMPIONS.map((c) => c.id));
     const zones = new Set(ZONES.map((z) => z.id));
     for (const loc of LOCATIONS) {
-      expect(zones.has(loc.zone), `${loc.id} zone ${loc.zone}`).toBe(true);
       if (loc.requires) expect(stages.some((s) => s.id === loc.requires), `${loc.id} requires ${loc.requires}`).toBe(true);
-      // every location ends with its boss
+      // the node, its banner and its progress line sit inside the world, clear of its frame and of the header
+      expect(loc.map.x, `${loc.id} map x`).toBeGreaterThan(80);
+      expect(loc.map.x, `${loc.id} map x`).toBeLessThan(WORLD_MAP.w - 80);
+      expect(loc.map.y, `${loc.id} map y`).toBeGreaterThan(56);
+      expect(loc.map.y, `${loc.id} map y`).toBeLessThan(WORLD_MAP.h - 60);
+      // an area whose stages are designed is fought on a known zone and ends with its boss
+      if (!loc.stages.length) continue;
+      expect(loc.zone && zones.has(loc.zone), `${loc.id} zone ${loc.zone}`).toBe(true);
       expect(loc.stages[loc.stages.length - 1].enemies.some((e) => e.boss), `${loc.id} final stage boss`).toBe(true);
     }
     for (const s of stages) {
@@ -105,12 +111,11 @@ describe('campaign', () => {
       expect(s.enemies.length).toBeLessThanOrEqual(3);
       for (const e of s.enemies) expect(ids.has(e.champion), `${s.id} enemy ${e.champion}`).toBe(true);
       if (s.recruit) expect(ids.has(s.recruit), `${s.id} recruit`).toBe(true);
-      // inside the world, clear of its frame and of the header when scrolled to the top
-      expect(s.map.x, `${s.id} map x`).toBeGreaterThan(24);
-      expect(s.map.x, `${s.id} map x`).toBeLessThan(WORLD_MAP.w - 24);
-      expect(s.map.y, `${s.id} map y`).toBeGreaterThan(48);
-      expect(s.map.y, `${s.id} map y`).toBeLessThan(WORLD_MAP.h - 24);
     }
+  });
+
+  it('has the parts the campaign screen draws: area nodes, their glow, stage nodes', () => {
+    for (const k of ['camp_open', 'camp_cleared', 'camp_locked', 'camp_glow_0', 'node_open', 'node_cleared', 'node_locked', 'node_boss', 'node_glow_0']) expect(ui.parts[k], k).toBeTruthy();
   });
 
   it('has a world map and an overview of the size the campaign data assumes', () => {
@@ -207,7 +212,7 @@ describe('font', () => {
       ...Object.values(STATUSES).flatMap((s) => [s.name, s.desc]),
       ...[RARITIES, AFFINITIES, FACTIONS].flatMap((m) => Object.values(m).flatMap((d) => [d.name, 'desc' in d ? d.desc : ''])),
       ...Object.values(ROLES).flatMap((r) => [r.id, r.desc]),
-      ...LOCATIONS.flatMap((l) => [l.chapter, l.name, l.blurb, ...l.stages.flatMap((s) => [s.id, s.name, s.blurb])]),
+      ...LOCATIONS.flatMap((l) => [l.chapter, l.name, l.blurb, ...l.stages.flatMap((s) => [s.id, s.blurb])]),
       ...ZONES.flatMap((z) => [z.name, z.subtitle]),
       ...CHAPTERS.flatMap((ch) => [ch.title, ch.demo?.label ?? '', ...ch.blocks.flatMap((b) => ('text' in b ? [b.text] : b.kind === 'list' ? b.items : []))]),
     ];
@@ -216,7 +221,7 @@ describe('font', () => {
   });
 
   it('has a title-face glyph for every title, name and big number', () => {
-    const titles = [...CHAMPIONS.map((c) => c.name), ...CHAPTERS.map((ch) => ch.title), 'NEW CHAMPION', 'VICTORY', 'DEFEAT', 'BOSS', 'FIGHT!', 'PAUSED', 'UNDYING!', 'OVERDRIVE!', '0123456789+'];
+    const titles = [...CHAMPIONS.map((c) => c.name), ...CHAPTERS.map((ch) => ch.title), ...LOCATIONS.map((l) => l.chapter), 'NEW CHAMPION', 'VICTORY', 'DEFEAT', 'BOSS', 'FIGHT!', 'PAUSED', 'UNDYING!', 'OVERDRIVE!', '0123456789+'];
     expect(missing('display', titles)).toEqual([]);
   });
 

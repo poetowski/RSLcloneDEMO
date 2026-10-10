@@ -6,15 +6,16 @@
 //
 // Zone 1 follows Jakub's working notes (docs/DESIGN_DECISIONS.md section 5):
 // ten stages on a dim island, in the arc contact, the settlement, escalation,
-// the turning point and leaving. The notes are not locked. Stage names and
-// texts quote the notes; the enemies are copies of the two champions that
-// exist, standing in for the warriors of both worlds until enemies are designed.
+// the turning point and leaving. The notes are not locked. Stages have no
+// names; their texts quote the notes; the enemies are copies of the two
+// champions that exist, standing in for the warriors of both worlds until
+// enemies are designed. Zone 2 is a node on the map whose stages wait for him.
 import { LocationDef, StageDef } from './types';
 
 /**
  * The campaign world map in pixels: two screens wide and one tall, scrolled
- * sideways. Stage and location `map` positions are in this space; `overview`
- * is how many times smaller the whole-world overview is drawn.
+ * sideways. Location `map` positions (the campaign nodes) are in this space;
+ * `overview` is how many times smaller the whole-world overview is drawn.
  */
 export const WORLD_MAP = { w: 1280, h: 360, overview: 2 };
 
@@ -32,90 +33,80 @@ export const LOCATIONS: LocationDef[] = [
     name: 'A Dim Island',
     zone: 'zone1',
     blurb: 'A small settlement on a dim island under an open sky. The broken loom has connected warriors from two worlds here, the Azure Crown and the Sanguine Dominion, who would never meet naturally.',
-    map: { x: 500, y: 140 },
+    map: { x: 300, y: 152 },
     stages: [
       {
         id: '1-1',
-        name: 'Contact',
         blurb: `${CONTACT} The first battle.`,
         enemies: [{ champion: 'azure_warrior' }, { champion: 'azure_warrior' }],
         power: 0.35,
         recruit: 'sanguine_support',
-        map: { x: 110, y: 200 },
       },
       {
         id: '1-2',
-        name: 'Contact',
         blurb: CONTACT,
         enemies: [{ champion: 'azure_warrior' }, { champion: 'sanguine_support' }],
         power: 0.84,
-        map: { x: 210, y: 178 },
       },
       {
         id: '1-3',
-        name: 'The Settlement',
         blurb: `${SETTLEMENT} The pair fight together for the first time.`,
         enemies: [{ champion: 'azure_warrior' }, { champion: 'azure_warrior' }],
         power: 0.78,
-        map: { x: 318, y: 208 },
       },
       {
         id: '1-4',
-        name: 'The Settlement',
         blurb: SETTLEMENT,
         enemies: [{ champion: 'azure_warrior' }, { champion: 'sanguine_support' }],
         power: 0.89,
-        map: { x: 424, y: 186 },
       },
       {
         id: '1-5',
-        name: 'The Settlement',
         blurb: SETTLEMENT,
         enemies: [{ champion: 'azure_warrior' }, { champion: 'azure_warrior' }, { champion: 'sanguine_support' }],
         power: 0.54,
-        map: { x: 528, y: 214 },
       },
       {
         id: '1-6',
-        name: 'Escalation',
         blurb: ESCALATION,
         enemies: [{ champion: 'azure_warrior' }, { champion: 'sanguine_support' }, { champion: 'sanguine_support' }],
         power: 0.66,
-        map: { x: 636, y: 184 },
       },
       {
         id: '1-7',
-        name: 'Escalation',
         blurb: ESCALATION,
         enemies: [{ champion: 'azure_warrior' }, { champion: 'azure_warrior' }, { champion: 'sanguine_support' }],
         power: 0.59,
-        map: { x: 742, y: 212 },
       },
       {
         id: '1-8',
-        name: 'Escalation',
         blurb: ESCALATION,
         enemies: [{ champion: 'azure_warrior' }, { champion: 'azure_warrior' }, { champion: 'azure_warrior' }],
         power: 0.66,
-        map: { x: 848, y: 182 },
       },
       {
         id: '1-9',
-        name: 'The Turning Point',
         blurb: 'The turning point.',
         enemies: [{ champion: 'azure_warrior' }, { champion: 'sanguine_support' }, { champion: 'azure_warrior' }],
         power: 0.59,
-        map: { x: 956, y: 206 },
       },
       {
         id: '1-10',
-        name: 'Leaving',
         blurb: 'Leaving the island, on to the next area.',
         enemies: [{ champion: 'azure_warrior', boss: true }, { champion: 'sanguine_support' }, { champion: 'sanguine_support' }],
         power: 0.59,
-        map: { x: 1080, y: 176 },
       },
     ],
+  },
+  {
+    // Zone 2 of the notes (DESIGN_DECISIONS.md 5.4): a node on the map, its stages not designed yet
+    id: 'zone2',
+    chapter: 'II',
+    name: 'A Mystic Arena',
+    blurb: 'A mystic arena in a deep forest, inside Court of Root territory.',
+    requires: '1-10',
+    map: { x: 1040, y: 152 },
+    stages: [],
   },
 ];
 
@@ -133,6 +124,13 @@ export function locationOf(stageId: string): LocationDef {
   const l = LOCATIONS.find((x) => x.stages.some((s) => s.id === stageId));
   if (!l) throw new Error(`no location for stage "${stageId}"`);
   return l;
+}
+
+/** The combat background a stage is fought on: its location's. */
+export function zoneOf(stageId: string): string {
+  const l = locationOf(stageId);
+  if (!l.zone) throw new Error(`location "${l.id}" has stages but no zone`);
+  return l.zone;
 }
 
 /** The stage whose first clear recruits this champion (undefined for starters). */

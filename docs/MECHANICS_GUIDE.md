@@ -189,16 +189,16 @@ Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take
 
 | Stage | Enemies | Power | Win (300) | Win (report) | Band |
 | --- | --- | --- | --- | --- | --- |
-| 1-1 Contact | 2 warriors | 0.35 | 95% | 90% | first |
-| 1-2 Contact | warrior, support | 0.84 | 89% | 85% | normal |
-| 1-3 The Settlement | 2 warriors | 0.78 | 85% | 60% | normal |
-| 1-4 The Settlement | warrior, support | 0.89 | 82% | 85% | normal |
-| 1-5 The Settlement | 2 warriors, support | 0.54 | 79% | 80% | normal |
-| 1-6 Escalation | warrior, 2 supports | 0.66 | 76% | 75% | normal |
-| 1-7 Escalation | 2 warriors, support | 0.59 | 71% | 70% | normal |
-| 1-8 Escalation | 3 warriors | 0.66 | 69% | 65% | normal |
-| 1-9 The Turning Point | 2 warriors, support | 0.59 | 67% | 75% | normal |
-| 1-10 Leaving | warrior (boss), 2 supports | 0.59 | 61% | 60% | boss |
+| 1-1 | 2 warriors | 0.35 | 95% | 90% | first |
+| 1-2 | warrior, support | 0.84 | 89% | 85% | normal |
+| 1-3 | 2 warriors | 0.78 | 85% | 60% | normal |
+| 1-4 | warrior, support | 0.89 | 82% | 85% | normal |
+| 1-5 | 2 warriors, support | 0.54 | 79% | 80% | normal |
+| 1-6 | warrior, 2 supports | 0.66 | 76% | 75% | normal |
+| 1-7 | 2 warriors, support | 0.59 | 71% | 70% | normal |
+| 1-8 | 3 warriors | 0.66 | 69% | 65% | normal |
+| 1-9 | 2 warriors, support | 0.59 | 67% | 75% | normal |
+| 1-10 | warrior (boss), 2 supports | 0.59 | 61% | 60% | boss |
 
 ## 11. AI (`src/game/battle/ai.ts`)
 

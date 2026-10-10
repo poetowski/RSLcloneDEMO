@@ -8,7 +8,7 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 
 - **2 champions**, the starter of the Azure Crown and the second champion of the Sanguine Dominion (names to come), each with idle, run, three attacks, hurt and death, rendered for both facings. Four factions: the Azure Crown, the Sanguine Dominion, the Court of Root and the Ashveil Reign.
 - **A combat background** for Zone 1, *A Dim Island*: the green at the edge of a small settlement, under an open dusk sky with other islands drifting in it.
-- **A campaign** of 10 stages on a painted world map two screens wide (drag it, jump between stages with the arrows, or press `M` for the whole world); the second champion joins after the first battle.
+- **A campaign** on a painted world map two screens wide, the edge of a continent with a rift in the west and jungle in the east: one node per area, each opening its list of stages (drag the map, step between areas with the arrows, or press `M` for the whole world). Zone 1 holds 10 stages; Zone 2's node waits for its stages. The second champion joins after the first battle.
 - **A Weaver Matrix** for every champion: six slots in two triangles holding Thread Spools, each with a main stat and strands, on the champion page's MATRIX tab (spools have no sources yet; `?spools=1` adds a sample).
 - **A collection** of champions with locked silhouettes, rarities, affinities, factions and roles, and a detail page with every animation and skill.
 - **The Academy**: an in-game codex that teaches combat, the turn meter, damage, affinities, all buffs, debuffs and special mechanics, with live demonstrations.

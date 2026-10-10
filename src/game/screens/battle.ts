@@ -3,7 +3,7 @@
 // routes onward — recruit ceremony, next stage, retry or back to the map.
 import { App, Screen } from '../app';
 import { battleStats, recordClear } from '../archivist';
-import { allStages, locationOf, stage } from '../data/campaign';
+import { allStages, stage, zoneOf } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
 import { homeZone, zone } from '../data/zones';
 import { BattleScene, BattleSetup } from '../view/scene';
@@ -23,7 +23,7 @@ export class BattleScreen implements Screen {
         player: o.team.map(champion),
         playerStats: o.team.map((id) => battleStats(p, id)),
         enemy: st.enemies,
-        zone: zone(locationOf(st.id).zone),
+        zone: zone(zoneOf(st.id)),
         stage: st,
         seed: Math.floor(Math.random() * 1e9),
         auto: p.settings.auto,
@@ -35,7 +35,7 @@ export class BattleScreen implements Screen {
           const victory = out.winner === 'player';
           const first = victory && !(p.stars[st.id] > 0);
           if (victory) this.recruited = recordClear(p, st.id, out.stars);
-          return { victory, stars: out.stars, stageId: st.id, stageName: st.name, recruit: this.recruited ? champion(this.recruited) : undefined, firstClear: first, turns: out.turns };
+          return { victory, stars: out.stars, stageId: st.id, recruit: this.recruited ? champion(this.recruited) : undefined, firstClear: first, turns: out.turns };
         },
         next: () => {
           if (this.recruited) app.router.recruit(this.recruited);

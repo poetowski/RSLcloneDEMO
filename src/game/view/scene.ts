@@ -125,7 +125,7 @@ export class BattleScene {
 
   get stageLabel(): string {
     const st = this.setup.stage;
-    return st ? `Stage ${st.id}  ${st.name}` : this.demoSkill ? 'Academy demonstration' : 'Practice';
+    return st ? `Stage ${st.id}` : this.demoSkill ? 'Academy demonstration' : 'Practice';
   }
 
   // ---------------------------------------------------------------------------
@@ -199,7 +199,7 @@ export class BattleScene {
       v.play('run');
     }
     const st = this.setup.stage;
-    if (st && !this.demoSkill) this.hud.showBanner(`${st.id}  ${st.name}`, '#ffe9a0');
+    if (st && !this.demoSkill) this.hud.showBanner(`Stage ${st.id}`, '#ffe9a0');
     await this.clock.wait(250);
     await Promise.all(
       vs.map(async (v, i) => {
@@ -228,7 +228,7 @@ export class BattleScene {
     }
     const survivors = this.battle.alive('player').length;
     const outcome: BattleOutcome = { winner: w, survivors, stars: starsFor(this.setup.player.length, survivors), turns: this.battle.turn };
-    this.results = this.hooks.finish?.(outcome) ?? { victory: w === 'player', stars: outcome.stars, turns: outcome.turns, stageId: this.setup.stage?.id, stageName: this.setup.stage?.name };
+    this.results = this.hooks.finish?.(outcome) ?? { victory: w === 'player', stars: outcome.stars, turns: outcome.turns, stageId: this.setup.stage?.id };
     this.resultsT = 0;
   }
 

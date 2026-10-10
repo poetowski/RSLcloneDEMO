@@ -430,6 +430,36 @@ export function nodeGlow(phase: number): Bitmap {
   return b;
 }
 
+/**
+ * A campaign node (33x33): an area on the world map. A medallion with a gold
+ * rim (stone while locked), a groove, a core lit from the top-left (gold once
+ * every stage is cleared) and four studs; the runtime writes the numeral on it.
+ */
+export function campNode(kind: 'open' | 'cleared' | 'locked'): Bitmap {
+  const b = new Bitmap(33, 33);
+  const c = 16.5;
+  const rim = kind === 'locked' ? UIR.stone : G;
+  const core = kind === 'cleared' ? [G[1], G[2], G[3]] : kind === 'locked' ? [UIR.fill[1], UIR.stone[1], UIR.stone[2]] : [UIR.fill[1], UIR.fill[3], UIR.navy[2]];
+  ellipseFill(b, c, c, 15.6, 15.6, (x, y, d) => {
+    if (d > 0.8) return rampDither(rim, 3.7 - ((x + y) / 33) * 2.4 - (d > 0.94 ? 0.7 : 0), x, y);
+    if (d > 0.73) return DARK;
+    return rampDither(core, 2.3 - d * 1.2 - ((x + y) / 33) * 0.8, x, y);
+  });
+  for (const [sx, sy] of [[16, 1], [16, 31], [1, 16], [31, 16]]) {
+    b.set(sx, sy, rim[4]);
+    b.set(sx + 1, sy, rim[2]);
+  }
+  if (kind === 'locked') b.blit(lock(), 11, 10);
+  return outline(b, DARK);
+}
+
+/** Pulsing ring around the node of the area the campaign is in (3 frames). */
+export function campGlow(phase: number): Bitmap {
+  const b = new Bitmap(47, 47);
+  ellipseRing(b, 23.5, 23.5, 22.5, 22.5, 2, (x, y, a) => (Math.floor(((a + Math.PI) / (Math.PI * 2)) * 24 + phase) % 2 === 0 ? G[4] : G[2]));
+  return b;
+}
+
 // ---------------------------------------------------------------------------
 // Menu glyphs (16x16), shaded with the champion renderer
 // ---------------------------------------------------------------------------

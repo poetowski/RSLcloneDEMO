@@ -61,7 +61,7 @@ Ranked. When two targets conflict, the higher one wins.
 ### AE4 Fair, learnable challenge
 
 - **Built from:** the Academy (12 chapters, 5 live demos), tooltips on every unit, skill and status, on-screen keywords (`RESIST`, `STRONG HIT`, `HEAL BLOCKED`, `ABSORB`, `COUNTER`, `UNDYING!`, `OVERDRIVE!`), matchup counts in team select, deterministic rules, the balance norms, the campaign curve, stars as a mastery goal and a defeat panel that points to the Academy.
-- **Working when:** the numbers taught equal the numbers used; the campaign stays inside its bands; difficulty rises in steps the player can see coming (the stage panel shows the enemy line-up and its power).
+- **Working when:** the numbers taught equal the numbers used; the campaign stays inside its bands; difficulty rises in steps the player can see coming (the stage list shows the enemy line-up and its power).
 - **Broken when:** text and rules drift ([DDD.md](DDD.md) DR-1, closed 2026-10-07; DR-5 open); a stage spikes outside its band; a rule acts without a visible word.
 
 ### AE5 A crafted, coherent world
@@ -210,7 +210,7 @@ The first source column is the truth. The last column lists every hand-written c
 | Cooldowns | A1 0, A2 3, A3 4-5 | `SKILL_NORMS` (`norms.ts`) | MECHANICS_GUIDE 4 and 10 |
 | Hard control | 1 turn, guaranteed only on an A3 | `STATUS_NORMS` | MECHANICS_GUIDE 10, Academy `control` |
 | Boss HP | x1.6 | `BOSS_HP` (`campaign.ts`) and the `Battle` default | MECHANICS_GUIDE 10, Academy `campaign` ("60% more HP") |
-| Stage power | multiplies enemy HP and ATK | `StageDef.power`, `Battle` constructor | stage panel ("power 85%") |
+| Stage power | multiplies enemy HP and ATK | `StageDef.power`, `Battle` constructor | stage list ("power 85%") |
 | Stars | 3 / 2 / 1 by champions lost | `starsFor` (`sim.ts`) | MECHANICS_GUIDE 1, Academy `campaign`, results panel |
 | AI | highest priority first; `allyHurt` below 70% HP or with a debuff; control spares the disabled and picks the highest ATK; dispel picks the most buffed; else 70% lowest HP%, 30% random | `ai.ts` | MECHANICS_GUIDE 11 |
 | Hit-stop | 55 ms, 90 ms on a crit, real time | `BattleScene.applyEvent`, `Clock.hitStop` | MECHANICS_GUIDE 12 |
@@ -248,16 +248,16 @@ Zone 1, *A Dim Island*, from Jakub's working notes (DESIGN_DECISIONS.md 5.3, not
 
 | Stage | Enemies | Power | Kind | Lean (Ember / Tide attackers) | First introduces |
 | --- | --- | --- | --- | --- | --- |
-| 1-1 Contact | 2 warriors | 0.35 | first | Tide +2 (not owned yet) | the fight, Leaping Blow's execute; brings the Sanguine Support |
-| 1-2 Contact | warrior, support | 0.84 | normal | Ember -1, Tide +1 | enemy heals and ATK Up, Burn, Heal Block |
-| 1-3 The Settlement | 2 warriors | 0.78 | normal | Tide +2 | duplicate enemies |
-| 1-4 The Settlement | warrior, support | 0.89 | normal | Ember -1, Tide +1 | |
-| 1-5 The Settlement | 2 warriors, support | 0.54 | normal | Ember -1, Tide +2 | three enemies |
-| 1-6 Escalation | warrior, 2 supports | 0.66 | normal | Ember -2, Tide +1 | two healers |
-| 1-7 Escalation | 2 warriors, support | 0.59 | normal | Ember -1, Tide +2 | |
-| 1-8 Escalation | 3 warriors | 0.66 | normal | Tide +3 | |
-| 1-9 The Turning Point | 2 warriors, support | 0.59 | normal | Ember -1, Tide +2 | |
-| 1-10 Leaving | warrior (boss), 2 supports | 0.59 | boss | Ember -2, Tide +1 | boss HP and crown |
+| 1-1 | 2 warriors | 0.35 | first | Tide +2 (not owned yet) | the fight, Leaping Blow's execute; brings the Sanguine Support |
+| 1-2 | warrior, support | 0.84 | normal | Ember -1, Tide +1 | enemy heals and ATK Up, Burn, Heal Block |
+| 1-3 | 2 warriors | 0.78 | normal | Tide +2 | duplicate enemies |
+| 1-4 | warrior, support | 0.89 | normal | Ember -1, Tide +1 | |
+| 1-5 | 2 warriors, support | 0.54 | normal | Ember -1, Tide +2 | three enemies |
+| 1-6 | warrior, 2 supports | 0.66 | normal | Ember -2, Tide +1 | two healers |
+| 1-7 | 2 warriors, support | 0.59 | normal | Ember -1, Tide +2 | |
+| 1-8 | 3 warriors | 0.66 | normal | Tide +3 | |
+| 1-9 | 2 warriors, support | 0.59 | normal | Ember -1, Tide +2 | |
+| 1-10 | warrior (boss), 2 supports | 0.59 | boss | Ember -2, Tide +1 | boss HP and crown |
 
 ### ME5 Feel: the presentation mechanics
 
@@ -520,6 +520,7 @@ Record every change that moves a dynamic out of its band, changes a band, or cha
 | 2026-10-06 | MDA baseline established (this document) | - | - | section 6 | reference point for later changes |
 | 2026-10-08 | Final name and domain lexicon (The Loom: Reliquary of Legends); T11 decided in part: champions grow through gear, the Weaver Matrix | AE1, AE3 | none yet: the layout is a placeholder and no spools exist | - | outline approved by Jakub: six slots with fixed or variable stat nodes, Thread Spools, 2- and 4-piece Weave Patterns counted wherever their spools sit, a 2-piece pattern up to three times. Layout, spools, pattern bonuses and spool sources wait for the Weaver Matrix proposal |
 | 2026-10-10 | Jakub's design decisions replace the proof-of-concept content ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)): the four category enums (Ember / Bloom / Tide, Common / Elite / Heroic / Mythic, Tank / Damage / Support, four factions), the two starting champions, Zone 1 of ten stages on a new map and background; everything else of the proof of concept removed | AE3, AE5 | every dynamic: thirteen champions become two (stand-in bodies and kits), ten stages become Zone 1 with stand-in enemies; impact cannot be measured below six champions | section 6.1-6.4 -> 6.0 | approved by Jakub ("go, implement the changes"). Stand-ins until he designs them: names, kits, stats, bodies, enemies, the size of an affinity edge, rarity budgets; Zone 1's art is a first take on his notes. The first stage fields two weak copies (power 0.35) so the first battle lasts about five actions instead of two |
+| 2026-10-10 | The campaign map: the edge of a continent with a rift in the west and jungle in the east, nothing beyond its north and south edges; one node per area whose stage list opens as a popup instead of a dot per stage; stages unnamed; a second node (Zone 2, its stages not designed) | AE2, AE6 | none: the same stages and powers | ten dots on the map -> two nodes; names -> ids | set by Jakub |
 | 2026-10-10 | Faction standards: the Court of Root a brown claw on green, the Ashveil Reign one white bone across a dark grey (about 80%), the Azure Crown's crown confirmed gold | AE5 | none | question marks -> designed medallions | set by Jakub |
 | 2026-10-10 | The gear system: the two-triangle layout, spools with a main stat (Ashen, Silver, Gilded) and strands, attunement, the MATRIX tab; DEF and CRIT closed on ATK and HP in the rules (damage x 40 / DEF, crits x2, every champion's DEF remapped and crit halved so battles stay the same) | AE1, AE3 | impact within ±3 points, curve -1 to +4 points; the impact measure now plays 960 battles per champion (240 flagged noise as a failure) | section 6 stays the reference; numbers moved inside the noise | approved by Jakub ("this looks like a good gear system"). Weave Patterns and spool sources are not defined yet; stage powers are re-measured once sources set how fast spools arrive |
 

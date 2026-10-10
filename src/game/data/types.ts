@@ -210,10 +210,10 @@ export interface EnemySlot {
   boss?: boolean;
 }
 
+/** One battle of the campaign. Stages have no names (Jakub, 2026-10-10): the id is how they are called. */
 export interface StageDef {
   /** "1-3" style id, unique across the campaign */
   id: string;
-  name: string;
   blurb: string;
   /** formation order: front, back-top, back-bottom */
   enemies: EnemySlot[];
@@ -221,21 +221,22 @@ export interface StageDef {
   power: number;
   /** champion recruited on the first clear */
   recruit?: string;
-  /** node position on the world map (`WORLD_MAP` pixels, 1920x720) */
-  map: { x: number; y: number };
 }
 
+/** A campaign node: an area on the world map whose stages open in its stage list. */
 export interface LocationDef {
   id: string;
   /** chapter numeral shown in the UI */
   chapter: string;
   name: string;
-  zone: string;
+  /** combat background of its stages; none while its stages are not designed */
+  zone?: string;
   blurb: string;
   /** stage that must be cleared before this location opens */
   requires?: string;
-  /** label position on the world map (`WORLD_MAP` pixels) */
+  /** the campaign node on the world map (`WORLD_MAP` pixels); the landmark is drawn above it */
   map: { x: number; y: number };
+  /** empty while the area's stages are not designed */
   stages: StageDef[];
 }
 

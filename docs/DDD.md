@@ -88,8 +88,8 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 
 | Term | Meaning | In code |
 | --- | --- | --- |
-| Location (chapter) | a campaign chapter with one zone, opened by a `requires` stage | `LocationDef` |
-| Stage | one battle of the campaign, id `"<chapter>-<n>"` | `StageDef` |
+| Location (area, campaign node) | an area of the campaign: one node on the world map whose stage list opens from it, one zone for its stages, opened by a `requires` stage; it may have no stages yet | `LocationDef`, `CampaignScreen` |
+| Stage | one battle of the campaign, called by its id `"<chapter>-<n>"`; stages have no names and no place on the map: they open from their area's node | `StageDef` |
 | Recruit, first clear | the first win of a stage brings its champion, fought there or not (the second champion joins after the first battle without being fought) | `StageDef.recruit`, `recordClear`, `Reliquary.recruit` |
 | Starters | the champions owned from the start | `STARTERS` |
 | Roster | the champions the player owns | `roster()` |
@@ -396,7 +396,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 
 | ID | Invariant | Enforced by |
 | --- | --- | --- |
-| INV-P1 | Stage ids are unique; 1-3 enemies, all known champions; zones known; map positions inside the world, clear of its frame | test |
+| INV-P1 | Stage ids are unique; 1-3 enemies, all known champions; an area with stages names a known zone; campaign nodes inside the world, clear of its frame and the header | test |
 | INV-P9 | The world map and its overview have the sizes `WORLD_MAP` declares | test |
 | INV-P2 | Every location ends on a boss stage; `requires` names an existing stage | test |
 | INV-P3 | Every non-starter is brought by exactly one stage; it need not be among that stage's enemies | test |
@@ -499,7 +499,7 @@ The project skills cover the two most common changes. The others touch several c
 | New skill field (a mechanic) | `SkillDef` with a doc comment → its place in the resolution order (4.1) and its events → presentation → norms (does it count toward a budget?) → AI (does `decide` need to understand it?) → test → Academy → MECHANICS_GUIDE 4.1 and 8 | test, balance re-baseline |
 | New passive kind | `PassiveDef.kind` → the rule (in `applyDamage` or a new hook) with a once-flag on `Unit`, reset in `BattleScene.demo` → an event (make `passive` carry its kind, DR-14) → a required animation in the content test (like `rise`) → Academy → tests: fires once, lethal hits, ticks, Undying interplay | test, balance |
 | New event kind | the `BattleEvent` union → its place in the order (section 5) → a case in `applyEvent` (and in `playTicks` for start-of-turn events) → MECHANICS_GUIDE 12, section 5 here | test, captures |
-| New stage or location | `campaign.ts` (enemies in formation order, the champion its first clear brings, map position in `WORLD_MAP` pixels) → `npm run art -- map` (check the world and the overview) → tune `power` with `npm run balance` → [MDA.md](MDA.md) ME4 lean and DY9 shape → GAME_STRUCTURE 3 | test, balance |
+| New stage or location | `campaign.ts` (a stage: enemies in formation order, the champion its first clear brings; a location: its node position in `WORLD_MAP` pixels, its zone, its landmark in `tools/art/map.ts`) → `npm run art -- map` (check the world and the overview) → tune `power` with `npm run balance` → [MDA.md](MDA.md) ME4 lean and DY9 shape → GAME_STRUCTURE 3 | test, balance |
 | New faction | `FactionId`, `FACTIONS` → `UIR.faction` ramp and `emblem()` (`tools/art/ui/menu.ts`), `npm run art -- ui` → `homeZone()` → the Academy `champions` chapter (it names every faction) → the champion template and worksheet lists → ART_GUIDE 2.4 | test, audit |
 | A rule constant | the constant → every copy listed in [MDA.md](MDA.md) ME1 → tests that assert the number → balance, and stage `power` re-tuned if the curve moved → [MDA.md](MDA.md) section 6 | test, balance |
 | Rename an id | data and art modules and registries → `npm run art` → stages, `STARTERS`, tests, docs, URLs → a rename in `readSave` for stored ids (champion, stage); without one, loading drops the old id and its progress → special cases keyed by id in `scene.ts` | test, audit, typecheck |
