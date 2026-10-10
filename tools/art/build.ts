@@ -2,8 +2,8 @@
 // twice produces byte-identical files.
 //   npm run art                    (everything)
 //   npm run art -- champions       (one group: champions | fx | zones | ui | font | map)
-//   npm run art -- champions monk  (one champion)
-//   npm run art -- zones sunscar   (one zone)
+//   npm run art -- champions azure_warrior  (one champion)
+//   npm run art -- zones zone1     (one zone)
 import fs from 'node:fs';
 import path from 'node:path';
 import { writeJson } from './io.ts';

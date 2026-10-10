@@ -1,51 +1,47 @@
-// The campaign world map: the realm seen from above, lit from the top-left
-// like everything else. The world (WORLD_MAP, 1920x720) is three screens wide
-// and two tall and scrolls under the campaign screen; the overview is the same
-// world drawn again at a third of the size, so it fits one screen. Snowfields and peaks in the north-west
-// around the Frostfang temple, green hills and a river through the middle,
-// the sea in the south-west, the Sunscar desert in the south-east and, above
-// a laterite escarpment in the north-east, the golden highland of Nyota. The
-// road and the location landmarks are placed from the campaign data
+// The campaign world map: the broken realm seen from above at a slant, lit
+// from the top-left like everything else. The world (WORLD_MAP, 1280x360) is
+// two screens wide and one tall and scrolls sideways under the campaign
+// screen; the overview is the same world drawn at half the size.
+//
+// It shows Zone 1 of Jakub's working notes (docs/DESIGN_DECISIONS.md 5.2,
+// 5.3): a dim island floating over a sea of cloud, its settlement in the
+// middle, the standards of the Azure Crown and the Sanguine Dominion where
+// their warriors first meet at the west end, the road east to the point
+// where the player leaves, and smaller islands and loose rock drifting
+// around it. Other areas join the line to the east as they are designed.
+//
+// The road and the location landmark are placed from the campaign data
 // (src/game/data/campaign.ts, world pixels), so new stages extend the road
-// automatically; stage nodes and labels are drawn by the runtime on top.
-// The geography is laid out on a 640x360 design sheet (the river, the
-// streams, the escarpment, the pyramids) and mapped onto each render; surface
-// detail (shading, dithering, scattered icons) is drawn in the render's own
-// pixels, so the big world gets more detail instead of bigger pixels.
+// automatically; stage nodes and labels are drawn by the runtime on top. The
+// geography is laid out on a 640x180 design sheet and mapped onto each
+// render; surface detail is drawn in the render's own pixels.
 import path from 'node:path';
 import { LOCATIONS, WORLD_MAP } from '../../src/game/data/campaign.ts';
 import { dith, ellipseFill, outline, polyFill, rampDither } from './paint.ts';
 import { Bitmap, hash2, hex, RGBA, rng } from './raster.ts';
 
 /** The design sheet the geography is laid out on. */
-const DW = 640, DH = 360;
+const DW = 640, DH = 180;
 
-/** The render in progress: its size, the design-to-pixel scale and a stroke scale for water and roads. */
-let W = DW, H = DH, SX = 1, SY = 1, K = 1;
-/** design sheet -> render pixels */
-const px = ([x, y]: [number, number]): [number, number] => [x * SX, y * SY];
+/** The render in progress: its size and the design-to-pixel scale. */
+let W = DW, H = DH, S = 1;
 /** world pixels (campaign data) -> render pixels */
 const wp = (x: number, y: number): [number, number] => [(x * W) / WORLD_MAP.w, (y * H) / WORLD_MAP.h];
 const ramp = (list: string[]) => list.map((h) => hex(h));
 
-const SNOW = ramp(['#4a5878', '#7a8cb0', '#a8bad6', '#d0deee', '#eef5fc']);
-const TUNDRA = ramp(['#46525a', '#64706a', '#84907a', '#a4ac8c']);
-const GRASS = ramp(['#1a3418', '#284c22', '#3a682c', '#548436', '#76a244']);
-const STEPPE = ramp(['#4a4a22', '#6a662c', '#8c8238', '#ae9e4a', '#c8b660']);
-const DESERT = ramp(['#7a4622', '#a66432', '#cc8644', '#e6a85c', '#f6c87c']);
-const SEA = ramp(['#0a1632', '#10264c', '#183a6a', '#24548a', '#3c74aa', '#78a8d8']);
-const ROCK = ramp(['#1c1a26', '#34324a', '#54526e', '#7c7a96', '#a6a6be']);
-const PINE = ramp(['#0c1c14', '#163222', '#22482c', '#326238']);
-const LEAF = ramp(['#10260e', '#1c3c16', '#2c5a20', '#447a2c', '#64983a']);
-const ROAD = ramp(['#2a180c', '#6a4424', '#a07040', '#c89a60']);
-const STONE = ramp(['#1e1c26', '#3a3848', '#5e5c70', '#8a889c', '#b8b6c8']);
+const SKY = ramp(['#0b0e1e', '#11162a', '#1a2038', '#242c48', '#2e3756']);
+const CLOUD = ramp(['#0e1222', '#161b30', '#20263e', '#2b324c', '#383e5a', '#474c68', '#5a5c78', '#706e88']);
+const GRASS = ramp(['#141c16', '#1c261c', '#253122', '#2f3c28', '#3a472e', '#465435', '#55623d']);
+const ROCK = ramp(['#0f1018', '#191a26', '#242634', '#303344', '#3e4254', '#4e5366', '#62677a']);
+const EARTH = ramp(['#1e1813', '#2c231a', '#3c3022', '#4e3f2c', '#625238']);
+const TREE = ramp(['#0c140f', '#132016', '#1b2c1d', '#243824', '#2e452b']);
+const THATCH = ramp(['#1b150d', '#2e2416', '#43361f', '#5a4a2b', '#706039']);
+const STONE = ramp(['#14151d', '#262833', '#3a3d4b', '#525667', '#6d7283']);
+const LAMP = ramp(['#9a5020', '#e09040', '#ffcf80']);
 const GOLD = ramp(['#5a3410', '#a8701e', '#e8b440', '#fff0a8']);
-const SAVANNA = ramp(['#4e3418', '#7a5220', '#a8782a', '#cc9e36', '#e8c250']);
-const LATERITE = ramp(['#3a140c', '#6a2a18', '#94422a', '#b8603a', '#d8844e']);
-const ADOBE = ramp(['#3a160c', '#7a3a1e', '#b0602e', '#d88a48', '#f2b070']);
-const ACACIA = ramp(['#14240e', '#24401a', '#3a5e24', '#567c30']);
-const LIGHT = ramp(['#0e5a5a', '#36d0c0', '#90f5e2', '#e8fff8']);
-const SUNRED = hex('#c8361a');
+const AZURE = ramp(['#16306c', '#2856b8', '#4a7ae0']);
+const BLOOD = ramp(['#5a0e18', '#b02a36', '#e0505a']);
+const SABLE = ramp(['#08070a', '#1a161e', '#2a2530']);
 const INKC = hex('#07080e');
 
 // ---------------------------------------------------------------------------
@@ -62,308 +58,296 @@ function vnoise(x: number, y: number, scale: number, seed: number): number {
 }
 
 function fbm(x: number, y: number, seed: number): number {
-  return vnoise(x, y, 64, seed) * 0.55 + vnoise(x, y, 24, seed + 1) * 0.3 + vnoise(x, y, 9, seed + 2) * 0.15;
+  return vnoise(x, y, 40, seed) * 0.55 + vnoise(x, y, 16, seed + 1) * 0.3 + vnoise(x, y, 6, seed + 2) * 0.15;
 }
 
-/** 0 = far north-west (frost) .. 1 = far south-east (desert). */
-const climate = (x: number, y: number) => (x / W) * 0.55 + (y / H) * 0.45 + (fbm(x / SX, y / SY, 3) - 0.5) * 0.16;
-const seaLevel = (x: number, y: number) => x / W + (1 - y / H) * 0.85 + (fbm(x / SX, y / SY, 11) - 0.5) * 0.18;
-const isSea = (x: number, y: number) => seaLevel(x, y) < 0.36;
-const height = (x: number, y: number) => fbm(x, y, 21);
-
-/** The Nyota escarpment: the plateau lies north-east of this edge (y of the rim at x). */
-const rimY = (x: number) => {
-  const d = x / SX;
-  return (40 + (d - 400) * 0.83 + (vnoise(d, 0, 18, 41) - 0.5) * 14) * SY;
+/** The island in design coordinates: west and east tips, and its top surface between yTop and yBot. */
+const X0 = 22, X1 = 606;
+/** 0..1 along the island, fattest a little west of the middle, a long point to the east */
+const along = (x: number) => (x - X0) / (X1 - X0);
+const girth = (x: number) => {
+  const u = along(x);
+  if (u <= 0 || u >= 1) return 0;
+  return Math.pow(Math.sin(Math.PI * Math.pow(u, 0.85)), 0.55) * (1 - 0.25 * u);
 };
-/** > 0 on the plateau (px above the rim), <= 0 below it. */
-const plateau = (x: number, y: number) => rimY(x) - y;
-/** The cliff face: the band of rock just below the rim (render pixels). */
-let CLIFF = 11;
-/** West edge of the escarpment country (render pixels). */
-let EAST = 330;
+const midY = (x: number) => 92 + Math.sin(x * 0.011) * 5 - along(x) * 6;
+const yTop = (x: number) => midY(x) - girth(x) * (40 + (vnoise(x, 0, 26, 71) - 0.5) * 16);
+const yBot = (x: number) => midY(x) + girth(x) * (34 + (vnoise(x, 0, 22, 72) - 0.5) * 14);
+/** the cliff face below the south edge, and the rock hanging beneath it */
+const cliffH = (x: number) => girth(x) * 9;
+const hang = (x: number) => Math.pow(girth(x), 1.4) * (26 + (vnoise(x, 0, 9, 73) - 0.5) * 22 + (vnoise(x, 0, 3, 74) - 0.5) * 8);
 
-/** Streams of the highland that pour off the escarpment (design sheet). */
-const STREAMS_D: [number, number][][] = [
-  [[560, 0], [552, 26], [530, 52], [506, 80], [490, 106], [484, 124]],
-  [[640, 150], [628, 170], [614, 196], [606, 214]],
-];
-
-/** The river: from the mountains in the north down to the sea in the south-west (design sheet). */
-const RIVER_D: [number, number][] = [[318, 0], [312, 30], [296, 58], [300, 92], [286, 128], [256, 156], [236, 190], [200, 214], [168, 238], [128, 262], [96, 290]];
-
-let STREAMS: [number, number][][] = [];
-let RIVER: [number, number][] = [];
-
-function nearPolyline(x: number, y: number, pts: [number, number][]): number {
-  let best = Infinity;
-  for (let i = 0; i < pts.length - 1; i++) {
-    const [ax, ay] = pts[i], [bx, by] = pts[i + 1];
-    const dx = bx - ax, dy = by - ay;
-    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)));
-    best = Math.min(best, Math.hypot(x - ax - dx * t, y - ay - dy * t));
-  }
-  return best;
-}
-
-/** Stage nodes in campaign order: the road visits each of them. */
-function roadPoints(): [number, number][] {
-  return LOCATIONS.flatMap((l) => l.stages.map((s) => wp(s.map.x, s.map.y)));
-}
+/** Inside the island's top surface, in render pixels. */
+const onTop = (x: number, y: number) => {
+  const dx = x / S, dy = y / S;
+  return dx > X0 && dx < X1 && dy > yTop(dx) && dy < yBot(dx);
+};
 
 // ---------------------------------------------------------------------------
-// ground
+// the sky and the sea of cloud below
 // ---------------------------------------------------------------------------
 
-function ground(b: Bitmap) {
+function sky(b: Bitmap) {
+  const horizon = 20 * S;
+  // the sky over the horizon, and the deep beneath the clouds
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
-      if (isSea(x, y)) {
-        const depth = 0.36 - seaLevel(x, y);
-        let v = 2.6 - depth * 9 + (vnoise(x, y, 14, 5) - 0.5) * 0.6;
-        // wave glints in short horizontal strokes
-        if (hash2(Math.floor(x / 4), y, 7) > 0.93 && y % 3 === 0) v += 1.6;
-        if (depth < 0.012) v = 4.6; // surf line
-        b.set(x, y, rampDither(SEA, v, x, y));
+      if (y < horizon) b.set(x, y, rampDither(SKY, (y / horizon) * 4.2, x, y));
+      else b.set(x, y, rampDither(CLOUD, 0.7 + ((y - horizon) / (H - horizon)) * 0.6, x, y));
+    }
+  }
+  // the sea of cloud, far to near: rows of billows, small and packed at the horizon, bigger as they come nearer
+  const r = rng(41);
+  for (let row = 0; ; row++) {
+    const dy = 19 + Math.pow(row / 22, 1.35) * 160;
+    if (dy > DH + 12) break;
+    const near = Math.min(1, (dy - 20) / (DH - 20));
+    const size = 4 + near * 15;
+    for (let dx = -12 + r() * size; dx < DW + 12; dx += size * (1 + r() * 0.9)) {
+      const bank = vnoise(dx, dy * 2.2, 70, 43);
+      if (bank < 0.3 && r() < 0.75) continue;
+      puff(b, dx, dy + (r() - 0.5) * size * 0.3, size * (0.6 + r() * 0.5 + bank * 0.3), near, r, (bank - 0.5) * 1.6);
+    }
+  }
+  // a few stars over the horizon
+  const rs = rng(5);
+  for (let i = 0; i < 40 * S; i++) {
+    const x = Math.floor(rs() * W), y = Math.floor(rs() * 14 * S);
+    b.set(x, y, hex(rs() < 0.3 ? '#c8c8e0' : '#8a8aa8'));
+  }
+}
+
+/** One billow: a few round lobes, each lit on its upper left and darkening to a rim at its foot. */
+function puff(b: Bitmap, cx: number, cy: number, s: number, near: number, r: () => number, tone: number) {
+  const lobes: [number, number, number][] = [
+    [-0.55, 0.12, 0.7 + r() * 0.2],
+    [0.55, 0.14, 0.7 + r() * 0.2],
+    [0, -0.1, 1],
+    [(r() - 0.5) * 0.6, -0.42, 0.55 + r() * 0.2],
+  ];
+  for (const [ox, oy, k] of lobes) {
+    const X = (cx + ox * s) * S, Y = (cy + oy * s * 0.55) * S, R = s * k * S * 0.62, RY = R * 0.5;
+    ellipseFill(b, X, Y, R, RY, (x, y, d) => {
+      const lx = (x + 0.5 - X) / R, ly = (y + 0.5 - Y) / RY;
+      let v = 3 + tone + (1 - near) * 0.9 - lx * 0.8 - ly * 1.1;
+      if (d > 0.84 && ly > 0) v -= 1.4;
+      return rampDither(CLOUD, v, x, y);
+    });
+  }
+}
+
+/** The shadow the island throws on the clouds below, away from the light. */
+function shadow(b: Bitmap) {
+  const ox = 22, oy = 30;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const dx = x / S - ox, dy = y / S - oy;
+      if (dx <= X0 || dx >= X1) continue;
+      const bottom = yBot(dx) + cliffH(dx) + hang(dx) * 0.6;
+      if (dy < yTop(dx) + 6 || dy > bottom) continue;
+      const edge = Math.min(dy - yTop(dx) - 6, bottom - dy) / (6 * Math.max(0.3, girth(dx)));
+      if (edge < 1 && !dith(x, y, edge)) continue;
+      b.set(x, y, CLOUD[hash2(x, y, 3) > 0.5 ? 1 : 0]);
+    }
+  }
+}
+
+/** A small island or a loose rock adrift: a lit grassy top over a jagged hanging cone, its own shadow below. */
+function islet(b: Bitmap, cx: number, cy: number, s: number, grassy: boolean, seed: number) {
+  const w = 18 * s, top = 6 * s, depth = 22 * s;
+  const X = cx * S, Y = cy * S, Wd = w * S;
+  // shadow on the clouds
+  ellipseFill(b, X + 16 * S * s, Y + 30 * S * s, Wd * 0.8, top * S * 0.8, (x, y) => (dith(x, y, 0.75) ? CLOUD[0] : 0));
+  const icon = new Bitmap(Math.ceil(Wd * 2 + 6), Math.ceil((top + depth) * S + 8));
+  const ox = Math.round(X - Wd - 3), oy = Math.round(Y - top * S - 3);
+  const lx = (x: number) => x + ox, ly = (y: number) => y + oy;
+  // the hanging rock: a cone with a ragged edge
+  for (let x = 0; x < icon.w; x++) {
+    const u = (lx(x) - X) / Wd;
+    if (Math.abs(u) >= 1) continue;
+    const bottom = Y + depth * S * (1 - Math.abs(u)) * (0.6 + 0.4 * vnoise(x, seed, 3, seed)) ;
+    for (let y = 0; y < icon.h; y++) {
+      const Yy = ly(y);
+      if (Yy < Y || Yy > bottom) continue;
+      icon.set(x, y, rampDither(ROCK, 3.4 - u * 1.6 - ((Yy - Y) / (depth * S)) * 1.6, lx(x), Yy));
+    }
+  }
+  // the top: an ellipse of grass (or bare rock), lit from the top-left
+  ellipseFill(icon, X - ox, Y - oy, Wd, top * S, (x, y, d) => {
+    const u = (lx(x) - X) / Wd, v = (ly(y) - Y) / (top * S);
+    return rampDither(grassy ? GRASS : ROCK, 4.2 - u * 1.2 - v * 1.2 - d * 0.8, lx(x), ly(y));
+  });
+  b.blit(outline(icon, INKC), ox, oy);
+}
+
+// ---------------------------------------------------------------------------
+// the island
+// ---------------------------------------------------------------------------
+
+function island(b: Bitmap) {
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const dx = x / S, dy = y / S;
+      if (dx <= X0 || dx >= X1) continue;
+      const t = yTop(dx), bo = yBot(dx);
+      if (dy < t) continue;
+      if (dy < bo) {
+        // the top surface: grass, hills shaded by a light from the top-left, a lit rim along the north edge
+        const sh = (fbm(dx - 2, dy - 2, 21) - fbm(dx + 2, dy + 2, 21)) * 9;
+        let v = 2.9 + sh + (vnoise(x, y, 5 * S, 23) - 0.5) * 0.7 + (fbm(dx, dy, 25) - 0.5) * 1.2;
+        if (dy - t < 1.6) v = 5.6;
+        else if (dy - t < 3) v += 1.2;
+        if (bo - dy < 1.5) v -= 1;
+        b.set(x, y, rampDither(GRASS, v, x, y));
         continue;
       }
-      // hill shading: slopes facing the top-left are lit
-      const sh = (height(x - 2, y - 2) - height(x + 2, y + 2)) * 9;
-      const c = climate(x, y);
-      const shore = seaLevel(x, y) < 0.375;
-      const pl = plateau(x, y);
-      let col: RGBA;
-      if (pl > 0) {
-        // golden highland grass; bare red laterite shows through in patches; the rim catches the light
-        const laterite = fbm(x, y, 51) > 0.6;
-        col = laterite ? rampDither(LATERITE, 2.8 + sh * 0.6 + (vnoise(x, y, 5, 53) - 0.5) * 0.6, x, y) : rampDither(SAVANNA, 2.6 + sh * 0.8 + (vnoise(x, y, 6, 55) - 0.5) * 0.8, x, y);
-        if (pl < 1.5) col = SAVANNA[4];
-      } else if (pl > -CLIFF && x > EAST) {
-        // the cliff face: laterite strata cut by vertical flutes, darker toward the foot
-        const k = -pl / CLIFF;
-        const flute = Math.sin(x * 1.1 + vnoise(x, y, 4, 57) * 4) > 0.45 ? -0.9 : 0;
-        const stratum = Math.floor(-pl + vnoise(x, 0, 9, 59) * 3) % 4 === 0 ? -0.5 : 0;
-        col = pl > -1 ? LATERITE[4] : rampDither(LATERITE, 3.3 - k * 2.6 + flute + stratum, x, y);
-      } else if (shore) col = rampDither(DESERT, 3.4 + sh * 0.5, x, y);
-      else if (c < 0.36) col = rampDither(SNOW, 2.8 + sh + (vnoise(x, y, 6, 9) - 0.5) * 0.5, x, y);
-      else if (c < 0.4) col = rampDither(TUNDRA, 1.8 + sh + (c - 0.36) * 20, x, y);
-      else if (c < 0.57) col = rampDither(GRASS, 2.4 + sh + (vnoise(x, y, 7, 13) - 0.5) * 0.8, x, y);
-      else if (c < 0.63) col = rampDither(STEPPE, 2.2 + sh + (c - 0.57) * 14, x, y);
-      else col = rampDither(DESERT, 2.4 + sh + Math.sin(x * 0.12 + y * 0.31 + vnoise(x, y, 20, 4) * 6) * 0.35, x, y);
-      b.set(x, y, col);
-    }
-  }
-  // the river, lit on its upper bank
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      if (isSea(x, y)) continue;
-      const d = nearPolyline(x + (vnoise(x, y, 10, 8) - 0.5) * 6 * K, y, RIVER);
-      const w = (1.4 + (y / H) * 1.8) * K;
-      if (d < w) b.set(x, y, rampDither(SEA, d < w * 0.4 ? 4.2 : 3.2, x, y));
-      else if (d < w + 1) b.set(x, y, climate(x, y) < 0.38 ? SNOW[4] : SEA[1]);
-    }
-  }
-  // highland streams, each ending in a waterfall down the escarpment and a pool of spray
-  for (const st of STREAMS) {
-    for (let y = 0; y < H; y++) {
-      for (let x = Math.floor(EAST); x < W; x++) {
-        if (plateau(x, y) <= 0) continue;
-        const d = nearPolyline(x + (vnoise(x, y, 8, 61) - 0.5) * 4 * K, y, st);
-        if (d < 1.3 * K) b.set(x, y, rampDither(SEA, d < 0.6 * K ? 4.4 : 3.4, x, y));
-        else if (d < 2.2 * K) b.set(x, y, ACACIA[1]);
+      const c = cliffH(dx);
+      if (dy < bo + c) {
+        // the cliff face: strata of rock, lit toward the west where it turns to the light
+        const k = (dy - bo) / Math.max(1, c);
+        const stratum = Math.floor((dy - bo) * 1.4 + vnoise(dx, 0, 7, 75) * 3) % 3 === 0 ? -0.6 : 0;
+        const turn = (yBot(dx + 1) - yBot(dx - 1)) * 0.8;
+        b.set(x, y, rampDither(ROCK, 4.6 - k * 2.2 + stratum + turn, x, y));
+        continue;
+      }
+      const hg = hang(dx);
+      if (dy < bo + c + hg) {
+        // the rock hanging beneath: darker the deeper it goes, its west faces catching some light
+        const k = (dy - bo - c) / Math.max(1, hg);
+        const facet = (hang(dx + 1.5) - hang(dx - 1.5)) * 0.25;
+        const root = hash2(Math.floor(x / Math.max(1, S)), 77, 9) > 0.93 && k < 0.5 ? -1 : 0;
+        b.set(x, y, rampDither(ROCK, 2.8 - k * 2.2 + facet + root + (vnoise(x, y, 4 * S, 76) - 0.5) * 0.6, x, y));
       }
     }
-    const ex = Math.round(st[st.length - 1][0]);
-    const top = Math.round(rimY(ex));
-    const fw = Math.max(1, Math.round(K));
-    for (let y = top - 1; y < top + CLIFF + 1; y++) {
-      for (let k = 0; k < fw; k++) b.set(ex + k, y, (y + k) % 3 === 0 ? SEA[5] : SEA[4]);
-      b.set(ex + fw, y, SEA[3]);
-    }
-    ellipseFill(b, ex + fw / 2, top + CLIFF + 2, 3.4 * K, 1.6 * K, (x, y, d) => (d < 0.55 ? SEA[5] : SEA[3]));
+  }
+  // dark underside outline where the hanging rock meets the clouds
+  for (let x = 0; x < W; x++) {
+    const dx = x / S;
+    if (dx <= X0 || dx >= X1) continue;
+    const y = Math.round((yBot(dx) + cliffH(dx) + hang(dx)) * S);
+    b.set(x, y, INKC);
+    b.set(x, Math.round(yTop(dx) * S) - 1, INKC);
   }
 }
 
-// ---------------------------------------------------------------------------
-// landmarks and scattered icons
-// ---------------------------------------------------------------------------
-
-function mountain(b: Bitmap, x: number, base: number, h: number, w: number, rock: RGBA[], snowy: boolean) {
-  const peak = x + (hash2(x, base, 3) - 0.5) * w * 0.3;
-  const icon = new Bitmap(Math.ceil(w * 2 + 6), Math.ceil(h + 6));
-  const ox = Math.round(x - w - 3), oy = Math.round(base - h - 3);
-  polyFill(icon, [[peak - ox, 3], [x + w - ox, h + 3], [x - w - ox, h + 3]], (px, py) => {
-    const lx = px + ox, ly = py + oy;
-    const left = lx < peak + (ly - (base - h)) * 0.12;
-    const k = (ly - (base - h)) / h;
-    if (snowy && k < 0.42 + (hash2(lx, 1, 9) - 0.5) * 0.18) return left ? SNOW[4] : SNOW[2];
-    return rampDither(rock, left ? 3.2 - k : 1.6 - k * 0.6, px, py);
-  });
-  b.blit(outline(icon, rock[0]), ox, oy);
-}
-
-function pine(b: Bitmap, x: number, y: number, s: number, snowy: boolean) {
-  const icon = new Bitmap(12, 18);
-  for (let t = 0; t < 3; t++) {
-    const top = 2 + t * 3 * s, half = (2.2 + t * 1.3) * s;
-    polyFill(icon, [[6, top], [6 + half, top + 5 * s], [6 - half, top + 5 * s]], (px) => (px < 6 ? PINE[3] : PINE[2]));
-    if (snowy) icon.set(5, Math.round(top + 1), SNOW[4]);
-  }
-  icon.set(6, Math.round(2 + 14 * s), ROAD[1]);
-  b.blit(outline(icon, PINE[0]), Math.round(x - 6), Math.round(y - 15 * s));
-}
-
-function tree(b: Bitmap, x: number, y: number) {
-  const icon = new Bitmap(12, 12);
-  ellipseFill(icon, 6, 5, 4.6, 4, (px, py, d) => rampDither(LEAF, 3.6 - (px - 3) / 4 - (py - 2) / 4 - d * 0.6, px, py));
-  icon.set(6, 10, ROAD[1]);
-  icon.set(6, 9, ROAD[1]);
-  b.blit(outline(icon, LEAF[0]), Math.round(x - 6), Math.round(y - 11));
-}
-
-function dune(b: Bitmap, x: number, y: number, w: number) {
-  for (let k = -w; k <= w; k++) {
-    const yy = Math.round(y - Math.sqrt(Math.max(0, 1 - (k / w) ** 2)) * 3);
-    b.set(x + k, yy, k < w * 0.3 ? DESERT[4] : DESERT[1]);
-    if (k > -w * 0.6 && k < w * 0.3) b.set(x + k, yy + 1, DESERT[3]);
-  }
-}
-
-function pyramid(b: Bitmap, x: number, base: number, h: number) {
-  const icon = new Bitmap(h * 2 + 4, h + 4);
-  polyFill(icon, [[h + 2, 2], [2 * h + 2, h + 2], [2, h + 2]], (px) => (px < h + 3 ? DESERT[4] : DESERT[1]));
-  icon.set(h + 2, 2, GOLD[3]);
-  b.blit(outline(icon, DESERT[0]), x - h - 2, base - h - 2);
-}
-
-/** Flat-topped acacia of the highland. */
-function acacia(b: Bitmap, x: number, y: number) {
-  const icon = new Bitmap(14, 10);
-  ellipseFill(icon, 7, 3, 6.2, 2, (px, py, d) => rampDither(ACACIA, 3.4 - (px - 1) / 6 - d * 0.5, px, py));
-  for (let py = 4; py < 9; py++) icon.set(7 - (py > 6 ? 1 : 0), py, ROAD[1]);
-  icon.set(5, 5, ROAD[1]);
-  b.blit(outline(icon, ACACIA[0]), Math.round(x - 7), Math.round(y - 9));
-}
-
-/** Baobab: a swollen bottle trunk with a ragged crown. */
-function baobabIcon(b: Bitmap, x: number, y: number) {
-  const icon = new Bitmap(16, 17);
-  const TRUNK = ramp(['#2a1c18', '#5a4236', '#86644e', '#aa8a6c']);
-  ellipseFill(icon, 8, 11.5, 3.4, 4.6, (px, py, d) => rampDither(TRUNK, 3.3 - (px - 5) / 2.6 - d * 0.5, px, py));
-  // stubby branches spreading from the top of the trunk, a thin crown on them
-  for (const [x0, y0, x1, y1] of [[7, 7, 3, 4], [8, 7, 8, 3], [9, 7, 13, 4]] as const) {
-    for (let t = 0; t <= 1; t += 0.25) icon.set(Math.round(x0 + (x1 - x0) * t), Math.round(y0 + (y1 - y0) * t), TRUNK[2]);
-  }
-  for (const [cx, cy] of [[3, 3.4], [8, 2.4], [13, 3.4]] as const) ellipseFill(icon, cx, cy, 2.6, 1.4, (px, py, d) => rampDither(ACACIA, 3.2 - (px - cx + 2) / 3 - d * 0.5, px, py));
-  b.blit(outline(icon, TRUNK[0]), Math.round(x - 8), Math.round(y - 16));
-}
-
-/** Nyota landmark: the star-gate tower of the city, pinnacles tipped with light, a beam into the sky. */
-function skyCity(b: Bitmap, x: number, y: number) {
-  const icon = new Bitmap(36, 40);
-  // the beam of the sky-tower behind the city
-  for (let py = 0; py < 22; py++) if (dith(27, py, 0.35 + py / 30)) icon.set(27, py, LIGHT[py > 12 ? 2 : 1]);
-  // side towers, then the tall gate tower in the middle
-  for (const [x0, x1, top] of [[3, 12, 22], [24, 33, 20], [11, 25, 12]] as const) {
-    polyFill(icon, [[x0 + 1, top], [x1 - 1, top], [x1, 37], [x0, 37]], (px) => (px < (x0 + x1) / 2 ? ADOBE[3] : ADOBE[2]));
-    for (let px = x0 + 1; px < x1; px++) icon.set(px, top, ADOBE[4]);
-    // pinnacles with orbs of light
-    for (let px = x0 + 2; px < x1 - 1; px += 4) {
-      icon.set(px, top - 1, ADOBE[3]);
-      icon.set(px, top - 2, ADOBE[3]);
-      icon.set(px, top - 3, LIGHT[3]);
-    }
-    // toron studs
-    for (let py = top + 4; py < 34; py += 5) for (let px = x0 + 2 + ((py >> 2) % 2); px < x1 - 1; px += 4) icon.set(px, py, ADOBE[0]);
-  }
-  // the star portal and the gold star over it
-  ellipseFill(icon, 18, 29, 3.4, 5.4, (px, py, d) => (d < 0.6 ? LIGHT[3] : LIGHT[1]));
-  for (let py = 29; py < 37; py++) for (let px = 15; px <= 21; px++) if (Math.abs(px - 18) < 3.4) icon.set(px, py, py === 36 ? GOLD[1] : LIGHT[py < 31 ? 2 : 1]);
-  for (const [dx, dy] of [[0, -2], [0, 2], [-2, 0], [2, 0], [0, -1], [0, 1], [-1, 0], [1, 0], [0, 0]]) icon.set(18 + dx, 18 + dy, dx === 0 && dy === 0 ? GOLD[3] : GOLD[2]);
-  b.blit(outline(icon, ADOBE[0]), x - 18, y - 36);
-}
-
-/** Frostfang landmark: a snowbound temple of columns. */
-function frostTemple(b: Bitmap, x: number, y: number) {
-  const icon = new Bitmap(30, 24);
-  polyFill(icon, [[2, 9], [15, 2], [28, 9]], (px) => (px < 15 ? SNOW[4] : SNOW[2]));
-  for (let px = 3; px < 28; px++) {
-    icon.set(px, 10, STONE[4]);
-    icon.set(px, 11, STONE[2]);
-  }
-  for (const cx of [5, 10, 15, 20, 25]) {
-    for (let py = 12; py < 20; py++) {
-      icon.set(cx, py, STONE[4]);
-      icon.set(cx + 1, py, STONE[2]);
-    }
-  }
-  for (let px = 2; px < 29; px++) {
-    icon.set(px, 20, STONE[3]);
-    icon.set(px, 21, STONE[1]);
-  }
-  b.blit(outline(icon, STONE[0]), x - 15, y - 22);
-}
-
-/** Sunscar landmark: a pylon gate with a red sun over the door. */
-function sunTemple(b: Bitmap, x: number, y: number) {
-  const icon = new Bitmap(32, 24);
-  for (const [x0, x1] of [[2, 12], [20, 30]]) {
-    polyFill(icon, [[x0 + 1, 3], [x1 - 1, 3], [x1, 21], [x0, 21]], (px) => (px < (x0 + x1) / 2 ? DESERT[4] : DESERT[2]));
-    for (let px = x0; px <= x1; px++) icon.set(px, 3, DESERT[4]);
-  }
-  for (let px = 12; px < 20; px++) {
-    icon.set(px, 8, DESERT[3]);
-    icon.set(px, 9, DESERT[2]);
-  }
-  ellipseFill(icon, 16, 6, 2.2, 2, SUNRED);
-  b.blit(outline(icon, DESERT[0]), x - 16, y - 22);
-}
-
+/** Trees, boulders and field walls scattered over the top, clear of the road, the stages and the settlement. */
 function scatter(b: Bitmap, clear: (x: number, y: number) => boolean) {
   const r = rng(99);
   const icons: { y: number; draw: () => void }[] = [];
-  for (let gy = 6; gy < H - 4; gy += 13) {
-    for (let gx = 4; gx < W - 4; gx += 13) {
-      const x = Math.round(gx + (r() - 0.5) * 9), y = Math.round(gy + (r() - 0.5) * 9);
-      if (isSea(x, y) || isSea(x, y + 6) || !clear(x, y)) continue;
-      if (nearPolyline(x, y, RIVER) < 7 * K) continue;
-      const c = climate(x, y);
-      const n = fbm(x, y, 31);
-      const pl = plateau(x, y);
-      if (pl > -CLIFF - 4 && pl < 3) continue;
-      if (pl > 0) {
-        if (STREAMS.some((st) => nearPolyline(x, y, st) < 5 * K)) continue;
-        if (n > 0.6) icons.push({ y, draw: () => baobabIcon(b, x, y) });
-        else if (n > 0.4) icons.push({ y, draw: () => acacia(b, x, y) });
-        continue;
-      }
-      if (y < 34 * SY || (c < 0.33 && n > 0.56)) {
-        const hgt = 12 + r() * 12;
-        icons.push({ y, draw: () => mountain(b, x, y, hgt, hgt * 0.95, ROCK, c < 0.5) });
-      } else if (c < 0.42 && n > 0.42) {
-        const s = 0.8 + r() * 0.3;
-        icons.push({ y, draw: () => pine(b, x, y, s, c < 0.38) });
-      } else if (c >= 0.42 && c < 0.56 && n > 0.47) {
-        const kind = r() < 0.35;
-        icons.push({ y, draw: () => (kind ? pine(b, x, y, 0.8, false) : tree(b, x, y)) });
-      } else if (c > 0.66 && n > 0.45) {
-        const w = 4 + Math.floor(r() * 4);
-        icons.push({ y, draw: () => dune(b, x, y, w) });
-      }
+  const step = 9 * S;
+  for (let gy = 0; gy < H; gy += step) {
+    for (let gx = 0; gx < W; gx += step) {
+      const x = Math.round(gx + (r() - 0.5) * step), y = Math.round(gy + (r() - 0.5) * step);
+      if (!onTop(x, y) || !onTop(x, y - 6 * S) || !onTop(x, y + 2 * S) || !clear(x, y)) continue;
+      const n = fbm(x / S, y / S, 31);
+      if (n > 0.55) icons.push({ y, draw: () => tree(b, x, y) });
+      else if (n < 0.3 && r() < 0.35) icons.push({ y, draw: () => boulder(b, x, y) });
     }
   }
   icons.sort((a, c) => a.y - c.y).forEach((i) => i.draw());
+}
+
+function tree(b: Bitmap, x: number, y: number) {
+  const s = S;
+  // its shadow falls down and to the right
+  ellipseFill(b, x + 2 * s, y + 1, 3.4 * s, 1.4 * s, (px, py) => (dith(px, py, 0.6) ? GRASS[0] : 0));
+  const icon = new Bitmap(Math.ceil(10 * s), Math.ceil(11 * s));
+  const cx = icon.w / 2, cy = 4.2 * s;
+  icon.set(Math.round(cx), Math.round(cy + 3.6 * s), EARTH[1]);
+  ellipseFill(icon, cx, cy, 3.6 * s, 3.4 * s, (px, py, d) => rampDither(TREE, 3.6 - (px - cx + 3) / (2.4 * s) - (py - cy + 3) / (2.6 * s) - d * 0.5, px, py));
+  b.blit(outline(icon, TREE[0]), Math.round(x - cx), Math.round(y - 8 * s));
+}
+
+function boulder(b: Bitmap, x: number, y: number) {
+  const s = S;
+  const icon = new Bitmap(Math.ceil(7 * s), Math.ceil(5 * s));
+  ellipseFill(icon, 3.5 * s, 2.6 * s, 2.8 * s, 1.9 * s, (px, py) => rampDither(STONE, 3.4 - (px - 1) / (2 * s) - (py - 1) / (1.6 * s), px, py));
+  b.blit(outline(icon, STONE[0]), Math.round(x - 3.5 * s), Math.round(y - 4 * s));
+}
+
+/**
+ * The settlement, the location's landmark: a cluster of thatched cottages
+ * with lit windows inside a ring of field walls, a thread of smoke.
+ */
+function settlement(b: Bitmap, x: number, y: number) {
+  const s = S;
+  // strips of field to the west and east of the houses, furrows lit along their upper edge
+  for (const [fx, fy, fw, fh, crop] of [[-58, -6, 26, 9, false], [-60, 5, 22, 7, true], [34, -9, 24, 8, true], [36, 2, 28, 9, false]] as const) {
+    for (let py = Math.round(y + fy * s); py < y + (fy + fh) * s; py++) {
+      for (let px = Math.round(x + fx * s); px < x + (fx + fw) * s; px++) {
+        if (!onTop(px, py)) continue;
+        const furrow = Math.floor((py - y) / Math.max(1, s)) % 2 === 0;
+        b.set(px, py, crop ? rampDither(GRASS, furrow ? 4.6 : 3.4, px, py) : rampDither(EARTH, furrow ? 3.2 : 2.2, px, py));
+      }
+    }
+  }
+  // field walls: a broken ring of stone around the houses
+  for (let a = 0; a < Math.PI * 2; a += 0.01) {
+    if (Math.sin(a * 3 + 1) > 0.82) continue;
+    const px = Math.round(x + Math.cos(a) * 26 * s), py = Math.round(y - 4 * s + Math.sin(a) * 11 * s);
+    b.set(px, py, STONE[Math.cos(a + 0.8) > 0 ? 3 : 1]);
+  }
+  const houses: [number, number, number, boolean][] = [
+    [-14, -8, 1, true],
+    [2, -12, 0.9, false],
+    [14, -6, 1.1, true],
+    [-4, -2, 1, false],
+    [-18, 2, 0.8, false],
+    [10, 3, 0.9, true],
+  ];
+  for (const [hx, hy, k, lit] of houses.sort((p, q) => p[1] - q[1])) cottageIcon(b, x + hx * s, y + hy * s, k * s, lit);
+  // smoke from one chimney
+  for (let i = 0; i < 14 * s; i++) {
+    const px = Math.round(x + 4 * s + Math.sin(i / (3 * s)) * s + i * 0.35), py = Math.round(y - 16 * s - i);
+    if (dith(px, py, 0.8 - i / (18 * s))) b.set(px, py, STONE[2]);
+  }
+}
+
+function cottageIcon(b: Bitmap, x: number, y: number, s: number, lit: boolean) {
+  const icon = new Bitmap(Math.ceil(12 * s) + 2, Math.ceil(10 * s) + 2);
+  const w = 10 * s, wallH = 3.4 * s, roofH = 5 * s;
+  const x0 = 1, base = icon.h - 1;
+  // wall
+  for (let py = Math.round(base - wallH); py < base; py++) for (let px = Math.round(x0 + s); px < x0 + w - s; px++) icon.set(px, py, rampDither(STONE, 3.2 - (px - x0) / w * 1.4, px, py));
+  if (lit) for (let k = 0; k < Math.max(1, Math.round(s)); k++) icon.set(Math.round(x0 + w * 0.35) + k, Math.round(base - wallH * 0.55), LAMP[s > 1.5 ? 2 : 1]);
+  // thatched roof
+  polyFill(icon, [[x0, base - wallH], [x0 + w * 0.25, base - wallH - roofH], [x0 + w * 0.75, base - wallH - roofH], [x0 + w, base - wallH]], (px, py) => rampDither(THATCH, 3.8 - (px - x0) / w * 2 - (py - (base - wallH - roofH)) / roofH * 0.6, px, py));
+  b.blit(outline(icon, INKC), Math.round(x - icon.w / 2), Math.round(y - icon.h + 1));
+}
+
+/** A standard planted in the ground: a pole and a little banner. */
+function flag(b: Bitmap, x: number, y: number, cloth: RGBA[], device: RGBA) {
+  const s = S;
+  const icon = new Bitmap(Math.ceil(7 * s) + 2, Math.ceil(12 * s) + 2);
+  const pole = 1;
+  for (let py = 1; py < icon.h - 1; py++) icon.set(pole, py, EARTH[3]);
+  icon.set(pole, 0, GOLD[2]);
+  for (let py = 2; py < 2 + 6 * s; py++) {
+    for (let px = pole + 1; px < pole + 1 + 5 * s; px++) {
+      const hem = py > 2 + 5 * s && Math.abs(px - pole - 0.5 - 2.5 * s) < s;
+      if (hem) continue;
+      icon.set(px, py, rampDither(cloth, 2.2 - (px - pole) / (5 * s) * 1.4, px, py));
+    }
+  }
+  icon.set(Math.round(pole + 1 + 2.5 * s), Math.round(2 + 2.6 * s), device);
+  if (s > 1.5) icon.set(Math.round(pole + 2.5 * s), Math.round(2 + 2.6 * s), device);
+  b.blit(outline(icon, INKC), Math.round(x - pole), Math.round(y - icon.h + 1));
 }
 
 // ---------------------------------------------------------------------------
 // road, compass, frame
 // ---------------------------------------------------------------------------
 
+/** Stage nodes in campaign order: the road visits each of them. */
+function roadPoints(): [number, number][] {
+  return LOCATIONS.flatMap((l) => l.stages.map((s) => wp(s.map.x, s.map.y)));
+}
+
 /** Curved road segment points between two stops. */
 function roadSegment(a: [number, number], c: [number, number], i: number): [number, number][] {
   const [ax, ay] = a, [bx, by] = c;
   const len = Math.hypot(bx - ax, by - ay);
-  const nx = -(by - ay) / len, ny = (bx - ax) / len, bend = (i % 2 ? 1 : -1) * Math.min(14 * K, len * 0.12);
+  const nx = -(by - ay) / len, ny = (bx - ax) / len, bend = (i % 2 ? 1 : -1) * Math.min(10 * S, len * 0.12);
   const out: [number, number][] = [];
   for (let s = 0; s <= len; s += 0.5) {
     const t = s / len;
@@ -372,49 +356,29 @@ function roadSegment(a: [number, number], c: [number, number], i: number): [numb
   return out;
 }
 
-function road(b: Bitmap) {
-  const pts = roadPoints();
-  const all = pts.slice(0, -1).flatMap((p, i) => roadSegment(p, pts[i + 1], i));
-  // packed earth: dark verge, worn center, the odd pebble
+function road(b: Bitmap, all: [number, number][]) {
+  // packed earth: a dark verge, a worn centre lit on its upper-left side
   for (const [x, y] of all) {
-    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1], [-1, 1]]) b.set(Math.round(x) + dx, Math.round(y) + dy, ROAD[0]);
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1], [-1, 1]]) b.set(Math.round(x) + dx, Math.round(y) + dy, EARTH[0]);
   }
   for (const [x, y] of all) {
     const X = Math.round(x), Y = Math.round(y);
-    b.set(X, Y, hash2(X, Y, 3) > 0.85 ? ROAD[1] : ROAD[2]);
-    b.set(X + 1, Y, ROAD[3]);
-    b.set(X, Y + 1, ROAD[1]);
-  }
-  // steps cut into the cliff where the road climbs the escarpment
-  for (const [x, y] of all) {
-    const pl = plateau(x, y);
-    if (pl > 1 || pl < -CLIFF - 1 || x < EAST) continue;
-    const X = Math.round(x), Y = Math.round(y);
-    for (let k = -2; k <= 2; k++) b.set(X + k, Y, Y % 2 ? LATERITE[4] : LATERITE[1]);
-  }
-  // a plank bridge where the road crosses the river
-  for (const [x, y] of all) {
-    if (nearPolyline(x, y, RIVER) > 2.2 * K) continue;
-    for (let k = -4; k <= 4; k++) {
-      const X = Math.round(x) + k, Y = Math.round(y);
-      b.set(X, Y - 2, ROAD[0]);
-      b.set(X, Y - 1, k % 2 ? ROAD[3] : ROAD[2]);
-      b.set(X, Y, k % 2 ? ROAD[2] : ROAD[3]);
-      b.set(X, Y + 1, ROAD[1]);
-      b.set(X, Y + 2, ROAD[0]);
-    }
+    b.set(X, Y, hash2(X, Y, 3) > 0.85 ? EARTH[2] : EARTH[3]);
+    b.set(X + 1, Y, EARTH[4]);
+    b.set(X, Y + 1, EARTH[2]);
   }
 }
 
 function compass(b: Bitmap, cx: number, cy: number) {
   const at = (r: number, a: number): [number, number] => [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+  const k = Math.max(0.6, S / 2);
   for (let i = 0; i < 8; i++) {
     const a = (i * Math.PI) / 4 - Math.PI / 2;
-    const long = i % 2 === 0 ? 15 : 8;
-    for (const side of [-1, 1]) polyFill(b, [[cx, cy], at(long, a), at(3, a + side * (Math.PI / 4))], side < 0 ? GOLD[3] : GOLD[1]);
+    const long = (i % 2 === 0 ? 15 : 8) * k;
+    for (const side of [-1, 1]) polyFill(b, [[cx, cy], at(long, a), at(3 * k, a + side * (Math.PI / 4))], side < 0 ? GOLD[3] : GOLD[1]);
   }
-  ellipseFill(b, cx, cy, 2.4, 2.4, GOLD[2]);
-  ['#..#', '##.#', '#.##', '#..#'].forEach((row, yy) => [...row].forEach((ch, xx) => ch === '#' && b.set(cx - 2 + xx, cy - 22 + yy, GOLD[3])));
+  ellipseFill(b, cx, cy, 2.4 * k, 2.4 * k, GOLD[2]);
+  ['#..#', '##.#', '#.##', '#..#'].forEach((row, yy) => [...row].forEach((ch, xx) => ch === '#' && b.set(Math.round(cx - 2 + xx), Math.round(cy - 22 * k + yy), GOLD[3])));
 }
 
 function frame(b: Bitmap) {
@@ -424,7 +388,7 @@ function frame(b: Bitmap) {
       const e = Math.min(x, y, W - 1 - x, H - 1 - y);
       if (e < 2) b.set(x, y, INKC);
       else if (e === 3) b.set(x, y, GOLD[1]);
-      else if (e < 18 && dith(x, y, ((18 - e) / 16) * 0.45)) b.set(x, y, SEA[0]);
+      else if (e < 18 && dith(x, y, ((18 - e) / 16) * 0.45)) b.set(x, y, CLOUD[0]);
     }
   }
 }
@@ -433,33 +397,27 @@ function frame(b: Bitmap) {
 function renderMap(w: number, h: number): Bitmap {
   W = w;
   H = h;
-  SX = w / DW;
-  SY = h / DH;
-  K = Math.max(1, Math.min(SX, SY) * 0.9);
-  CLIFF = Math.round(11 * Math.max(SY, 0.7));
-  EAST = 330 * SX;
-  RIVER = RIVER_D.map(px);
-  STREAMS = STREAMS_D.map((st) => st.map(px));
+  S = w / DW;
   const b = new Bitmap(W, H);
-  ground(b);
+  sky(b);
+  // other islands and loose rock adrift, far ones small near the horizon
+  for (const [x, y, s, g, seed] of [[592, 30, 0.7, true, 1], [64, 24, 0.5, true, 2], [430, 22, 0.4, true, 3], [250, 26, 0.3, false, 4], [618, 132, 0.9, true, 5], [12, 150, 0.6, true, 6], [560, 160, 0.35, false, 7], [140, 168, 0.4, false, 8]] as const) islet(b, x, y, s, g, seed);
+  shadow(b);
+  island(b);
   const nodes = roadPoints();
-  const marks = LOCATIONS.map((l) => wp(l.map.x, l.map.y));
   const roadPts = nodes.slice(0, -1).flatMap((p, i) => roadSegment(p, nodes[i + 1], i));
+  const marks = LOCATIONS.map((l) => wp(l.map.x, l.map.y));
   const clear = (x: number, y: number) =>
-    nodes.every(([nx, ny]) => Math.hypot(x - nx, y - ny) > 18) && marks.every(([mx, my]) => Math.hypot(x - mx, y - my + 8) > 26) && roadPts.every(([rx, ry]) => Math.hypot(x - rx, y - ry) > 8);
+    nodes.every(([nx, ny]) => Math.hypot(x - nx, y - ny) > 12 * S) && marks.every(([mx, my]) => Math.hypot((x - mx) / 2.4, y - my + 4 * S) > 16 * S) && roadPts.every(([rx, ry]) => Math.hypot(x - rx, y - ry) > 5 * S);
   scatter(b, clear);
-  road(b);
-  const landmark: Record<string, (b: Bitmap, x: number, y: number) => void> = { frostfang: frostTemple, sunscar: sunTemple, nyota: skyCity };
-  for (const l of LOCATIONS) {
-    const [x, y] = wp(l.map.x, l.map.y);
-    (landmark[l.zone] ?? frostTemple)(b, Math.round(x), Math.round(y));
-  }
-  for (const [x, y, size] of [[600, 262, 9], [616, 270, 6], [520, 304, 7]]) {
-    const [X, Y] = px([x, y]);
-    pyramid(b, Math.round(X), Math.round(Y), size);
-  }
-  const [cx, cy] = px([50, 300]);
-  compass(b, Math.round(cx), Math.round(cy));
+  road(b, roadPts);
+  for (const [x, y] of marks) settlement(b, Math.round(x), Math.round(y));
+  // where the two worlds first touch: their standards face each other at the first stage
+  const [fx, fy] = nodes[0];
+  flag(b, fx - 14 * S, fy - 3 * S, AZURE, GOLD[3]);
+  flag(b, fx + 12 * S, fy - 9 * S, SABLE, BLOOD[2]);
+  void BLOOD;
+  compass(b, Math.round(30 * S), Math.round(156 * S));
   frame(b);
   return b;
 }

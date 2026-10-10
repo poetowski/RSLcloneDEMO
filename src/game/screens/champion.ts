@@ -389,11 +389,11 @@ export class ChampionScreen extends BaseScreen {
     });
     let cy = y + 108;
     const aff = AFFINITIES[this.c.affinity];
-    const beats = aff.beats ? AFFINITIES[aff.beats].name : null;
+    const beats = AFFINITIES[aff.beats].name;
     const loses = Object.values(AFFINITIES).find((a) => a.beats === this.c.affinity)?.name;
     ui.text(ctx, 'AFFINITY', x, cy, { color: COLORS.dim, variant: 'bold' });
     cy += 12;
-    cy += ui.para(ctx, beats ? `Strong hits against ${beats}, weak hits against ${loses}.` : 'Void: never deals or takes strong or weak hits.', x, cy, w, { color: COLORS.text });
+    cy += ui.para(ctx, `Strong hits against ${beats}, weak hits against ${loses}.`, x, cy, w, { color: COLORS.text });
     cy += 8;
     ui.text(ctx, 'ROLE', x, cy, { color: COLORS.dim, variant: 'bold' });
     cy += 12;
@@ -407,7 +407,9 @@ export class ChampionScreen extends BaseScreen {
     ui.blit(ctx, 'emblem_' + this.c.faction, x, cy - 2);
     ui.text(ctx, fac.name, x + 20, cy + 2, { color: fac.color, variant: 'bold' });
     cy += 18;
-    cy += ui.para(ctx, fac.desc, x, cy, w, { color: COLORS.dim }) + 10;
+    cy += ui.para(ctx, fac.desc, x, cy, w, { color: COLORS.dim }) + 4;
+    if (fac.standard) cy += ui.para(ctx, `Standard: ${fac.standard}`, x, cy, w, { color: COLORS.dim }) + 6;
+    else cy += 6;
     const st = recruitStage(this.c.id);
     ui.text(ctx, STARTERS.includes(this.c.id) ? 'Joins you from the start.' : st ? `Recruited by the first clear of stage ${st.id}, ${st.name}.` : '', x, cy, { color: COLORS.faint });
   }

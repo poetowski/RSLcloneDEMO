@@ -56,10 +56,12 @@ export class BattleScreen implements Screen {
     } else {
       const owner = CHAMPIONS.find((c) => c.skills.some((s) => s.id === o.demo));
       if (!owner) throw new Error(`no champion has skill "${o.demo}"`);
-      // the owner and two companions against three others from the far end of the roster
+      // the owner and two companions against three others from the far end of the roster; a small
+      // roster repeats itself, so the demo always has a full line on each side
       const others = CHAMPIONS.filter((c) => c.id !== owner.id);
-      const player = [owner, ...others.slice(0, 2)];
-      const enemy = others.slice(2).reverse().slice(0, 3).map((c) => ({ champion: c.id }));
+      const pick = (i: number) => (others.length ? others[i % others.length] : owner);
+      const player = [owner, pick(0), pick(1)];
+      const enemy = [0, 1, 2].map((i) => ({ champion: pick(others.length - 1 - i + 3 * others.length).id }));
       const setup: BattleSetup = {
         player,
         enemy,

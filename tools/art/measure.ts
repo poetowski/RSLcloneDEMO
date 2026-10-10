@@ -3,7 +3,7 @@
 //   npx tsx tools/art/measure.ts
 // With a hero and an animation it prints both hands (rig space: [forward, up]
 // from the feet) at every hit frame, the starting point for a `muzzle`:
-//   npx tsx tools/art/measure.ts sunspear attack3
+//   npx tsx tools/art/measure.ts azure_warrior attack3
 import { renderFrame, PIVOT } from './char.ts';
 import { HEROES } from './champions/index.ts';
 import { solve } from './rig.ts';

@@ -14,24 +14,27 @@ A champion is two modules that must agree, plus the content around them:
 | Effects the skills name | `tools/art/fx/<faction>.ts` | content tests (fx exist) |
 | Where the player meets and recruits them | `src/game/data/campaign.ts` | content tests, balance curve |
 
-Read first: `docs/MECHANICS_GUIDE.md` (sections 4-10), `docs/ART_GUIDE.md` (sections 2-8), `docs/GAME_STRUCTURE.md`. Templates sit next to this file.
+Read first: `docs/DESIGN_DECISIONS.md` (Jakub's world, categories, factions and starting champions), `docs/MECHANICS_GUIDE.md` (sections 4-10), `docs/ART_GUIDE.md` (sections 2-8), `docs/GAME_STRUCTURE.md`. Templates sit next to this file.
 
 ## 1. Design (worksheet first)
 
 1. Copy `templates/worksheet.md` into your notes and fill every line. Show Jakub the worksheet (name, concept, stats, kit, numbers, placement, art direction) and wait for his yes before building; without his answer, stop at the worksheet (CLAUDE.md, Content approval).
-2. Pick the **role** first, then shape the kit around it:
+2. The four categories are Jakub's (DESIGN_DECISIONS.md 2), independent of each other: a faction does not imply an affinity, a role or a rarity.
+   - **Faction:** the Azure Crown, the Sanguine Dominion, the Court of Root or the Ashveil Reign.
+   - **Rarity:** Common, Elite, Heroic or Mythic (sets the stat budget).
+   - **Affinity:** Ember, Bloom or Tide (Ember beats Bloom, Bloom beats Tide, Tide beats Ember; no Void).
+   - **Role:** Tank, Damage or Support. There is no fourth role: control, bruiser, assassin and the like are descriptive tags.
+3. Pick the **role** first, then shape the kit around it:
    - Tank: a taunt or shield A2/A3, high HP/DEF, A1 with a defensive rider (DEF Down, Weaken).
-   - Bruiser: sustain (lifesteal, shields) plus a big A3.
-   - Damage: multi-hit or execute, high ATK/SPD/CRIT, low DEF.
+   - Damage: multi-hit or execute, high ATK/SPD/CRIT, low DEF. Tagged *bruiser*: sustain (lifesteal, shields) plus a big A3. Tagged *control*: chance-based debuffs on A1/A2, one guaranteed 1-turn control on A3.
    - Support: heal/cleanse/buff on A2, a team-wide payoff on A3.
-   - Control: chance-based debuffs on A1/A2, one guaranteed 1-turn control on A3.
-3. Give the kit one idea the roster does not have yet (Counterattack for Kha'zir, Undying for Anhotep, ally Turn Meter for Kwesi, Overdrive for Mwamba). Check `docs/MECHANICS_GUIDE.md` sections 8-9 for what exists. A passive is `undying` or `overdrive` (`PassiveDef` in `types.ts`); a new kind follows step 2.6.
-4. Choose an **affinity** that makes the recruiting stage interesting against the player's likely teams (team select shows strong/weak counts).
+4. Give the kit one idea the roster does not have yet. The engine has Counterattack, Undying, ally Turn Meter, Overdrive, Dispel and control with no champion using them today; check `docs/MECHANICS_GUIDE.md` sections 8-9 for what exists. A passive is `undying` or `overdrive` (`PassiveDef` in `types.ts`); a new kind follows step 2.6.
+5. Choose an **affinity** that makes the stage that brings the champion interesting against the player's likely teams (team select shows strong/weak counts).
 
 ## 2. Rules module
 
 1. Copy `templates/champion-data.template.ts` to `src/game/data/champions/<id>.ts`; register it in `src/game/data/champions/index.ts` (array order = collection order, group by faction).
-2. Stats: `statScore = HP/12 + ATK x 1.1 + (DEF - 40) x 2.25 + SPD x 1.3 + CRIT x 300` within **5%** of the rarity budget (common 390, uncommon 410, rare 425, epic 440, legendary 455); limits HP 900-1700, ATK 70-130, DEF 56-80, SPD 90-125, CRIT 0.025-0.15 (DEF divides damage as 40 / DEF; a critical hit deals double). A passive is paid for from the budget.
+2. Stats: `statScore = HP/12 + ATK x 1.1 + (DEF - 40) x 2.25 + SPD x 1.3 + CRIT x 300` within **5%** of the rarity budget (Common 390, Elite 425, Heroic 440, Mythic 455); limits HP 900-1700, ATK 70-130, DEF 56-80, SPD 90-125, CRIT 0.025-0.15 (DEF divides damage as 40 / DEF; a critical hit deals double). A passive is paid for from the budget.
 3. Skills: total multiplier per slot (A1 single 0.9-1.25 / AoE 0.5-0.8; A2 1.1-1.6 / 0.5-1.1; A3 1.3-2.6 / 0.7-1.2), cooldowns A1 0, A2 3, A3 4-5; statuses last at most 3 turns, Stun/Freeze 1 turn and guaranteed only on A3.
 4. `hits` has **one entry per hit frame** of the animation you will author. `fx` names must exist (or be created in step 4). `ai.priority` 1/2/3 by slot; `when: 'allyHurt'` for heals that should wait.
 5. Presentation fields: `approach` (`melee`, `center` for AoE melee, `ranged`, `leap` with a `jump` event, `blink` to strike from behind, `none` for in-place casts), `projectile` + champion `muzzle` for ranged, `castFx` ground circle, `actorFx` on the `cast` event, `shake` for heavy hits. Measure the `muzzle` instead of guessing it: `npx tsx tools/art/measure.ts <id> <anim>` prints the hands at every hit frame; projectiles spawn there on the hit frame (a new projectile also gets a trail and, if it should, an arc in `perform()` of `scene.ts`).
@@ -53,7 +56,7 @@ New `fx` names go into `tools/art/fx/<faction>.ts` (or `common.ts`), built from 
 
 ## 5. Campaign placement
 
-Put the champion into a stage's `enemies` and set that stage's `recruit` to its id (`src/game/data/campaign.ts`); a champion can only be recruited where the player fought it. A boss gets `boss: true` (x1.6 HP, crown, boss intro). A new stage needs a `map` position on the world map (`WORLD_MAP` pixels, 1920x720) that does not overlap other nodes, also on the overview at a third of the size; the road follows the stage order automatically after `npm run art -- map`.
+Set `recruit` to its id on the stage whose first clear brings the champion (`src/game/data/campaign.ts`); it may be among that stage's enemies or not (the Sanguine Support joins after the first battle without being fought). An enemy goes into a stage's `enemies`; a boss gets `boss: true` (x1.6 HP, crown, boss intro). A new stage needs a `map` position on the world map (`WORLD_MAP` pixels, 1280x360) that does not overlap other nodes, also on the overview at half the size; the road follows the stage order automatically after `npm run art -- map`.
 
 ## 6. Build and verify (all must pass)
 

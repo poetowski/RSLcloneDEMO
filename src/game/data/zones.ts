@@ -5,42 +5,27 @@ import { FactionId, ZoneDef } from './types';
 
 export const ZONES: ZoneDef[] = [
   {
-    id: 'frostfang',
-    name: 'Frostfang Ruins',
-    subtitle: 'The frozen temple of the broken Oath',
-    ambient: 'snow',
-    glow: [255, 170, 80],
-    shadow: { dx: 1, stretch: 1 },
-  },
-  {
-    id: 'sunscar',
-    name: 'Sunscar Ruins',
-    subtitle: 'Necropolis of the sun kings',
-    ambient: 'sand',
-    glow: [255, 150, 60],
-    shadow: { dx: 6, stretch: 1.35 },
-    tint: { color: '#ff9a50', alpha: 0.08, op: 'soft-light' },
-    birds: 3,
-    haze: true,
-  },
-  {
-    id: 'nyota',
-    name: 'Nyota Skyforge',
-    subtitle: 'Terrace of the star-smiths',
+    // Zone 1 from Jakub's working notes: open sky, a dim island, a small settlement
+    id: 'zone1',
+    name: 'A Dim Island',
+    subtitle: 'Open sky over a small settlement',
     ambient: 'motes',
-    glow: [90, 230, 220],
+    glow: [255, 176, 96],
     shadow: { dx: 2, stretch: 1.1 },
-    tint: { color: '#7a3cc8', alpha: 0.06, op: 'soft-light' },
-    birds: 2,
-    embers: ['#90f5e2', '#e8fff8', '#90f5e2', '#36d0c0', '#18908a'],
+    tint: { color: '#3c4a78', alpha: 0.07, op: 'soft-light' },
   },
 ];
 
 const byId = new Map(ZONES.map((z) => [z.id, z]));
 
-/** The zone a faction calls home: where its champions stand in the Academy demos and their dioramas. */
+/**
+ * The zone a faction calls home: where its champions stand in the Academy
+ * demos and on their detail page. No faction has a home yet, so every one
+ * stands in the first zone.
+ */
 export function homeZone(faction: FactionId): ZoneDef {
-  return zone(faction === 'sunscar' ? 'sunscar' : faction === 'nyota' ? 'nyota' : 'frostfang');
+  void faction;
+  return ZONES[0];
 }
 
 export function zone(id: string): ZoneDef {

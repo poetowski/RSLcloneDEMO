@@ -54,7 +54,7 @@ export function spool(p: PatternKey, grade: number): Bitmap {
   return outline(b, UIR.ink[0]);
 }
 
-const ARC = UIR.affinity.arcane;
+const ARC = UIR.arcane;
 
 /** A thread of arcane light from p to q: a bright core and a dithered halo. */
 function lightLine(b: Bitmap, p: V, q: V) {

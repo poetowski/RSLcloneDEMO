@@ -5,9 +5,11 @@
 //   1. stat budget per rarity           (norms.ts RARITY_BUDGET, +-5%)
 //   2. kit norms                        (norms.ts SKILL_NORMS / STATUS_NORMS)
 //   3. impact: win rate of random teams that include the champion, against
-//      random enemy teams from the roster. Healthy band: 40-60%.
-//   4. campaign curve: win rate of every 3-champion team the player can own
-//      at that point, against the stage. Bands per stage kind (below).
+//      random enemy teams from the roster. Healthy band: 40-60%. Needs at
+//      least six champions (two teams of three without repeats); skipped below.
+//   4. campaign curve: win rate of every team the player can own at that
+//      point (three champions, or all of them while they own fewer), against
+//      the stage. Bands per stage kind (below).
 import { combatants, Combatant } from '../src/game/battle/battle';
 import { simulate } from '../src/game/battle/sim';
 import { BOSS_HP, LOCATIONS, STARTERS } from '../src/game/data/campaign';
@@ -67,7 +69,8 @@ for (const c of CHAMPIONS) {
 
 console.log(`\n== 3. Impact (random 3v3 teams from the roster, ${SAMPLES} battles each, band ${pct(IMPACT_BAND[0])}-${pct(IMPACT_BAND[1])}) ==`);
 const impacts: [string, number][] = [];
-for (const c of CHAMPIONS) {
+if (CHAMPIONS.length < 6) console.log(`  --  skipped: the roster has ${CHAMPIONS.length} champions, impact needs 6 for two teams of three`);
+else for (const c of CHAMPIONS) {
   const r = rngFor(1000 + CHAMPIONS.indexOf(c));
   let wins = 0;
   for (let i = 0; i < SAMPLES; i++) {
@@ -85,11 +88,15 @@ for (const [id, w] of impacts.sort((a, b) => b[1] - a[1])) {
 
 console.log(`\n== 4. Campaign curve (every team the player can own, ${STAGE_SEEDS} seeds per team) ==`);
 const owned = [...STARTERS];
+/** every team of `size` from the pool, in pool order */
+function teamsOf(pool: ChampionDef[], size: number): ChampionDef[][] {
+  if (size === 0) return [[]];
+  return pool.flatMap((c, i) => teamsOf(pool.slice(i + 1), size - 1).map((t) => [c, ...t]));
+}
 for (const loc of LOCATIONS) {
   loc.stages.forEach((s, si) => {
     const pool = owned.map((id) => champion(id));
-    const teams: ChampionDef[][] = [];
-    for (let a = 0; a < pool.length; a++) for (let b = a + 1; b < pool.length; b++) for (let c = b + 1; c < pool.length; c++) teams.push([pool[a], pool[b], pool[c]]);
+    const teams = teamsOf(pool, Math.min(3, pool.length));
     const enemy: Combatant[] = s.enemies.map((e) => ({ def: champion(e.champion), boss: e.boss }));
     let wins = 0, total = 0, best = 0;
     for (const t of teams) {

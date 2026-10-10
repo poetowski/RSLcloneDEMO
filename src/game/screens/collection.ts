@@ -16,7 +16,7 @@ import { nine, Rect4 } from '../view/assets';
 import { drawChampion, frameAt } from '../view/unit';
 import { BaseScreen, Diorama } from './base';
 
-const FILTERS: (Affinity | 'all')[] = ['all', 'force', 'wild', 'arcane', 'void'];
+const FILTERS: (Affinity | 'all')[] = ['all', ...(Object.keys(AFFINITIES) as Affinity[])];
 
 /** Card grid geometry and the window it scrolls in (below the filter tabs). */
 const CW = 112, CH = 140, GAP = 8, COLS = 5;

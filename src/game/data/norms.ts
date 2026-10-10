@@ -8,13 +8,17 @@ export function statScore(s: Stats): number {
   return s.hp / 12 + s.atk * 1.1 + (s.def - 40) * 2.25 + s.spd * 1.3 + s.crit * 300;
 }
 
-/** Target stat score per rarity. A champion must land within BUDGET_TOLERANCE of it. */
+/**
+ * Target stat score per rarity. A champion must land within BUDGET_TOLERANCE of it.
+ * What rarity gates is not decided yet (docs/DESIGN_DECISIONS.md 2.2): these
+ * are the proof of concept's budgets carried over (Elite at the old Rare,
+ * Heroic at Epic, Mythic at Legendary).
+ */
 export const RARITY_BUDGET: Record<Rarity, number> = {
   common: 390,
-  uncommon: 410,
-  rare: 425,
-  epic: 440,
-  legendary: 455,
+  elite: 425,
+  heroic: 440,
+  mythic: 455,
 };
 export const BUDGET_TOLERANCE = 0.05;
 

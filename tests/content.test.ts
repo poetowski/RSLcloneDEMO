@@ -122,8 +122,29 @@ describe('campaign', () => {
     expect(size('public/assets/map/overview.png')).toEqual([WORLD_MAP.w / WORLD_MAP.overview, WORLD_MAP.h / WORLD_MAP.overview]);
   });
 
-  it('only recruits champions the player faced in that stage', () => {
-    for (const s of allStages()) if (s.recruit) expect(s.enemies.map((e) => e.champion), s.id).toContain(s.recruit);
+});
+
+// Jakub's locked decisions (docs/DESIGN_DECISIONS.md sections 2 and 4): a
+// change here is a change to his design, not a fix.
+describe('design decisions', () => {
+  it('has the four category enums', () => {
+    expect(Object.keys(AFFINITIES)).toEqual(['ember', 'bloom', 'tide']);
+    expect(Object.values(AFFINITIES).map((a) => `${a.id}>${a.beats}`)).toEqual(['ember>bloom', 'bloom>tide', 'tide>ember']);
+    expect(Object.values(RARITIES).map((r) => [r.name, r.rank])).toEqual([['Common', 1], ['Elite', 2], ['Heroic', 3], ['Mythic', 4]]);
+    expect(Object.keys(ROLES)).toEqual(['Tank', 'Damage', 'Support']);
+    expect(Object.values(FACTIONS).map((f) => f.name)).toEqual(['Azure Crown', 'Sanguine Dominion', 'Court of Root', 'Ashveil Reign']);
+  });
+
+  it('starts with the Azure Crown warrior and brings the Sanguine Dominion support after the first battle', () => {
+    const [first] = CHAMPIONS, second = CHAMPIONS[1];
+    expect([first.rarity, first.role, first.faction, first.affinity]).toEqual(['elite', 'Damage', 'azure_crown', 'ember']);
+    expect([second.rarity, second.role, second.faction, second.affinity]).toEqual(['elite', 'Support', 'sanguine_dominion', 'tide']);
+    expect(STARTERS).toEqual([first.id]);
+    expect(allStages()[0].recruit).toBe(second.id);
+  });
+
+  it('opens with a ten-stage first zone', () => {
+    expect(LOCATIONS[0].stages).toHaveLength(10);
   });
 });
 
@@ -238,14 +259,19 @@ describe('save', () => {
     expect(frontier(p)).toBe(stages[1].id);
   });
 
-  it('opens a location only after the stage it requires', () => {
+  it('opens the first location at once and every other only after the stage it requires', () => {
     const p = newArchivist();
-    const second = LOCATIONS[1];
-    expect(locationOpen(p, second)).toBe(false);
-    for (const s of LOCATIONS[0].stages) recordClear(p, s.id, 1);
-    expect(locationOpen(p, second)).toBe(true);
-    expect(cleared(p, LOCATIONS[0].stages[0].id)).toBe(true);
-    expect(recruitStage(second.stages[0].recruit!)?.id).toBe(second.stages[0].id);
+    expect(locationOpen(p, LOCATIONS[0])).toBe(true);
+    for (const loc of LOCATIONS.slice(1)) {
+      expect(loc.requires, loc.id).toBeTruthy();
+      expect(locationOpen(p, loc), loc.id).toBe(false);
+    }
+    for (const s of allStages()) {
+      recordClear(p, s.id, 1);
+      for (const loc of LOCATIONS) if (loc.requires === s.id) expect(locationOpen(p, loc), loc.id).toBe(true);
+    }
+    expect(cleared(p, allStages()[0].id)).toBe(true);
+    for (const s of allStages()) if (s.recruit) expect(recruitStage(s.recruit)?.id).toBe(s.id);
   });
 
   it('starts with a soul file and an empty Weaver Matrix for every starter', () => {
@@ -258,30 +284,37 @@ describe('save', () => {
     }
   });
 
-  it('migrates a proof-of-concept save once and drops ids the catalog lacks', () => {
-    const [first, second] = allStages();
-    const recruit = first.recruit!;
-    const v1 = JSON.stringify({
-      version: 1,
-      unlocked: [recruit, 'nobody'],
-      stars: { [first.id]: 3, '9-9': 2 },
-      team: [STARTERS[0], recruit, 'nobody'],
-      fresh: [recruit],
-      read: [CHAPTERS[0].id],
-      settings: { speed: 3, auto: true },
-    });
-    const p = readSave(null, v1);
-    for (const id of [...STARTERS, recruit]) expect(isUnlocked(p, id), id).toBe(true);
-    expect(isUnlocked(p, 'nobody')).toBe(false);
-    expect(isFresh(p, recruit)).toBe(true);
-    expect(isFresh(p, STARTERS[0])).toBe(false);
-    expect(p.stars).toEqual({ [first.id]: 3 });
-    expect(p.team).toEqual([STARTERS[0], recruit]);
-    expect(p.read).toEqual([CHAPTERS[0].id]);
-    expect(p.settings).toEqual({ speed: 3, auto: true });
-    expect(stageOpen(p, second.id)).toBe(true);
-    // once a current save exists, the old one is never read again
-    expect(readSave(writeSave(newArchivist()), v1).stars).toEqual({});
+  it('carries only the settings and the Academy reading over from an older save', () => {
+    const [first] = allStages();
+    const old = (version: number) =>
+      JSON.stringify({
+        version,
+        unlocked: ['knight', 'monk'],
+        stars: { [first.id]: 3, '2-4': 2 },
+        team: ['knight', 'monk'],
+        fresh: ['monk'],
+        read: [CHAPTERS[0].id],
+        settings: { speed: 3, auto: true },
+        reliquary: { files: [{ champion: 'knight', fresh: false, slots: [] }], stock: [] },
+      });
+    for (const version of [1, 2]) {
+      const p = readSave(null, old(version));
+      expect(p.reliquary.files().map((f) => f.champion), `v${version}`).toEqual(STARTERS);
+      expect(p.stars).toEqual({});
+      expect(p.team).toEqual(STARTERS);
+      expect(p.read).toEqual([CHAPTERS[0].id]);
+      expect(p.settings).toEqual({ speed: 3, auto: true });
+    }
+    // once a current save exists, an older one is never read again
+    expect(readSave(writeSave(newArchivist()), old(2)).read).toEqual([]);
+  });
+
+  it('gives every cleared stage its champion, also when the stage changed what it brings', () => {
+    const [first] = allStages();
+    const text = JSON.stringify({ version: 3, stars: { [first.id]: 2 }, team: [...STARTERS, first.recruit], read: [], settings: { speed: 1, auto: false }, reliquary: {} });
+    const p = readSave(text);
+    expect(isUnlocked(p, first.recruit!)).toBe(true);
+    expect(p.team).toEqual([...STARTERS, first.recruit]);
   });
 
   it('keeps everything through a save and a load, spools included', () => {
@@ -303,11 +336,13 @@ describe('save', () => {
   it('starts a new game from another version or unreadable text', () => {
     const fresh = writeSave(newArchivist());
     const saves: [string | null, string | null][] = [
-      [JSON.stringify({ version: 3 }), null],
+      [JSON.stringify({ version: 4 }), null],
+      [JSON.stringify({ version: 2, stars: { '1-1': 3 } }), null],
       ['{oops', null],
-      [JSON.stringify({ version: 2, team: 5 }), null],
+      [JSON.stringify({ version: 3, team: 5 }), null],
       [null, JSON.stringify({ version: 1, unlocked: 7 })],
       [null, JSON.stringify({ version: 7 })],
+      [null, '{oops'],
       [null, null],
     ];
     for (const [raw, rawV1] of saves) expect(writeSave(readSave(raw, rawV1)), `${raw} ${rawV1}`).toBe(fresh);

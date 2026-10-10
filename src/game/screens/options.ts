@@ -3,6 +3,7 @@
 import { W } from '../../engine/screen';
 import { App } from '../app';
 import { newArchivist, saveArchivist, unlockEverything } from '../archivist';
+import { ZONES } from '../data/zones';
 import { COLORS } from '../ui/ui';
 import { BaseScreen, Diorama } from './base';
 
@@ -13,7 +14,7 @@ export class OptionsScreen extends BaseScreen {
 
   constructor(app: App) {
     super(app);
-    this.diorama = new Diorama(app, 'frostfang');
+    this.diorama = new Diorama(app, ZONES[0].id);
     this.ui.focusId = 'speed_' + this.archivist.settings.speed;
   }
 

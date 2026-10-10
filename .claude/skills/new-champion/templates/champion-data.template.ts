@@ -1,21 +1,22 @@
 // TEMPLATE: copy to src/game/data/champions/<id>.ts, register it in
 // src/game/data/champions/index.ts (CHAMPIONS order = collection order), and
 // keep every number inside src/game/data/norms.ts. The values below are a
-// legal epic Bruiser so the file passes the norms as-is.
+// legal Heroic Damage champion with a bruiser's kit, so the file passes the
+// norms as-is. The categories are Jakub's (docs/DESIGN_DECISIONS.md 2).
 import { ChampionDef } from '../types';
 
 export const spearwarden: ChampionDef = {
   id: 'spearwarden',
   name: 'Template',
   title: 'the Spear Warden',
-  role: 'Bruiser', // Tank | Bruiser | Damage | Support | Control
-  rarity: 'epic', // common | uncommon | rare | epic | legendary  (sets the stat budget)
-  affinity: 'wild', // force > wild > arcane > force; void is neutral
-  faction: 'wildwood', // dawn | clans | wildwood | coven | temple | sunscar
+  role: 'Damage', // Tank | Damage | Support (bruiser, control and the like are tags, not roles)
+  rarity: 'heroic', // common | elite | heroic | mythic  (sets the stat budget)
+  affinity: 'bloom', // ember > bloom > tide > ember
+  faction: 'court_of_root', // azure_crown | sanguine_dominion | court_of_root | ashveil_reign
   color: '#4a8c40', // signature hue: name text in the UI; match the art's main ramp
   // muzzle: [24, 46],  // ranged champions only: projectile origin [forward, up] from the feet
   // statScore = hp/12 + atk*1.1 + (def-40)*2.25 + spd*1.3 + crit*300  must land within 5% of the rarity budget
-  // (epic 440). This one: 108.3 + 110 + 63 + 135.2 + 22.5 = 439
+  // (heroic 440). This one: 108.3 + 110 + 63 + 135.2 + 22.5 = 439
   stats: { hp: 1300, atk: 100, def: 68, spd: 104, crit: 0.075 },
   lore: 'Two or three sentences in the voice of the world: who they are, what they guard, what they want.',
   skills: [

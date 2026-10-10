@@ -4,7 +4,7 @@ import { CHAMPION_ART } from './champions/index.ts';
 import { ICON } from './icons.ts';
 import { Bitmap, hex } from './raster.ts';
 
-const [ids = 'knight', out = 'icons.png', scale = '6'] = process.argv.slice(2);
+const [ids = 'azure_warrior', out = 'icons.png', scale = '6'] = process.argv.slice(2);
 const list = ids.split(',');
 const sheet = new Bitmap(3 * (ICON + 4) + 4, list.length * (ICON + 4) + 4).fill(hex('#141a28'));
 list.forEach((id, r) => {

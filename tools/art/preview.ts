@@ -5,7 +5,7 @@ import { FRAME_H, FRAME_W, PIVOT, renderAnim } from './char.ts';
 import { HEROES } from './champions/index.ts';
 import { Bitmap, hex } from './raster.ts';
 
-const [id = 'knight', scaleArg = '3', out = 'preview.png', animArg, facingArg] = process.argv.slice(2);
+const [id = 'azure_warrior', scaleArg = '3', out = 'preview.png', animArg, facingArg] = process.argv.slice(2);
 const c = HEROES[id];
 if (!c) throw new Error(`unknown hero ${id}; have ${Object.keys(HEROES).join(', ')}`);
 const scale = Number(scaleArg);

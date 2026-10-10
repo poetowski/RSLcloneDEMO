@@ -4,7 +4,7 @@ How the domain of The Loom: Reliquary of Legends (code name TLROL) is cut into b
 
 Companion guides: [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) (the rules), [GAME_STRUCTURE.md](GAME_STRUCTURE.md) (content and screens), [ART_GUIDE.md](ART_GUIDE.md), [UI_GUIDE.md](UI_GUIDE.md).
 
-Snapshot: commit `8dd9a26`, 2026-10-06. Every dependency rule in section 8 and every "true today" in section 6 was checked against that commit. The save, the Reliquary and their rules (sections 2.3, 2.6, 3, 4.4, 4.7, 6.3, 6.5, 8) were checked again on 2026-10-08, the gear system and the DEF and crit rules on 2026-10-10.
+Snapshot: commit `8dd9a26`, 2026-10-06. Every dependency rule in section 8 and every "true today" in section 6 was checked against that commit. The save, the Reliquary and their rules (sections 2.3, 2.6, 3, 4.4, 4.7, 6.3, 6.5, 8) were checked again on 2026-10-08, the gear system and the DEF and crit rules on 2026-10-10, and the content from Jakub's design decisions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md): the categories, the factions, the two starting champions, Zone 1; sections 2.2, 2.3, 2.5, 2.7, 6.2, 6.3, 9, 10) the same day.
 
 ---
 
@@ -71,11 +71,12 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | --- | --- | --- |
 | Champion | the definition of a hero, enemy or boss: identity, stats, kit, lore | `ChampionDef` |
 | Kit | a champion's three skills and its passive | `ChampionDef.skills`, `.passive` |
-| Rarity | sets the stat budget and the card frame | `Rarity`, `RARITIES`, `RARITY_BUDGET` |
-| Affinity | Force, Wild, Arcane (a cycle) and Void (outside it) | `Affinity`, `AFFINITIES` |
-| Role | Tank, Bruiser, Damage, Support, Control: how the budget is spent | `Role`, `ROLES` |
-| Faction | one of the seven peoples; picks the home zone and the material language | `FactionId`, `FACTIONS` |
-| Signature hue | the champion's colour in the UI and its art | `ChampionDef.color` |
+| Rarity | Common, Elite, Heroic, Mythic; sets the stat budget and the card frame (what it gates in play is not decided) | `Rarity`, `RARITIES`, `RARITY_BUDGET` |
+| Affinity | Ember, Bloom, Tide, a cycle: Ember beats Bloom, Bloom beats Tide, Tide beats Ember (no Void) | `Affinity`, `AFFINITIES`, `affinityEdge` |
+| Role | Tank, Damage, Support: how the budget is spent (no fourth role; Control, Bruiser and the like are descriptive tags) | `Role`, `ROLES` |
+| Faction | one of four powers: the Azure Crown, the Sanguine Dominion, the Court of Root, the Ashveil Reign; story and standard, no mechanics | `FactionId`, `FACTIONS`, `FactionDef.standard` |
+| Standard | a faction's heraldry: the Azure Crown a gold crown on blue, the Sanguine Dominion a red hexagon on black, the Court of Root a brown claw on green, the Ashveil Reign a white bone across a dark grey | `FactionDef.standard`, `emblem_<faction>` |
+| Signature hue | the champion's colour in the UI and its art; for today's stand-in bodies, their faction's colour | `ChampionDef.color` |
 | Muzzle | where projectiles leave a ranged champion's sprite | `ChampionDef.muzzle` |
 | Approach | how the actor travels before the attack | `Approach` |
 | Stat score, budget | weighted stat sum, and its target per rarity (±5%) | `statScore`, `budgetDelta`, `BUDGET_TOLERANCE` |
@@ -89,13 +90,13 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | --- | --- | --- |
 | Location (chapter) | a campaign chapter with one zone, opened by a `requires` stage | `LocationDef` |
 | Stage | one battle of the campaign, id `"<chapter>-<n>"` | `StageDef` |
-| Recruit, first clear | the first win of a stage recruits its champion | `StageDef.recruit`, `recordClear`, `Reliquary.recruit` |
+| Recruit, first clear | the first win of a stage brings its champion, fought there or not (the second champion joins after the first battle without being fought) | `StageDef.recruit`, `recordClear`, `Reliquary.recruit` |
 | Starters | the champions owned from the start | `STARTERS` |
 | Roster | the champions the player owns | `roster()` |
 | Collection | every champion, owned or locked | `CollectionScreen` |
 | Open / cleared / locked | a stage the player may fight / has won / may not fight yet | `stageOpen`, `cleared` |
 | Frontier | the newest playable stage | `frontier()` |
-| World map, overview | the campaign map in world pixels (1920x720), scrolled under a camera; the overview draws the same world on one screen | `WORLD_MAP`, `CampaignScreen` |
+| World map, overview | the campaign map in world pixels (1280x360), scrolled sideways under a camera: the campaign is a line of areas crossed from left to right; the overview draws the same world on one screen | `WORLD_MAP`, `CampaignScreen` |
 | Stars | 3, 2 or 1 by champions lost; the best is kept | `starsFor`, `MasterArchivist.stars` |
 | Master Archivist | the player and their save: stars, last team, Academy chapters read, settings, and the Reliquary | `MasterArchivist`, `loadArchivist`, `saveArchivist`, `readSave`, `writeSave` |
 | Fresh (NEW) | recruited, not yet opened on the champion page | `HeroSoulFile.fresh`, `isFresh`, `Reliquary.markSeen` |
@@ -138,6 +139,8 @@ The same word means different things in different contexts. That is legitimate i
 | Hit | a `HitDef`, a hit frame, the `hit` index of an event | they are one concept seen from three sides and must stay equal in number |
 | Power | stage `power` vs balance "impact" vs stat score | never call a stat score "power" |
 | Slot | formation slot (0-2, `Unit.slot`), skill slot (A1-A3, `SkillDef.slot`), matrix slot (0-5, `MatrixSlot`) | always say which: formation slot, skill slot, matrix slot |
+| Zone | in Jakub's notes a campaign area ("Zone 1", a location with its stages: `LocationDef`) vs in code a combat background (`ZoneDef`, `ZoneArt`) | in code "location" is the area and "zone" the background; Zone 1 is the location `zone1` whose background is the zone `zone1` |
+| Archivist | the player in Jakub's premise (a celestial presence that recollects champions) vs `MasterArchivist`, the save | the premise's Archivist is not modelled yet; `MasterArchivist` is the save |
 
 ### 2.6 Reliquary and the Weaver Matrix
 
@@ -145,7 +148,7 @@ The language of the final game (approved 2026-10-08). Heroes keep the word *cham
 
 | Term | Meaning | In code |
 | --- | --- | --- |
-| The Loom: Reliquary of Legends | the game; *The Loom* for short; code name TLROL | `tlrol.save.v2` |
+| The Loom: Reliquary of Legends | the game; *The Loom* for short; code name TLROL | `tlrol.save.v3` |
 | Master Archivist | the player; in code, the player's save | `MasterArchivist` |
 | Reliquary | the vault of everything the archivist owns: one soul file per champion and the loose spools; the aggregate root of both | `Reliquary` |
 | Hero Soul File | one owned champion's record: which champion, its NEW badge, its Weaver Matrix | `HeroSoulFile` |
@@ -164,6 +167,19 @@ The language of the final game (approved 2026-10-08). Heroes keep the word *cham
 | Weave Pattern | a set bonus woven by 2 or 4 spools of one pattern, wherever they sit | `WeavePatternDef` |
 | Woven | a pattern complete in a matrix, and how many times (6 spools of a 2-piece pattern: 3 times) | `WovenPattern`, `WeavePatternEvaluator` |
 | Spindle of Fate | named in the brief as what the archivist works; a placeholder with no meaning or code yet | - |
+
+### 2.7 The world (Jakub's premise)
+
+The language of [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) section 1. None of it is modelled in code yet beyond the names it gives to content.
+
+| Term | Meaning | In code |
+| --- | --- | --- |
+| The loom | a celestial divine loom whose breaking, at a time nobody knows, broke reality across dimensions, space and time | - |
+| The broken realm | the world after the break: floating islands, places and worlds connected that would never meet | the world map (`tools/art/map.ts`) |
+| Archivist | the player, more celestial than physical, who collects and reconstructs champions to repair the loom | `MasterArchivist` (the save) |
+| Recollection | the central verb: champions are fragmented souls of legendary champions, collected and reconstructed | `HeroSoulFile` (the record of one) |
+| World (of a faction) | the Azure Crown and the Sanguine Dominion come from separate worlds and meet only where the loom connects them | `FactionDef.desc` |
+| Starter, second champion | the Azure Crown warrior who is there from the start, the Sanguine Dominion support who joins after the first battle; names to come | `azure_warrior`, `sanguine_support`, `STARTERS` |
 
 ## 3. Bounded contexts
 
@@ -345,7 +361,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C3 | TM stays within 0-100; after acting it is 0 or the kept meter (max 99); a dead unit has TM 0 | code; tests on reset and `selfTm` |
 | INV-C4 | A status appears at most once per unit; reapplying keeps the longer duration and the larger shield | code (`addStatus`); no test |
 | INV-C5 | Durations count the holder's own turns and tick at its turn end, also on a skipped turn | code in both turn loops; test on Freeze |
-| INV-C6 | A skill with cooldown N is unavailable for the holder's next N turns | code; test on Shield Bash |
+| INV-C6 | A skill with cooldown N is unavailable for the holder's next N turns | code; test (a synthetic A2 on cooldown 3) |
 | INV-C7 | Single-target enemy skills must target a taunter while one lives; AoE and counterattacks ignore Taunt | code; test (Taunt vs single and AoE; the counter case is untested) |
 | INV-C8 | Every hit deals at least 1; shields absorb before HP, except Poison and Burn | code; tests on shields and ticks |
 | INV-C9 | Heal Block stops every heal (skills, Regen, lifesteal) and says so | code; test for skill heals only |
@@ -369,11 +385,12 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-K8 | Every faction, affinity, role and rarity has its UI part (`emblem_`, `gem_`, `role_`, `card_`) | convention: screens throw on a missing part (R-6) |
 | INV-K9 | Every A1 targets a single enemy, because counterattacks answer with A1 | convention, true today (R-6) |
 | INV-K10 | Effect names are unique across effect modules (a later module would silently override an earlier one) | convention, true today: 63 names (R-6) |
-| INV-K11 | Every faction has a deliberate home zone | convention: `homeZone()` falls back to Frostfang (DR-12) |
+| INV-K11 | Every faction has a deliberate home zone | convention: `homeZone()` returns the first zone for every faction until zones belong to factions (DR-12) |
 | INV-K12 | Numbers in skill descriptions equal the data | convention, true today for all 39 skills (R-1) |
 | INV-K13 | Numbers in the Academy, its figures and the stat tips equal the rules | test for the turn-meter numbers it quotes; the rest by convention (DR-5, R-1) |
 | INV-K14 | Definitions do not change at runtime | convention: objects are not frozen |
-| INV-K15 | The interface ramps repeat the category colours: `UIR.rarity` and `UIR.affinity` base entries and `UIR.faction` glyphs (`palette.ts`) equal the colours in `meta.ts` | convention, true today for all 16 (R-6) |
+| INV-K15 | The interface ramps repeat the category colours: `UIR.rarity` and `UIR.affinity` base entries (`palette.ts`) equal the colours in `meta.ts`; faction medallions follow the standards instead (the Azure Crown's crown is gold on its blue field) | convention, true today for all 7 (R-6) |
+| INV-K16 | Jakub's locked decisions hold: the four enums and their order, the affinity cycle, the factions' names, the two starting champions' rarity, role, faction and affinity, the second joining after the first battle, a ten-stage first zone | test ("design decisions" in `tests/content.test.ts`); a change there is a change to his design |
 
 ### 6.3 Campaign and progression
 
@@ -382,12 +399,13 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-P1 | Stage ids are unique; 1-3 enemies, all known champions; zones known; map positions inside the world, clear of its frame | test |
 | INV-P9 | The world map and its overview have the sizes `WORLD_MAP` declares | test |
 | INV-P2 | Every location ends on a boss stage; `requires` names an existing stage | test |
-| INV-P3 | Every non-starter is recruited by exactly one stage, and only where it is fought | test |
+| INV-P3 | Every non-starter is brought by exactly one stage; it need not be among that stage's enemies | test |
 | INV-P4 | A stage opens when its location is open and the previous stage there is cleared | test (save); the battle route does not check it (DR-11) |
 | INV-P5 | A recruit happens on the first clear only, and only if not owned; stars only go up | test |
 | INV-P6 | Every champion and stage id in the save exists in the catalog | test: loading drops unknown ids (`readSave`) |
 | INV-P7 | A team holds 1-3 different owned champions | the team screen only |
-| INV-P8 | The save has version 2 under `tlrol.save.v2`; a version 1 save is migrated once and left in place; missing fields take defaults; another version starts a new game | test |
+| INV-P8 | The save has version 3 under `tlrol.save.v3`; an older save (version 2 under `tlrol.save.v2`, version 1 under `oathbound.profile.v1`) gives only its settings and Academy reading to a new game, once, and is left in place; missing fields take defaults; another version starts a new game | test |
+| INV-P10 | Every cleared stage's champion has its soul file (a save survives a stage that changes what it brings) | test (`readSave`) |
 
 ### 6.4 Presentation and art
 
@@ -429,7 +447,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | Status rules | apply, refresh, resist, tick, expire | `tryApply`, `addStatus`, `endTurn` |
 | Cooldowns | when a skill is ready | `useSkill`, `endTurn`, `ready` |
 | Death and passives | death, Undying, Overdrive | `Battle.applyDamage` |
-| AI | skill and target | `ai.ts`: highest `ai.priority` ready skill (Serenity's 4 puts healing above the A3 when an ally is hurt); `allyHurt` below 70% HP or with a debuff; control aims at the uncontrolled with the highest ATK; dispel at the most buffed; otherwise 70% lowest HP%, 30% random |
+| AI | skill and target | `ai.ts`: highest `ai.priority` ready skill (a heal with priority 4 and `allyHurt` goes before the A3 when an ally is hurt); `allyHurt` below 70% HP or with a debuff; control aims at the uncontrolled with the highest ATK; dispel at the most buffed; otherwise 70% lowest HP%, 30% random |
 | Stars | 3 / 2 / 1 | `starsFor` |
 | Unlocks | open stages and locations | `stageOpen`, `locationOpen`, `frontier` |
 | Rewards | recruit on first clear | `recordClear`, `Reliquary.recruit` |
@@ -481,7 +499,7 @@ The project skills cover the two most common changes. The others touch several c
 | New skill field (a mechanic) | `SkillDef` with a doc comment → its place in the resolution order (4.1) and its events → presentation → norms (does it count toward a budget?) → AI (does `decide` need to understand it?) → test → Academy → MECHANICS_GUIDE 4.1 and 8 | test, balance re-baseline |
 | New passive kind | `PassiveDef.kind` → the rule (in `applyDamage` or a new hook) with a once-flag on `Unit`, reset in `BattleScene.demo` → an event (make `passive` carry its kind, DR-14) → a required animation in the content test (like `rise`) → Academy → tests: fires once, lethal hits, ticks, Undying interplay | test, balance |
 | New event kind | the `BattleEvent` union → its place in the order (section 5) → a case in `applyEvent` (and in `playTicks` for start-of-turn events) → MECHANICS_GUIDE 12, section 5 here | test, captures |
-| New stage or location | `campaign.ts` (enemies in formation order, `recruit` among them, map position in `WORLD_MAP` pixels) → `npm run art -- map` (check the world and the overview) → tune `power` with `npm run balance` → [MDA.md](MDA.md) ME4 lean and DY9 shape → GAME_STRUCTURE 3 | test, balance |
+| New stage or location | `campaign.ts` (enemies in formation order, the champion its first clear brings, map position in `WORLD_MAP` pixels) → `npm run art -- map` (check the world and the overview) → tune `power` with `npm run balance` → [MDA.md](MDA.md) ME4 lean and DY9 shape → GAME_STRUCTURE 3 | test, balance |
 | New faction | `FactionId`, `FACTIONS` → `UIR.faction` ramp and `emblem()` (`tools/art/ui/menu.ts`), `npm run art -- ui` → `homeZone()` → the Academy `champions` chapter (it names every faction) → the champion template and worksheet lists → ART_GUIDE 2.4 | test, audit |
 | A rule constant | the constant → every copy listed in [MDA.md](MDA.md) ME1 → tests that assert the number → balance, and stage `power` re-tuned if the curve moved → [MDA.md](MDA.md) section 6 | test, balance |
 | Rename an id | data and art modules and registries → `npm run art` → stages, `STARTERS`, tests, docs, URLs → a rename in `readSave` for stored ids (champion, stage); without one, loading drops the old id and its progress → special cases keyed by id in `scene.ts` | test, audit, typecheck |
@@ -496,17 +514,17 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | ID | Severity | Where | What | Fix |
 | --- | --- | --- | --- | --- |
 | DR-1 | medium | `src/game/data/codex.ts` (Special Mechanics) | the Academy says Resonance drains 10% turn meter; the data (`starsinger.ts`) and MECHANICS_GUIDE say 15% | closed 2026-10-07: the text says 15%, and a content test compares every turn-meter number the Academy quotes with the skill (the first piece of R-1) |
-| DR-2 | medium | `tests/battle.test.ts` | "runs every champion through battles" lists 10 champions by hand: Imara, Kwesi and Mwamba never run | iterate `CHAMPIONS` |
+| DR-2 | medium | `tests/battle.test.ts` | "runs every champion through battles" lists 10 champions by hand: Imara, Kwesi and Mwamba never run | closed 2026-10-10: the test iterates `CHAMPIONS`, and every rule test runs on synthetic champions (`tests/fixtures.ts`), so the rules stay proven whatever the roster |
 | DR-3 | medium | `tools/art/build.ts`, `tools/art/fx/kit.ts`, `tools/art/zones/shared.ts`, `tools/art/ui/index.ts`, `tools/art/font.ts` vs `src/game/view/assets.ts`, `src/engine/font.ts` | `ChampionAtlasJson`, `FxJson`, `ZoneJson` with `PropKind`, `UiJson` and `FontJson` are each declared twice, producer and consumer | R-4 |
 | DR-4 | medium | `src/game/battle/sim.ts`, `src/game/view/scene.ts` | the turn structure is written twice; the balance numbers come from one copy, play from the other | R-7 |
 | DR-5 | low | `statuses.ts`, `codex.ts`, `screens/academy.ts`, `screens/champion.ts` | rule numbers restated by hand: status texts, the Academy damage figure (4.8, ±20%, x1.25, x1.5, 0.92-1.08), the turn-meter figure's SPD values, the stat tips, the list of factions | R-1, R-8 |
-| DR-6 | low | `.claude/skills/new-champion/templates/` | worksheet and data template list factions without `nyota`; the worksheet says only `undying` exists as a passive (`overdrive` does too) | update the lists |
+| DR-6 | low | `.claude/skills/new-champion/templates/` | worksheet and data template list factions without `nyota`; the worksheet says only `undying` exists as a passive (`overdrive` does too) | closed 2026-10-10: the lists name today's categories and both passives |
 | DR-7 | low | `.claude/skills/new-combat-background/templates/worksheet.md` | ambient options list `snow` and `sand`, not `motes` | update the list |
 | DR-8 | low | `src/game/data/statuses.ts` | the header points to `tools/art/ui.ts STATUS`; icons live in `tools/art/ui/status.ts` | fix the comment |
 | DR-9 | low | `tools/review.sh` | passes `seed=` and `target=` in the URL; the game reads neither (demos use seed 7 and the first target) | read them in `main.ts`, or drop them |
 | DR-10 | low | CLAUDE.md, `tools/balance.ts` | "numbers stay inside norms.ts", but the impact and curve bands live in the balance tool and the rule constants in `battle.ts` | state the rule precisely, or move the bands into `norms.ts` |
 | DR-11 | low | `src/game/screens/battle.ts`, `src/main.ts` | the battle route checks neither stage access nor ownership: deep links can record clears out of order | intended for screenshots; R-13 if progress ever carries value |
-| DR-12 | low | `src/game/data/zones.ts` | `homeZone()` maps factions in code; a new faction silently gets Frostfang | R-6 |
+| DR-12 | low | `src/game/data/zones.ts` | `homeZone()` maps factions in code; a new faction silently gets Frostfang. Since 2026-10-10 it returns the first zone for every faction (one zone exists) | R-6 |
 | DR-13 | low | `src/game/view/scene.ts` | choreography keyed by id: the Arrow Rain volley, projectile trails as hex literals, arcs, slow projectiles, `crack` / `holy` / `ice_spikes`, the `ADDITIVE` list; each new projectile or light effect needs a code edit | R-9 |
 | DR-14 | low | `src/game/view/scene.ts` | `applyEvent` is not exhaustive: a new event kind compiles and shows nothing; `passive` always reads `OVERDRIVE!` whatever the passive | R-5 |
 | DR-15 | low | `src/game/profile.ts` (now `archivist.ts`), screens | profile fields are written from several screens and stored ids are never validated: a renamed champion makes `champion()` throw on load | R-10, R-11; in part 2026-10-08: loading drops unknown ids, and the NEW badge goes through `Reliquary.markSeen` |
@@ -515,7 +533,9 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | DR-18 | low | `tools/balance.ts` | re-implements the mulberry32 generator instead of using `Rng` | import `Rng` |
 | DR-19 | trivial | `src/main.ts` | `?? STARTERS.join(',')` is unreachable (`join` never returns nullish) | simplify |
 | DR-20 | trivial | MECHANICS_GUIDE 2 | says the actor's meter resets to `selfTm`; the code caps it at 99 | add "(at most 99)" |
-| DR-21 | medium | `src/main.ts`, `src/game/screens/academy.ts`, `src/game/screens/options.ts` | placeholder content is named in engine code: the deep-link defaults (`knight`, `monk`), the Academy demo cast and figures (`knight`, `monk`, `frostmage`, `tomblord`), the default zone `frostfang`; replacing the content breaks them | derive them from the data (first champion, first zone, the skill's owner) before the content changes; R-6, R-9 |
+| DR-21 | medium | `src/main.ts`, `src/game/screens/academy.ts`, `src/game/screens/options.ts` | placeholder content is named in engine code: the deep-link defaults (`knight`, `monk`), the Academy demo cast and figures (`knight`, `monk`, `frostmage`, `tomblord`), the default zone `frostfang`; replacing the content breaks them | closed 2026-10-10: the defaults, the turn-meter racers, the skills figure and the dioramas come from the data (first and last champion, first zone); the demo line-up repeats a small roster |
+| DR-26 | low | `src/game/data/campaign.ts` | Zone 1's enemies are copies of the two champions the player owns (stand-ins for the warriors of both worlds), so every stage is a near mirror match and the balance curve has one team per stage | design the enemies of Zone 1 (Jakub) |
+| DR-27 | low | `tools/art/fx/`, `tools/art/palette.ts` | the effect groups are named after the proof of concept's zones (`sunscar.ts`, `nyota.ts`) and hold effects no champion uses any more; 28 of the 52 `MAT` materials (skin tones, metals, glows, `jackal`) are used by no module today | regroup by use when the kits are designed; keep the materials as a library, renaming the champion-named ones when they are next used |
 | DR-22 | medium | `src/game/battle/battle.ts` (`speed`, `attack`, `defense`) | status sizes (ATK Up/Down 25%, DEF Up 40%, DEF Down 30%, SPD Up/Down 25%) live in rule code instead of `StatusDef`; the status texts restate them | R-8: sizes as status data, texts built from them |
 | DR-23 | low | `src/game/profile.ts` (now `archivist.ts`) | the save key `oathbound.profile.v1` carries the placeholder name; renaming the game, or a champion (DR-15), loses or breaks saves | closed 2026-10-08: the name is final and the save moved to `tlrol.save.v2`; a version 1 save is migrated once |
 | DR-24 | low | `src/game/view/fx.ts` (`FxLayer.text`) | floating battle words stack by count, not by size: `RESIST` and `CRITICAL` can print over a damage number (seen with critical hits and resisted debuffs) | stack by each text's height, or give words and numbers their own lanes |

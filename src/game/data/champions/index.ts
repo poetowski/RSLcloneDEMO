@@ -1,22 +1,13 @@
 // Champion registry. Adding a champion = one data module here + one art module
-// in tools/art/champions/ (see .claude/skills/new-champion).
+// in tools/art/champions/ (see .claude/skills/new-champion). The roster is
+// Jakub's (docs/DESIGN_DECISIONS.md section 4): the starter and the second
+// champion; everything else waits for his design.
 import { ChampionDef } from '../types';
-import { archer } from './archer';
-import { colossus } from './colossus';
-import { dreadknight } from './dreadknight';
-import { frostmage } from './frostmage';
-import { jackal } from './jackal';
-import { knight } from './knight';
-import { monk } from './monk';
-import { priestess } from './priestess';
-import { starsinger } from './starsinger';
-import { stalker } from './stalker';
-import { sunspear } from './sunspear';
-import { tomblord } from './tomblord';
-import { warrior } from './warrior';
+import { azureWarrior } from './azure_warrior';
+import { sanguineSupport } from './sanguine_support';
 
-/** Collection order: by faction, then the order champions are met in the campaign. */
-export const CHAMPIONS: ChampionDef[] = [knight, warrior, archer, monk, frostmage, dreadknight, stalker, jackal, priestess, tomblord, sunspear, starsinger, colossus];
+/** Collection order: the order champions join. */
+export const CHAMPIONS: ChampionDef[] = [azureWarrior, sanguineSupport];
 
 const byId = new Map(CHAMPIONS.map((c) => [c.id, c]));
 
@@ -26,4 +17,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { archer, colossus, dreadknight, frostmage, jackal, knight, monk, priestess, stalker, starsinger, sunspear, tomblord, warrior };
+export { azureWarrior, sanguineSupport };

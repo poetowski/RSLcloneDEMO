@@ -82,7 +82,7 @@ export function allParts(): Record<string, Bitmap> {
     divider: divider(),
   };
   for (const [r, ramp] of Object.entries(UIR.rarity)) parts['card_' + r] = cardFrame(ramp);
-  for (const a of ['force', 'wild', 'arcane', 'void'] as const) parts['gem_' + a] = gem(a);
+  for (const a of Object.keys(UIR.affinity) as (keyof typeof UIR.affinity)[]) parts['gem_' + a] = gem(a);
   for (const f of Object.keys(UIR.faction) as (keyof typeof UIR.faction)[]) parts['emblem_' + f] = emblem(f);
   for (const r of Object.keys(UIR.role) as (keyof typeof UIR.role)[]) parts['role_' + r] = roleIcon(r);
   for (const k of ['open', 'cleared', 'locked', 'boss'] as const) parts['node_' + k] = mapNode(k);

@@ -117,7 +117,7 @@ export function castMetal(w: number, h: number, strokes: Stroke[], top: number, 
 
 /** An arcane jewel lit from the top-left: a dark rim, a dithered body, one glint. */
 function jewel(b: Bitmap, cx: number, cy: number, r: number) {
-  const J = UIR.affinity.arcane;
+  const J = UIR.arcane;
   for (let y = Math.floor(cy - r - 1); y <= Math.ceil(cy + r + 1); y++) for (let x = Math.floor(cx - r - 1); x <= Math.ceil(cx + r + 1); x++) {
     const dx = x + 0.5 - cx, dy = y + 0.5 - cy;
     const d = Math.hypot(dx, dy);
@@ -267,55 +267,59 @@ function litFill(ramp: RGBA[], cx: number, cy: number, r: number, bias = 0) {
 }
 
 /** Affinity gems (11x11): a distinct cut per affinity so color is never the only cue. */
-export function gem(aff: 'force' | 'wild' | 'arcane' | 'void'): Bitmap {
+/** Affinity gem (11x11): a cut stone in the affinity's ramp, lit from the top-left. */
+export function gem(aff: keyof typeof UIR.affinity): Bitmap {
   const b = new Bitmap(11, 11);
   const r = UIR.affinity[aff];
   const c = 5.5;
-  if (aff === 'force') {
+  if (aff === 'ember') {
     polyFill(b, [[5.5, 0.6], [10.4, 5.5], [5.5, 10.4], [0.6, 5.5]], litFill(r, c, c, 5));
     polyFill(b, [[5.5, 2.4], [8.6, 5.5], [5.5, 8.6], [2.4, 5.5]], litFill(r, c, c, 5, 0.6));
-  } else if (aff === 'wild') {
+  } else if (aff === 'bloom') {
     polyFill(b, [[9.8, 0.8], [10, 5], [7.6, 8.6], [3.6, 10.2], [1, 9.6], [1.2, 6], [3.6, 2.8], [6.8, 1.2]], litFill(r, c, c, 5));
     for (let k = 0; k < 7; k++) b.set(2 + k, 9 - k, r[1]);
-  } else if (aff === 'arcane') {
+  } else {
     ellipseFill(b, c, c, 5, 5, (x, y) => litFill(r, c, c, 5)(x, y));
     for (const [x, y] of [[5, 2], [5, 3], [5, 7], [5, 8], [2, 5], [3, 5], [7, 5], [8, 5], [5, 5], [4, 4], [6, 6], [4, 6], [6, 4]]) b.set(x, y, r[4]);
-  } else {
-    polyFill(b, [[3, 0.8], [8, 0.8], [10.4, 5.5], [8, 10.2], [3, 10.2], [0.6, 5.5]], litFill(r, c, c, 5));
-    ellipseFill(b, c, c, 2.4, 2.4, () => r[0]);
-    b.set(5, 5, r[3]);
   }
   b.set(3, 3, r[4]);
   return outline(b, r[0]);
 }
 
-const EMBLEMS: Record<string, string[]> = {
-  dawn: ['...#...', '.#.#.#.', '..###..', '#######', '..###..', '.#.#.#.', '...#...'],
-  clans: ['.##.#..', '####.#.', '#####..', '####.#.', '.##.#..', '....#..', '....#..'],
-  wildwood: ['.....##', '...####', '..#####', '.####.#', '.###.##', '.#.###.', '#......'],
-  coven: ['...#...', '.#.#.#.', '..###..', '#######', '..###..', '.#.#.#.', '...#...'],
-  temple: ['...#...', '..###..', '#.###.#', '##.#.##', '###.###', '.#####.', '..###..'],
-  sunscar: ['..###..', '.#...#.', '.#...#.', '..###..', '#######', '...#...', '...#...'],
-  nyota: ['...#...', '...#...', '..###..', '#######', '..###..', '...#...', '...#...'],
+/**
+ * The charges on the faction medallions, after the standards: '#' the glyph
+ * colour, 'l' its lit edge, 's' its shaded edge. A 7-row glyph sits at (4,4),
+ * a 9-row one at (3,3).
+ */
+const EMBLEMS: Record<keyof typeof UIR.faction, string[]> = {
+  azure_crown: ['.......', '#..#..#', '##.#.##', '#######', '#######', '.......', '#######'],
+  sanguine_dominion: ['.......', '..###..', '.#####.', '#######', '.#####.', '..###..', '.......'],
+  // a talon: thick at its root, curving down to a point
+  court_of_root: ['..lll##..', '...ll##s.', '....l##s.', '....l##s.', '...l##s..', '..l##s...', '.l##s....', '.l#s.....', 'l........'],
+  // one bone laid across
+  ashveil_reign: ['.......', '.......', '##...##', '.#####.', '##...##', '.......', '.......'],
 };
 
-/** Faction medallion (15x15): gold rim, field color, glyph. */
+/** Faction medallion (15x15): gold rim, field color, the standard's charge. */
 export function emblem(faction: keyof typeof UIR.faction): Bitmap {
   const b = new Bitmap(15, 15);
-  const [field, glyph] = UIR.faction[faction];
+  const [field, glyph, lit = glyph, shade = glyph] = UIR.faction[faction];
   ellipseFill(b, 7.5, 7.5, 7, 7, (x, y, d) => (d > 0.8 ? rampDither(G, 3.4 - (x + y - 14) / 9, x, y) : field));
-  // the coven's flake has a crescent moon behind it to set it apart from dawn's sun
-  if (faction === 'coven') ellipseRing(b, 7.5, 7.5, 4.6, 4.6, 1, (x, y, a) => (a > 0.6 && a < 2.6 ? UIR.navy[2] : 0));
-  mask(b, 4, 4, EMBLEMS[faction], glyph);
+  const rows = EMBLEMS[faction];
+  const o = rows.length === 9 ? 3 : 4;
+  rows.forEach((row, yy) =>
+    [...row].forEach((ch, xx) => {
+      const c = ch === '#' ? glyph : ch === 'l' ? lit : ch === 's' ? shade : 0;
+      if (c) b.set(o + xx, o + yy, c);
+    }),
+  );
   return outline(b, G[0]);
 }
 
-const ROLES: Record<string, string[]> = {
+const ROLES: Record<keyof typeof UIR.role, string[]> = {
   Tank: ['#######', '#######', '#######', '#######', '.#####.', '..###..', '...#...'],
-  Bruiser: ['###.###', '#######', '###.###', '...#...', '...#...', '...#...', '...#...'],
   Damage: ['......#', '.....##', '....##.', '#..##..', '.###...', '..##...', '.#..#..'],
   Support: ['..###..', '..###..', '#######', '#######', '#######', '..###..', '..###..'],
-  Control: ['.#####.', '#.....#', '#.###.#', '#.#.#.#', '#.#...#', '#..###.', '.#.....'],
 };
 
 /** Role glyph (9x9) in the role color with a dark outline. */
@@ -361,15 +365,15 @@ export function crown(): Bitmap {
   const b = new Bitmap(13, 10);
   polyFill(b, [[0.5, 9], [0.5, 2.5], [3.5, 5.5], [6.5, 0.6], [9.5, 5.5], [12.5, 2.5], [12.5, 9]], litFill(G, 6.5, 5, 6, 0.3));
   for (let x = 1; x < 12; x++) b.set(x, 8, G[1]);
-  b.set(6, 5, UIR.affinity.force[3]);
-  b.set(3, 7, UIR.affinity.arcane[3]);
-  b.set(9, 7, UIR.affinity.wild[3]);
+  b.set(6, 5, UIR.affinity.ember[3]);
+  b.set(3, 7, UIR.affinity.tide[3]);
+  b.set(9, 7, UIR.affinity.bloom[3]);
   return outline(b, G[0]);
 }
 
 export function check(): Bitmap {
   const b = new Bitmap(9, 8);
-  mask(b, 0, 0, ['.......#', '......##', '.....##.', '#...##..', '##.##...', '.###....', '..#.....'], UIR.affinity.wild[4]);
+  mask(b, 0, 0, ['.......#', '......##', '.....##.', '#...##..', '##.##...', '.###....', '..#.....'], UIR.affinity.bloom[4]);
   return outline(b, DARK);
 }
 

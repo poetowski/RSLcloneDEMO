@@ -10,6 +10,7 @@ import { Block, Chapter, chapter, CHAPTERS, FigureId } from '../data/codex';
 import { AFFINITIES, RARITIES, ROLES } from '../data/meta';
 import { STATUSES } from '../data/statuses';
 import { Affinity, Role } from '../data/types';
+import { ZONES } from '../data/zones';
 import { COLORS } from '../ui/ui';
 import { blit, nine } from '../view/assets';
 import { BaseScreen, Diorama } from './base';
@@ -23,7 +24,7 @@ export class AcademyScreen extends BaseScreen {
   constructor(app: App, id?: string) {
     super(app);
     this.ch = id ? chapter(id) : (CHAPTERS.find((c) => !this.archivist.read.includes(c.id)) ?? CHAPTERS[0]);
-    this.diorama = new Diorama(app, 'frostfang');
+    this.diorama = new Diorama(app, ZONES[0].id);
     this.markRead();
     this.ui.focusId = 'ch_' + this.ch.id;
   }
@@ -191,7 +192,9 @@ export class AcademyScreen extends BaseScreen {
             ctx.fillRect(tx0 + i, ty, 1, 2);
           }
           ui.blit(ctx, 'chevron_gold', tx1 - 5, ty - 11);
-          const racers: [string, number][] = [['knight', 100], ['monk', 116], ['frostmage', 108], ['tomblord', 96]];
+          // four racers, allies above and enemies below; a small roster races on both sides
+          const n = CHAMPIONS.length;
+          const racers: [string, number][] = [0, 1, 2, 3].map((i) => CHAMPIONS[n >= 4 ? i : Math.floor((i * n) / 4)]).map((c) => [c.id, c.stats.spd]);
           racers.forEach(([cid, spd], i) => {
             const k = ((this.t * spd) / 400000 + i * 0.23) % 1;
             const cx = Math.round(tx0 + k * (tx1 - tx0));
@@ -211,7 +214,7 @@ export class AcademyScreen extends BaseScreen {
       }
       case 'skills': {
         if (ctx) {
-          const k = champion('knight');
+          const k = CHAMPIONS[0];
           k.skills.forEach((s, i) => {
             const sx = x + i * Math.floor(w / 3);
             const r = a.ui.json.icons[s.id];
@@ -245,11 +248,10 @@ export class AcademyScreen extends BaseScreen {
       case 'affinity': {
         if (ctx) {
           const cx = x + 90, cy = y + 50, r = 34;
-          const pos: Record<Exclude<Affinity, 'void'>, [number, number]> = {
-            force: [cx, cy - r],
-            wild: [cx + r * 0.95, cy + r * 0.6],
-            arcane: [cx - r * 0.95, cy + r * 0.6],
-          };
+          // the cycle clockwise from the top: each affinity's arrow points at the one it beats
+          const ids = Object.keys(AFFINITIES) as Affinity[];
+          const spots: [number, number][] = [[cx, cy - r], [cx + r * 0.95, cy + r * 0.6], [cx - r * 0.95, cy + r * 0.6]];
+          const pos = Object.fromEntries(ids.map((id, i) => [id, spots[i]])) as Record<Affinity, [number, number]>;
           const arrow = (from: [number, number], to: [number, number], color: string) => {
             const dx = to[0] - from[0], dy = to[1] - from[1], l = Math.hypot(dx, dy);
             const ux = dx / l, uy = dy / l;
@@ -260,20 +262,13 @@ export class AcademyScreen extends BaseScreen {
               for (let k = 0; k < 5; k++) ctx.fillRect(Math.round(a1[0] - ux * k + -uy * side * k * 0.8), Math.round(a1[1] - uy * k + ux * side * k * 0.8), 2, 2);
             }
           };
-          arrow(pos.force, pos.wild, AFFINITIES.force.color);
-          arrow(pos.wild, pos.arcane, AFFINITIES.wild.color);
-          arrow(pos.arcane, pos.force, AFFINITIES.arcane.color);
-          for (const [aff, [gx, gy]] of Object.entries(pos) as [Exclude<Affinity, 'void'>, [number, number]][]) {
+          for (const id of ids) arrow(pos[id], pos[AFFINITIES[id].beats], AFFINITIES[id].color);
+          for (const [aff, [gx, gy]] of Object.entries(pos) as [Affinity, [number, number]][]) {
             const g = ui.part('gem_' + aff);
             ctx.drawImage(a.ui.img, g[0], g[1], g[2], g[3], Math.round(gx - g[2]), Math.round(gy - g[3]), g[2] * 2, g[3] * 2);
             ui.text(ctx, AFFINITIES[aff].name.toUpperCase(), gx, gy + 12, { color: AFFINITIES[aff].color, variant: 'bold', align: 'center' });
           }
-          const vx = x + 220, vy = y + 30;
-          const g = ui.part('gem_void');
-          ctx.drawImage(a.ui.img, g[0], g[1], g[2], g[3], vx, vy, g[2] * 2, g[3] * 2);
-          ui.text(ctx, 'VOID', vx + 30, vy + 2, { color: AFFINITIES.void.color, variant: 'bold' });
-          ui.text(ctx, 'outside the cycle', vx + 30, vy + 13, { color: COLORS.dim });
-          ui.text(ctx, 'Arrow = deals strong hits to', vx, vy + 40, { color: COLORS.faint });
+          ui.text(ctx, 'Arrow = deals strong hits to', x + 160, y + 46, { color: COLORS.faint });
         }
         return 100;
       }

@@ -36,10 +36,12 @@ export type TargetKind = 'enemy' | 'enemies' | 'ally' | 'allies' | 'self';
  */
 export type Approach = 'melee' | 'ranged' | 'center' | 'leap' | 'blink' | 'none';
 
-export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-export type Affinity = 'force' | 'arcane' | 'wild' | 'void';
-export type Role = 'Tank' | 'Bruiser' | 'Damage' | 'Support' | 'Control';
-export type FactionId = 'dawn' | 'clans' | 'wildwood' | 'coven' | 'temple' | 'sunscar' | 'nyota';
+// The four category enums are Jakub's (docs/DESIGN_DECISIONS.md section 2):
+// independent axes, fixed per champion when it is authored.
+export type Rarity = 'common' | 'elite' | 'heroic' | 'mythic';
+export type Affinity = 'ember' | 'bloom' | 'tide';
+export type Role = 'Tank' | 'Damage' | 'Support';
+export type FactionId = 'azure_crown' | 'sanguine_dominion' | 'court_of_root' | 'ashveil_reign';
 
 export interface StatusApp {
   status: StatusId;
@@ -164,7 +166,7 @@ export interface AffinityDef {
   name: string;
   color: string;
   /** the affinity this one deals strong hits against */
-  beats?: Affinity;
+  beats: Affinity;
   desc: string;
 }
 
@@ -173,6 +175,8 @@ export interface FactionDef {
   name: string;
   color: string;
   desc: string;
+  /** the faction's standard as designed, or undefined while it is not */
+  standard?: string;
 }
 
 export interface RoleDef {

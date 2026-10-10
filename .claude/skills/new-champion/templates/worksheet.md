@@ -8,11 +8,11 @@ Fill this in before writing code, and show it to the user when they are around: 
 | --- | --- | --- |
 | id | | lowercase, one word, unique (`src/game/data/champions/index.ts`) |
 | Name, title | | "Name" + "the Title"; name fits on a 112 px card (about 14 characters) |
-| Faction | | `dawn, clans, wildwood, coven, temple, sunscar` (`meta.ts`); decides the home background |
-| Role | | Tank, Bruiser, Damage, Support, Control |
-| Rarity | | sets the stat budget: rare 425, epic 440, legendary 455 |
-| Affinity | | Force > Wild > Arcane > Force, Void neutral; check the matchups of the stage that recruits them |
-| Recruited by | | an existing or new stage where this champion is one of the enemies |
+| Faction | | Azure Crown, Sanguine Dominion, Court of Root, Ashveil Reign (`meta.ts`; DESIGN_DECISIONS.md 3) |
+| Role | | Tank, Damage, Support; tags such as bruiser or control describe the kit |
+| Rarity | | Common, Elite, Heroic, Mythic; sets the stat budget: 390, 425, 440, 455 |
+| Affinity | | Ember > Bloom > Tide > Ember; independent of the faction; check the matchups of the stage that brings them |
+| Joins by | | starter, or the stage whose first clear brings them (fought there or not) |
 
 ## Look
 
@@ -23,7 +23,7 @@ Fill this in before writing code, and show it to the user when they are around: 
 | Materials | | from `MAT` in `tools/art/palette.ts`; a new ramp only if nothing fits (6 steps, hue-shifted) |
 | Weapon / focus | | a function in the art module, reused by the icons |
 | Height | | 66-80 px body, audit range 64-96 |
-| Closest existing champion | | the art module to start from (sword: knight, two-hander: dreadknight, polearm: jackal, dual blades: stalker, bow: archer, staff caster: frostmage / priestess, unarmed: monk) |
+| Closest existing champion | | the art module to start from: two bearded axes `azure_warrior`, staff caster `sanguine_support`; the proof of concept's modules are in git history at tag `poc-v1` (`tools/art/champions/`: sword `knight`, two-hander `dreadknight`, polearm `jackal` or `sunspear`, dual blades `stalker`, bow `archer`, staff casters `frostmage` and `starsinger`, unarmed `monk` and `colossus`, a mummy king `tomblord`) |
 
 ## Kit
 
@@ -32,7 +32,7 @@ Fill this in before writing code, and show it to the user when they are around: 
 | A1 (CD 0) | | | total 0.9-1.25 (AoE 0.5-0.8) | chance-based debuff at most | `attack1` | |
 | A2 (CD 3) | | | total 1.1-1.6 (AoE 0.5-1.1) | | | |
 | A3 (CD 4-5) | | | total 1.3-2.6 (AoE 0.7-1.2) | the only slot that may guarantee a 1-turn Stun/Freeze | | |
-| Passive | | | | `undying` exists; a new kind needs rules, tests and an Academy entry | | |
+| Passive | | | | `undying` and `overdrive` exist; a new kind needs rules, tests and an Academy entry | | |
 
 Stats (HP / ATK / DEF / SPD / CRIT): ______ ; statScore = HP/12 + ATK x 1.1 + (DEF - 40) x 2.25 + SPD x 1.3 + CRIT x 300 = ______ (within 5% of the budget).
 

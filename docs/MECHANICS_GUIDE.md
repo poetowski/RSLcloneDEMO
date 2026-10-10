@@ -120,7 +120,7 @@ ATK x (1 +/- 0.25) with ATK Up / ATK Down;  DEF x 1.16 with DEF Up, x 0.88 with 
 
 ## 6. Affinities
 
-Force beats Wild, Wild beats Arcane, Arcane beats Force; **Void** stands outside the cycle and never deals or takes strong or weak hits. Strong hit +20% (`STRONG HIT`), weak hit -20% (`WEAK HIT`). Team select counts each champion's strong (+) and weak (-) matchups against the stage.
+Three affinities in a cycle (Jakub's, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 2.1): **Ember** beats **Bloom**, Bloom beats **Tide**, Tide beats Ember. There is no Void; it is reserved as a possible later neutral affinity. What beating does (damage, crit, landing chance, or all three) is not decided: until it is, the proof of concept's rule stands, a strong hit +20% (`STRONG HIT`) and a weak hit -20% (`WEAK HIT`). Team select counts each champion's strong (+) and weak (-) matchups against the stage.
 
 ## 7. Status effects (`src/game/data/statuses.ts`)
 
@@ -156,29 +156,20 @@ Force beats Wild, Wild beats Arcane, Arcane beats Force; **Void** stands outside
 | Cleanse | removes one debuff from each ally |
 | Lifesteal | heals the actor for a fraction of damage dealt (blocked by Heal Block) |
 | Execute | `mult` bonus against targets below `below` x max HP |
-| Turn Meter boost | `tmAllies` adds to every other ally's turn meter on the last hit (Rhythm of the March: +20%); `tmTargets` drains enemies (Arrow Rain -15%, Resonance -15%) |
-| Undying (passive) | the first lethal hit leaves the champion at `value` x max HP with every debuff removed (Anhotep: 25%) |
-| Overdrive (passive) | the first time a hit leaves the champion alive below `value` x max HP, it gains the passive's `statuses` (Mwamba: below 50%, ATK Up + DEF Up 2t); a lethal hit never triggers it. Shows as a `passive` event: banner, core-flare, `OVERDRIVE!` |
+| Turn Meter boost | `tmAllies` adds to every other ally's turn meter on the last hit; `tmTargets` drains enemies |
+| Undying (passive) | the first lethal hit leaves the champion at `value` x max HP with every debuff removed |
+| Overdrive (passive) | the first time a hit leaves the champion alive below `value` x max HP, it gains the passive's `statuses`; a lethal hit never triggers it. Shows as a `passive` event: banner, core-flare, `OVERDRIVE!` |
+
+No champion of today's roster uses turn meter boosts, Counterattack, control, Undying or Overdrive; the rules stay in the engine and are proven by the rule tests on synthetic champions (`tests/fixtures.ts`).
 
 ## 9. Champion kits
 
+The two champions' kits are not designed yet ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 7). The proof of concept's berserker and sun priestess stand in, with their mechanics unchanged and their skills renamed plainly:
+
 | Champion | A1 | A2 (CD 3) | A3 (CD 4) |
 | --- | --- | --- | --- |
-| **Sir Aldric**, Tank, Arcane | Valiant Strike 1.0, 35% DEF Down 2t | Shield Bash 1.3, 75% Stun 1t | Aegis Oath: allies Shield 20% + DEF Up 2t, self Taunt 2t |
-| **Brakka**, Damage, Force | Rending Chop 2 x 0.6 | Whirlwind: all, 2 x 0.5 | Skullsplitter (leap) 2.2, x1.5 below 50%, DEF Down 2t |
-| **Sylwen**, Damage, Wild | Swift Shot 1.05 | Venom Arrow 1.1, Poison 3t, 50% SPD Down 2t | Arrow Rain: all 0.8, TM -15% |
-| **Master Tenzo**, Support, Wild | Flurry 0.38 + 0.38 + 0.46 | Serenity: heal 18%, cleanse, Regen 2t | Dragon Kick (leap) 1.9, 60% Stun 1t |
-| **Ysolde**, Control, Arcane | Ice Shard 1.0, 30% SPD Down 2t | Blizzard: all 0.75, 50% SPD Down 2t | Glacial Prison 1.5, Freeze 1t |
-| **Vorhaal**, Bruiser, Void | Cursed Cleave 1.0, 30% ATK Down 2t | Soul Rend 1.45, lifesteal 60% | Dread Sweep: all 1.05, 60% DEF Down 2t |
-| **Akhet**, Damage, Force | Twin Fangs 2 x 0.55, 25% Poison per hit | Scorpion Sting (blink) 1.45, Heal Block + Weaken 2t | Mirage Assault (blink) 4 x 0.5, x1.5 below 40%, ends at 25% TM |
-| **Kha'zir**, Tank, Force | Jackal's Bite 1.0, 30% Weaken 2t | Warden's Vigil: allies Counter 2t, self Taunt 2t | Weighing of Hearts: dispel, 1.8, Weaken 2t |
-| **Nefret**, Support, Arcane | Solar Lance 1.0, 35% Burn 2t | Blessing of Dawn: heal 15%, ATK Up 2t | Wrath of the Sun: all 0.85, Heal Block 2t, 60% Burn 2t |
-| **Anhotep**, Control, Void | Grave Touch 1.0, 40% Poison 2t | Curse of Ages: all 0.6, 40% Weaken + 40% SPD Down 2t | Eternal Tomb 1.3, Stun 1t, Heal Block 2t |
-| **Imara**, Bruiser, Force | Sunspear Flurry 2 x 0.55, 50% self Shield 10% 2t | Spiral of Spears (center): all 2 x 0.45, 40% DEF Down 2t | Sunfall Javelin (ranged) 2.0, Weaken 2t |
-| **Kwesi**, Support, Wild | Resonance (ranged) 1.1, TM -15% | Rhythm of the March: other allies TM +20%, SPD Up 2t, cleanse | Starsong Crescendo: all 1.0, heal allies 15% |
-| **Mwamba**, Tank, Arcane | Gravity Fist 1.05, 30% SPD Down 2t | Magnetic Pull: all 0.6, 50% ATK Down 2t, self Taunt 2t | Starfall Protocol (CD 5): all 1.0, 35% Stun 1t |
-
-Anhotep also has **Undying** (25%); Mwamba has **Overdrive** (below 50%: ATK Up + DEF Up 2t).
+| **Azure Warrior**, Damage, Ember | Strike 2 x 0.6 | Whirlwind: all, 2 x 0.5 | Leaping Blow (leap) 2.2, x1.5 below 50%, DEF Down 2t |
+| **Sanguine Support**, Support, Tide | Bolt (ranged) 1.0, 35% Burn 2t | Mending: heal 15%, ATK Up 2t | Smite: all 0.85, Heal Block 2t, 60% Burn 2t |
 
 ## 10. Difficulty guardrails
 
@@ -186,28 +177,28 @@ Numbers are tuned against explicit norms, not by feel. `src/game/data/norms.ts` 
 
 | Guardrail | Rule |
 | --- | --- |
-| Stat budget | `statScore = HP/12 + ATK x 1.1 + (DEF - 40) x 2.25 + SPD x 1.3 + CRIT x 300` within **5%** of the rarity budget: common 390, uncommon 410, rare 425, epic 440, legendary 455. A passive is paid for from the budget (Anhotep sits at -5%). |
+| Stat budget | `statScore = HP/12 + ATK x 1.1 + (DEF - 40) x 2.25 + SPD x 1.3 + CRIT x 300` within **5%** of the rarity budget: Common 390, Elite 425, Heroic 440, Mythic 455 (the proof of concept's Common, Rare, Epic and Legendary budgets carried over: what rarity gates is not decided). A passive is paid for from the budget. |
 | Stat limits | HP 900-1700, ATK 70-130, DEF 56-80, SPD 90-125, CRIT 2.5-15% |
 | Skill multipliers (sum of hits) | A1 single 0.9-1.25 / AoE 0.5-0.8; A2 1.1-1.6 / 0.5-1.1; A3 1.3-2.6 / 0.7-1.2 |
 | Cooldowns | A1 0, A2 3, A3 4-5 |
 | Statuses | hard control lasts 1 turn and is guaranteed only on an A3; anything else at most 3 turns |
-| Impact | `npm run balance` section 3: random 3v3 teams that include the champion win **40-60%** against random teams (960 battles per champion) |
-| Campaign curve | section 4: every team the player can own at that point, auto-battled 20 times: first stage 85-100%, normal 55-92%, boss 40-80% (humans win more than the AI) |
+| Impact | `npm run balance` section 3: random 3v3 teams that include the champion win **40-60%** against random teams (960 battles per champion). It needs six champions for two teams of three and is skipped below that (today's roster has two) |
+| Campaign curve | section 4: every team the player can own at that point (three champions, or all of them while they own fewer), auto-battled 20 times: first stage 85-100%, normal 55-92%, boss 40-80% (humans win more than the AI) |
 
-Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take `BOSS_HP = 1.6` x HP. The current report:
+Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take `BOSS_HP = 1.6` x HP. In Zone 1 the player owns at most the two champions, so every stage has one team; its powers were chosen against 300 battles each for a smooth decline, and the report's 20-battle sample checks them:
 
-| Stage | Power | Avg win | Band |
-| --- | --- | --- | --- |
-| 1-1 The Frozen Gate | 0.85 | 100% | first |
-| 1-2 Hall of Icicles | 0.92 | 80% | normal |
-| 1-3 Throne of the Dread Knight | 0.95 | 62% | boss |
-| 2-1 Dunes of Ash | 1.35 | 87% | normal |
-| 2-2 The Sunken Colonnade | 0.88 | 75% | normal |
-| 2-3 Temple of the Burning Sun | 0.90 | 71% | normal |
-| 2-4 Tomb of Anhotep | 0.80 | 68% | boss |
-| 3-1 The Baobab Steps | 1.35 | 83% | normal |
-| 3-2 The Hall of Echoes | 0.98 | 82% | normal |
-| 3-3 Heart of the Skyforge | 0.85 | 62% | boss |
+| Stage | Enemies | Power | Win (300) | Win (report) | Band |
+| --- | --- | --- | --- | --- | --- |
+| 1-1 Contact | 2 warriors | 0.35 | 95% | 90% | first |
+| 1-2 Contact | warrior, support | 0.84 | 89% | 85% | normal |
+| 1-3 The Settlement | 2 warriors | 0.78 | 85% | 60% | normal |
+| 1-4 The Settlement | warrior, support | 0.89 | 82% | 85% | normal |
+| 1-5 The Settlement | 2 warriors, support | 0.54 | 79% | 80% | normal |
+| 1-6 Escalation | warrior, 2 supports | 0.66 | 76% | 75% | normal |
+| 1-7 Escalation | 2 warriors, support | 0.59 | 71% | 70% | normal |
+| 1-8 Escalation | 3 warriors | 0.66 | 69% | 65% | normal |
+| 1-9 The Turning Point | 2 warriors, support | 0.59 | 67% | 75% | normal |
+| 1-10 Leaving | warrior (boss), 2 supports | 0.59 | 61% | 60% | boss |
 
 ## 11. AI (`src/game/battle/ai.ts`)
 
@@ -258,7 +249,7 @@ This split keeps the rules testable without a browser (`npm test`) and lets the 
 | Campaign map | drag to move; arrows jump between stages; `W` `A` `S` `D` or `Shift` + arrows slide; `M` whole map; `Enter` opens a stage, then PREPARE |
 | MATRIX tab (champion page) | click a slot, then a lit spool in the stock to weave it; TAKE OUT returns the slot's spool to the stock |
 
-URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=3-3`, `&team=knight,monk,frostmage`, `&champion=colossus`, `&chapter=buffs`, `?demo=<skill_id>` (loops one skill), `?unlockall=1`, `?reset=1`, `?spools=1` (adds 24 sample spools to the stock), and for screenshots `&hp=0.1` (scales enemy HP).
+URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=1-5`, `&team=azure_warrior,sanguine_support`, `&champion=sanguine_support`, `&chapter=buffs`, `?demo=<skill_id>` (loops one skill), `?unlockall=1`, `?reset=1`, `?spools=1` (adds 24 sample spools to the stock), and for screenshots `&hp=0.1` (scales enemy HP).
 
 ## 14. The Weaver Matrix (`src/game/reliquary/`, `src/game/data/matrix.ts`)
 

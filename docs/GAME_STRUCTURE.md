@@ -2,7 +2,7 @@
 
 How the content of The Loom: Reliquary of Legends fits together: champions and their categories, the campaign, combat backgrounds, the Academy, the player's save and the screens that present them. Rules of combat: [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md). Pixels: [ART_GUIDE.md](ART_GUIDE.md). Screens: [UI_GUIDE.md](UI_GUIDE.md).
 
-> **Status: proof of concept.** The name and the logo are final: **The Loom: Reliquary of Legends** (code name TLROL), high fantasy with a gothic arcane look. The champions, factions, world, stages, lore, numbers and art are still placeholders, to be replaced by content Jakub reviews and approves. The engine, the tools and the guardrails stay.
+> **Status: Jakub's own content is coming in.** The name and the logo are final: **The Loom: Reliquary of Legends** (code name TLROL), high fantasy with a gothic arcane look. The categories, the factions, the two starting champions and Zone 1 follow his design decisions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)); what he has not designed yet stands in, marked as such below. The engine, the tools and the guardrails stay.
 
 ---
 
@@ -12,8 +12,8 @@ How the content of The Loom: Reliquary of Legends fits together: champions and t
 LocationDef ──zone──> ZoneDef (behaviour) + ZoneArt (pixels)
    │
    └─ stages: StageDef ──enemies──> ChampionDef ──skills──> SkillDef x3
-                │                        │
-                └─recruit────────────────┘   (first clear joins your collection)
+                │                        ▲
+                └─recruit────────────────┘   (the first clear brings this champion)
 ```
 
 Every piece of content is plain data in `src/game/data/`, paired with an art module in `tools/art/`:
@@ -31,48 +31,41 @@ Every piece of content is plain data in `src/game/data/`, paired with an art mod
 
 ## 2. Champion categories (`src/game/data/meta.ts`)
 
-| Category | Values | Meaning |
+The four enums are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 2): independent axes, fixed per champion when it is authored. What each one does in play is still open; where the game needs a rule today it keeps the proof of concept's, marked below.
+
+| Category | Values | Meaning today |
 | --- | --- | --- |
-| Rarity | Common, Uncommon, **Rare**, **Epic**, **Legendary** | the stat budget (`norms.ts`); the card frame color |
-| Affinity | **Force**, **Wild**, **Arcane**, Void | Force > Wild > Arcane > Force for +/-20% damage; Void is neutral |
-| Role | Tank, Bruiser, Damage, Support, Control | how the budget is spent and what the kit does |
-| Faction | Order of Dawn, Clans of the North, Wildwood, Frostfang Coven, Temple of the Still Peak, Sunscar Dynasty, Free City of Nyota | story and visual family; picks the champion's home background (`homeZone()` in `zones.ts`) |
+| Rarity | Common, **Elite**, **Heroic**, **Mythic** | the stat budget (`norms.ts`, the proof of concept's budgets carried over) and the card frame color; what rarity gates is not decided |
+| Affinity | **Ember**, **Bloom**, **Tide** | Ember > Bloom > Tide > Ember; a strong hit deals +20% damage and a weak hit -20% (the proof of concept's rule: the mechanism is not decided) |
+| Role | Tank, Damage, Support | how the budget is spent and what the kit does; whether roles are mechanical is not decided |
+| Faction | Azure Crown, Sanguine Dominion, Court of Root, Ashveil Reign | story and standard (the medallion on cards and pages, named on the champion page's lore tab); no mechanics. Standards: a gold crown on blue, a red hexagon on black, a brown claw on green, a white bone across a dark grey |
 
 The roster today:
 
 | Champion | Rarity | Affinity | Role | Faction | How you get them |
 | --- | --- | --- | --- | --- | --- |
-| Sir Aldric | Epic | Arcane | Tank | Order of Dawn | starter |
-| Brakka Ironhide | Rare | Force | Damage | Clans of the North | starter |
-| Sylwen | Rare | Wild | Damage | Wildwood | starter |
-| Master Tenzo | Epic | Wild | Support | Temple of the Still Peak | clear 1-1 |
-| Ysolde | Epic | Arcane | Control | Frostfang Coven | clear 1-2 |
-| Vorhaal | Legendary | Void | Bruiser | Frostfang Coven | clear 1-3 (boss) |
-| Akhet | Rare | Force | Damage | Sunscar Dynasty | clear 2-1 |
-| Kha'zir | Epic | Force | Tank | Sunscar Dynasty | clear 2-2 |
-| Nefret | Epic | Arcane | Support | Sunscar Dynasty | clear 2-3 |
-| Anhotep | Legendary | Void | Control | Sunscar Dynasty | clear 2-4 (boss) |
-| Imara | Epic | Force | Bruiser | Free City of Nyota | clear 3-1 |
-| Kwesi | Rare | Wild | Support | Free City of Nyota | clear 3-2 |
-| Mwamba | Legendary | Arcane | Tank | Free City of Nyota | clear 3-3 (boss) |
+| Azure Warrior (name to come) | Elite | Ember | Damage | Azure Crown | starter |
+| Sanguine Support (name to come) | Elite | Tide | Support | Sanguine Dominion | after the first battle (clear 1-1) |
+
+Their names, personalities, kits and art are not designed: the proof of concept's berserker and sun priestess stand in for their bodies, stats and skills, with plainly renamed skills.
 
 ## 3. The campaign (`src/game/data/campaign.ts`)
 
 - A **location** is a chapter with one combat background, a label on the world map and an optional `requires` stage that opens it.
-- A **stage** lists up to three enemies in formation order (front, back-top, back-bottom), a `power` multiplier for their HP and ATK, an optional boss flag per enemy (x1.6 HP, a crown), a map position (world pixels, see below) and the champion it **recruits** on the first clear. Only champions the player actually faced in that stage can be recruited there.
+- A **stage** lists up to three enemies in formation order (front, back-top, back-bottom), a `power` multiplier for their HP and ATK, an optional boss flag per enemy (x1.6 HP, a crown), a map position (world pixels, see below) and the champion its first clear brings (`recruit`), who need not be among its enemies: the second champion joins after the first battle without being fought there.
 - A stage opens when the previous stage of its location is cleared; the first stage of a location opens when the location does.
 - Difficulty follows the curve in [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) section 10; tune `power` with `npm run balance`.
-- The **world map** is `WORLD_MAP` (1920x720, three screens wide and two tall). Stage and location `map` positions are in its pixels. The campaign screen scrolls it under a camera: drag to move (a click fires on release), arrows jump between stages and the camera keeps the focused stage in view, `W` `A` `S` `D` or `Shift` + arrows slide it, and `M` (or WHOLE MAP) shows the overview, the same world drawn at a third of the size on one screen; clicking the overview goes there.
+- The **world map** is `WORLD_MAP` (1280x360, two screens wide and one tall): the campaign is a line of areas crossed from left to right (DESIGN_DECISIONS.md 5.1). Stage and location `map` positions are in its pixels. The campaign screen scrolls it under a camera: drag to move (a click fires on release), arrows jump between stages and the camera keeps the focused stage in view, `W` `A` `S` `D` or `Shift` + arrows slide it, and `M` (or WHOLE MAP) shows the overview, the same world drawn at half the size on one screen; clicking the overview goes there.
 
 | Location | Zone | Stages |
 | --- | --- | --- |
-| I. Frostfang Ruins | `frostfang` | 1-1 The Frozen Gate, 1-2 Hall of Icicles, 1-3 Throne of the Dread Knight (boss Vorhaal) |
-| II. Sunscar Ruins (after 1-3) | `sunscar` | 2-1 Dunes of Ash, 2-2 The Sunken Colonnade, 2-3 Temple of the Burning Sun, 2-4 Tomb of Anhotep (boss Anhotep) |
-| III. Nyota Highlands (after 2-4) | `nyota` | 3-1 The Baobab Steps, 3-2 The Hall of Echoes, 3-3 Heart of the Skyforge (boss Mwamba) |
+| I. A Dim Island | `zone1` | 1-1, 1-2 Contact (1-1 brings the Sanguine Support), 1-3 to 1-5 The Settlement, 1-6 to 1-8 Escalation, 1-9 The Turning Point, 1-10 Leaving (boss) |
+
+Zone 1 follows Jakub's working notes (DESIGN_DECISIONS.md 5.3), which are not locked: the stage names and texts quote them. Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed. Zone 2 (the mystic arena in a Court of Root forest) is sketched in the notes and not built.
 
 ## 4. The save: the Master Archivist and the Reliquary
 
-The Master Archivist (`src/game/archivist.ts`) is the player and their save, stored in `localStorage` under `tlrol.save.v2`; every access is guarded so the game runs without storage.
+The Master Archivist (`src/game/archivist.ts`) is the player and their save, stored in `localStorage` under `tlrol.save.v3`; every access is guarded so the game runs without storage.
 
 | Field | Meaning |
 | --- | --- |
@@ -84,7 +77,7 @@ The Master Archivist (`src/game/archivist.ts`) is the player and their save, sto
 
 The Reliquary (`src/game/reliquary/`) holds one Hero Soul File per owned champion, with its NEW badge (recruited, not yet opened on the champion page) and its Weaver Matrix of six slots, and the loose Thread Spools. The Weaver Matrix has its approved slots, grades, strands and attunement ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14) and shows on the champion page's MATRIX tab. Spools have no sources yet and Weave Patterns are not defined, so the stock stays empty in play; `?spools=1` adds a sample for development.
 
-Loading drops champion and stage ids the catalog no longer has. A proof-of-concept save (`oathbound.profile.v1`) is migrated once into the new one and left in place.
+Loading drops champion and stage ids the catalog no longer has, and gives every cleared stage's champion its soul file (so a save survives a stage that changes what it brings). An older save (`tlrol.save.v2` from before Jakub's content, or the proof of concept's `oathbound.profile.v1`) holds champions and stages that no longer exist: only its settings and the Academy chapters read carry over, once, into a new game, and the old entry is left in place.
 
 Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `recordClear` (stars + first-clear recruit), `isFresh`, `unlockEverything` (Options, demo use).
 
@@ -109,14 +102,14 @@ Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `r
 | Screen | File | Route |
 | --- | --- | --- |
 | Main menu | `src/game/screens/menu.ts` | `?screen=menu` (default) |
-| Campaign map | `screens/campaign.ts` | `?screen=campaign&stage=2-3` |
+| Campaign map | `screens/campaign.ts` | `?screen=campaign&stage=1-6` |
 | Team select | `screens/team.ts` | `?screen=team&stage=1-2` |
-| Battle | `screens/battle.ts` + `view/scene.ts` | `?screen=battle&stage=1-3&team=knight,monk,frostmage` |
+| Battle | `screens/battle.ts` + `view/scene.ts` | `?screen=battle&stage=1-3&team=azure_warrior,sanguine_support` |
 | Collection | `screens/collection.ts` | `?screen=collection` |
-| Champion page | `screens/champion.ts` | `?screen=champion&champion=tomblord` |
+| Champion page | `screens/champion.ts` | `?screen=champion&champion=azure_warrior` |
 | Academy | `screens/academy.ts` | `?screen=academy&chapter=debuffs` |
 | Options | `screens/options.ts` | `?screen=options` |
-| Recruit ceremony | `screens/recruit.ts` | `?screen=recruit&champion=jackal` |
-| Skill demo | `screens/battle.ts` (demo mode) | `?demo=eternal_tomb` |
+| Recruit ceremony | `screens/recruit.ts` | `?screen=recruit&champion=sanguine_support` |
+| Skill demo | `screens/battle.ts` (demo mode) | `?demo=leaping_blow` |
 
 All navigation goes through `app.router` (`src/main.ts`), which wraps each switch in a dithered dissolve. `?unlockall=1`, `?reset=1` and `?spools=1` change the save before the first screen opens.

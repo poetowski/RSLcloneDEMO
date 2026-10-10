@@ -82,7 +82,7 @@ async function boot() {
   };
 
   // deep links: ?screen=campaign|team|battle|collection|champion|academy|options|recruit
-  //   &stage=1-2 &team=knight,monk &champion=monk &chapter=buffs   ?demo=<skill id>
+  //   &stage=1-2 &team=azure_warrior,sanguine_support &champion=azure_warrior &chapter=buffs   ?demo=<skill id>
   const r = app.router;
   const demo = params.get('demo');
   const stageId = params.get('stage') ?? '1-1';
@@ -103,7 +103,7 @@ async function boot() {
       r.collection();
       break;
     case 'champion':
-      r.champion(params.get('champion') ?? 'knight');
+      r.champion(params.get('champion') ?? CHAMPIONS[0].id);
       break;
     case 'academy':
       r.academy(params.get('chapter') ?? undefined);
@@ -112,7 +112,7 @@ async function boot() {
       r.options();
       break;
     case 'recruit':
-      r.recruit(params.get('champion') ?? 'monk');
+      r.recruit(params.get('champion') ?? CHAMPIONS[CHAMPIONS.length - 1].id);
       break;
     default:
       r.menu();

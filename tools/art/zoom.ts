@@ -5,7 +5,7 @@ import { PIVOT, renderFrame } from './char.ts';
 import { HEROES } from './champions/index.ts';
 import { Bitmap, hex } from './raster.ts';
 
-const [id = 'knight', anim = 'idle', frameArg = '0', out = 'zoom.png', scaleArg = '10', side] = process.argv.slice(2);
+const [id = 'azure_warrior', anim = 'idle', frameArg = '0', out = 'zoom.png', scaleArg = '10', side] = process.argv.slice(2);
 const c = HEROES[id];
 if (!c) throw new Error(`unknown hero ${id}; have ${Object.keys(HEROES).join(', ')}`);
 const bmp = renderFrame(c, anim, Number(frameArg), side === 'left' ? -1 : 1);

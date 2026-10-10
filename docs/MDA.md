@@ -4,7 +4,7 @@ The Loom: Reliquary of Legends is designed backwards from the experience it has 
 
 Rules in detail: [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md). Domain model, invariants and change playbooks: [DDD.md](DDD.md). Pixels: [ART_GUIDE.md](ART_GUIDE.md). Screens: [UI_GUIDE.md](UI_GUIDE.md).
 
-Baseline: commit `8dd9a26`, 2026-10-06 (section 6).
+Baselines (section 6): Zone 1 on Jakub's own content, 2026-10-10 (6.0); the proof of concept's thirteen champions and ten stages at commit `8dd9a26`, 2026-10-06 (6.1-6.4), kept as the reference for how the engine behaves with a full roster.
 
 ---
 
@@ -80,6 +80,8 @@ Ranked. When two targets conflict, the higher one wins.
 
 For each dynamic: what happens, what drives it, the measured baseline, the band to hold, the aesthetics it serves, and what to watch. Sources of the numbers: section 6.
 
+The `Baseline` lines below were measured on the proof of concept's roster and campaign, which Jakub's content replaced on 2026-10-10 ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)). With two champions and stand-in enemies most dynamics cannot be measured yet; Zone 1's numbers are in 6.0, and every dynamic is re-measured as his roster grows.
+
 ### DY1 The opening race
 
 - **Happens:** Speed and a small random head start decide who acts first and in which order the openers fire. Lapping (one champion acting twice before another acts once) almost never happens.
@@ -107,7 +109,7 @@ For each dynamic: what happens, what drives it, the measured baseline, the band 
 ### DY4 Counter-picking by affinity
 
 - **Happens:** team select is a real decision when a stage leans toward one or two affinities.
-- **Driven by:** Force > Wild > Arcane > Force at ±20%, Void neutral; the `+n -n` matchup counts on every roster card; the three starters covering the three cycle affinities.
+- **Driven by:** Ember > Bloom > Tide > Ember at ±20% (the proof of concept's size of the edge: what an edge does is not decided), no neutral affinity; the `+n -n` matchup counts on every roster card. Today the starter is Ember and the second champion Tide: a counter pair on purpose (DESIGN_DECISIONS.md 4.4), so the pair covers two of the three affinities.
 - **Baseline:** in random battles 22% of hits are strong and 22% weak. The lean per stage (enemies hit strong / weak by each attacking affinity) is in ME4. Chapter I rewards Wild, chapter II Arcane (2-2: Arcane +3, Wild -3), chapter III Force (3-2: +2). The final boss 3-3 is neutral: every cycle affinity is +1 / -1.
 - **Band:** every chapter has at least one stage with a lean of 2 or more for some affinity. A neutral line-up is a deliberate exam, normally a boss.
 - **Serves:** AE1, AE4.
@@ -196,7 +198,7 @@ The first source column is the truth. The last column lists every hand-written c
 | Defense | x 40 / DEF (`DEF_SCALE`) | `Battle.rollDamage` | MECHANICS_GUIDE 5, Academy `damage`, champion page stat tip |
 | Critical hit | x2, rolled per hit with CRIT | `CRIT_MULT` | MECHANICS_GUIDE 5, Academy, champion page stat tip |
 | Spread | x0.92-1.08; at least 1 damage | `Battle.rollDamage` | MECHANICS_GUIDE 5, Academy figure |
-| Affinity | ±20%, Void neutral | `AFFINITY_BONUS`, `affinityEdge` (`meta.ts`) | MECHANICS_GUIDE 6, Academy `affinity`, `AFFINITIES` texts |
+| Affinity | ±20% (Ember > Bloom > Tide > Ember; the size is the proof of concept's) | `AFFINITY_BONUS`, `affinityEdge` (`meta.ts`) | MECHANICS_GUIDE 6, Academy `affinity`, `AFFINITIES` texts |
 | Weaken | +25% damage taken | `WEAKEN_MULT` | `statuses.ts`, MECHANICS_GUIDE 5 and 7, Academy figure |
 | ATK Up / ATK Down | ±25% | `Battle.attack` (inline) | `statuses.ts`, MECHANICS_GUIDE 5 and 7 |
 | DEF Up / DEF Down | +16% / -12% | `DEF_UP`, `DEF_DOWN` (`battle.ts`) | `statuses.ts`, MECHANICS_GUIDE 5 and 7, Academy `damage` |
@@ -231,44 +233,31 @@ Every skill is data (`SkillDef` in `types.ts`); these are the levers a kit can p
 
 ### ME3 The roster
 
-Proof-of-concept content: every champion here is a placeholder until it is reviewed.
+Jakub's two starting champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4). Rarity, role, faction, affinity and when they join are his; names, kits, stats and bodies are stand-ins from the proof of concept (the berserker and the sun priestess) until he designs them.
 
-| Champion (`id`) | Role, rarity, affinity | SPD | Signature idea | Met / recruited |
+| Champion (`id`) | Role, rarity, affinity, faction | SPD | Signature idea (stand-in kit) | Met / joins |
 | --- | --- | --- | --- | --- |
-| Sir Aldric (`knight`) | Tank, epic, Arcane | 100 | team Shield and DEF Up with a self Taunt | starter |
-| Brakka (`warrior`) | Damage, rare, Force | 104 | two-hit AoE; leap execute below 50% | starter |
-| Sylwen (`archer`) | Damage, rare, Wild | 112 | AoE turn-meter drain; guaranteed Poison | starter |
-| Master Tenzo (`monk`) | Support, epic, Wild | 116 | team heal, cleanse and Regen when allies are hurt | 1-1 / 1-1 |
-| Ysolde (`frostmage`) | Control, epic, Arcane | 108 | guaranteed Freeze; AoE SPD Down | 1-1 / 1-2 |
-| Vorhaal (`dreadknight`) | Bruiser, legendary, Void | 100 | lifesteal | 1-2 / 1-3 boss |
-| Akhet (`stalker`) | Damage, rare, Force | 118 | per-hit Poison, blink, Heal Block and Weaken, ends at 25% meter | 2-1 / 2-1 |
-| Kha'zir (`jackal`) | Tank, epic, Force | 97 | team Counterattack; Dispel | 2-1 / 2-2 |
-| Nefret (`priestess`) | Support, epic, Arcane | 110 | team heal and ATK Up; AoE Heal Block and Burn | 2-3 / 2-3 |
-| Anhotep (`tomblord`) | Control, legendary, Void | 96 | Undying; guaranteed Stun and Heal Block | 2-4 / 2-4 boss |
-| Imara (`sunspear`) | Bruiser, epic, Force | 106 | self Shield on A1 (50%); two-hit AoE spin | 3-1 / 3-1 |
-| Kwesi (`starsinger`) | Support, rare, Wild | 114 | ally meter +20%, SPD Up, cleanse; AoE damage that heals | 3-1 / 3-2 |
-| Mwamba (`colossus`) | Tank, legendary, Arcane | 92 | Overdrive; AoE Taunt; AoE stun chance | 3-3 / 3-3 boss |
+| Azure Warrior (`azure_warrior`) | Damage, elite, Ember, Azure Crown | 104 | two-hit A1 and AoE; leap execute below 50%, DEF Down; teaches how damage works | starter |
+| Sanguine Support (`sanguine_support`) | Support, elite, Tide, Sanguine Dominion | 110 | team heal and ATK Up; AoE Heal Block and Burn; teaches sustain | after the first battle (1-1), not fought there |
 
-Spread: roles Tank 3, Damage 3, Support 3, Control 2, Bruiser 2; affinities Force 4, Arcane 4, Wild 3, Void 2; rarities epic 6, rare 4, legendary 3 (common and uncommon have budgets but no champions, T8).
+Spread: roles Damage 1, Support 1, Tank 0; affinities Ember 1, Tide 1, Bloom 0; rarities Elite 2 (Common, Heroic and Mythic have budgets but no champions, T8); factions Azure Crown 1, Sanguine Dominion 1, the Court of Root and the Ashveil Reign none.
 
 ### ME4 The campaign
 
-Proof-of-concept content: locations, stages and their numbers are placeholders until reviewed.
+Zone 1, *A Dim Island*, from Jakub's working notes (DESIGN_DECISIONS.md 5.3, not locked). Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed, so the leans are thin: the warrior copies are Ember, the support copies Tide.
 
-Lean = enemies each attacking affinity hits strong (+) or weak (-); only the notable ones are listed.
-
-| Stage | Enemies (affinity) | Power | Kind | Lean | First introduces |
+| Stage | Enemies | Power | Kind | Lean (Ember / Tide attackers) | First introduces |
 | --- | --- | --- | --- | --- | --- |
-| 1-1 The Frozen Gate | Tenzo (W), Ysolde (A) | 0.85 | first | Wild +1; Force +1/-1 | enemy heals, Freeze, stun chance, SPD Down |
-| 1-2 Hall of Icicles | Vorhaal (V), Tenzo, Ysolde | 0.92 | normal | Wild +1 | lifesteal, ATK Down, DEF Down |
-| 1-3 Throne of the Dread Knight | Vorhaal (boss), Tenzo, Ysolde | 0.95 | boss | Wild +1 | boss HP and crown |
-| 2-1 Dunes of Ash | Kha'zir (F), Akhet (F) | 1.35 | chapter gate | Arcane +2, Wild -2 | Taunt, Counterattack, Dispel, Heal Block, Weaken, blink |
-| 2-2 The Sunken Colonnade | Kha'zir, Akhet, Akhet | 0.88 | normal | Arcane +3, Wild -3 | duplicate enemies |
-| 2-3 Temple of the Burning Sun | Kha'zir, Nefret (A), Akhet | 0.90 | normal | Arcane +2, Wild +1/-2 | Burn, AoE Heal Block, team heal and ATK Up |
-| 2-4 Tomb of Anhotep | Anhotep (V, boss), Kha'zir, Nefret | 0.80 | boss | Arcane +1 | Undying, guaranteed Stun |
-| 3-1 The Baobab Steps | Imara (F), Kwesi (W) | 1.35 | chapter gate | Force +1, Arcane +1/-1 | ally meter boost, SPD Up, enemy Shield |
-| 3-2 The Hall of Echoes | Imara, Kwesi, Kwesi | 0.98 | normal | Force +2, Arcane +1/-2 | duplicate enemies |
-| 3-3 Heart of the Skyforge | Mwamba (A, boss), Imara, Kwesi | 0.85 | boss | neutral: +1/-1 for every cycle affinity | Overdrive, AoE Taunt, AoE stun |
+| 1-1 Contact | 2 warriors | 0.35 | first | Tide +2 (not owned yet) | the fight, Leaping Blow's execute; brings the Sanguine Support |
+| 1-2 Contact | warrior, support | 0.84 | normal | Ember -1, Tide +1 | enemy heals and ATK Up, Burn, Heal Block |
+| 1-3 The Settlement | 2 warriors | 0.78 | normal | Tide +2 | duplicate enemies |
+| 1-4 The Settlement | warrior, support | 0.89 | normal | Ember -1, Tide +1 | |
+| 1-5 The Settlement | 2 warriors, support | 0.54 | normal | Ember -1, Tide +2 | three enemies |
+| 1-6 Escalation | warrior, 2 supports | 0.66 | normal | Ember -2, Tide +1 | two healers |
+| 1-7 Escalation | 2 warriors, support | 0.59 | normal | Ember -1, Tide +2 | |
+| 1-8 Escalation | 3 warriors | 0.66 | normal | Tide +3 | |
+| 1-9 The Turning Point | 2 warriors, support | 0.59 | normal | Ember -1, Tide +2 | |
+| 1-10 Leaving | warrior (boss), 2 supports | 0.59 | boss | Ember -2, Tide +1 | boss HP and crown |
 
 ### ME5 Feel: the presentation mechanics
 
@@ -374,7 +363,26 @@ These complete the balance report. Until they are automated ([DDD.md](DDD.md) R-
 
 ## 6. Baseline
 
-Commit `8dd9a26`, 2026-10-06. `npm test` (39 tests), `npm run typecheck`, `npm run audit` and `npm run balance` all pass.
+### 6.0 Zone 1 (2026-10-10)
+
+Jakub's content: the two starting champions and Zone 1 with stand-in enemies. `npm test` (84 tests), `npm run typecheck`, `npm run audit` and `npm run balance` all pass; impact is skipped (it needs six champions). Every stage has one team (the player owns at most two champions), auto-battled 300 times (seeds 1000-1299) with the 6.5 loop:
+
+| Stage | Power | Team size | Auto win | Actions | 3-star share of wins | Player opens | Strong / weak hits |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1-1 | 0.35 | 1 | 95% | 5.5 | 100% | 31% | 0% / 0% |
+| 1-2 | 0.84 | 2 | 89% | 8.6 | 65% | 52% | 24% / 28% |
+| 1-3 | 0.78 | 2 | 85% | 8.0 | 63% | 79% | 29% / 35% |
+| 1-4 | 0.89 | 2 | 82% | 8.9 | 60% | 52% | 24% / 27% |
+| 1-5 | 0.54 | 2 | 79% | 9.8 | 63% | 51% | 25% / 28% |
+| 1-6 | 0.66 | 2 | 76% | 11.5 | 57% | 36% | 24% / 28% |
+| 1-7 | 0.59 | 2 | 71% | 10.2 | 56% | 51% | 25% / 28% |
+| 1-8 | 0.66 | 2 | 69% | 10.1 | 32% | 72% | 28% / 42% |
+| 1-9 | 0.59 | 2 | 67% | 10.2 | 58% | 50% | 25% / 29% |
+| 1-10 | 0.59 | 2 | 61% | 11.6 | 42% | 36% | 21% / 30% |
+
+The curve falls smoothly from 95% to 61%. Battles are short (5.5 to 11.6 actions; the proof of concept ran 10 to 26), there are no skipped turns (no control in either kit), and the mirror line-ups make weak hits slightly more common than strong ones.
+
+The sections below are the proof of concept's baseline (commit `8dd9a26`, 2026-10-06, 39 tests): thirteen champions and ten stages that no longer exist, kept as the reference for a full roster.
 
 ### 6.1 Champions
 
@@ -486,13 +494,13 @@ Paste it into the pull request description.
 | --- | --- | --- |
 | T1 | The Academy calls Speed "the most valuable stat in the game", but the roster's SPD range almost never produces lapping (0.07 double turns per battle): Speed decides the opening order, not extra turns. | widen the SPD limits with care; add tempo kits; or rephrase the Academy line to "Speed decides who opens" |
 | T2 | The reference player is the AI, and it plays timing kits badly: executes fire as openers, control fires as soon as it is ready. Impact under-rates timing kits (Damage role 42-44%) and the curve measures auto, not people. | `ai.when` conditions such as "target below the execute threshold"; a smarter upper-bound policy in the balance tool; playtest data |
-| T3 | The AI is predictable: always the highest-priority ready skill. Good for learning (enemies telegraph), thin as a late-game challenge. | boss-specific AI (for example, Mwamba holding Starfall Protocol until Overdrive) |
-| T4 | The final boss 3-3 is affinity-neutral (+1/-1 for every cycle affinity), so team select gives no hint there. | keep it as the deliberate exam, and decide it on purpose for every future finale |
+| T3 | The AI is predictable: always the highest-priority ready skill. Good for learning (enemies telegraph), thin as a late-game challenge. In Zone 1 the starter opens with Leaping Blow, so its execute is never saved for a low target. | boss-specific AI (for example, a boss holding its A3 until its second act) |
+| T4 | A finale's affinity lean is a design choice: the proof of concept's last boss was neutral on purpose. Zone 1's enemies are stand-ins, so its leans (Tide favoured throughout) say nothing yet. | decide the lean on purpose for every finale once enemies are designed |
 | T5 | Stars only count losses: after 3 stars there is nothing left to chase, and there is no economy by design. | medals for turn count or no-auto clears, challenge modifiers, or accept it |
 | T6 | Chapter gates run at power 1.35, shown in red as "power 135%", yet they are among the easier stages (82-84% on auto) because they field two enemies. The number frightens more than the fight does. | a difficulty rating that counts the enemies, or accept it |
 | T7 | Battles are seeded with `Math.random` and the seed is never shown: a surprising loss cannot be replayed or reported. | show the seed on the results panel and accept `&seed=` ([DDD.md](DDD.md) R-12) |
-| T8 | Latent vocabulary: targets `ally` and `self` and the rarities common and uncommon exist in the model with no content, so they are untested in play. | content using them gets a presentation review (ally markers, prompts) and rules tests |
-| T9 | A failed buff roll (Imara's 50% Shield) is silent while a failed debuff shows `RESIST`. | decide whether the player should see it |
+| T8 | Latent vocabulary: targets `ally` and `self`, the rarities Common, Heroic and Mythic, the Tank role, the Bloom affinity, two of four factions, control, Counterattack, turn meter skills, Undying and Overdrive exist in the model with no content today, so they are untested in play (the rules have tests on synthetic champions). | content using them gets a presentation review (ally markers, prompts) and rules tests |
+| T9 | A failed buff roll (a chance Shield, say) is silent while a failed debuff shows `RESIST`. | decide whether the player should see it |
 | T10 | Control can chain: a chance stun on an A2 and a guaranteed A3 stun on the same team can lock one enemy; there is no immunity window. The skipped share is fine today (at most 11.5%). | watch the skipped share whenever control is added; an immunity rule if it rises |
 | T11 | Champion growth: gear is decided (the Weaver Matrix, section 9); champions still have no levels, ranks or skill upgrades. Gear moves every balance band: the curve will need an expected matrix per stage. | gear alone; or also levels, ascension, skill books |
 | T12 | Acquisition: one recruit per first clear ties the size of the roster to the size of the campaign. | keep it; shards, summoning, fixed rewards or events |
@@ -511,6 +519,8 @@ Record every change that moves a dynamic out of its band, changes a band, or cha
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-06 | MDA baseline established (this document) | - | - | section 6 | reference point for later changes |
 | 2026-10-08 | Final name and domain lexicon (The Loom: Reliquary of Legends); T11 decided in part: champions grow through gear, the Weaver Matrix | AE1, AE3 | none yet: the layout is a placeholder and no spools exist | - | outline approved by Jakub: six slots with fixed or variable stat nodes, Thread Spools, 2- and 4-piece Weave Patterns counted wherever their spools sit, a 2-piece pattern up to three times. Layout, spools, pattern bonuses and spool sources wait for the Weaver Matrix proposal |
+| 2026-10-10 | Jakub's design decisions replace the proof-of-concept content ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)): the four category enums (Ember / Bloom / Tide, Common / Elite / Heroic / Mythic, Tank / Damage / Support, four factions), the two starting champions, Zone 1 of ten stages on a new map and background; everything else of the proof of concept removed | AE3, AE5 | every dynamic: thirteen champions become two (stand-in bodies and kits), ten stages become Zone 1 with stand-in enemies; impact cannot be measured below six champions | section 6.1-6.4 -> 6.0 | approved by Jakub ("go, implement the changes"). Stand-ins until he designs them: names, kits, stats, bodies, enemies, the size of an affinity edge, rarity budgets; Zone 1's art is a first take on his notes. The first stage fields two weak copies (power 0.35) so the first battle lasts about five actions instead of two |
+| 2026-10-10 | Faction standards: the Court of Root a brown claw on green, the Ashveil Reign one white bone across a dark grey (about 80%), the Azure Crown's crown confirmed gold | AE5 | none | question marks -> designed medallions | set by Jakub |
 | 2026-10-10 | The gear system: the two-triangle layout, spools with a main stat (Ashen, Silver, Gilded) and strands, attunement, the MATRIX tab; DEF and CRIT closed on ATK and HP in the rules (damage x 40 / DEF, crits x2, every champion's DEF remapped and crit halved so battles stay the same) | AE1, AE3 | impact within ±3 points, curve -1 to +4 points; the impact measure now plays 960 battles per champion (240 flagged noise as a failure) | section 6 stays the reference; numbers moved inside the noise | approved by Jakub ("this looks like a good gear system"). Weave Patterns and spool sources are not defined yet; stage powers are re-measured once sources set how fast spools arrive |
 
 ## 10. Keeping this document true

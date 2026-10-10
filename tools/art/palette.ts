@@ -197,35 +197,36 @@ export const UIR = {
   fill: fx(['#070910', '#0d1220', '#141c30', '#1c2840', '#26364f']),
   ink: fx(['#07080e', '#1a1210', '#2a1e14', '#3a2a18', '#4a3820']),
   parchment: fx(['#3a2814', '#7a5a34', '#b8946a', '#e2c89c', '#f8ecd0']),
+  /** arcane light: the jewels of the logo, the threads of the Weaver Matrix */
+  arcane: fx(['#06142e', '#143a7a', '#2a6ac8', '#5aa8ff', '#d8ecff']),
   rarity: {
     common: fx(['#1a1c22', '#3a404c', '#6a7280', '#b8c0cc', '#eef2f8']),
-    uncommon: fx(['#0a1a0c', '#1c4a22', '#2f8a3a', '#6fd36a', '#d0ffc8']),
-    rare: fx(['#081428', '#163a6e', '#2a6ac0', '#5aa8ff', '#d0e8ff']),
-    epic: fx(['#160828', '#3e1866', '#7a34b8', '#c070ff', '#f0d8ff']),
-    legendary: fx(['#2a1404', '#5a3208', '#b06a10', '#ffb340', '#fff0c0']),
+    elite: fx(['#081428', '#163a6e', '#2a6ac0', '#5aa8ff', '#d0e8ff']),
+    heroic: fx(['#160828', '#3e1866', '#7a34b8', '#c070ff', '#f0d8ff']),
+    mythic: fx(['#2a1404', '#5a3208', '#b06a10', '#ffb340', '#fff0c0']),
   },
   affinity: {
-    force: fx(['#2a0606', '#7a1410', '#c0302a', '#ff5a4a', '#ffd0c0']),
-    wild: fx(['#06200a', '#145a1c', '#2a9a32', '#5ad05a', '#d8ffc8']),
-    arcane: fx(['#06142e', '#143a7a', '#2a6ac8', '#5aa8ff', '#d8ecff']),
-    void: fx(['#14062a', '#3e1270', '#7a34c0', '#c070ff', '#f4dcff']),
+    ember: fx(['#2a0606', '#7a1410', '#c0302a', '#ff5a4a', '#ffd0c0']),
+    bloom: fx(['#06200a', '#145a1c', '#2a9a32', '#5ad05a', '#d8ffc8']),
+    tide: fx(['#06142e', '#143a7a', '#2a6ac8', '#5aa8ff', '#d8ecff']),
   },
-  /** [field, glyph] per faction; glyph = the faction color in meta.ts */
+  /**
+   * [field, glyph, glyph lit edge, glyph shaded edge] per faction, after its
+   * standard in docs/DESIGN_DECISIONS.md 3.6: the Azure Crown a gold crown on
+   * blue, the Sanguine Dominion a red hexagon on black, the Court of Root a
+   * brown claw on green, the Ashveil Reign a white bone across a dark grey
+   * (about 80% dark).
+   */
   faction: {
-    dawn: fx(['#1c2a5a', '#f0c650']),
-    clans: fx(['#3a1012', '#d9443f']),
-    wildwood: fx(['#10301a', '#5ad05a']),
-    coven: fx(['#0e2440', '#7fd8ff']),
-    temple: fx(['#3a1a08', '#f39432']),
-    sunscar: fx(['#2a1a3a', '#ffb340']),
-    nyota: fx(['#2a0a2a', '#ff5fb0']),
+    azure_crown: fx(['#2856b8', '#f0c650']),
+    sanguine_dominion: fx(['#0e0b10', '#e0505a']),
+    court_of_root: fx(['#2f6a30', '#a8743e', '#d09a5a', '#6a4424']),
+    ashveil_reign: fx(['#333333', '#ece4d0']),
   },
   role: {
     Tank: hex('#8fc0ff'),
-    Bruiser: hex('#ff8a6a'),
     Damage: hex('#ffd060'),
     Support: hex('#8cff9a'),
-    Control: hex('#d89cff'),
   },
 };
 

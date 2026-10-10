@@ -24,7 +24,7 @@ export interface MasterArchivist {
 
 /** The save as stored under `KEY`. */
 interface SaveJson {
-  version: 2;
+  version: 3;
   stars: Record<string, number>;
   team: string[];
   read: string[];
@@ -32,20 +32,21 @@ interface SaveJson {
   reliquary: ReliquaryJson;
 }
 
-/** The proof of concept's save ("Oathbound"), read once and migrated. */
-interface SaveJsonV1 {
-  version: 1;
-  /** recruited champions (the starters were implied) */
-  unlocked: string[];
-  stars: Record<string, number>;
-  team: string[];
-  fresh: string[];
+/**
+ * An older save: version 2 (the game before Jakub's own content replaced the
+ * proof of concept's) or version 1 (the proof of concept, "Oathbound"). The
+ * champions and stages they hold no longer exist, so only the settings and
+ * the Academy chapters read carry over, once.
+ */
+interface OldSaveJson {
+  version: 1 | 2;
   read: string[];
   settings: MasterArchivist['settings'];
 }
 
-const KEY = 'tlrol.save.v2';
-const KEY_V1 = 'oathbound.profile.v1';
+const KEY = 'tlrol.save.v3';
+/** Older saves, newest first. */
+const OLD_KEYS = ['tlrol.save.v2', 'oathbound.profile.v1'];
 
 export function newArchivist(): MasterArchivist {
   const reliquary = new Reliquary(MATRIX_LAYOUT);
@@ -54,23 +55,25 @@ export function newArchivist(): MasterArchivist {
 }
 
 /**
- * The archivist from stored text: the current save, else a version 1 save
- * (migrated), else a new game. Ids the catalog no longer has are dropped, and
- * every starter has its soul file.
+ * The archivist from stored text: the current save, else an older save (its
+ * settings and reading on a new game), else a new game. Ids the catalog no
+ * longer has are dropped, every starter has its soul file and every cleared
+ * stage has brought its champion.
  */
-export function readSave(raw: string | null, rawV1: string | null = null): MasterArchivist {
+export function readSave(raw: string | null, rawOld: string | null = null): MasterArchivist {
   const a = newArchivist();
   try {
     if (raw) {
       const s = JSON.parse(raw) as Partial<SaveJson>;
-      if (s.version !== 2) return a;
+      if (s.version !== 3) return a;
       a.reliquary = Reliquary.fromJSON(s.reliquary ?? {}, MATRIX_LAYOUT);
-      copy(a, s);
-    } else if (rawV1) {
-      const s = JSON.parse(rawV1) as Partial<SaveJsonV1>;
-      if (s.version !== 1) return a;
-      for (const id of s.unlocked ?? []) a.reliquary.recruit(id, (s.fresh ?? []).includes(id));
-      copy(a, s);
+      a.stars = { ...s.stars };
+      if (Array.isArray(s.team)) a.team = [...s.team];
+      keepHabits(a, s);
+    } else if (rawOld) {
+      const s = JSON.parse(rawOld) as Partial<OldSaveJson>;
+      if (s.version !== 1 && s.version !== 2) return a;
+      keepHabits(a, s);
     }
   } catch {
     return newArchivist(); // unreadable save: a new game
@@ -78,43 +81,46 @@ export function readSave(raw: string | null, rawV1: string | null = null): Maste
   return validated(a);
 }
 
-/** The fields both save versions share, over the defaults. */
-function copy(a: MasterArchivist, s: Partial<Pick<SaveJson, 'stars' | 'team' | 'read' | 'settings'>>) {
-  a.stars = { ...s.stars };
-  if (Array.isArray(s.team)) a.team = [...s.team];
+/** The Academy chapters read and the settings, over the defaults. */
+function keepHabits(a: MasterArchivist, s: Partial<Pick<SaveJson, 'read' | 'settings'>>) {
   if (Array.isArray(s.read)) a.read = [...s.read];
   a.settings = { ...a.settings, ...s.settings };
 }
 
-/** Drops ids the catalog no longer has (renamed or removed content) and gives every starter its soul file. */
+/**
+ * Drops ids the catalog no longer has (renamed or removed content), gives
+ * every starter its soul file and every cleared stage's champion its own, so
+ * a save survives stages that change what they bring.
+ */
 function validated(a: MasterArchivist): MasterArchivist {
   const champions = new Set(CHAMPIONS.map((c) => c.id));
   const stages = new Set(allStages().map((s) => s.id));
   a.reliquary.keepOnly((id) => champions.has(id));
-  for (const id of STARTERS) a.reliquary.recruit(id, false);
-  a.team = a.team.filter((id) => a.reliquary.has(id));
   for (const id of Object.keys(a.stars)) if (!stages.has(id)) delete a.stars[id];
+  for (const id of STARTERS) a.reliquary.recruit(id, false);
+  for (const s of allStages()) if (s.recruit && cleared(a, s.id)) a.reliquary.recruit(s.recruit, false);
+  a.team = a.team.filter((id) => a.reliquary.has(id));
   return a;
 }
 
 export function loadArchivist(): MasterArchivist {
   let raw: string | null = null;
-  let rawV1: string | null = null;
+  let rawOld: string | null = null;
   try {
     raw = localStorage.getItem(KEY);
-    if (!raw) rawV1 = localStorage.getItem(KEY_V1);
+    if (!raw) rawOld = OLD_KEYS.map((k) => localStorage.getItem(k)).find((v) => v) ?? null;
   } catch {
     // storage unavailable: a new game for this session
   }
-  const a = readSave(raw, rawV1);
-  // a version 1 save is migrated once; the old entry is left as it was
-  if (!raw && rawV1) saveArchivist(a);
+  const a = readSave(raw, rawOld);
+  // an older save is read once; its entry is left as it was
+  if (!raw && rawOld) saveArchivist(a);
   return a;
 }
 
 /** The archivist as stored text. */
 export function writeSave(a: MasterArchivist): string {
-  const s: SaveJson = { version: 2, stars: a.stars, team: a.team, read: a.read, settings: a.settings, reliquary: a.reliquary.toJSON() };
+  const s: SaveJson = { version: 3, stars: a.stars, team: a.team, read: a.read, settings: a.settings, reliquary: a.reliquary.toJSON() };
   return JSON.stringify(s);
 }
 

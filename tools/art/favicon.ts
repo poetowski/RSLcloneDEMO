@@ -1,8 +1,10 @@
-// Writes public/favicon.png: the knight's portrait in a gold frame (32x32).
+// Writes public/favicon.png: the starter's portrait in a gold frame (32x32), a
+// placeholder until a favicon is designed.
+import { STARTERS } from '../../src/game/data/campaign.ts';
 import { Bitmap, hex } from './raster.ts';
 const ui = Bitmap.load('public/assets/ui/ui.png');
 const json = JSON.parse((await import('node:fs')).readFileSync('public/assets/ui/ui.json', 'utf8'));
-const [x, y, w, h] = json.portraits.knight;
+const [x, y, w, h] = json.portraits[STARTERS[0]];
 const out = new Bitmap(32, 32).fill(hex('#120c08'));
 out.rect(1, 1, 30, 30, hex('#e8b440'));
 out.blit(ui, 2, 2, { src: { x, y, w, h } });

@@ -13,7 +13,7 @@ A combat background ("zone") is one art module and one behaviour entry:
 | Behaviour: ambience, light pools, shadows, tint, birds, haze | `src/game/data/zones.ts` (a `ZoneDef`) | `tests/content.test.ts` |
 | Where it is used | a `LocationDef.zone` in `src/game/data/campaign.ts` | content tests |
 
-The contract (`ZoneArt`, `PropKind`, rows, spawns) is in `tools/art/zones/shared.ts`. Reference zones: `frostfang.ts` (night, snow, stone arches), `sunscar.ts` (sunset, sand, reliefs, a gate and a colonnade framing the desert) and `nyota.ts` (cosmic dusk, painted panels, a mud-brick gate whose portal is a pulsing prop, pylons over an open void with floating islands). Read `docs/ART_GUIDE.md` sections 3, 4 and 10 first.
+The contract (`ZoneArt`, `PropKind`, rows, spawns) is in `tools/art/zones/shared.ts`. Reference zone: `zone1.ts` (Zone 1, *A Dim Island*: dusk, a grass floor seamless across variants, a dry-stone wall with a gap, cottages and the faction standards as props, drifting islands over a sea of cloud). The proof of concept's `frostfang.ts` (night, snow, stone arches), `sunscar.ts` (sunset, sand, reliefs, a gate framing the desert) and `nyota.ts` (cosmic dusk, painted panels, floating islands with waterfalls) are in git history at tag `poc-v1`. The world's places come from Jakub's notes (`docs/DESIGN_DECISIONS.md` section 5): floating islands, each broken in its own way. Read `docs/ART_GUIDE.md` sections 3, 4 and 10 first.
 
 ## 1. Design (worksheet first)
 
@@ -24,7 +24,7 @@ Rules that are not negotiable:
 1. **The key light is in the upper-left** (sun, moon, fire). Every tile, prop and carving is lit from there: top/left edges bright, bottom/right edges dark; in sunk relief the upper-left lip is in shadow.
 2. **The floor (rows 6-11) is mid value and low contrast.** Champions are outlined and high contrast; the floor must never compete. Put bright, saturated set pieces on the wall, in the backdrop or at the edges.
 3. **Formation spots are fixed** (player 216,250 / 152,216 / 136,284; enemy 424,250 / 488,216 / 504,284). No tall `back` prop directly behind them, no `fg` prop near them.
-4. **Openings earn their keep**: every transparent gap in the wall shows something composed in the backdrop (the Sunscar gate frames the great pyramid). Check the backdrop against the wall: an element the architecture half hides (a beam rising from behind a pylon, the sliver of an island beside a tower) reads as a glitch, so move it into an opening or leave it out.
+4. **Openings earn their keep**: every transparent gap in the wall shows something composed in the backdrop (the gap in Zone 1's wall frames the path running out to the island's edge, the cloud sea and a drifting island). Check the backdrop against the wall: an element the architecture half hides (a beam rising from behind a pylon, the sliver of an island beside a tower) reads as a glitch, so move it into an opening or leave it out.
 5. **No smooth gradients, no anti-aliasing**: ramps with 4x4 Bayer dithering (`rampDither`, `dith`).
 6. **Seamless tiles**: joints on the right/bottom edges, bevel light on the top/left, so any tiles can sit side by side.
 
@@ -66,11 +66,11 @@ Visual review — look at every image at 2x before calling it done:
 ```bash
 # first look at docs/images/zone_<id>.png (the static composition), then check it live:
 npm run dev
-npx tsx tools/shots.ts "http://localhost:5173/?unlockall=1&screen=battle&stage=<a stage using it>&team=knight,dreadknight,stalker" out "w6000,ka,B6:700"
+npx tsx tools/shots.ts "http://localhost:5173/?unlockall=1&screen=battle&stage=<a stage using it>&team=azure_warrior,sanguine_support" out "w6000,ka,B6:700"
 npx tsx tools/shots.ts "http://localhost:5173/?unlockall=1&screen=team&stage=<stage>" out "w2500,B1:0"
 ```
 
-Pick a test team with a light, a dark and a saturated champion (Sir Aldric, Vorhaal, Akhet): all three must read against the floor, their HP bars and numbers must stay legible over the wall, and nothing in the foreground may cover them.
+Pick a test team with a light, a dark and a saturated champion (today the Sanguine Support's white linen and the Azure Warrior's fur and red; add a dark champion when the roster has one): all must read against the floor, their HP bars and numbers must stay legible over the wall, and nothing in the foreground may cover them.
 
 ## 5. Done means
 
