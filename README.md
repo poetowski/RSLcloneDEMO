@@ -9,6 +9,7 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 - **13 champions** in 7 factions, each with idle, run, three attacks, hurt and death (Anhotep also rises from the dead), rendered for both facings.
 - **3 combat backgrounds**: the snowbound *Frostfang Ruins*, the sunset necropolis of the *Sunscar Ruins* and the afrofuturist *Nyota Skyforge* on the high plateau.
 - **A campaign** of 10 stages in three chapters on a painted world map three screens wide (drag it, jump between stages with the arrows, or press `M` for the whole world); every enemy you defeat can be **recruited** on the first clear.
+- **A Weaver Matrix** for every champion: six slots in two triangles holding Thread Spools, each with a main stat and strands, on the champion page's MATRIX tab (spools have no sources yet; `?spools=1` adds a sample).
 - **A collection** of champions with locked silhouettes, rarities, affinities, factions and roles, and a detail page with every animation and skill.
 - **The Academy**: an in-game codex that teaches combat, the turn meter, damage, affinities, all buffs, debuffs and special mechanics, with live demonstrations.
 - **Real mechanics**: turn meter, A1/A2/A3 cooldowns, 16 statuses, affinity cycle, counterattacks, dispels, lifesteal, execute, turn meter boosts, Undying, Overdrive, bosses, stars, auto battle and speed controls.

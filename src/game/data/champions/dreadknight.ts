@@ -9,7 +9,7 @@ export const dreadknight: ChampionDef = {
   affinity: 'void',
   faction: 'coven',
   color: '#a44cff',
-  stats: { hp: 1550, atk: 104, def: 82, spd: 100, crit: 0.12 },
+  stats: { hp: 1550, atk: 104, def: 73, spd: 100, crit: 0.06 },
   lore: "Once the Order's greatest knight, Vorhaal bargained with the Coven for a blade that cannot break. It drinks a little of every soul it cuts, and a little of his.",
   skills: [
     {

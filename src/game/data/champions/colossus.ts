@@ -9,7 +9,7 @@ export const colossus: ChampionDef = {
   affinity: 'arcane',
   faction: 'nyota',
   color: '#ffc850',
-  stats: { hp: 1650, atk: 86, def: 96, spd: 92, crit: 0.08 },
+  stats: { hp: 1650, atk: 86, def: 78, spd: 92, crit: 0.04 },
   lore: 'The guardian the first star-smiths raised to keep the Skyforge. Mwamba has stood at the heart of the forge for a thousand years, and it decides who may carry the fire it guards.',
   passive: {
     id: 'starforged_core',

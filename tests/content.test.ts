@@ -13,6 +13,7 @@ import { STATUSES } from '../src/game/data/statuses';
 import { StatusId } from '../src/game/data/types';
 import { ZONES } from '../src/game/data/zones';
 import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, stageOpen, writeSave } from '../src/game/archivist';
+import { PATTERN_IDS } from '../src/game/data/matrix';
 import { threadSpool } from '../src/game/reliquary/matrix';
 
 const json = (p: string) => JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -211,6 +212,13 @@ describe('font', () => {
   });
 });
 
+describe('weaver matrix art', () => {
+  it('has the rose, the slot rings and a spool icon for every pattern and grade', () => {
+    for (const p of ['matrix_rose', 'lobe_sel', 'lobe_attune']) expect(ui.parts[p], p).toBeTruthy();
+    for (const id of PATTERN_IDS) for (const g of [0, 1, 2]) expect(ui.parts[`spool_${id}_${g}`], `spool_${id}_${g}`).toBeTruthy();
+  });
+});
+
 describe('save', () => {
   it('opens stages in order and recruits on the first clear only', () => {
     const p = newArchivist();
@@ -281,9 +289,9 @@ describe('save', () => {
     recordClear(p, allStages()[0].id, 2);
     p.read.push(CHAPTERS[0].id);
     p.settings = { speed: 2, auto: true };
-    const spool = threadSpool('test', 'spd', 8);
+    const spool = threadSpool('test', 2, 'crit', [['spd', 1], ['atk', 3], ['hp', 2]]);
     p.reliquary.addSpool(spool);
-    p.reliquary.addSpool(threadSpool('test', 'hp', 120));
+    p.reliquary.addSpool(threadSpool('test', 0, 'hp', [['def', 1]]));
     p.reliquary.equip(STARTERS[0], 3, spool);
     const text = writeSave(p);
     const q = readSave(text);

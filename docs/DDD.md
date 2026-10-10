@@ -4,7 +4,7 @@ How the domain of The Loom: Reliquary of Legends (code name TLROL) is cut into b
 
 Companion guides: [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) (the rules), [GAME_STRUCTURE.md](GAME_STRUCTURE.md) (content and screens), [ART_GUIDE.md](ART_GUIDE.md), [UI_GUIDE.md](UI_GUIDE.md).
 
-Snapshot: commit `8dd9a26`, 2026-10-06. Every dependency rule in section 8 and every "true today" in section 6 was checked against that commit. The save, the Reliquary and their rules (sections 2.3, 2.6, 3, 4.4, 4.7, 6.3, 6.5, 8) were checked again on 2026-10-08.
+Snapshot: commit `8dd9a26`, 2026-10-06. Every dependency rule in section 8 and every "true today" in section 6 was checked against that commit. The save, the Reliquary and their rules (sections 2.3, 2.6, 3, 4.4, 4.7, 6.3, 6.5, 8) were checked again on 2026-10-08, the gear system and the DEF and crit rules on 2026-10-10.
 
 ---
 
@@ -149,11 +149,17 @@ The language of the final game (approved 2026-10-08). Heroes keep the word *cham
 | Master Archivist | the player; in code, the player's save | `MasterArchivist` |
 | Reliquary | the vault of everything the archivist owns: one soul file per champion and the loose spools; the aggregate root of both | `Reliquary` |
 | Hero Soul File | one owned champion's record: which champion, its NEW badge, its Weaver Matrix | `HeroSoulFile` |
-| Weaver Matrix | a champion's gear: six slots in a hexagon | `WeaverMatrix` |
+| Weaver Matrix | a champion's gear: six slots in two triangles | `WeaverMatrix` |
 | Matrix slot | one of the six, numbered 0 (top) clockwise to 5; holds at most one spool | `MatrixSlot`, `SlotIndex` |
 | Stat node | a slot's rule for a spool's main stat: fixed (one stat) or variable (one of a list) | `StatNode` |
-| Matrix layout | the six stat nodes, the same for every champion; a placeholder today (every slot takes every stat) | `MatrixLayout`, `MATRIX_LAYOUT` |
-| Thread Spool | a piece of gear: a pattern and a main stat; a value, never changed in place | `ThreadSpool`, `threadSpool()`, `sameSpool()` |
+| Matrix layout | the six stat nodes, the same for every champion: ATK, DEF and HP fixed in slots 1, 3 and 5; slot 2 SPD or a %, slot 4 CRIT or a %, slot 6 a % | `MatrixLayout`, `MATRIX_LAYOUT` |
+| Fixed slot, choice slot | the two triangles: a fixed slot takes one stat, a choice slot one of a list | `StatNode.kind` |
+| Thread Spool | a piece of gear: a pattern, a grade, a main stat and strands; a value, never changed in place | `ThreadSpool`, `threadSpool()`, `rollSpool()`, `sameSpool()` |
+| Grade | Ashen, Silver or Gilded: sets the main value and the number of strands | `Grade`, `GRADES`, `MAIN_VALUE`, `STRAND_COUNT` |
+| Main stat | the spool's stat that decides the slots it fits; its value follows the grade | `ThreadSpool.main` |
+| Strand | an additional stat on a spool, rolled once in its grade's range | `ThreadSpool.strands`, `STRAND_RANGE` |
+| Attunement | a choice slot's bond to the fixed stats beside it; a strand of that stat gains +1 there | `attunedStats`, `strandValue`, `ATTUNE_BONUS` |
+| Woven stats | a champion's stats with its matrix, the stats it brings to battle | `wovenStats`, `matrixBonus`, `battleStats` |
 | Stock | the spools in the Reliquary that sit in no slot | `Reliquary.spools()` |
 | Weave Pattern | a set bonus woven by 2 or 4 spools of one pattern, wherever they sit | `WeavePatternDef` |
 | Woven | a pattern complete in a matrix, and how many times (6 spools of a 2-piece pattern: 3 times) | `WovenPattern`, `WeavePatternEvaluator` |
@@ -217,7 +223,8 @@ The language of the final game (approved 2026-10-08). Heroes keep the word *cham
 | C2, C1 → C3 | policy reads the model | `auditChampion`, `simulate` | `npm test`, `npm run balance` | the bands are calibrated on the AI (see [MDA.md](MDA.md) T2) |
 | C6 → C4 | application service → domain + repository | `stageOpen`, `recordClear`, `saveArchivist` | content tests (save) | screens also write `team`, `read` and `settings` directly (DR-15) |
 | C4 → C10 | the archivist holds the Reliquary; one save document | `Reliquary` methods, `ReliquaryJson` | tests (round trip, migration, salvage) | a layout change strands spools: loading moves every spool its slot no longer takes to the stock (INV-R5) |
-| C2 → C10 | catalog | `StatNode`, `MatrixLayout`, `MATRIX_LAYOUT`, `WeavePatternDef`, `STAT_IDS` | typecheck | the layout is a placeholder until approved |
+| C2 → C10 | catalog | `StatNode`, `MatrixLayout`, `MATRIX_LAYOUT`, grades, values, strand rules, `STAT_IDS` | typecheck, tests | approved 2026-10-10; Weave Patterns still undefined |
+| C10 → C1 | stats only | `Combatant.stats` from `battleStats` (archivist) | tests | spools never reach the rules except as stats; enemies wear none |
 | C6 → C5 | anti-corruption seam | `BattleHooks` (`finish`, `next`, `retry`, `exit`, `settings`) | design | none: the scene knows nothing of the save or routes, keep it so |
 
 ## 4. Tactical model
@@ -300,8 +307,9 @@ winner()           checked before choosing and after every action
 - **Entity: `HeroSoulFile`.** Identity: the champion id, one file per champion. Frozen; the Reliquary replaces it on every change.
 - **Value objects:** `ThreadSpool` and `StatBonus` (frozen, equal when their fields are equal: `sameSpool`), `MatrixSlot`, `WeaverMatrix` (every change returns a new matrix), `WovenPattern`.
 - **Domain service: `WeavePatternEvaluator`.** Counts spools per pattern over the whole matrix, never by slot; a pattern is woven `floor(count / pieces)` times; results follow catalog order; an unknown pattern throws.
+- **Spool rules:** `threadSpool` enforces them (main value from the grade, strand count by grade, no repeats, values in range, SPD strands +1); `rollSpool` draws a valid spool. `attunedStats`, `strandValue`, `matrixBonus` (SPD strands capped at +4) and `wovenStats` turn a matrix into stats; the archivist's `battleStats` hands them to `Combatant.stats`.
 - **Persistence:** `toJSON` and `fromJSON` (`ReliquaryJson`) keep spools by slot index. Loading puts a spool back into its slot when the slot still takes it, otherwise into the stock, and drops malformed entries.
-- **Waiting for approval, not built:** the matrix layout (a placeholder in `data/matrix.ts`: every slot takes every stat), spool stats, the pattern catalog and its bonuses, where spools come from, the matrix screen, and the bridge into combat (a champion's stats plus its matrix, handed to `Combatant`; phase 3).
+- **Built (2026-10-10):** the layout, grades, strands, attunement, the bridge into combat and the MATRIX tab. **Not defined yet:** the Weave Pattern catalog and its bonuses, and where spools and materials come from; the stage powers are measured again once sources exist.
 
 ## 5. Domain events
 
@@ -401,12 +409,15 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 
 | ID | Invariant | Enforced by |
 | --- | --- | --- |
-| INV-R1 | A Weaver Matrix has six slots; a slot holds at most one spool, and only one its stat node takes | type (`MatrixLayout`), code (`equip`), test |
+| INV-R1 | A Weaver Matrix has six slots in two triangles (ATK, DEF, HP fixed; SPD only in slot 2, CRIT only in slot 4); a slot holds at most one spool, and only one its stat node takes | type (`MatrixLayout`), code (`equip`), test |
 | INV-R2 | A Weave Pattern counts its spools wherever they sit and is woven `floor(count / pieces)` times: a 2-piece pattern up to three times, a 4-piece pattern once | test (every arrangement over the six slots) |
 | INV-R3 | A spool is in exactly one place, the stock or one slot; only the Reliquary moves spools | code, test (2000 random moves) |
 | INV-R4 | One soul file per champion; every starter has one | code (`recruit`, `readSave`), test |
 | INV-R5 | A save never loses a valid spool: one its slot no longer takes goes to the stock on load | test |
 | INV-R6 | Thread Spools never change: frozen, and equal fields make the same spool | code (`threadSpool`), test |
+| INV-R7 | A spool's main value follows its grade; it has one strand per grade step, none repeating a stat, each in its grade's range, SPD strands +1; a save cannot raise a stored value | code (`threadSpool`, `readSpool`), test |
+| INV-R8 | Strands add at most +4 SPD to a matrix; attunement adds +1 only on choice slots, for the fixed stats beside them | code (`matrixBonus`), test |
+| INV-R9 | The matrix reaches battle only as the stats a combatant brings; without them a unit fights with its base stats | code (`Battle`), test |
 
 ## 7. Policies: where decisions live
 

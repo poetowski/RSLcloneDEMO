@@ -70,8 +70,8 @@ export const CHAPTERS: Chapter[] = [
     blocks: [
       { kind: 'p', text: 'Every damaging hit is built from the attacker\'s Attack (ATK) times the skill\'s multiplier, reduced by the target\'s Defense (DEF).' },
       { kind: 'figure', id: 'damage' },
-      { kind: 'p', text: 'Defense never makes anyone immune: 50 DEF lets two thirds of the damage through, 100 DEF still lets half through. DEF Up and DEF Down change it by 40% and 30%.' },
-      { kind: 'p', text: 'Critical hits roll on every hit with the attacker\'s Crit Rate and deal 50% more damage. Multi-hit skills roll each hit separately, so they crit more often and spread damage over more chances to apply effects.' },
+      { kind: 'p', text: 'Defense divides damage: twice the DEF, half the damage. A champion with 80 DEF takes half of what one with 40 DEF takes, and no amount makes anyone immune. DEF Up and DEF Down change it by 16% and 12%.' },
+      { kind: 'p', text: 'Critical hits roll on every hit with the attacker\'s Crit Rate and deal double damage. Multi-hit skills roll each hit separately, so they crit more often and spread damage over more chances to apply effects.' },
       { kind: 'p', text: 'Shields absorb damage before HP. Poison and Burn ignore shields.' },
     ],
   },

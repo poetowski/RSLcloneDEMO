@@ -9,7 +9,7 @@ export const monk: ChampionDef = {
   affinity: 'wild',
   faction: 'temple',
   color: '#f39432',
-  stats: { hp: 1150, atk: 94, def: 60, spd: 116, crit: 0.15 },
+  stats: { hp: 1150, atk: 94, def: 64, spd: 116, crit: 0.075 },
   lore: 'The last master of the Still Peak temple. Tenzo teaches that a closed fist and an open palm are the same hand; his enemies rarely stay to learn the rest.',
   skills: [
     {

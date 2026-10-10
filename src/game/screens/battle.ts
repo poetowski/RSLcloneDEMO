@@ -2,7 +2,7 @@
 // (or an Academy demonstration), records the result in the save and
 // routes onward — recruit ceremony, next stage, retry or back to the map.
 import { App, Screen } from '../app';
-import { recordClear } from '../archivist';
+import { battleStats, recordClear } from '../archivist';
 import { allStages, locationOf, stage } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
 import { homeZone, zone } from '../data/zones';
@@ -21,6 +21,7 @@ export class BattleScreen implements Screen {
       const st = stage(o.stageId);
       const setup: BattleSetup = {
         player: o.team.map(champion),
+        playerStats: o.team.map((id) => battleStats(p, id)),
         enemy: st.enemies,
         zone: zone(locationOf(st.id).zone),
         stage: st,

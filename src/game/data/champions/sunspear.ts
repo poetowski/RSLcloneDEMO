@@ -10,7 +10,7 @@ export const sunspear: ChampionDef = {
   faction: 'nyota',
   color: '#ff5fb0',
   muzzle: [40, 67],
-  stats: { hp: 1350, atk: 108, def: 68, spd: 106, crit: 0.15 },
+  stats: { hp: 1350, atk: 108, def: 67, spd: 106, crit: 0.075 },
   lore: 'Captain of the Spear Guard of Nyota. Imara dances the old spear forms with a blade of hard light, and no stranger climbs the Baobab Steps without answering to her.',
   skills: [
     {

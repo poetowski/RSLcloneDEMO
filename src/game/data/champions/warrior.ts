@@ -9,7 +9,7 @@ export const warrior: ChampionDef = {
   affinity: 'force',
   faction: 'clans',
   color: '#d9443f',
-  stats: { hp: 1150, atk: 118, def: 55, spd: 104, crit: 0.2 },
+  stats: { hp: 1150, atk: 118, def: 62, spd: 104, crit: 0.1 },
   lore: 'A clan champion of the frozen north who fights with an axe in each hand and a war song on his lips. He follows Aldric because the knight once refused to leave him behind.',
   skills: [
     {

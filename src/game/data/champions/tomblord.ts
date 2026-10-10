@@ -10,7 +10,7 @@ export const tomblord: ChampionDef = {
   faction: 'sunscar',
   color: '#4cd43a',
   muzzle: [42, 50],
-  stats: { hp: 1400, atk: 100, def: 70, spd: 96, crit: 0.12 },
+  stats: { hp: 1400, atk: 100, def: 68, spd: 96, crit: 0.06 },
   lore: 'The god-king who refused to die. Anhotep sealed himself in gold and linen to outlast the sun itself, and the sands have finally given him back.',
   passive: {
     id: 'undying',

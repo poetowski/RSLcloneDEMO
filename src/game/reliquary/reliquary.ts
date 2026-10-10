@@ -4,7 +4,7 @@
 // exactly one place: the stock or one slot. Terms and invariants:
 // docs/DDD.md 2.6, 4.7, 6.5.
 import { MatrixLayout, PatternId, StatId } from '../data/types';
-import { fits, sameSpool, SlotIndex, threadSpool, ThreadSpool, WeaverMatrix } from './matrix';
+import { fits, Grade, sameSpool, SlotIndex, threadSpool, ThreadSpool, WeaverMatrix } from './matrix';
 
 /** Hero Soul File: an entity, one champion's record in the Reliquary. Identity: the champion id. */
 export interface HeroSoulFile {
@@ -142,9 +142,10 @@ export class Reliquary {
 /** A spool from saved data, or null when it is malformed. */
 function readSpool(raw: unknown): ThreadSpool | null {
   if (!raw || typeof raw !== 'object') return null;
-  const s = raw as { pattern?: unknown; main?: { stat?: unknown; value?: unknown } };
+  const s = raw as { pattern?: unknown; grade?: unknown; main?: { stat?: unknown }; strands?: { stat?: unknown; value?: unknown }[] };
   try {
-    return threadSpool(s.pattern as PatternId, s.main?.stat as StatId, s.main?.value as number);
+    const strands = (s.strands ?? []).map((t) => [t.stat as StatId, t.value as number] as const);
+    return threadSpool(s.pattern as PatternId, s.grade as Grade, s.main?.stat as StatId, strands);
   } catch {
     return null;
   }

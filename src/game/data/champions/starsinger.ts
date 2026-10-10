@@ -10,7 +10,7 @@ export const starsinger: ChampionDef = {
   faction: 'nyota',
   color: '#40d8c8',
   muzzle: [35, 62],
-  stats: { hp: 1200, atk: 96, def: 62, spd: 114, crit: 0.12 },
+  stats: { hp: 1200, atk: 96, def: 65, spd: 114, crit: 0.06 },
   lore: "A griot of Nyota who keeps the city's memory in song. His kora-staff is strung with starlight, and when he plays, the whole line moves to his rhythm.",
   skills: [
     {

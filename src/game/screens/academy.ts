@@ -231,10 +231,10 @@ export class AcademyScreen extends BaseScreen {
       }
       case 'damage': {
         const lines = [
-          ['DAMAGE = ATK x skill multiplier x 4.8 x 100 / (100 + DEF)', COLORS.goldHi],
+          ['DAMAGE = ATK x skill multiplier x 4.8 x 40 / DEF', COLORS.goldHi],
           ['x 1.2 strong hit, x 0.8 weak hit      x 1.25 if Weakened', COLORS.text],
-          ['x 1.5 critical hit      x 0.92 to 1.08 random spread', COLORS.text],
-          ['Example: 100 ATK, a 1.0 skill, a 100 DEF target: about 240 damage.', COLORS.dim],
+          ['x 2 critical hit      x 0.92 to 1.08 random spread', COLORS.text],
+          ['Example: 100 ATK, a 1.0 skill, an 80 DEF target: about 240 damage.', COLORS.dim],
         ] as const;
         if (ctx) {
           ui.panel(ctx, 'well', x, y, w, 56);

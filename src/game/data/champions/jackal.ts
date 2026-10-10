@@ -9,7 +9,7 @@ export const jackal: ChampionDef = {
   affinity: 'force',
   faction: 'sunscar',
   color: '#2aa890',
-  stats: { hp: 1600, atk: 82, def: 92, spd: 97, crit: 0.1 },
+  stats: { hp: 1600, atk: 82, def: 77, spd: 97, crit: 0.05 },
   lore: "Sworn guardian of the Sunscar necropolis. Kha'zir has watched the tomb gates for three hundred years behind the mask of the jackal god; he weighs every intruder's heart and finds it wanting.",
   skills: [
     {

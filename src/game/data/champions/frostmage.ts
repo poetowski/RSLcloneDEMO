@@ -10,7 +10,7 @@ export const frostmage: ChampionDef = {
   faction: 'coven',
   color: '#5cc4ea',
   muzzle: [34, 47],
-  stats: { hp: 1150, atk: 108, def: 55, spd: 108, crit: 0.15 },
+  stats: { hp: 1150, atk: 108, def: 62, spd: 108, crit: 0.075 },
   lore: 'High witch of the Frostfang Coven. Ysolde froze her own heart to keep the old ice magic alive, and can no longer remember why it mattered.',
   skills: [
     {

@@ -9,9 +9,10 @@ The game is **The Loom: Reliquary of Legends** (code name TLROL), high fantasy w
 - the name; "Reliquary of Legends" is the subtitle, and heroes stay *champions*;
 - the domain lexicon: Master Archivist, Reliquary, Hero Soul File, Weaver Matrix, Thread Spool, Weave Pattern ([docs/DDD.md](docs/DDD.md) 2.6); the Spindle of Fate is a placeholder name with no meaning yet;
 - the logo: a gothic rose window (six jewelled lobes, as the Weaver Matrix holds six spools) before THE LOOM in cast gold, with RELIQUARY OF LEGENDS beneath in the `display` face;
+- the gear system (2026-10-10): the two-triangle Weaver Matrix, spools with a main stat (Ashen, Silver, Gilded) and strands, attunement, the MATRIX tab and the spool art, and the combat rules that make DEF divide damage (40 / DEF) and critical hits deal double ([docs/MECHANICS_GUIDE.md](docs/MECHANICS_GUIDE.md) 5 and 14);
 - the Weaver Matrix outline: six slots whose stat nodes are fixed (one stat) or variable (one of a list); 2- and 4-piece Weave Patterns counted wherever their spools sit; a 2-piece pattern can be woven up to three times.
 
-Everything else is proof-of-concept placeholder: the champions, factions, zones, stages, lore, Academy text, rule numbers, norms, effects and art, and the matrix layout, spools and patterns. Jakub, the game's designer, approves or rejects every piece of real content before it is built: names, stats, numbers, mechanics, texts and art.
+Not defined yet: the Weave Patterns (names, rules and values) and where spools and materials come from. Everything else is proof-of-concept placeholder: the champions, factions, zones, stages, lore, Academy text, rule numbers, norms, effects and art. Jakub, the game's designer, approves or rejects every piece of real content before it is built: names, stats, numbers, mechanics, texts and art.
 
 - Propose first: options with a recommendation, and rendered previews or captures for anything visual. Then wait for his answer.
 - Never build unapproved content, also in a session he is not part of: stop at the proposal.
@@ -33,7 +34,7 @@ Everything else is proof-of-concept placeholder: the champions, factions, zones,
 ## Where things are
 
 - Rules: `src/game/battle/` (pure, tested). Content data: `src/game/data/` (champions, statuses, meta, campaign, zones, codex, norms).
-- Player state: `src/game/archivist.ts` (the Master Archivist: the save, its migration, unlocks) and `src/game/reliquary/` (Hero Soul Files, the Weaver Matrix, Thread Spools, the Weave Pattern evaluator); the matrix catalog is `src/game/data/matrix.ts`.
+- Player state: `src/game/archivist.ts` (the Master Archivist: the save, its migration, unlocks) and `src/game/reliquary/` (Hero Soul Files, the Weaver Matrix, Thread Spools and their strands, the Weave Pattern evaluator); the matrix catalog is `src/game/data/matrix.ts`, its art `tools/art/ui/matrix.ts`, its tab in `src/game/screens/champion.ts`.
 - Presentation: `src/game/view/` (battle scene, units, fx, HUD, zone), `src/game/screens/` (menus), `src/game/ui/ui.ts` (UI kit), `src/game/app.ts` + `src/main.ts` (router, deep links).
 - Art: `tools/art/champions/` (one module per champion), `tools/art/fx/` (kit + effect groups), `tools/art/zones/` (one module per background + `shared.ts` contract), `tools/art/ui/`, `tools/art/map.ts`, `tools/art/palette.ts` (every color).
 - Docs: `docs/ART_GUIDE.md`, `docs/MECHANICS_GUIDE.md`, `docs/GAME_STRUCTURE.md`, `docs/UI_GUIDE.md`; design intent and measured baseline in `docs/MDA.md`; domain language, invariants and change playbooks in `docs/DDD.md`.

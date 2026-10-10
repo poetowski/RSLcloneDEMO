@@ -11,6 +11,7 @@ import { Bitmap, hex } from '../raster.ts';
 import { solve } from '../rig.ts';
 import { banner, button, chevron, footRing, GLYPHS, panel, skillFrame, smallGlyph } from './kit.ts';
 import { arrow, bigButton, cardFrame, check, crown, divider, emblem, gem, lock, logo, mapNode, MENU_ICONS, newBadge, nodeGlow, podium, roleIcon, star, tab, well } from './menu.ts';
+import { matrixParts } from './matrix.ts';
 import { STATUS_ICONS, statusIcon } from './status.ts';
 
 type Rect4 = [number, number, number, number];
@@ -93,6 +94,7 @@ export function allParts(): Record<string, Bitmap> {
   }
   for (const [k, g] of Object.entries(GLYPHS)) parts['g_' + k] = smallGlyph(g);
   for (const [k, make] of Object.entries(MENU_ICONS)) parts['mi_' + k] = make();
+  Object.assign(parts, matrixParts());
   return parts;
 }
 

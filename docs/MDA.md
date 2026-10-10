@@ -99,7 +99,7 @@ For each dynamic: what happens, what drives it, the measured baseline, the band 
 ### DY3 Focus fire and time-to-kill
 
 - **Happens:** removing one enemy early, and with it all its turns, is the main tactical axis. Protection matters because it breaks focus.
-- **Driven by:** damage = ATK x mult x 4.8 x 100 / (100 + DEF) x modifiers; the AI focusing the lowest HP% 70% of the time; Taunt, Shield, heals and execute.
+- **Driven by:** damage = ATK x mult x 4.8 x 40 / DEF x modifiers (since 2026-10-10; 100 / (100 + DEF) before); the AI focusing the lowest HP% 70% of the time; Taunt, Shield, heals and execute.
 - **Baseline:** with crits counted and the roster's average DEF (68.5), one A1 takes 18% (Sir Aldric) to 34% (Brakka) of an average champion's 1,302 HP: 2.9 to 5.6 A1s to kill. Campaign battles last 10-26 actions on average.
 - **Band:** A1 time-to-kill against the average champion between 2.5 and 6 hits. A full-HP one-shot happens only as the rare product of set-up, crit and a strong hit, never as a kit's plan.
 - **Serves:** AE1, AE2. **Watch:** raising an ATK limit or a multiplier norm shortens time-to-kill for everyone and collapses DY2 and DY6.
@@ -193,13 +193,13 @@ The first source column is the truth. The last column lists every hand-written c
 | Starting meter | random 0-12% | `Battle` constructor | MECHANICS_GUIDE 2, Academy tip |
 | Meter after acting | 0, or `selfTm` capped at 99 | `Battle.endTurn` | MECHANICS_GUIDE 2-3 |
 | Damage | ATK x mult x 4.8 | `DAMAGE_SCALE` | MECHANICS_GUIDE 5, Academy damage figure (`academy.ts`) |
-| Defense | x 100 / (100 + DEF) | `Battle.rollDamage` | MECHANICS_GUIDE 5, Academy `damage`, champion page stat tip |
-| Critical hit | x1.5, rolled per hit with CRIT | `CRIT_MULT` | MECHANICS_GUIDE 5, Academy, champion page stat tip |
+| Defense | x 40 / DEF (`DEF_SCALE`) | `Battle.rollDamage` | MECHANICS_GUIDE 5, Academy `damage`, champion page stat tip |
+| Critical hit | x2, rolled per hit with CRIT | `CRIT_MULT` | MECHANICS_GUIDE 5, Academy, champion page stat tip |
 | Spread | x0.92-1.08; at least 1 damage | `Battle.rollDamage` | MECHANICS_GUIDE 5, Academy figure |
 | Affinity | ±20%, Void neutral | `AFFINITY_BONUS`, `affinityEdge` (`meta.ts`) | MECHANICS_GUIDE 6, Academy `affinity`, `AFFINITIES` texts |
 | Weaken | +25% damage taken | `WEAKEN_MULT` | `statuses.ts`, MECHANICS_GUIDE 5 and 7, Academy figure |
 | ATK Up / ATK Down | ±25% | `Battle.attack` (inline) | `statuses.ts`, MECHANICS_GUIDE 5 and 7 |
-| DEF Up / DEF Down | +40% / -30% | `Battle.defense` (inline) | `statuses.ts`, MECHANICS_GUIDE 5 and 7, Academy `damage` |
+| DEF Up / DEF Down | +16% / -12% | `DEF_UP`, `DEF_DOWN` (`battle.ts`) | `statuses.ts`, MECHANICS_GUIDE 5 and 7, Academy `damage` |
 | SPD Up / SPD Down | ±25% | `Battle.speed` (inline) | `statuses.ts`, MECHANICS_GUIDE 2 |
 | Poison / Burn | -5% / -6% max HP at turn start, through shields | `POISON_PCT`, `BURN_PCT` | `statuses.ts`, MECHANICS_GUIDE 3 and 7, Academy |
 | Regen | +7.5% max HP at turn start | `REGEN_PCT` | `statuses.ts`, MECHANICS_GUIDE 7 |
@@ -511,6 +511,7 @@ Record every change that moves a dynamic out of its band, changes a band, or cha
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-06 | MDA baseline established (this document) | - | - | section 6 | reference point for later changes |
 | 2026-10-08 | Final name and domain lexicon (The Loom: Reliquary of Legends); T11 decided in part: champions grow through gear, the Weaver Matrix | AE1, AE3 | none yet: the layout is a placeholder and no spools exist | - | outline approved by Jakub: six slots with fixed or variable stat nodes, Thread Spools, 2- and 4-piece Weave Patterns counted wherever their spools sit, a 2-piece pattern up to three times. Layout, spools, pattern bonuses and spool sources wait for the Weaver Matrix proposal |
+| 2026-10-10 | The gear system: the two-triangle layout, spools with a main stat (Ashen, Silver, Gilded) and strands, attunement, the MATRIX tab; DEF and CRIT closed on ATK and HP in the rules (damage x 40 / DEF, crits x2, every champion's DEF remapped and crit halved so battles stay the same) | AE1, AE3 | impact within ±3 points, curve -1 to +4 points; the impact measure now plays 960 battles per champion (240 flagged noise as a failure) | section 6 stays the reference; numbers moved inside the noise | approved by Jakub ("this looks like a good gear system"). Weave Patterns and spool sources are not defined yet; stage powers are re-measured once sources set how fast spools arrive |
 
 ## 10. Keeping this document true
 

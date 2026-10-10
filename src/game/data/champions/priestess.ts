@@ -10,7 +10,7 @@ export const priestess: ChampionDef = {
   faction: 'sunscar',
   color: '#ffc040',
   muzzle: [54, 56],
-  stats: { hp: 1200, atk: 100, def: 62, spd: 110, crit: 0.12 },
+  stats: { hp: 1200, atk: 100, def: 65, spd: 110, crit: 0.06 },
   lore: 'High priestess of the burning sun. Nefret carries the dawn in her staff and the noon in her temper; the dynasty\'s dead still rise when she sings.',
   skills: [
     {

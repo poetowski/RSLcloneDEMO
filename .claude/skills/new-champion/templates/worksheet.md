@@ -34,7 +34,7 @@ Fill this in before writing code, and show it to the user when they are around: 
 | A3 (CD 4-5) | | | total 1.3-2.6 (AoE 0.7-1.2) | the only slot that may guarantee a 1-turn Stun/Freeze | | |
 | Passive | | | | `undying` exists; a new kind needs rules, tests and an Academy entry | | |
 
-Stats (HP / ATK / DEF / SPD / CRIT): ______ ; statScore = HP/12 + ATK x 1.1 + DEF x 0.9 + SPD x 1.3 + CRIT x 150 = ______ (within 5% of the budget).
+Stats (HP / ATK / DEF / SPD / CRIT): ______ ; statScore = HP/12 + ATK x 1.1 + (DEF - 40) x 2.25 + SPD x 1.3 + CRIT x 300 = ______ (within 5% of the budget).
 
 ## Checks after building
 

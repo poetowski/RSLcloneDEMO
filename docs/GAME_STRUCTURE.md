@@ -82,7 +82,7 @@ The Master Archivist (`src/game/archivist.ts`) is the player and their save, sto
 | `settings` | default battle speed and auto |
 | `reliquary` | the champions owned, starters included |
 
-The Reliquary (`src/game/reliquary/`) holds one Hero Soul File per owned champion, with its NEW badge (recruited, not yet opened on the champion page) and its Weaver Matrix of six slots, and the loose Thread Spools. The matrix has no content yet: its slot rules are a placeholder (`src/game/data/matrix.ts`), and no spools or Weave Patterns exist until they are approved.
+The Reliquary (`src/game/reliquary/`) holds one Hero Soul File per owned champion, with its NEW badge (recruited, not yet opened on the champion page) and its Weaver Matrix of six slots, and the loose Thread Spools. The Weaver Matrix has its approved slots, grades, strands and attunement ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14) and shows on the champion page's MATRIX tab. Spools have no sources yet and Weave Patterns are not defined, so the stock stays empty in play; `?spools=1` adds a sample for development.
 
 Loading drops champion and stage ids the catalog no longer has. A proof-of-concept save (`oathbound.profile.v1`) is migrated once into the new one and left in place.
 
@@ -119,4 +119,4 @@ Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `r
 | Recruit ceremony | `screens/recruit.ts` | `?screen=recruit&champion=jackal` |
 | Skill demo | `screens/battle.ts` (demo mode) | `?demo=eternal_tomb` |
 
-All navigation goes through `app.router` (`src/main.ts`), which wraps each switch in a dithered dissolve. `?unlockall=1` and `?reset=1` change the save before the first screen opens.
+All navigation goes through `app.router` (`src/main.ts`), which wraps each switch in a dithered dissolve. `?unlockall=1`, `?reset=1` and `?spools=1` change the save before the first screen opens.

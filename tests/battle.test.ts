@@ -9,6 +9,43 @@ const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!
 const PLAYER = combatants([knight, warrior, archer]);
 const ENEMY = combatants([dreadknight, monk, frostmage]);
 
+describe('damage rules', () => {
+  /** total damage of Valiant Strike into a target, over the same seeds */
+  const total = (target: ChampionDef) => {
+    let sum = 0;
+    for (let seed = 1; seed <= 60; seed++) {
+      const b = new Battle(combatants([knight]), [{ def: target }], { seed });
+      const r = b.useSkill(b.get('p0'), skill(knight, 'valiant_strike'), 'e0');
+      for (const e of r.events) if (e.kind === 'damage') sum += e.amount;
+    }
+    return sum;
+  };
+  const withStats = (c: ChampionDef, stats: Partial<ChampionDef['stats']>): ChampionDef => ({ ...c, stats: { ...c.stats, ...stats } });
+
+  it('divides damage by DEF: twice the DEF, half the damage', () => {
+    expect(total(withStats(warrior, { def: 40 })) / total(withStats(warrior, { def: 80 }))).toBeCloseTo(2, 1);
+  });
+
+  it('doubles damage on a critical hit', () => {
+    const always = withStats(knight, { crit: 1 }), never = withStats(knight, { crit: 0 });
+    const hit = (actor: ChampionDef) => {
+      const b = new Battle(combatants([actor]), combatants([warrior]), { seed: 5 });
+      const r = b.useSkill(b.get('p0'), skill(knight, 'valiant_strike'), 'e0');
+      return r.events.find((e) => e.kind === 'damage');
+    };
+    const a = hit(always), n = hit(never);
+    expect(a?.kind === 'damage' && a.crit).toBe(true);
+    expect(a?.kind === 'damage' && n?.kind === 'damage' && a.amount / n.amount).toBeCloseTo(2, 1);
+  });
+
+  it('uses the stats a combatant brings, as a Weaver Matrix gives them', () => {
+    const b = new Battle([{ def: knight, stats: { ...knight.stats, hp: 2000, atk: 150 } }], combatants([warrior]), { seed: 1 });
+    expect(b.get('p0').maxHp).toBe(2000);
+    expect(b.attack(b.get('p0'))).toBe(150);
+    expect(new Battle(combatants([knight]), combatants([warrior])).get('p0').maxHp).toBe(knight.stats.hp);
+  });
+});
+
 describe('turn meter', () => {
   it('lets the fastest unit act first when meters are equal', () => {
     const b = new Battle(PLAYER, ENEMY, { seed: 1 });
@@ -70,7 +107,7 @@ describe('damage', () => {
         const b = new Battle(combatants([warrior]), combatants([target]), { seed });
         const r = b.useSkill(b.get('p0'), skill(warrior, 'rending_chop'), 'e0');
         const e = r.events.find((x) => x.kind === 'damage');
-        if (e?.kind === 'damage') sum += (e.amount * (100 + target.stats.def)) / 100;
+        if (e?.kind === 'damage') sum += (e.amount * target.stats.def) / 40;
       }
       return sum / 200;
     };

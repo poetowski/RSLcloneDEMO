@@ -3,7 +3,7 @@
 // replays the returned events. Rules are documented in docs/MECHANICS_GUIDE.md.
 import { AFFINITY_BONUS, affinityEdge } from '../data/meta';
 import { STATUSES } from '../data/statuses';
-import { ChampionDef, SkillDef, StatusId, TeamId } from '../data/types';
+import { ChampionDef, SkillDef, Stats, StatusId, TeamId } from '../data/types';
 import { Rng } from './rng';
 
 export interface StatusInst {
@@ -18,11 +18,15 @@ export interface StatusInst {
 export interface Combatant {
   def: ChampionDef;
   boss?: boolean;
+  /** the champion's stats with its Weaver Matrix; its base stats when absent */
+  stats?: Stats;
 }
 
 export interface Unit {
   uid: string;
   champion: ChampionDef;
+  /** stats in this battle: the champion's, or with its Weaver Matrix (stage power is applied separately) */
+  stats: Stats;
   team: TeamId;
   /** 0 = front, 1 = back-top, 2 = back-bottom */
   slot: number;
@@ -73,12 +77,16 @@ export interface SkillResult {
 }
 
 export const TURN_FULL = 100;
-const CRIT_MULT = 1.5;
+const CRIT_MULT = 2;
 const POISON_PCT = 0.05;
 const BURN_PCT = 0.06;
 const REGEN_PCT = 0.075;
 const WEAKEN_MULT = 1.25;
 const DAMAGE_SCALE = 4.8;
+/** damage taken is multiplied by DEF_SCALE / DEF: twice the DEF, half the damage */
+const DEF_SCALE = 40;
+const DEF_UP = 0.16;
+const DEF_DOWN = 0.12;
 
 export interface BattleOptions {
   seed?: number;
@@ -99,10 +107,12 @@ export class Battle {
     const bossHp = opts.bossHp ?? 1.6;
     const mk = (c: Combatant, team: TeamId, slot: number): Unit => {
       const k = team === 'enemy' ? power : 1;
-      const hp = Math.round(c.def.stats.hp * k * (c.boss ? bossHp : 1));
+      const stats = c.stats ?? c.def.stats;
+      const hp = Math.round(stats.hp * k * (c.boss ? bossHp : 1));
       return {
         uid: `${team === 'player' ? 'p' : 'e'}${slot}`,
         champion: c.def,
+        stats,
         team,
         slot,
         boss: !!c.boss,
@@ -150,21 +160,21 @@ export class Battle {
     let k = 1;
     if (this.has(u, 'spd_up')) k += 0.25;
     if (this.has(u, 'spd_down')) k -= 0.25;
-    return u.champion.stats.spd * k;
+    return u.stats.spd * k;
   }
 
   attack(u: Unit): number {
     let k = 1;
     if (this.has(u, 'atk_up')) k += 0.25;
     if (this.has(u, 'atk_down')) k -= 0.25;
-    return u.champion.stats.atk * u.atkMul * k;
+    return u.stats.atk * u.atkMul * k;
   }
 
   defense(u: Unit): number {
     let k = 1;
-    if (this.has(u, 'def_up')) k += 0.4;
-    if (this.has(u, 'def_down')) k -= 0.3;
-    return u.champion.stats.def * k;
+    if (this.has(u, 'def_up')) k += DEF_UP;
+    if (this.has(u, 'def_down')) k -= DEF_DOWN;
+    return u.stats.def * k;
   }
 
   // --- turn meter ----------------------------------------------------------
@@ -353,10 +363,10 @@ export class Battle {
   }
 
   rollDamage(a: Unit, t: Unit, s: SkillDef, mult: number): { amount: number; crit: boolean; edge: -1 | 0 | 1 } {
-    const crit = this.rng.chance(a.champion.stats.crit);
+    const crit = this.rng.chance(a.stats.crit);
     const edge = affinityEdge(a.champion.affinity, t.champion.affinity);
     let dmg = this.attack(a) * mult * DAMAGE_SCALE;
-    dmg *= 100 / (100 + this.defense(t));
+    dmg *= DEF_SCALE / this.defense(t);
     dmg *= 1 + edge * AFFINITY_BONUS;
     if (this.has(t, 'weaken')) dmg *= WEAKEN_MULT;
     if (s.execute && t.hp / t.maxHp < s.execute.below) dmg *= s.execute.mult;

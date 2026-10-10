@@ -23,12 +23,12 @@ function mask(b: Bitmap, x: number, y: number, rows: string[], c: RGBA) {
 // ---------------------------------------------------------------------------
 
 /** A stroke in pixel space (y down) and its radius. */
-interface Stroke {
+export interface Stroke {
   pts: V[];
   r: number;
 }
 
-const arc = (cx: number, cy: number, rx: number, ry: number, a0: number, a1: number, n = 10): V[] =>
+export const arc = (cx: number, cy: number, rx: number, ry: number, a0: number, a1: number, n = 10): V[] =>
   Array.from({ length: n + 1 }, (_, i) => {
     const a = ((a0 + ((a1 - a0) * i) / n) * Math.PI) / 180;
     return v(cx + Math.cos(a) * rx, cy + Math.sin(a) * ry);
@@ -72,12 +72,13 @@ function wordStrokes(word: string, x: number, top: number, S: number, r: number)
 }
 
 /**
- * Cast gold: strokes rasterized into a crisp mask, then shaded like metal: a
+ * Cast metal: strokes rasterized into a crisp mask, then shaded like metal: a
  * lit bevel on the top-left edges, a dark bevel on the bottom-right, a face in
  * hard bands from `top` (bright) to `base` (dark), and an outline in the
- * darkest gold.
+ * darkest step. Gold by default (the logo, the matrix rose); `rim` is a
+ * 5-step interface ramp, `face` a 6-step material ramp.
  */
-function castGold(w: number, h: number, strokes: Stroke[], top: number, base: number): Bitmap {
+export function castMetal(w: number, h: number, strokes: Stroke[], top: number, base: number, rim: RGBA[] = G, face: RGBA[] = MAT.gold.ramp): Bitmap {
   const m = new Uint8Array(w * h);
   for (const st of strokes) {
     const xs = st.pts.map((p) => p.x), ys = st.pts.map((p) => p.y);
@@ -103,15 +104,15 @@ function castGold(w: number, h: number, strokes: Stroke[], top: number, base: nu
     const dark2 = !at(x + 2, y) || !at(x, y + 2);
     const k = (y - top) / (base - top);
     let c: RGBA;
-    if (litEdge && !darkEdge) c = G[4];
-    else if (darkEdge && !litEdge) c = G[1];
-    else if (litEdge && darkEdge) c = G[2];
-    else if (lit2 && !dark2) c = MAT.gold.ramp[4];
-    else if (dark2 && !lit2) c = MAT.gold.ramp[2];
-    else c = k < 0.22 ? MAT.gold.ramp[4] : k < 0.36 ? G[4] : k < 0.66 ? MAT.gold.ramp[3] : MAT.gold.ramp[2];
+    if (litEdge && !darkEdge) c = rim[4];
+    else if (darkEdge && !litEdge) c = rim[1];
+    else if (litEdge && darkEdge) c = rim[2];
+    else if (lit2 && !dark2) c = face[4];
+    else if (dark2 && !lit2) c = face[2];
+    else c = k < 0.22 ? face[4] : k < 0.36 ? rim[4] : k < 0.66 ? face[3] : face[2];
     b.set(x, y, c);
   }
-  return outline(b, G[0]);
+  return outline(b, rim[0]);
 }
 
 /** An arcane jewel lit from the top-left: a dark rim, a dithered body, one glint. */
@@ -150,7 +151,7 @@ export function logo(): Bitmap {
     { pts: arc(ex, cy, 4.2, 4.2, 0, 360, 16), r: 1.2 },
     ...wordStrokes('THE LOOM', ex + ring + 12 + R, top, S, R),
   ];
-  const b = castGold(w, h, strokes, top, base);
+  const b = castMetal(w, h, strokes, top, base);
   for (const p of lobes) jewel(b, p.x, p.y, 3.4);
   jewel(b, ex, cy, 2.6);
   const out = new Bitmap(w + 2, h + 2);

@@ -10,7 +10,7 @@ export const archer: ChampionDef = {
   faction: 'wildwood',
   color: '#4a8c40',
   muzzle: [20, 43],
-  stats: { hp: 1020, atk: 112, def: 48, spd: 112, crit: 0.22 },
+  stats: { hp: 1020, atk: 112, def: 59, spd: 112, crit: 0.11 },
   lore: 'A ranger of the Wildwood who can split a falling snowflake at a hundred paces. Her arrows are fletched with feathers from birds she has never let go hungry.',
   skills: [
     {

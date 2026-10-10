@@ -9,7 +9,7 @@ export const stalker: ChampionDef = {
   affinity: 'force',
   faction: 'sunscar',
   color: '#3a58c0',
-  stats: { hp: 1000, atk: 118, def: 45, spd: 118, crit: 0.22 },
+  stats: { hp: 1000, atk: 118, def: 58, spd: 118, crit: 0.11 },
   lore: 'A dune stalker who walks where the wind erases footprints. Akhet sells his daggers to the Sunscar court and his silence to no one.',
   skills: [
     {

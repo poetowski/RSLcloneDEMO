@@ -16,7 +16,8 @@ import { auditChampion, budgetDelta, RARITY_BUDGET, statScore } from '../src/gam
 import { ChampionDef } from '../src/game/data/types';
 
 const quick = process.argv.includes('quick');
-const SAMPLES = quick ? 60 : 240;
+// 960 battles keep the impact noise near +-1.6 points; 240 left about +-3 and flagged noise as failures
+const SAMPLES = quick ? 60 : 960;
 const STAGE_SEEDS = quick ? 6 : 20;
 export const IMPACT_BAND: [number, number] = [0.4, 0.6];
 /** Auto-battle win rate bands for the campaign curve (humans win more). */

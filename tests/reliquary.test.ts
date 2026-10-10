@@ -1,12 +1,16 @@
-// Rules of the Reliquary context: Thread Spools are values, a Weaver Matrix
-// keeps six slots that take only what their stat nodes accept, Weave Patterns
-// count spools wherever they sit, and the Reliquary never loses or copies a
-// spool, also through a save (docs/DDD.md 6.5). Patterns and layouts here are
-// test fixtures, not content.
+// Rules of the Reliquary context: Thread Spools are values with a main stat and
+// strands; the Weaver Matrix keeps six slots in two triangles that take only
+// what their stat nodes accept; attunement and the SPD strand cap shape what a
+// matrix adds; Weave Patterns count spools wherever they sit; the Reliquary
+// never loses or copies a spool, also through a save (docs/DDD.md 6.5,
+// docs/MECHANICS_GUIDE.md 14). Patterns and fixture layouts here are test
+// fixtures, not content.
 import { describe, expect, it } from 'vitest';
-import { STAT_IDS } from '../src/game/data/matrix';
-import { MatrixLayout, StatNode, WeavePatternDef } from '../src/game/data/types';
-import { sameSpool, SlotIndex, threadSpool, WeavePatternEvaluator, WeaverMatrix } from '../src/game/reliquary/matrix';
+import { MAIN_VALUE, MATRIX_LAYOUT, SPD_STRAND_CAP, STAT_IDS, STRAND_COUNT, STRAND_RANGE } from '../src/game/data/matrix';
+import { MatrixLayout, StatId, StatNode, WeavePatternDef } from '../src/game/data/types';
+import {
+  attunedStats, Grade, matrixBonus, rollSpool, sameSpool, SlotIndex, threadSpool, ThreadSpool, WeavePatternEvaluator, WeaverMatrix, wovenStats,
+} from '../src/game/reliquary/matrix';
 import { Reliquary, ReliquaryJson } from '../src/game/reliquary/reliquary';
 
 const ANY: StatNode = { kind: 'variable', stats: STAT_IDS };
@@ -28,43 +32,104 @@ const CATALOG: WeavePatternDef[] = [
 const evaluator = new WeavePatternEvaluator(CATALOG);
 const woven = (m: WeaverMatrix) => evaluator.evaluate(m).map((w) => `${w.pattern.id}x${w.times}`).join(',');
 
+/** A valid spool with the lowest strands, in a fixed order, unless strands are given. */
+function sp(pattern: string, stat: StatId, grade: Grade = 1, strands?: [StatId, number][]): ThreadSpool {
+  const order: StatId[] = ['hp', 'atk', 'def', 'crit', 'spd'].filter((s) => s !== stat) as StatId[];
+  const fill = order.slice(0, STRAND_COUNT[grade]).map((s): [StatId, number] => [s, s === 'spd' ? 1 : STRAND_RANGE[grade][0]]);
+  return threadSpool(pattern, grade, stat, strands ?? fill);
+}
+
 /** Every ordering of the items, duplicates included. */
 function permutations<T>(xs: T[]): T[][] {
   if (xs.length <= 1) return [xs];
   return xs.flatMap((x, i) => permutations([...xs.slice(0, i), ...xs.slice(i + 1)]).map((rest) => [x, ...rest]));
 }
 
+function rngFor(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 describe('thread spools', () => {
   it('are values: equal fields make the same spool, and nothing changes them', () => {
-    const a = threadSpool('pair_a', 'atk', 20);
-    expect(sameSpool(a, threadSpool('pair_a', 'atk', 20))).toBe(true);
-    expect(sameSpool(a, threadSpool('pair_a', 'atk', 21))).toBe(false);
-    expect(sameSpool(a, threadSpool('pair_b', 'atk', 20))).toBe(false);
-    expect(Object.isFrozen(a) && Object.isFrozen(a.main)).toBe(true);
+    const a = sp('pair_a', 'atk');
+    expect(sameSpool(a, sp('pair_a', 'atk'))).toBe(true);
+    expect(sameSpool(a, sp('pair_b', 'atk'))).toBe(false);
+    expect(sameSpool(a, sp('pair_a', 'atk', 1, [['hp', 2], ['def', 1]]))).toBe(false);
+    expect(sameSpool(a, sp('pair_a', 'atk', 2))).toBe(false);
+    expect(Object.isFrozen(a) && Object.isFrozen(a.main) && Object.isFrozen(a.strands) && Object.isFrozen(a.strands[0])).toBe(true);
   });
 
-  it('refuse an empty pattern, an unknown stat or a value that is not positive', () => {
-    expect(() => threadSpool('', 'atk', 20)).toThrow();
-    expect(() => threadSpool('pair_a', 'luck' as never, 20)).toThrow();
-    for (const v of [0, -5, NaN, Infinity]) expect(() => threadSpool('pair_a', 'atk', v)).toThrow();
+  it('take their main value from the grade', () => {
+    for (const s of STAT_IDS) for (const g of [0, 1, 2] as Grade[]) expect(sp('pair_a', s, g).main.value).toBe(MAIN_VALUE[s][g]);
+  });
+
+  it('carry one strand per grade step, never repeating a stat', () => {
+    expect(sp('pair_a', 'atk', 0).strands).toHaveLength(1);
+    expect(sp('pair_a', 'atk', 1).strands).toHaveLength(2);
+    expect(sp('pair_a', 'atk', 2).strands).toHaveLength(3);
+    expect(() => threadSpool('pair_a', 1, 'atk', [['hp', 1]])).toThrow(); // too few
+    expect(() => threadSpool('pair_a', 0, 'atk', [['hp', 1], ['def', 1]])).toThrow(); // too many
+    expect(() => threadSpool('pair_a', 1, 'atk', [['atk', 1], ['hp', 1]])).toThrow(); // repeats the main stat
+    expect(() => threadSpool('pair_a', 1, 'atk', [['hp', 1], ['hp', 2]])).toThrow(); // repeats a strand
+  });
+
+  it('keep strands inside the grade range, and a SPD strand is always +1', () => {
+    expect(() => threadSpool('pair_a', 0, 'atk', [['hp', 2]])).toThrow(); // Ashen rolls +1 only
+    expect(() => threadSpool('pair_a', 1, 'atk', [['hp', 3], ['def', 1]])).toThrow(); // Silver +1 to 2
+    expect(() => threadSpool('pair_a', 2, 'atk', [['hp', 3], ['def', 0], ['crit', 1]])).toThrow();
+    expect(() => threadSpool('pair_a', 2, 'atk', [['hp', 1.5], ['def', 1], ['crit', 1]])).toThrow();
+    expect(() => threadSpool('pair_a', 2, 'atk', [['spd', 2], ['def', 1], ['crit', 1]])).toThrow();
+    expect(threadSpool('pair_a', 2, 'atk', [['spd', 1], ['def', 3], ['crit', 1]]).strands).toHaveLength(3);
+  });
+
+  it('refuse an empty pattern, an unknown grade or an unknown stat', () => {
+    expect(() => sp('', 'atk')).toThrow();
+    expect(() => threadSpool('pair_a', 3 as Grade, 'atk', [])).toThrow();
+    expect(() => threadSpool('pair_a', 0, 'luck' as never, [['hp', 1]])).toThrow();
+    expect(() => threadSpool('pair_a', 0, 'atk', [['luck' as never, 1]])).toThrow();
+  });
+
+  it('always roll within the rules', () => {
+    const r = rngFor(3);
+    for (let i = 0; i < 3000; i++) {
+      const g = (i % 3) as Grade;
+      const stat = STAT_IDS[i % STAT_IDS.length];
+      const s = rollSpool('pair_a', g, stat, r);
+      expect(s.strands).toHaveLength(STRAND_COUNT[g]);
+      expect(new Set([stat, ...s.strands.map((t) => t.stat)]).size).toBe(STRAND_COUNT[g] + 1);
+    }
   });
 });
 
 describe('weaver matrix', () => {
+  it('has two triangles: ATK, DEF and HP fixed, SPD only in slot 2 and CRIT only in slot 4', () => {
+    expect(MATRIX_LAYOUT.map((n) => (n.kind === 'fixed' ? n.stat : 'choice'))).toEqual(['atk', 'choice', 'def', 'choice', 'hp', 'choice']);
+    const takes = (s: StatId) => MATRIX_LAYOUT.flatMap((n, i) => ((n.kind === 'fixed' ? n.stat === s : n.stats.includes(s)) ? [i] : []));
+    expect(takes('spd')).toEqual([1]);
+    expect(takes('crit')).toEqual([3]);
+  });
+
   it('has six slots that take only what their stat nodes accept', () => {
     const m = WeaverMatrix.empty(MIXED);
     expect(m.slots.map((s) => s.index)).toEqual([0, 1, 2, 3, 4, 5]);
     expect(m.spools()).toEqual([]);
-    expect(() => m.equip(0, threadSpool('pair_a', 'hp', 100))).toThrow(); // fixed: atk only
-    expect(() => m.equip(4, threadSpool('pair_a', 'atk', 20))).toThrow(); // variable: crit or hp
-    expect(m.equip(4, threadSpool('pair_a', 'crit', 0.05)).matrix.spools()).toHaveLength(1);
-    expect(m.equip(5, threadSpool('pair_a', 'spd', 8)).matrix.spools()).toHaveLength(1);
+    expect(() => m.equip(0, sp('pair_a', 'hp'))).toThrow(); // fixed: atk only
+    expect(() => m.equip(4, sp('pair_a', 'atk'))).toThrow(); // variable: crit or hp
+    expect(m.equip(4, sp('pair_a', 'crit')).matrix.spools()).toHaveLength(1);
+    expect(m.equip(5, sp('pair_a', 'spd')).matrix.spools()).toHaveLength(1);
   });
 
   it('returns a new matrix on every change, with the spool it displaced', () => {
     const empty = WeaverMatrix.empty(MIXED);
-    const a = threadSpool('pair_a', 'atk', 20);
-    const b = threadSpool('pair_b', 'atk', 25);
+    const a = sp('pair_a', 'atk');
+    const b = sp('pair_b', 'atk');
     const one = empty.equip(0, a);
     expect(empty.slots[0].spool).toBeNull();
     expect(one.removed).toBeNull();
@@ -76,6 +141,33 @@ describe('weaver matrix', () => {
     expect(out.removed).toBe(b);
     expect(out.matrix.spools()).toEqual([]);
     expect(Object.isFrozen(empty.slots) && Object.isFrozen(empty.slots[0])).toBe(true);
+  });
+
+  it('attunes each choice slot to the fixed stats beside it', () => {
+    const m = WeaverMatrix.empty(MATRIX_LAYOUT);
+    expect([0, 1, 2, 3, 4, 5].map((i) => attunedStats(m, i as SlotIndex))).toEqual([[], ['atk', 'def'], [], ['def', 'hp'], [], ['hp', 'atk']]);
+  });
+
+  it('adds main stats, strands and attunement', () => {
+    let m = WeaverMatrix.empty(MATRIX_LAYOUT);
+    m = m.equip(0, sp('pair_a', 'atk', 2, [['hp', 3], ['def', 2], ['crit', 1]])).matrix; // fixed: no attunement
+    m = m.equip(1, sp('pair_a', 'hp', 1, [['atk', 2], ['crit', 1]])).matrix; // ATK strand attuned in slot 2
+    const b = matrixBonus(m);
+    expect(b).toEqual({ atk: 10 + 2 + 1, hp: 3 + 7, def: 2, crit: 1 + 1, spd: 0 });
+  });
+
+  it('caps what SPD strands add at the matrix cap', () => {
+    let m = WeaverMatrix.empty(OPEN);
+    for (let i = 0; i < 6; i++) m = m.equip(i as SlotIndex, sp('pair_a', 'atk', 1, [['spd', 1], ['hp', 1]])).matrix;
+    expect(matrixBonus(m).spd).toBe(SPD_STRAND_CAP);
+  });
+
+  it('turns a matrix into stats: percent of base for ATK, HP and DEF, points for CRIT, flat SPD', () => {
+    let m = WeaverMatrix.empty(MATRIX_LAYOUT);
+    m = m.equip(0, sp('pair_a', 'atk', 2, [['hp', 3], ['def', 2], ['crit', 1]])).matrix;
+    m = m.equip(1, sp('pair_a', 'spd', 0, [['def', 1]])).matrix; // DEF strand attuned: +2
+    const w = wovenStats({ hp: 1000, atk: 100, def: 60, spd: 100, crit: 0.05 }, m);
+    expect(w).toEqual({ hp: 1030, atk: 110, def: 62, spd: 102, crit: 0.06 });
   });
 });
 
@@ -97,7 +189,7 @@ describe('weave patterns', () => {
     for (const order of permutations([...ids, ...Array<string>(6 - ids.length).fill('')])) {
       let m = WeaverMatrix.empty(OPEN);
       order.forEach((id, i) => {
-        if (id) m = m.equip(i as SlotIndex, threadSpool(id, 'spd', 8)).matrix;
+        if (id) m = m.equip(i as SlotIndex, sp(id, 'spd')).matrix;
       });
       seen.add(woven(m));
     }
@@ -105,19 +197,19 @@ describe('weave patterns', () => {
   });
 
   it('fail fast on a pattern the catalog does not have', () => {
-    const m = WeaverMatrix.empty(OPEN).equip(0, threadSpool('nope', 'spd', 8)).matrix;
+    const m = WeaverMatrix.empty(OPEN).equip(0, sp('nope', 'spd')).matrix;
     expect(() => evaluator.evaluate(m)).toThrow(/nope/);
   });
 });
 
 describe('reliquary', () => {
   const spools = [
-    threadSpool('pair_a', 'atk', 20),
-    threadSpool('pair_a', 'atk', 20),
-    threadSpool('pair_b', 'spd', 8),
-    threadSpool('quad', 'crit', 0.05),
-    threadSpool('quad', 'hp', 300),
-    threadSpool('pair_b', 'def', 15),
+    sp('pair_a', 'atk'),
+    sp('pair_a', 'atk'),
+    sp('pair_b', 'spd'),
+    sp('quad', 'crit'),
+    sp('quad', 'hp'),
+    sp('pair_b', 'def'),
   ];
   const stocked = () => {
     const r = new Reliquary(MIXED);
@@ -143,7 +235,7 @@ describe('reliquary', () => {
 
   it('moves spools between the stock and the slots without losing or copying one', () => {
     const r = stocked();
-    expect(() => r.equip('alpha', 0, threadSpool('pair_a', 'atk', 99))).toThrow(); // not in the stock
+    expect(() => r.equip('alpha', 0, sp('pair_a', 'atk', 2))).toThrow(); // not in the stock
     let seed = 7;
     const rnd = (n: number) => (seed = (seed * 48271) % 2147483647) % n;
     let moves = 0;
@@ -180,20 +272,21 @@ describe('reliquary', () => {
     expect(count(moved)).toBe(spools.length);
   });
 
-  it('drops malformed entries without losing a valid spool', () => {
-    const good = { pattern: 'pair_a', main: { stat: 'atk', value: 20 } };
+  it('drops malformed entries without losing a valid spool, and never trusts a stored main value', () => {
+    const good = { pattern: 'pair_a', grade: 1, main: { stat: 'atk', value: 99 }, strands: [{ stat: 'hp', value: 1 }, { stat: 'def', value: 2 }] };
     const saved = {
       files: [
-        { champion: 'alpha', fresh: false, slots: [good, { pattern: 'pair_a', main: { stat: 'luck', value: 1 } }, null] },
+        { champion: 'alpha', fresh: false, slots: [good, { ...good, strands: [{ stat: 'atk', value: 1 }, { stat: 'hp', value: 1 }] }, null] },
         { champion: 'alpha', fresh: true, slots: [good] },
         { champion: 7 },
       ],
-      stock: [good, 'junk', { pattern: '', main: { stat: 'atk', value: 1 } }],
+      stock: [good, 'junk', { ...good, grade: 5 }, { ...good, strands: [{ stat: 'hp', value: 1 }] }],
     } as unknown as ReliquaryJson;
     const r = Reliquary.fromJSON(saved, MIXED);
     expect(r.files().map((f) => f.champion)).toEqual(['alpha']);
     expect(r.file('alpha').fresh).toBe(false);
     expect(r.file('alpha').matrix.spools()).toHaveLength(1);
+    expect(r.file('alpha').matrix.slots[0].spool!.main.value).toBe(MAIN_VALUE.atk[1]);
     // the stocked spool, and the one from the duplicated file
     expect(r.spools()).toHaveLength(2);
   });

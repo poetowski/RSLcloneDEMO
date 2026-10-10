@@ -5,7 +5,7 @@ import { ChampionDef, Rarity, SkillDef, Stats } from './types';
 
 /** Weighted stat sum used to compare champions of different roles on one scale. */
 export function statScore(s: Stats): number {
-  return s.hp / 12 + s.atk * 1.1 + s.def * 0.9 + s.spd * 1.3 + s.crit * 150;
+  return s.hp / 12 + s.atk * 1.1 + (s.def - 40) * 2.25 + s.spd * 1.3 + s.crit * 300;
 }
 
 /** Target stat score per rarity. A champion must land within BUDGET_TOLERANCE of it. */
@@ -22,9 +22,9 @@ export const BUDGET_TOLERANCE = 0.05;
 export const STAT_LIMITS = {
   hp: [900, 1700],
   atk: [70, 130],
-  def: [40, 100],
+  def: [56, 80],
   spd: [90, 125],
-  crit: [0.05, 0.3],
+  crit: [0.025, 0.15],
 } as const;
 
 /** Total damage multiplier (sum of hit mults) allowed per slot, single target vs AoE. */

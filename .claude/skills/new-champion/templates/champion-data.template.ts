@@ -14,9 +14,9 @@ export const spearwarden: ChampionDef = {
   faction: 'wildwood', // dawn | clans | wildwood | coven | temple | sunscar
   color: '#4a8c40', // signature hue: name text in the UI; match the art's main ramp
   // muzzle: [24, 46],  // ranged champions only: projectile origin [forward, up] from the feet
-  // statScore = hp/12 + atk*1.1 + def*0.9 + spd*1.3 + crit*150  must land within 5% of the rarity budget
+  // statScore = hp/12 + atk*1.1 + (def-40)*2.25 + spd*1.3 + crit*300  must land within 5% of the rarity budget
   // (epic 440). This one: 108.3 + 110 + 63 + 135.2 + 22.5 = 439
-  stats: { hp: 1300, atk: 100, def: 70, spd: 104, crit: 0.15 },
+  stats: { hp: 1300, atk: 100, def: 68, spd: 104, crit: 0.075 },
   lore: 'Two or three sentences in the voice of the world: who they are, what they guard, what they want.',
   skills: [
     {

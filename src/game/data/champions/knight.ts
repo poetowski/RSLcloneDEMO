@@ -9,7 +9,7 @@ export const knight: ChampionDef = {
   affinity: 'arcane',
   faction: 'dawn',
   color: '#4f8ae6',
-  stats: { hp: 1500, atk: 78, def: 95, spd: 100, crit: 0.1 },
+  stats: { hp: 1500, atk: 78, def: 78, spd: 100, crit: 0.05 },
   lore: 'Last knight-captain of the Order of Dawn. Aldric swore to hold the northern passes when the Oath broke, and he has not lowered his shield since.',
   skills: [
     {

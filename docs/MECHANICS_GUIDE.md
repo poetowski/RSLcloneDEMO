@@ -107,13 +107,13 @@ interface SkillDef {
 
 ```
 damage = ATK x mult x 4.8
-       x 100 / (100 + DEF)
+       x 40 / DEF                        (twice the DEF, half the damage)
        x 1.2 strong hit / 0.8 weak hit   (affinity, section 6)
        x 1.25                            (target Weakened)
        x execute bonus                   (target HP below the threshold)
-       x 1.5                             (critical hit, chance = CRIT, rolled per hit)
+       x 2                               (critical hit, chance = CRIT, rolled per hit)
        x random 0.92-1.08
-ATK x (1 +/- 0.25) with ATK Up / ATK Down;  DEF x 1.4 with DEF Up, x 0.7 with DEF Down
+ATK x (1 +/- 0.25) with ATK Up / ATK Down;  DEF x 1.16 with DEF Up, x 0.88 with DEF Down
 ```
 
 **Shields** absorb damage before HP (shown as `ABSORB n`); Poison and Burn ignore them. A shield's value is a fraction of the **caster's** max HP.
@@ -127,7 +127,7 @@ Force beats Wild, Wild beats Arcane, Arcane beats Force; **Void** stands outside
 | Status | Type | Effect |
 | --- | --- | --- |
 | ATK Up | buff | +25% Attack |
-| DEF Up | buff | +40% Defense |
+| DEF Up | buff | +16% Defense |
 | SPD Up | buff | +25% Speed |
 | Shield | buff | absorbs damage up to its value |
 | Taunt | buff | enemies' single-target skills must target this champion |
@@ -137,7 +137,7 @@ Force beats Wild, Wild beats Arcane, Arcane beats Force; **Void** stands outside
 | Freeze | debuff | skips the next turn (encased in ice) |
 | Poison | debuff | -5% max HP at turn start, ignores shields |
 | Burn | debuff | -6% max HP at turn start, ignores shields |
-| DEF Down | debuff | -30% Defense |
+| DEF Down | debuff | -12% Defense |
 | SPD Down | debuff | -25% Speed |
 | ATK Down | debuff | -25% Attack |
 | Weaken | debuff | +25% damage taken |
@@ -186,12 +186,12 @@ Numbers are tuned against explicit norms, not by feel. `src/game/data/norms.ts` 
 
 | Guardrail | Rule |
 | --- | --- |
-| Stat budget | `statScore = HP/12 + ATK x 1.1 + DEF x 0.9 + SPD x 1.3 + CRIT x 150` within **5%** of the rarity budget: common 390, uncommon 410, rare 425, epic 440, legendary 455. A passive is paid for from the budget (Anhotep sits at -5%). |
-| Stat limits | HP 900-1700, ATK 70-130, DEF 40-100, SPD 90-125, CRIT 5-30% |
+| Stat budget | `statScore = HP/12 + ATK x 1.1 + (DEF - 40) x 2.25 + SPD x 1.3 + CRIT x 300` within **5%** of the rarity budget: common 390, uncommon 410, rare 425, epic 440, legendary 455. A passive is paid for from the budget (Anhotep sits at -5%). |
+| Stat limits | HP 900-1700, ATK 70-130, DEF 56-80, SPD 90-125, CRIT 2.5-15% |
 | Skill multipliers (sum of hits) | A1 single 0.9-1.25 / AoE 0.5-0.8; A2 1.1-1.6 / 0.5-1.1; A3 1.3-2.6 / 0.7-1.2 |
 | Cooldowns | A1 0, A2 3, A3 4-5 |
 | Statuses | hard control lasts 1 turn and is guaranteed only on an A3; anything else at most 3 turns |
-| Impact | `npm run balance` section 3: random 3v3 teams that include the champion win **40-60%** against random teams |
+| Impact | `npm run balance` section 3: random 3v3 teams that include the champion win **40-60%** against random teams (960 battles per champion) |
 | Campaign curve | section 4: every team the player can own at that point, auto-battled 20 times: first stage 85-100%, normal 55-92%, boss 40-80% (humans win more than the AI) |
 
 Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take `BOSS_HP = 1.6` x HP. The current report:
@@ -199,15 +199,15 @@ Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take
 | Stage | Power | Avg win | Band |
 | --- | --- | --- | --- |
 | 1-1 The Frozen Gate | 0.85 | 100% | first |
-| 1-2 Hall of Icicles | 0.92 | 79% | normal |
-| 1-3 Throne of the Dread Knight | 0.95 | 60% | boss |
-| 2-1 Dunes of Ash | 1.35 | 84% | normal |
-| 2-2 The Sunken Colonnade | 0.88 | 72% | normal |
+| 1-2 Hall of Icicles | 0.92 | 80% | normal |
+| 1-3 Throne of the Dread Knight | 0.95 | 62% | boss |
+| 2-1 Dunes of Ash | 1.35 | 87% | normal |
+| 2-2 The Sunken Colonnade | 0.88 | 75% | normal |
 | 2-3 Temple of the Burning Sun | 0.90 | 71% | normal |
-| 2-4 Tomb of Anhotep | 0.80 | 69% | boss |
-| 3-1 The Baobab Steps | 1.35 | 82% | normal |
-| 3-2 The Hall of Echoes | 0.98 | 80% | normal |
-| 3-3 Heart of the Skyforge | 0.85 | 63% | boss |
+| 2-4 Tomb of Anhotep | 0.80 | 68% | boss |
+| 3-1 The Baobab Steps | 1.35 | 83% | normal |
+| 3-2 The Hall of Echoes | 0.98 | 82% | normal |
+| 3-3 Heart of the Skyforge | 0.85 | 62% | boss |
 
 ## 11. AI (`src/game/battle/ai.ts`)
 
@@ -256,5 +256,39 @@ This split keeps the rules testable without a browser (`npm test`) and lets the 
 | `S` or the speed button | x1 / x2 / x3 (saved as the default) |
 | `Esc` / `P` or MENU | pause menu: resume, auto, speed, retreat |
 | Campaign map | drag to move; arrows jump between stages; `W` `A` `S` `D` or `Shift` + arrows slide; `M` whole map; `Enter` opens a stage, then PREPARE |
+| MATRIX tab (champion page) | click a slot, then a lit spool in the stock to weave it; TAKE OUT returns the slot's spool to the stock |
 
-URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=3-3`, `&team=knight,monk,frostmage`, `&champion=colossus`, `&chapter=buffs`, `?demo=<skill_id>` (loops one skill), `?unlockall=1`, `?reset=1`, and for screenshots `&hp=0.1` (scales enemy HP).
+URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=3-3`, `&team=knight,monk,frostmage`, `&champion=colossus`, `&chapter=buffs`, `?demo=<skill_id>` (loops one skill), `?unlockall=1`, `?reset=1`, `?spools=1` (adds 24 sample spools to the stock), and for screenshots `&hp=0.1` (scales enemy HP).
+
+## 14. The Weaver Matrix (`src/game/reliquary/`, `src/game/data/matrix.ts`)
+
+Every owned champion has a Weaver Matrix: six slots in two triangles that hold Thread Spools. What the matrix adds reaches battle as the champion's stats (`Combatant.stats`, built by `battleStats`); enemies wear no spools. Weave Patterns and the sources of spools are not defined yet: spools carry a draft pattern id that only colours them, and the stock stays empty in play (`?spools=1` adds a sample for development).
+
+| Slot | Kind | Takes a spool whose main stat is |
+| --- | --- | --- |
+| 1 (top) | fixed | ATK |
+| 2 | choice | SPD, or ATK, HP or DEF % |
+| 3 | fixed | DEF |
+| 4 (bottom) | choice | CRIT, or ATK, HP or DEF % |
+| 5 | fixed | HP |
+| 6 | choice | ATK, HP or DEF % |
+
+**Spools.** A spool has a grade (Ashen, Silver, Gilded), one main stat whose value the grade sets, and strands: additional stats, one per grade step.
+
+| | Ashen | Silver | Gilded |
+| --- | --- | --- | --- |
+| Main ATK, HP, DEF | +4% | +7% | +10% |
+| Main CRIT (chance) | +4% | +7% | +10% |
+| Main SPD | +2 | +3 | +4 |
+| Strands | 1 | 2 | 3 |
+| Each ATK, HP, DEF or CRIT strand | +1 | +1 to 2 | +1 to 3 |
+| Each SPD strand | +1 | +1 | +1 |
+
+**Rules.**
+1. A strand never repeats the spool's main stat, and a spool never carries the same strand twice.
+2. Strand values are rolled once, when the spool is found, and never change.
+3. A matrix's strands add at most +4 SPD together.
+4. **Attunement:** each fixed slot attunes the two choice slots beside it. A strand on a choice slot gains +1 when its stat matches a neighbouring fixed slot: slot 2 is attuned to ATK and DEF, slot 4 to DEF and HP, slot 6 to HP and ATK.
+5. Weaving a spool into a slot and taking it out are free; a spool you take out returns to the stock.
+
+**Stats with the matrix:** ATK, HP and DEF rise by the summed percent of the champion's base stat (rounded), CRIT by the summed points of chance, SPD by the flat sum. The MATRIX tab on the champion page shows the result.

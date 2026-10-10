@@ -10,7 +10,7 @@ import { starsFor } from '../battle/sim';
 import { BOSS_HP } from '../data/campaign';
 import { champion } from '../data/champions';
 import { STATUSES } from '../data/statuses';
-import { ChampionDef, EnemySlot, SkillDef, StageDef, StatusId, TeamId, ZoneDef } from '../data/types';
+import { ChampionDef, EnemySlot, SkillDef, StageDef, Stats, StatusId, TeamId, ZoneDef } from '../data/types';
 import { Assets } from './assets';
 import { FxLayer } from './fx';
 import { Hud, ResultsInfo, SkillSlot } from './hud';
@@ -19,6 +19,8 @@ import { ZoneView } from './zone';
 
 export interface BattleSetup {
   player: ChampionDef[];
+  /** each player champion's stats with its Weaver Matrix (base stats when absent) */
+  playerStats?: Stats[];
   enemy: EnemySlot[];
   zone: ZoneDef;
   /** campaign stage (labels, power); absent for practice and demos */
@@ -96,7 +98,7 @@ export class BattleScene {
     const s = this.setup;
     const enemy: Combatant[] = s.enemy.map((e) => ({ def: champion(e.champion), boss: e.boss }));
     this.battle = new Battle(
-      s.player.map((def) => ({ def })),
+      s.player.map((def, i) => ({ def, stats: s.playerStats?.[i] })),
       enemy,
       { seed, enemyPower: s.stage?.power ?? 1, bossHp: BOSS_HP },
     );
@@ -840,7 +842,7 @@ export class BattleScene {
         const b = v.bounds();
         const tip = () => ({
           title: v.champion.name,
-          sub: `${v.champion.role}  -  HP ${Math.round(v.hp)}/${v.maxHp}  SPD ${v.champion.stats.spd}`,
+          sub: `${v.champion.role}  -  HP ${Math.round(v.hp)}/${v.maxHp}  SPD ${this.battle.get(v.uid).stats.spd}`,
           body: v.statuses.map((s) => `${STATUSES[s.id].name} (${s.turns})`).join(', ') || v.champion.title,
           color: v.champion.color,
         });

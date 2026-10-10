@@ -4,9 +4,10 @@
 // in localStorage; every access is guarded because storage can be missing
 // (private windows) and the game must still run.
 import { LOCATIONS, STARTERS, allStages, stage } from './data/campaign';
-import { CHAMPIONS } from './data/champions';
+import { champion, CHAMPIONS } from './data/champions';
 import { MATRIX_LAYOUT } from './data/matrix';
-import { LocationDef } from './data/types';
+import { LocationDef, Stats } from './data/types';
+import { wovenStats } from './reliquary/matrix';
 import { Reliquary, ReliquaryJson } from './reliquary/reliquary';
 
 export interface MasterArchivist {
@@ -137,6 +138,12 @@ export function isFresh(a: MasterArchivist, id: string): boolean {
 /** Whether any champion still shows its NEW badge. */
 export function anyFresh(a: MasterArchivist): boolean {
   return a.reliquary.files().some((f) => f.fresh);
+}
+
+/** A champion's stats in battle: with its Weaver Matrix when owned, its base stats otherwise. */
+export function battleStats(a: MasterArchivist, id: string): Stats {
+  const base = champion(id).stats;
+  return a.reliquary.has(id) ? wovenStats(base, a.reliquary.file(id).matrix) : base;
 }
 
 export function roster(a: MasterArchivist): string[] {

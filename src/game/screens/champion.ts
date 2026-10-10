@@ -1,6 +1,6 @@
 // Champion detail: the champion at double size on a podium (preview any of
 // its animations), and its card: rarity, affinity, faction, role, skills,
-// stats and lore. Locked champions show as a silhouette with the stage that
+// stats, its Weaver Matrix and lore. Locked champions show as a silhouette with the stage that
 // recruits them; their kit can still be studied.
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
@@ -9,18 +9,57 @@ import { recruitStage, STARTERS } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../data/meta';
 import { STAT_LIMITS } from '../data/norms';
-import { ChampionDef } from '../data/types';
+import { ATTUNE_BONUS, GRADES, MATRIX_LAYOUT, PATTERN_NAMES } from '../data/matrix';
+import { ChampionDef, StatId, StatNode } from '../data/types';
 import { homeZone } from '../data/zones';
+import { attunedStats, fits, sameSpool, SlotIndex, StatBonus, strandValue, ThreadSpool, WeaverMatrix, wovenStats } from '../reliquary/matrix';
 import { COLORS } from '../ui/ui';
 import { blit, nine } from '../view/assets';
 import { drawChampion, frameAt } from '../view/unit';
 import { BaseScreen, Diorama } from './base';
 
-type Tab = 'skills' | 'stats' | 'lore';
+type Tab = 'skills' | 'stats' | 'matrix' | 'lore';
+const STAT: Record<StatId, string> = { hp: 'HP', atk: 'ATK', def: 'DEF', spd: 'SPD', crit: 'CRIT' };
+/** text colour of each pattern: the light step of its spool's thread */
+const PATTERN_TINT: Record<string, string> = {
+  lifethread: '#a2f56a', tension: '#ffd060', selvage: '#dff2ff', glint: '#ff8ad0', quickweft: '#ffe890', fraybite: '#d89cff', bloodweft: '#ff6a5a', wardknot: '#90f5e2',
+};
+/** grade name colour: the cap metal */
+const GRADE_TINT = ['#a08a7a', '#cfd8e6', '#efc04a'];
+
+/** "ATK +7%", "SPD +3" */
+function statText(s: StatId, v: number): string {
+  return s === 'spd' ? `${STAT[s]} +${v}` : `${STAT[s]} +${v}%`;
+}
+
+/** What a slot takes: "DEF", "SPD, or ATK, HP or DEF %", "ATK, HP or DEF %". */
+function ruleText(n: StatNode): string {
+  if (n.kind === 'fixed') return STAT[n.stat];
+  const special = n.stats.filter((s) => s === 'spd' || s === 'crit');
+  const p = n.stats.filter((s) => s !== 'spd' && s !== 'crit').map((s) => STAT[s]);
+  const pct = `${p.slice(0, -1).join(', ')} or ${p[p.length - 1]} %`;
+  return special.length ? `${special.map((s) => STAT[s]).join(', ')}, or ${pct}` : pct;
+}
+
+/** The rule written inside an empty slot. */
+function emptyLabel(n: StatNode): string[] {
+  if (n.kind === 'fixed') return [STAT[n.stat]];
+  const special = n.stats.find((s) => s === 'spd' || s === 'crit');
+  return special ? [STAT[special], 'or %'] : ['%'];
+}
+
+/** A strand as it counts in its slot: "ATK +2% +1" when attuned. */
+function strandText(m: WeaverMatrix, i: SlotIndex, st: StatBonus): string {
+  const extra = strandValue(m, i, st) - st.value;
+  return `${statText(st.stat, st.value)}${extra ? ` +${extra}` : ''}`;
+}
+
 
 export class ChampionScreen extends BaseScreen {
   private c: ChampionDef;
   private tab: Tab = 'skills';
+  /** the chosen slot on the MATRIX tab */
+  private slot: SlotIndex = 0;
   private anim = 'idle';
   private animT = 0;
   private diorama: Diorama;
@@ -142,7 +181,7 @@ export class ChampionScreen extends BaseScreen {
 
     // tabs
     let tx = px + 12;
-    for (const t of ['skills', 'stats', 'lore'] as Tab[]) {
+    for (const t of ['skills', 'stats', 'matrix', 'lore'] as Tab[]) {
       const label = t.toUpperCase();
       const w = ui.measure(label) + 18;
       const on = this.tab === t;
@@ -156,9 +195,158 @@ export class ChampionScreen extends BaseScreen {
     ctx.fillStyle = '#a8701e';
     ctx.fillRect(px + 10, py + 74, pw - 20, 1);
     const bx = px + 12, by = py + 82, bwid = pw - 24;
-    if (this.tab === 'skills') this.skills(ctx, bx, by, bwid);
+    if (this.tab === 'matrix') this.matrix(ctx, bx, by, bwid);
+    else if (this.tab === 'skills') this.skills(ctx, bx, by, bwid);
     else if (this.tab === 'stats') this.stats(ctx, bx, by, bwid);
     else this.lore(ctx, bx, by, bwid);
+  }
+
+  /** The Weaver Matrix: the rose of six slots, the chosen slot's spool, the stats it gives and the stock. */
+  private matrix(ctx: CanvasRenderingContext2D, x: number, y: number, w: number) {
+    const ui = this.ui;
+    const img = this.a.ui.img;
+    const c = this.c;
+    const rel = this.archivist.reliquary;
+    const own = rel.has(c.id);
+    const m = own ? rel.file(c.id).matrix : WeaverMatrix.empty(MATRIX_LAYOUT);
+    const sel = this.slot;
+    const isFixed = (i: number) => m.slots[i].node.kind === 'fixed';
+    const grade = (s: ThreadSpool) => GRADES[s.grade];
+    const name = (s: ThreadSpool) => PATTERN_NAMES[s.pattern as keyof typeof PATTERN_NAMES] ?? s.pattern;
+
+    // the rose: the fixed triangle in gold, the choice triangle in arcane light
+    const rx = x, ry = y - 2, half = 72;
+    blit(ctx, img, ui.part('matrix_rose'), rx, ry);
+    const at = (i: number) => {
+      const a = ((i * 60 - 90) * Math.PI) / 180;
+      return [Math.round(rx + half + Math.cos(a) * 42), Math.round(ry + half + Math.sin(a) * 42)];
+    };
+    const neighbours = isFixed(sel) ? [] : [(sel + 5) % 6, (sel + 1) % 6];
+    m.slots.forEach((slot, i) => {
+      const [lx, ly] = at(i);
+      const s = slot.spool;
+      if (s) blit(ctx, img, ui.part(`spool_${s.pattern}_${s.grade}`), lx - 9, ly - 9);
+      else {
+        const lines = emptyLabel(slot.node);
+        lines.forEach((t, k) => ui.text(ctx, t, lx, ly - (lines.length === 1 ? 4 : 9) + k * 10, { color: isFixed(i) ? '#c8a050' : '#7fb4f0', align: 'center' }));
+      }
+      if (i === sel) blit(ctx, img, ui.part('lobe_sel'), lx - 23, ly - 23);
+      else if (neighbours.includes(i)) blit(ctx, img, ui.part('lobe_attune'), lx - 23, ly - 23);
+      ui.regions.push({
+        id: `mx_slot_${i}`, x: lx - 18, y: ly - 18, w: 36, h: 36,
+        click: () => (this.slot = i as SlotIndex),
+        tip: () => (s
+          ? { title: `Slot ${i + 1}: ${name(s)} spool`, body: `${grade(s)}. Main ${statText(s.main.stat, s.main.value)}; strands ${s.strands.map((st) => strandText(m, i as SlotIndex, st)).join(', ')}.`, color: PATTERN_TINT[s.pattern] }
+          : { title: `Slot ${i + 1}: empty`, body: `${isFixed(i) ? 'Fixed' : 'Choice'} slot. Takes ${ruleText(slot.node)}.` }),
+      });
+    });
+    const gem = ui.part('gem_' + c.affinity);
+    blit(ctx, img, gem, rx + half - Math.floor(gem[2] / 2), ry + half - Math.floor(gem[3] / 2));
+
+    // stats with the matrix, under the rose
+    const sy = y + 150;
+    ui.text(ctx, 'WITH MATRIX', x, sy, { color: COLORS.goldHi, variant: 'bold' });
+    const base = c.stats, wov = wovenStats(base, m);
+    const pct = (k: number) => `${Math.round(k * 1000) / 10}%`;
+    const rows: [string, string, number, string][] = [
+      ['HP', String(wov.hp), wov.hp - base.hp, `+${wov.hp - base.hp}`],
+      ['ATK', String(wov.atk), wov.atk - base.atk, `+${wov.atk - base.atk}`],
+      ['DEF', String(wov.def), wov.def - base.def, `+${wov.def - base.def}`],
+      ['SPD', String(wov.spd), wov.spd - base.spd, `+${wov.spd - base.spd}`],
+      ['CRIT', pct(wov.crit), wov.crit - base.crit, `+${Math.round((wov.crit - base.crit) * 1000) / 10}`],
+    ];
+    rows.forEach(([n, v, d, dt], i) => {
+      const yy = sy + 13 + i * 11;
+      ui.text(ctx, n, x, yy, { color: COLORS.dim, variant: 'bold' });
+      ui.text(ctx, v, x + 76, yy, { color: COLORS.text, align: 'right' });
+      if (d > 1e-9) ui.text(ctx, dt, x + 82, yy, { color: COLORS.good });
+    });
+
+    // the chosen slot and its spool
+    const x2 = x + 154, cw = w - 154;
+    const node = m.slots[sel].node;
+    ui.text(ctx, `SLOT ${sel + 1}`, x2, y, { color: isFixed(sel) ? COLORS.gold : '#5aa8ff', variant: 'bold' });
+    ui.text(ctx, isFixed(sel) ? 'FIXED' : 'CHOICE', x2 + ui.measure(`SLOT ${sel + 1}`, 'bold') + 6, y, { color: COLORS.faint, variant: 'bold' });
+    ui.text(ctx, `Takes ${ruleText(node)}`, x2, y + 11, { color: COLORS.dim });
+    const tuned = attunedStats(m, sel);
+    if (tuned.length) ui.text(ctx, `Attuned: ${tuned.map((s) => STAT[s]).join(' and ')} strands +${ATTUNE_BONUS}`, x2, y + 22, { color: '#c8a050' });
+    const py = y + 36, ph = 88;
+    ui.panel(ctx, 'dark', x2, py, cw, ph);
+    const held = m.slots[sel].spool;
+    if (held) {
+      blit(ctx, img, ui.part(`spool_${held.pattern}_${held.grade}`), x2 + 8, py + 8);
+      ui.text(ctx, name(held).toUpperCase(), x2 + 30, py + 8, { color: PATTERN_TINT[held.pattern], variant: 'bold' });
+      ui.text(ctx, grade(held).toUpperCase(), x2 + 30, py + 19, { color: GRADE_TINT[held.grade] });
+      ui.text(ctx, 'MAIN', x2 + 10, py + 36, { color: COLORS.faint, variant: 'bold' });
+      ui.text(ctx, statText(held.main.stat, held.main.value), x2 + 44, py + 32, { color: COLORS.goldHi, variant: 'display' });
+      ui.text(ctx, 'STRANDS', x2 + 10, py + 56, { color: COLORS.faint, variant: 'bold' });
+      held.strands.forEach((st, k) => {
+        const line = statText(st.stat, st.value);
+        ui.text(ctx, line, x2 + 70, py + 56 + k * 11, { color: COLORS.text });
+        if (strandValue(m, sel, st) > st.value) ui.text(ctx, `+${ATTUNE_BONUS} ATTUNED`, x2 + 70 + ui.measure(line) + 6, py + 56 + k * 11, { color: COLORS.gold });
+      });
+      if (own) {
+        ui.button(ctx, 'mx_out', x2 + cw - 72, py + 6, 64, 16, 'TAKE OUT', {
+          kind: 'small',
+          click: () => {
+            rel.unequip(c.id, sel);
+            this.app.save();
+          },
+        });
+      }
+    } else {
+      ui.text(ctx, 'EMPTY', x2 + 10, py + 10, { color: COLORS.faint, variant: 'bold' });
+      ui.para(ctx, own ? 'Pick a spool from the stock below. It keeps the slot until you take it out.' : `Recruit ${c.name} to weave a matrix.`, x2 + 10, py + 24, cw - 20, { color: COLORS.dim }, 10);
+    }
+
+    // the stock: spools that fit the chosen slot are lit, the others dimmed
+    const groups: { s: ThreadSpool; n: number }[] = [];
+    for (const s of rel.spools()) {
+      const g = groups.find((e) => sameSpool(e.s, s));
+      if (g) g.n++;
+      else groups.push({ s, n: 1 });
+    }
+    groups.sort((a, b) => Number(fits(node, b.s)) - Number(fits(node, a.s)) || b.s.grade - a.s.grade);
+    const ky = y + 130, per = 8, max = per * 3;
+    ui.text(ctx, 'STOCK', x2, ky, { color: COLORS.goldHi, variant: 'bold' });
+    const total = rel.spools().length;
+    ui.text(ctx, total ? `${total} spools, lit ones fit slot ${sel + 1}` : 'empty', x2 + ui.measure('STOCK', 'bold') + 6, ky, { color: COLORS.faint });
+    groups.slice(0, max).forEach(({ s, n }, i) => {
+      const gx = x2 + (i % per) * 23, gy = ky + 12 + Math.floor(i / per) * 22;
+      const ok = fits(node, s);
+      ctx.save();
+      if (!ok) ctx.globalAlpha = 0.3;
+      blit(ctx, img, ui.part(`spool_${s.pattern}_${s.grade}`), gx, gy);
+      ctx.restore();
+      if (n > 1) ui.tinyNum(ctx, n, gx + 14, gy + 13);
+      ui.regions.push({
+        id: `mx_stock_${i}`, x: gx, y: gy, w: 20, h: 20,
+        click: own && ok ? () => {
+          rel.equip(c.id, sel, s);
+          this.app.save();
+        } : undefined,
+        tip: () => ({
+          title: `${name(s)} spool`,
+          body: `${grade(s)}. Main ${statText(s.main.stat, s.main.value)}; strands ${s.strands.map((st) => statText(st.stat, st.value)).join(', ')}. ${ok ? `Fits slot ${sel + 1}.` : `Slot ${sel + 1} cannot take ${STAT[s.main.stat]}.`}`,
+          color: PATTERN_TINT[s.pattern],
+        }),
+      });
+    });
+    if (groups.length > max) ui.text(ctx, `+${groups.length - max} more`, x2 + cw - 4, ky, { color: COLORS.faint, align: 'right' });
+
+    // legend
+    const ly0 = y + 212;
+    const key = (lx: number, color: string, label: string, dotted = false) => {
+      ctx.fillStyle = color;
+      if (dotted) for (let k = 0; k < 7; k += 2) ctx.fillRect(lx + k, ly0 + 2, 1, 5);
+      else ctx.fillRect(lx, ly0 + 2, 6, 5);
+      ui.text(ctx, label, lx + 10, ly0, { color: COLORS.dim });
+      return lx + 10 + ui.measure(label) + 10;
+    };
+    let kx = key(x2, COLORS.gold, 'fixed');
+    kx = key(kx, '#5aa8ff', 'choice');
+    key(kx, COLORS.gold, 'attunes', true);
+    void w;
   }
 
   private skills(ctx: CanvasRenderingContext2D, x: number, y: number, w: number) {
@@ -187,9 +375,9 @@ export class ChampionScreen extends BaseScreen {
     const rows: [string, number, readonly [number, number], string, string][] = [
       ['HP', st.hp, STAT_LIMITS.hp, '#3ccf5a', 'Health. When it reaches 0 the champion falls.'],
       ['ATK', st.atk, STAT_LIMITS.atk, '#ff8a5a', 'Attack: the base of every damaging skill.'],
-      ['DEF', st.def, STAT_LIMITS.def, '#5aa8ff', 'Defense: damage taken is multiplied by 100 / (100 + DEF).'],
+      ['DEF', st.def, STAT_LIMITS.def, '#5aa8ff', 'Defense: damage taken is multiplied by 40 / DEF. Twice the DEF, half the damage.'],
       ['SPD', st.spd, STAT_LIMITS.spd, '#ffe070', 'Speed: how fast the Turn Meter fills.'],
-      ['CRIT', st.crit, STAT_LIMITS.crit, '#ff5ac0', 'Critical rate: chance for each hit to deal +50% damage.'],
+      ['CRIT', st.crit, STAT_LIMITS.crit, '#ff5ac0', 'Critical rate: chance for each hit to deal double damage.'],
     ];
     rows.forEach(([name, val, [lo, hi], color, tip], i) => {
       const cy = y + i * 20;
