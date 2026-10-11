@@ -71,13 +71,13 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Term | Meaning | In code |
 | --- | --- | --- |
 | Champion | the definition of a hero, enemy or boss: identity, stats, kit, lore | `ChampionDef` |
-| Kit | a champion's two or three skills and its passive | `ChampionDef.skills`, `.passive` |
+| Kit | a champion's one to three skills and its passive | `ChampionDef.skills`, `.passive` |
 | Rarity | Common, Elite, Heroic, Mythic; sets the stat budget and the card frame (what it gates in play is not decided) | `Rarity`, `RARITIES`, `RARITY_BUDGET` |
 | Affinity | Ember, Bloom, Tide, a cycle: Ember beats Bloom, Bloom beats Tide, Tide beats Ember (no Void) | `Affinity`, `AFFINITIES`, `affinityEdge` |
 | Role | Tank, Damage, Support: how the budget is spent (no fourth role; Control, Bruiser and the like are descriptive tags) | `Role`, `ROLES` |
 | Faction | one of four powers: the Azure Crown, the Sanguine Dominion, the Court of Root, the Ashveil Reign; story and standard, no mechanics | `FactionId`, `FACTIONS`, `FactionDef.standard` |
 | Standard | a faction's heraldry: the Azure Crown a gold crown on blue, the Sanguine Dominion a red hexagon on black, the Court of Root a brown claw on green, the Ashveil Reign a white bone across a dark grey | `FactionDef.standard`, `emblem_<faction>` |
-| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost), never its faction's | `ChampionDef.color`, `ChampionArt.iconBg` |
+| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather), never its faction's | `ChampionDef.color`, `ChampionArt.iconBg` |
 | Muzzle | where projectiles leave a ranged champion's sprite | `ChampionDef.muzzle` |
 | Approach | how the actor travels before the attack | `Approach` |
 | Stat score, budget | weighted stat sum, and its target per rarity (±5%) | `statScore`, `budgetDelta`, `BUDGET_TOLERANCE` |
@@ -280,7 +280,7 @@ winner()           checked before choosing and after every action
 
 ### 4.2 Catalog (C2)
 
-- **`ChampionDef` is the root of a definition:** identity, stats, two or three skills (a tuple type: A1, A2 and an optional A3), an optional passive. Definitions are treated as immutable at runtime, by convention only: they are plain objects, not frozen.
+- **`ChampionDef` is the root of a definition:** identity, stats, one to three skills (a tuple type: A1, then an optional A2 and A3), an optional passive. Definitions are treated as immutable at runtime, by convention only: they are plain objects, not frozen.
 - **Registries:** `CHAMPIONS` (array order = collection order), `STATUSES` (keyed by `StatusId`, exhaustive by type), `LOCATIONS` (array order = campaign order; stage order inside a location = unlock order), `ZONES`, `CHAPTERS`, and `RARITIES`, `AFFINITIES`, `FACTIONS`, `ROLES` (keyed by their union types, exhaustive by type).
 - **Lookups fail fast:** `champion()`, `stage()`, `locationOf()`, `zone()` and `chapter()` throw on an unknown id.
 - **Ids are the integration keys between contexts**, and therefore published identifiers:

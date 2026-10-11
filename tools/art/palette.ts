@@ -45,6 +45,8 @@ export const MAT = {
   darkleather: m('darkleather', 'matte', ['#140c0c', '#241615', '#38231e', '#523428', '#724a36', '#966a4c']),
   wood: m('wood', 'matte', ['#1c100a', '#34200f', '#523218', '#774b24', '#9d6935', '#c28d4f']),
   bone: m('bone', 'matte', ['#2a2420', '#5a4e44', '#8f8070', '#c8b9a4', '#e8dcc8', '#fff8ea']),
+  /** leather dyed blue: the Skirmisher's jerkin, helmet and bracers */
+  blueLeather: m('blueLeather', 'matte', ['#0a0e1b', '#141c35', '#21305b', '#2e4681', '#4764a6', '#7a98cd']),
 
   // --- cloths (one signature hue per hero) --------------------------------
   blue: m('blue', 'cloth', ['#0e1030', '#182059', '#213a8f', '#2f5cc4', '#4f8ae6', '#8fc0ff']),
@@ -148,6 +150,9 @@ export const ACCENT = {
   smearMagenta: hex('#ff9ad8'),
   /** Captain Gareth: his Ember shows in what he does with the sword, the smear of the cut */
   smearEmber: hex('#ff8a3a'),
+  /** Bloom in a cut: the Skirmisher's smear */
+  smearLeaf: hex('#86d86a'),
+  leafCore: hex('#f0ffd8'),
   emberCore: hex('#ffe6b0'),
   /** the Rime Scholar's ice flakes */
   flake: hex('#e8f8ff'),

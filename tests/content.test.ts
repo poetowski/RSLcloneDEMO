@@ -148,7 +148,7 @@ describe('design decisions', () => {
     expect(allStages()[0].recruit).toBe(second.id);
     // his kit: Line Cut, Iron Blow (ATK Up on himself after the hit, no crit gate), Wide Sweep (damage only), no passive
     expect(first.skills.map((k) => k.name)).toEqual(['Line Cut', 'Iron Blow', 'Wide Sweep']);
-    expect(first.skills[1].statuses).toEqual([{ status: 'atk_up', turns: 2, to: 'self' }]);
+    expect(first.skills[1]?.statuses).toEqual([{ status: 'atk_up', turns: 2, to: 'self' }]);
     expect(first.skills[2]?.target).toBe('enemies');
     expect(first.skills[2]?.statuses ?? []).toEqual([]);
     expect(first.passive).toBeUndefined();
@@ -157,10 +157,19 @@ describe('design decisions', () => {
     // hers: Pale Strike (plain), Rimebind (Slow on every enemy), no A3, Cold Rebuke
     expect(second.skills.map((k) => k.name)).toEqual(['Pale Strike', 'Rimebind']);
     expect(second.skills[0].statuses ?? []).toEqual([]);
-    expect(second.skills[1].target).toBe('enemies');
-    expect(second.skills[1].statuses?.map((x) => x.status)).toEqual(['spd_down']);
+    expect(second.skills[1]?.target).toBe('enemies');
+    expect(second.skills[1]?.statuses?.map((x) => x.status)).toEqual(['spd_down']);
     expect(STATUSES.spd_down.name).toBe('Slow');
     expect(second.passive && [second.passive.name, second.passive.kind, second.passive.value, second.passive.statuses]).toEqual(['Cold Rebuke', 'rebuke', 0.35, [{ status: 'freeze', turns: 1 }]]);
+  });
+
+  it('has the Skirmisher of his brief: a Common of the Azure Crown, Damage, Bloom, one A1 that always hits twice, no A2', () => {
+    const s = CHAMPIONS.find((c) => c.id === 'skirmisher');
+    expect(s && [s.name, s.rarity, s.role, s.faction, s.affinity]).toEqual(['Skirmisher', 'common', 'Damage', 'azure_crown', 'bloom']);
+    expect(s?.skills).toHaveLength(1);
+    expect(s?.skills[0].hits).toHaveLength(2);
+    expect(s?.skills[0].statuses ?? []).toEqual([]);
+    expect(s?.passive).toBeUndefined();
   });
 
   it('opens with a ten-stage first zone', () => {

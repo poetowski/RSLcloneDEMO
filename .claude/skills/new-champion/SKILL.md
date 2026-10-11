@@ -9,7 +9,7 @@ A champion is two modules that must agree, plus the content around them:
 
 | Piece | File | Proven by |
 | --- | --- | --- |
-| Rules: identity, stats, two or three skills, passive | `src/game/data/champions/<id>.ts` + `champions/index.ts` | `tests/content.test.ts` (norms), `npm run balance` |
+| Rules: identity, stats, one to three skills, passive | `src/game/data/champions/<id>.ts` + `champions/index.ts` | `tests/content.test.ts` (norms), `npm run balance` |
 | Pixels: rig, animations, skill icons | `tools/art/champions/<id>.ts` + `champions/index.ts` | `npm run audit`, contact sheets |
 | Effects the skills name | `tools/art/fx/<faction>.ts` | content tests (fx exist) |
 | Where the player meets and recruits them | `src/game/data/campaign.ts` | content tests, balance curve |
@@ -28,7 +28,7 @@ Read first: `docs/DESIGN_DECISIONS.md` (Jakub's world, categories, factions and 
    - Tank: a taunt or shield A2/A3, high HP/DEF, A1 with a defensive rider (DEF Down, Weaken).
    - Damage: multi-hit or execute, high ATK/SPD/CRIT, low DEF. Tagged *bruiser*: sustain (lifesteal, shields) plus a big A3. Tagged *control*: chance-based debuffs on A1/A2, one guaranteed 1-turn control on A3.
    - Support: heal/cleanse/buff on A2, a team-wide payoff on A3.
-4. Give the kit one idea the roster does not have yet. The engine has Counterattack, Undying, ally Turn Meter, Overdrive, Dispel and skill control with no champion using them today; check `docs/MECHANICS_GUIDE.md` sections 8-9 for what exists. A passive is `undying`, `overdrive` or `rebuke` (`PassiveDef` in `types.ts`; the Rime Scholar's Cold Rebuke); a new kind follows step 2.6. A kit has two or three skills (the Rime Scholar has no A3). A status the champion places on itself starts counting at its next turn (Iron Blow's ATK Up covers two turns).
+4. Give the kit one idea the roster does not have yet. The engine has Counterattack, Undying, ally Turn Meter, Overdrive, Dispel and skill control with no champion using them today; check `docs/MECHANICS_GUIDE.md` sections 8-9 for what exists. A passive is `undying`, `overdrive` or `rebuke` (`PassiveDef` in `types.ts`; the Rime Scholar's Cold Rebuke); a new kind follows step 2.6. A kit has one to three skills (the Rime Scholar has no A3, the Skirmisher only an A1). A status the champion places on itself starts counting at its next turn (Iron Blow's ATK Up covers two turns).
 5. Choose an **affinity** that makes the stage that brings the champion interesting against the player's likely teams (team select shows strong/weak counts).
 
 ## 2. Rules module

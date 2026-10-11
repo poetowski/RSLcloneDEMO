@@ -53,7 +53,7 @@ export const CHAPTERS: Chapter[] = [
     title: 'Skills & Cooldowns',
     icon: 'mi_academy',
     blocks: [
-      { kind: 'p', text: 'Each champion has two or three skills. A1, the basic skill, is always ready. A2 and A3 are stronger but go on cooldown when used. Skills have shapes, not just sizes: one enemy, every enemy, or your own team.' },
+      { kind: 'p', text: 'Each champion has one to three skills. A1, the basic skill, is always ready. A2 and A3 are stronger but go on cooldown when used. Skills have shapes, not just sizes: one enemy, every enemy, or your own team.' },
       { kind: 'figure', id: 'skills' },
       { kind: 'p', text: 'A cooldown counts your champion\'s own turns: a skill with Cooldown 3 used now is ready again on the fourth turn after it. The number shown on a greyed-out skill is how many turns are left.' },
       { kind: 'h', text: 'Targets' },

@@ -28,6 +28,7 @@ Section 7 lists what is not decided.
 | 2026-10-11 | Zone names: Zone 1 the Fracture Reach, Zone 2 the Verdant Grove; Zone 2 is not about an arena | 5.3, 5.4, 7 |
 | 2026-10-11 | The world map redrawn: no edges, the rift reworked, the areas and the forest closer, growing east area by area | 5.4a |
 | 2026-10-11 | The redrawn world map approved as built ("i love it") | 5.4a |
+| 2026-10-11 | The Skirmisher, a Common of the Azure Crown | 12 |
 
 ---
 
@@ -507,8 +508,8 @@ open questions.
 - Faction mechanics (synergies, team-building constraints, UI filtering)
 - Champion schema (what fields a champion has beyond the enums) *(partly
   decided 2026-10-11: no subtitle, eight stats; section 10)*
-- Kit / skill design *(the starter pair's kits decided 2026-10-10, section 8;
-  their numbers are not)*
+- Kit / skill design *(the starter pair's kits decided 2026-10-10, section 8,
+  and the Skirmisher's 2026-10-11, section 12; their numbers are not)*
 - Art pipeline specification
 - Save and progression *(gear decided: the Weaver Matrix, section 9; levels,
   ranks, ascension and skill upgrades are not)*
@@ -812,3 +813,35 @@ them.
   the Weaver Matrix (a champion's gear), a Thread Spool (one piece of gear), a
   Weave Pattern (a set bonus). The Spindle of Fate is a placeholder name with
   no meaning yet.
+
+---
+
+## 12. The Skirmisher (received 2026-10-11)
+
+Jakub's brief, verbatim:
+
+```
+create one new common champion for azure crown.
+name Skirmisher. can have conditioned double hit on A1 and maybe simple A2?
+damage type. affinity bloom.
+art: light armored man with leather helmer and two short sword. leather is blue with azure insignia
+```
+
+and, the same day, settling the kit:
+
+```
+he must look weeker but he has no a2 only a1 with guaranteed double hit
+```
+
+| | |
+|---|---|
+| Rarity | Common |
+| Role | Damage |
+| Faction | Azure Crown |
+| Affinity | Bloom |
+| Kit | one skill: an A1 that always hits twice; no A2, no A3, no passive |
+| Look | a light-armoured man, weaker-looking than the starters: a leather helmet, two short swords, blue leather with the Azure insignia |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the skill's name
+(Twin Cut), text and multipliers, the stats, the lore line, the stage that
+brings him (the first clear of 1-5), and the details of his art.

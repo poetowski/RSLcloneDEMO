@@ -147,7 +147,7 @@ export interface ChampionDef {
   muzzle?: [number, number];
   stats: Stats;
   /** A1, A2 and, for most champions, A3 (the Rime Scholar has no A3) */
-  skills: [SkillDef, SkillDef] | [SkillDef, SkillDef, SkillDef];
+  skills: [SkillDef] | [SkillDef, SkillDef] | [SkillDef, SkillDef, SkillDef];
   passive?: PassiveDef;
   lore: string;
 }

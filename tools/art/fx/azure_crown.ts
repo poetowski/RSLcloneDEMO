@@ -1,11 +1,32 @@
-// Captain Gareth's effects (Azure Crown). His Ember affinity shows in what he
-// does with the sword, never in the sword: the cut glows white-hot and sheds
-// embers, the heavy blow bursts, the sweep leaves a flat arc of heat.
+// The Azure Crown's effects. Captain Gareth's Ember shows in what he does with
+// the sword, never in the sword: the cut glows white-hot and sheds embers, the
+// heavy blow bursts, the sweep leaves a flat arc of heat. The Skirmisher's
+// Bloom shows the same way: his two cuts glow green-gold and tear leaves loose.
 import { rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng } from '../raster.ts';
 import { burst, cut, FxDef, ramps, ring, sparks } from './kit.ts';
 
 const F = ramps.fire;
+const G = ramps.green;
+
+/** Leaves torn loose by a cut: they flutter out, then drift down turning; t in [0,1]. */
+function leaves(b: Bitmap, cx: number, cy: number, n: number, spread: number, t: number, seed: number) {
+  const r = rng(seed);
+  for (let k = 0; k < n; k++) {
+    const a = (r() - 0.5) * Math.PI * 2;
+    const sp = (0.3 + r() * 0.7) * spread;
+    const ease = 1 - (1 - t) * (1 - t);
+    const x = Math.round(cx + Math.cos(a) * sp * ease + Math.sin(t * 9 + k) * 1.6);
+    const y = Math.round(cy + Math.sin(a) * sp * ease * 0.7 + 16 * t * t);
+    const life = 1 - t * (0.5 + r() * 0.5);
+    if (life <= 0) continue;
+    const c = G[Math.max(1, Math.min(4, Math.round(life * 4.2)))];
+    // a leaf is two pixels, lying a different way as it turns
+    const turn = (k + Math.floor(t * 6)) % 3;
+    b.set(x, y, c);
+    b.set(x + (turn === 1 ? 0 : 1), y + (turn === 0 ? 0 : 1), turn === 2 ? G[2] : c);
+  }
+}
 
 /** Embers shed by a cut: they fly out mostly upward, slow, sink and dim; t in [0,1]. */
 function embers(b: Bitmap, cx: number, cy: number, n: number, spread: number, t: number, seed: number, gravity = 30) {
@@ -66,6 +87,30 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
       if (i < 6) cut(b, 12, 10, 62, 60, -2, thick, F, heat, reach);
       if (i === 1 || i === 2) burst(b, 38, 36, 6, 2, [13, 8][i - 1], 1.4, F, 0.4);
       if (i >= 1) embers(b, 40, 38, 18, 34, (i - 1) / 5, 17, 26);
+    },
+  },
+  /** Twin Cut, first hit: the near sword cuts high to low in a green-gold line and tears leaves loose. */
+  leaf_cut: {
+    w: 72, h: 72, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
+    draw: (b, t, i) => {
+      const reach = [0.55, 1, 1, 1, 1, 1, 1][i];
+      const heat = [1.4, 1.3, 1.05, 0.8, 0.6, 0.45, 0.3][i];
+      const thick = [2.8, 3.8, 3.2, 2.4, 1.8, 1.2, 1][i];
+      if (i < 6) cut(b, 14, 14, 60, 56, -2, thick, G, heat, reach);
+      if (i === 1 || i === 2) burst(b, 38, 36, 5, 2, [11, 7][i - 1], 1.2, G, 0.3);
+      if (i >= 1) leaves(b, 40, 38, 12, 30, (i - 1) / 5, 23);
+    },
+  },
+  /** Twin Cut, second hit: the far sword cuts back low to high. */
+  leaf_cut_rise: {
+    w: 72, h: 72, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
+    draw: (b, t, i) => {
+      const reach = [0.55, 1, 1, 1, 1, 1, 1][i];
+      const heat = [1.4, 1.3, 1.05, 0.8, 0.6, 0.45, 0.3][i];
+      const thick = [2.8, 3.8, 3.2, 2.4, 1.8, 1.2, 1][i];
+      if (i < 6) cut(b, 14, 58, 60, 16, 2, thick, G, heat, reach);
+      if (i === 1 || i === 2) burst(b, 36, 37, 5, 2, [11, 7][i - 1], 1.2, G, 0.9);
+      if (i >= 1) leaves(b, 36, 36, 12, 30, (i - 1) / 5, 29);
     },
   },
   /** Iron Blow: the blow comes straight down; a hot core bursts, a ring rolls out, embers fly. */
