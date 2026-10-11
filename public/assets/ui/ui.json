@@ -1,36 +1,36 @@
 {
  "icons": {
-  "strike": [
+  "line_cut": [
    0,
    0,
    40,
    40
   ],
-  "whirlwind": [
+  "iron_blow": [
    41,
    0,
    40,
    40
   ],
-  "leaping_blow": [
+  "wide_sweep": [
    82,
    0,
    40,
    40
   ],
-  "bolt": [
+  "pale_strike": [
    123,
    0,
    40,
    40
   ],
-  "mending": [
+  "rimebind": [
    164,
    0,
    40,
    40
   ],
-  "smite": [
+  "cold_rebuke": [
    205,
    0,
    40,
@@ -870,13 +870,13 @@
   ]
  },
  "portraits": {
-  "azure_warrior": [
+  "captain_gareth": [
    0,
    259,
    28,
    28
   ],
-  "sanguine_support": [
+  "rime_scholar": [
    29,
    259,
    28,

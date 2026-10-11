@@ -6,7 +6,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { cleaver, drummer, freezer, guard, inAffinity, mender, overdrive, stalker, striker, twin, undying, warden } from './fixtures';
+import { brute, cleaver, drummer, freezer, guard, inAffinity, mender, overdrive, rebuker, stalker, striker, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -288,6 +288,82 @@ describe('statuses', () => {
     const again = b.useSkill(b.get('p0'), skill(twin, 'twin_chop'), 'e0');
     expect(again.events.some((e) => e.kind === 'passive')).toBe(false);
     expect(b.has(c, 'atk_up')).toBe(false);
+  });
+
+  it("starts counting a status placed during its holder's own turn at the next turn", () => {
+    const b = new Battle(combatants([brute]), combatants([guard]), { seed: 3 });
+    const k = b.get('p0');
+    b.startTurn(k);
+    const r = b.useSkill(k, skill(brute, 'brute_blow'), 'e0');
+    // the buff comes after the hit: the blow itself is not boosted
+    expect(r.events.findIndex((e) => e.kind === 'status')).toBeGreaterThan(r.events.findIndex((e) => e.kind === 'damage'));
+    b.endTurn(k);
+    // it powers the next two turns, then expires
+    for (let turn = 0; turn < 2; turn++) {
+      b.startTurn(k);
+      expect(b.has(k, 'atk_up')).toBe(true);
+      b.endTurn(k);
+    }
+    expect(b.has(k, 'atk_up')).toBe(false);
+  });
+
+  it('answers a critical hit below the threshold with Rebuke, freezing the attacker for its next turn', () => {
+    const crit = { ...striker, stats: { ...striker.stats, crit: 1 } };
+    const b = new Battle(combatants([rebuker]), combatants([crit]), { seed: 2 });
+    const t = b.get('p0'), a = b.get('e0');
+    // above the threshold after the hit: no answer
+    t.hp = t.maxHp;
+    b.startTurn(a);
+    let r = b.useSkill(a, crit.skills[0], 'p0');
+    expect(r.events.some((e) => e.kind === 'passive')).toBe(false);
+    b.endTurn(a);
+    // below it: the attacker is frozen, and the freeze takes its next turn
+    t.hp = Math.round(t.maxHp * 0.6);
+    b.startTurn(a);
+    r = b.useSkill(a, crit.skills[0], 'p0');
+    expect(t.alive).toBe(true);
+    const p = r.events.find((e) => e.kind === 'passive');
+    expect(p?.kind === 'passive' && p.effect === 'rebuke' && p.source === 'e0').toBe(true);
+    expect(b.has(a, 'freeze')).toBe(true);
+    b.endTurn(a);
+    expect(b.has(a, 'freeze')).toBe(true);
+    expect(b.startTurn(a).skip).toBe(true);
+    b.endTurn(a);
+    expect(b.has(a, 'freeze')).toBe(false);
+    // then it rests for three of the holder's turns
+    t.hp = Math.round(t.maxHp * 0.6);
+    b.startTurn(a);
+    r = b.useSkill(a, crit.skills[0], 'p0');
+    expect(r.events.some((e) => e.kind === 'passive')).toBe(false);
+    b.endTurn(a);
+    for (let i = 0; i < 3; i++) {
+      b.startTurn(t);
+      b.endTurn(t);
+    }
+    t.hp = Math.round(t.maxHp * 0.6);
+    b.startTurn(a);
+    r = b.useSkill(a, crit.skills[0], 'p0');
+    expect(r.events.some((e) => e.kind === 'passive')).toBe(true);
+  });
+
+  it('never answers a hit that is not critical, nor one that kills', () => {
+    const plain = { ...striker, stats: { ...striker.stats, crit: 0 } };
+    const b = new Battle(combatants([rebuker]), combatants([plain]), { seed: 2 });
+    b.get('p0').hp = 300;
+    const r = b.useSkill(b.get('e0'), plain.skills[0], 'p0');
+    expect(r.events.some((e) => e.kind === 'passive')).toBe(false);
+    const crit = { ...striker, stats: { ...striker.stats, crit: 1 } };
+    const b2 = new Battle(combatants([rebuker]), combatants([crit]), { seed: 2 });
+    b2.get('p0').hp = 1;
+    const r2 = b2.useSkill(b2.get('e0'), crit.skills[0], 'p0');
+    expect(b2.get('p0').alive).toBe(false);
+    expect(r2.events.some((e) => e.kind === 'passive')).toBe(false);
+  });
+
+  it('plays a champion with two skills, and the AI uses them', () => {
+    expect(rebuker.skills.length).toBe(2);
+    const r = simulate(combatants([rebuker, twin]), combatants([striker, guard]), { seed: 7 });
+    expect(r.winner).not.toBeNull();
   });
 
   it('does not overload on a lethal hit', () => {

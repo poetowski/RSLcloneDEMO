@@ -3,7 +3,7 @@
 // replays the returned events. Rules are documented in docs/MECHANICS_GUIDE.md.
 import { AFFINITY_BONUS, affinityEdge } from '../data/meta';
 import { STATUSES } from '../data/statuses';
-import { ChampionDef, SkillDef, Stats, StatusId, TeamId } from '../data/types';
+import { ChampionDef, PassiveDef, SkillDef, Stats, StatusId, TeamId } from '../data/types';
 import { Rng } from './rng';
 
 export interface StatusInst {
@@ -12,6 +12,8 @@ export interface StatusInst {
   /** shield: remaining absorb */
   value: number;
   source: string;
+  /** placed during its holder's own turn: it starts counting down at the holder's next turn */
+  fresh?: boolean;
 }
 
 /** A champion entering battle, optionally as a boss. */
@@ -59,7 +61,7 @@ export type BattleEvent =
   | { kind: 'dispel'; target: string; status: StatusId; hit: number }
   | { kind: 'tm'; target: string; delta: number; hit: number }
   | { kind: 'revive'; target: string; hp: number; hit: number }
-  | { kind: 'passive'; target: string; name: string; hit: number }
+  | { kind: 'passive'; target: string; name: string; hit: number; effect: PassiveDef['kind']; source?: string }
   | { kind: 'death'; target: string; hit: number };
 
 export interface SkillResult {
@@ -100,6 +102,8 @@ export class Battle {
   units: Unit[] = [];
   rng: Rng;
   turn = 0;
+  /** the champion whose turn it is, from startTurn to endTurn */
+  acting: Unit | null = null;
 
   constructor(player: Combatant[], enemy: Combatant[], opts: BattleOptions = {}) {
     this.rng = new Rng(opts.seed ?? 1);
@@ -199,6 +203,7 @@ export class Battle {
 
   /** Start-of-turn ticks (poison, burn, regen). `skip` = stunned/frozen. */
   startTurn(u: Unit): { events: BattleEvent[]; skip: boolean } {
+    this.acting = u;
     const events: BattleEvent[] = [];
     if (this.has(u, 'poison')) this.applyDamage(u, Math.round(u.maxHp * POISON_PCT), false, 0, 0, events, 'poison');
     if (u.alive && this.has(u, 'burn')) this.applyDamage(u, Math.round(u.maxHp * BURN_PCT), false, 0, 0, events, 'burn');
@@ -207,12 +212,17 @@ export class Battle {
     return { events, skip };
   }
 
-  /** End of the actor's turn: TM reset, durations and cooldowns tick down. */
+  /** End of the actor's turn: TM reset, durations and cooldowns tick down (a status placed during this turn starts counting at the next). */
   endTurn(u: Unit): BattleEvent[] {
     const events: BattleEvent[] = [];
+    if (this.acting === u) this.acting = null;
     u.tm = u.alive ? Math.min(TURN_FULL - 1, u.pendingTm) : 0;
     u.pendingTm = 0;
     for (const s of [...u.statuses]) {
+      if (s.fresh) {
+        s.fresh = false;
+        continue;
+      }
       s.turns--;
       if (s.turns <= 0) {
         u.statuses.splice(u.statuses.indexOf(s), 1);
@@ -279,6 +289,7 @@ export class Battle {
         const dmg = this.rollDamage(actor, t, skill, h.mult);
         const dealt = this.applyDamage(t, dmg.amount, dmg.crit, dmg.edge, hi, events);
         damaged.add(t);
+        if (dmg.crit) this.rebuke(t, actor, hi, events);
         if (skill.lifesteal && dealt > 0 && actor.alive) this.heal(actor, Math.round(dealt * skill.lifesteal), hi, events);
         for (const app of skill.statuses ?? []) {
           if (app.perHit && app.to === 'targets' && t.alive) this.tryApply(actor, t, app.status, app.turns, app.chance, app.value, hi, events);
@@ -406,7 +417,7 @@ export class Battle {
     } else if (t.alive && p?.kind === 'overdrive' && !t.overdriven && t.hp / t.maxHp < p.value) {
       // the core overloads once: a second phase for bosses like Mwamba
       t.overdriven = true;
-      events.push({ kind: 'passive', target: t.uid, name: p.name, hit });
+      events.push({ kind: 'passive', target: t.uid, name: p.name, hit, effect: 'overdrive' });
       for (const st of p.statuses ?? []) {
         this.addStatus(t, st.status, st.turns, 0, t.uid);
         events.push({ kind: 'status', target: t.uid, status: st.status, turns: st.turns, hit });
@@ -415,14 +426,38 @@ export class Battle {
     return lost;
   }
 
+  /**
+   * Places a status, or refreshes it to the longer duration. Durations count
+   * the holder's own turns: a status placed during the holder's turn (a
+   * self-buff, a Rebuke answering a critical hit) starts counting at its next
+   * turn, so a 1-turn Freeze always skips a turn and a 2-turn ATK Up covers two.
+   */
   addStatus(u: Unit, id: StatusId, turns: number, value: number, source: string) {
+    const fresh = u === this.acting;
     const ex = u.statuses.find((s) => s.id === id);
     if (ex) {
-      ex.turns = Math.max(ex.turns, turns);
+      // compare what is left after this turn's tick with the new duration
+      const left = fresh && !ex.fresh ? ex.turns - 1 : ex.turns;
+      ex.turns = Math.max(left, turns);
       ex.value = Math.max(ex.value, value);
+      if (fresh) ex.fresh = true;
       return;
     }
-    u.statuses.push({ id, turns, value, source });
+    u.statuses.push({ id, turns, value, source, ...(fresh ? { fresh } : {}) });
+  }
+
+  /** Rebuke (passive): a critical hit on its holder below the threshold answers the attacker, then the passive rests. */
+  private rebuke(t: Unit, attacker: Unit, hit: number, events: BattleEvent[]) {
+    const p = t.champion.passive;
+    if (p?.kind !== 'rebuke' || !t.alive || !attacker.alive || t.team === attacker.team) return;
+    if (t.hp / t.maxHp >= p.value || (t.cooldowns[p.id] ?? 0) > 0) return;
+    // the rest counts the holder's own turns: one more if it is its turn now
+    t.cooldowns[p.id] = (p.cooldown ?? 0) + (t === this.acting ? 1 : 0);
+    events.push({ kind: 'passive', target: t.uid, name: p.name, hit, effect: 'rebuke', source: attacker.uid });
+    for (const st of p.statuses ?? []) {
+      this.addStatus(attacker, st.status, st.turns, 0, t.uid);
+      events.push({ kind: 'status', target: attacker.uid, status: st.status, turns: st.turns, hit });
+    }
   }
 
   winner(): TeamId | null {

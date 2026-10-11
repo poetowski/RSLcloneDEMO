@@ -202,11 +202,11 @@ The first source column is the truth. The last column lists every hand-written c
 | Weaken | +25% damage taken | `WEAKEN_MULT` | `statuses.ts`, MECHANICS_GUIDE 5 and 7, Academy figure |
 | ATK Up / ATK Down | ±25% | `Battle.attack` (inline) | `statuses.ts`, MECHANICS_GUIDE 5 and 7 |
 | DEF Up / DEF Down | +16% / -12% | `DEF_UP`, `DEF_DOWN` (`battle.ts`) | `statuses.ts`, MECHANICS_GUIDE 5 and 7, Academy `damage` |
-| SPD Up / SPD Down | ±25% | `Battle.speed` (inline) | `statuses.ts`, MECHANICS_GUIDE 2 |
+| SPD Up / Slow | ±25% | `Battle.speed` (inline) | `statuses.ts`, MECHANICS_GUIDE 2 |
 | Poison / Burn | -5% / -6% max HP at turn start, through shields | `POISON_PCT`, `BURN_PCT` | `statuses.ts`, MECHANICS_GUIDE 3 and 7, Academy |
 | Regen | +7.5% max HP at turn start | `REGEN_PCT` | `statuses.ts`, MECHANICS_GUIDE 7 |
 | Shield | absorbs up to `value` x the caster's max HP | `Battle.tryApply`, `Battle.applyDamage` | MECHANICS_GUIDE 5 |
-| Durations | the holder's own turns, ticking at its turn end; reapplying refreshes to the longer one, never stacks | `Battle.endTurn`, `Battle.addStatus` | MECHANICS_GUIDE 3 and 7, Academy `buffs`, `debuffs` |
+| Durations | the holder's own turns, ticking at its turn end; a status placed during the holder's own turn starts counting at its next; reapplying refreshes to the longer one, never stacks | `Battle.endTurn`, `Battle.addStatus` (`StatusInst.fresh`) | MECHANICS_GUIDE 3 and 7, Academy `basics`, `buffs`, `debuffs` |
 | Cooldowns | A1 0, A2 3, A3 4-5 | `SKILL_NORMS` (`norms.ts`) | MECHANICS_GUIDE 4 and 10 |
 | Hard control | 1 turn, guaranteed only on an A3 | `STATUS_NORMS` | MECHANICS_GUIDE 10, Academy `control` |
 | Boss HP | x1.6 | `BOSS_HP` (`campaign.ts`) and the `Battle` default | MECHANICS_GUIDE 10, Academy `campaign` ("60% more HP") |
@@ -233,12 +233,12 @@ Every skill is data (`SkillDef` in `types.ts`); these are the levers a kit can p
 
 ### ME3 The roster
 
-Jakub's two starting champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4). Rarity, role, faction, affinity and when they join are his; names, kits, stats and bodies are stand-ins from the proof of concept (the berserker and the sun priestess) until he designs them.
+Jakub's two starting champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4 and 8, Starter Heroes): names, looks, kits and what each teaches are his; stats and the numbers in the skills are stand-ins.
 
-| Champion (`id`) | Role, rarity, affinity, faction | SPD | Signature idea (stand-in kit) | Met / joins |
+| Champion (`id`) | Role, rarity, affinity, faction | SPD | Signature idea | Met / joins |
 | --- | --- | --- | --- | --- |
-| Azure Warrior (`azure_warrior`) | Damage, elite, Ember, Azure Crown | 104 | two-hit A1 and AoE; leap execute below 50%, DEF Down; teaches how damage works | starter |
-| Sanguine Support (`sanguine_support`) | Support, elite, Tide, Sanguine Dominion | 110 | team heal and ATK Up; AoE Heal Block and Burn; teaches sustain | after the first battle (1-1), not fought there |
+| Captain Gareth (`captain_gareth`) | Damage, elite, Ember, Azure Crown | 104 | a plain cut; a heavy blow that leaves ATK Up for his next two turns; one sweep through every enemy. Teaches how damage works: skills hit harder, change future turns, have shapes. Crit is not introduced on him (2.5%) | starter |
+| Rime Scholar (`rime_scholar`) | Support, elite, Tide, Sanguine Dominion | 106 | a plain attack; Slow on every enemy; no A3; Cold Rebuke freezes whoever crits her below 35% HP. Teaches that statuses exist, that a Support can deny, and that statuses can answer being hurt | after the first battle (1-1), not fought there |
 
 Spread: roles Damage 1, Support 1, Tank 0; affinities Ember 1, Tide 1, Bloom 0; rarities Elite 2 (Common, Heroic and Mythic have budgets but no champions, T8); factions Azure Crown 1, Sanguine Dominion 1, the Court of Root and the Ashveil Reign none.
 
@@ -248,16 +248,16 @@ Zone 1, *A Dim Island*, from Jakub's working notes (DESIGN_DECISIONS.md 5.3, not
 
 | Stage | Enemies | Power | Kind | Lean (Ember / Tide attackers) | First introduces |
 | --- | --- | --- | --- | --- | --- |
-| 1-1 | 2 warriors | 0.35 | first | Tide +2 (not owned yet) | the fight, Leaping Blow's execute; brings the Sanguine Support |
-| 1-2 | warrior, support | 0.84 | normal | Ember -1, Tide +1 | enemy heals and ATK Up, Burn, Heal Block |
-| 1-3 | 2 warriors | 0.78 | normal | Tide +2 | duplicate enemies |
-| 1-4 | warrior, support | 0.89 | normal | Ember -1, Tide +1 | |
-| 1-5 | 2 warriors, support | 0.54 | normal | Ember -1, Tide +2 | three enemies |
-| 1-6 | warrior, 2 supports | 0.66 | normal | Ember -2, Tide +1 | two healers |
-| 1-7 | 2 warriors, support | 0.59 | normal | Ember -1, Tide +2 | |
-| 1-8 | 3 warriors | 0.66 | normal | Tide +3 | |
-| 1-9 | 2 warriors, support | 0.59 | normal | Ember -1, Tide +2 | |
-| 1-10 | warrior (boss), 2 supports | 0.59 | boss | Ember -2, Tide +1 | boss HP and crown |
+| 1-1 | 2 Gareths | 0.48 | first | Tide +2 (not owned yet) | the fight: Line Cut, Iron Blow and its ATK Up, Wide Sweep through two enemies; brings the Rime Scholar |
+| 1-2 | Gareth, Rime Scholar | 0.81 | normal | Ember -1, Tide +1 | Slow on the player's team (an enemy Rimebind); an enemy's Cold Rebuke |
+| 1-3 | 2 Gareths | 1.03 | normal | Tide +2 | duplicate enemies, stronger than the player's own |
+| 1-4 | Gareth, Rime Scholar | 0.86 | normal | Ember -1, Tide +1 | |
+| 1-5 | 2 Gareths, Rime Scholar | 0.67 | normal | Ember -1, Tide +2 | three enemies |
+| 1-6 | Gareth, 2 Rime Scholars | 0.68 | normal | Ember -2, Tide +1 | two Rimebinds: the team slowed for long stretches |
+| 1-7 | 2 Gareths, Rime Scholar | 0.70 | normal | Ember -1, Tide +2 | |
+| 1-8 | 3 Gareths | 0.775 | normal | Tide +3 | three Wide Sweeps |
+| 1-9 | 2 Gareths, Rime Scholar | 0.71 | normal | Ember -1, Tide +2 | |
+| 1-10 | Gareth (boss), 2 Rime Scholars | 0.59 | boss | Ember -2, Tide +1 | boss HP and crown |
 
 ### ME5 Feel: the presentation mechanics
 
@@ -365,22 +365,22 @@ These complete the balance report. Until they are automated ([DDD.md](DDD.md) R-
 
 ### 6.0 Zone 1 (2026-10-10)
 
-Jakub's content: the two starting champions and Zone 1 with stand-in enemies. `npm test` (84 tests), `npm run typecheck`, `npm run audit` and `npm run balance` all pass; impact is skipped (it needs six champions). Every stage has one team (the player owns at most two champions), auto-battled 300 times (seeds 1000-1299) with the 6.5 loop:
+Jakub's content: Captain Gareth and the Rime Scholar (the Starter Heroes record, kits with stand-in numbers) and Zone 1 with stand-in enemies (copies of the two). `npm test` (90 tests), `npm run typecheck`, `npm run audit` and `npm run balance` all pass; impact is skipped (it needs six champions). Every stage has one team (the player owns at most two champions), auto-battled 300 times (seeds 1000-1299) with the 6.5 loop:
 
-| Stage | Power | Team size | Auto win | Actions | 3-star share of wins | Player opens | Strong / weak hits |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1-1 | 0.35 | 1 | 95% | 5.5 | 100% | 31% | 0% / 0% |
-| 1-2 | 0.84 | 2 | 89% | 8.6 | 65% | 52% | 24% / 28% |
-| 1-3 | 0.78 | 2 | 85% | 8.0 | 63% | 79% | 29% / 35% |
-| 1-4 | 0.89 | 2 | 82% | 8.9 | 60% | 52% | 24% / 27% |
-| 1-5 | 0.54 | 2 | 79% | 9.8 | 63% | 51% | 25% / 28% |
-| 1-6 | 0.66 | 2 | 76% | 11.5 | 57% | 36% | 24% / 28% |
-| 1-7 | 0.59 | 2 | 71% | 10.2 | 56% | 51% | 25% / 28% |
-| 1-8 | 0.66 | 2 | 69% | 10.1 | 32% | 72% | 28% / 42% |
-| 1-9 | 0.59 | 2 | 67% | 10.2 | 58% | 50% | 25% / 29% |
-| 1-10 | 0.59 | 2 | 61% | 11.6 | 42% | 36% | 21% / 30% |
+| Stage | Power | Team size | Auto win | Actions | 3-star share of wins | Player opens | Strong / weak hits | Skipped turns | Cold Rebukes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1-1 | 0.48 | 1 | 93% | 6.8 | 100% | 31% | 0% / 0% | 0.00 | 0.00 |
+| 1-2 | 0.81 | 2 | 90% | 11.2 | 62% | 50% | 28% / 20% | 0.03 | 0.07 |
+| 1-3 | 1.03 | 2 | 81% | 9.6 | 20% | 59% | 33% / 23% | 0.02 | 0.04 |
+| 1-4 | 0.86 | 2 | 87% | 11.8 | 48% | 50% | 28% / 20% | 0.04 | 0.07 |
+| 1-5 | 0.67 | 2 | 85% | 12.4 | 49% | 43% | 28% / 22% | 0.02 | 0.06 |
+| 1-6 | 0.68 | 2 | 81% | 15.0 | 32% | 37% | 27% / 20% | 0.06 | 0.10 |
+| 1-7 | 0.70 | 2 | 75% | 12.5 | 46% | 43% | 27% / 22% | 0.02 | 0.06 |
+| 1-8 | 0.775 | 2 | 76% | 10.4 | 18% | 50% | 31% / 24% | 0.01 | 0.04 |
+| 1-9 | 0.71 | 2 | 73% | 12.6 | 43% | 43% | 27% / 21% | 0.03 | 0.06 |
+| 1-10 | 0.59 | 2 | 65% | 16.5 | 31% | 37% | 26% / 24% | 0.08 | 0.12 |
 
-The curve falls smoothly from 95% to 61%. Battles are short (5.5 to 11.6 actions; the proof of concept ran 10 to 26), there are no skipped turns (no control in either kit), and the mirror line-ups make weak hits slightly more common than strong ones.
+(Skipped turns and Cold Rebukes are per battle.) The curve falls from 93% to 65%; on these seeds 1-4 and 1-5 sit a few points above 1-3, inside the noise of 300 battles (on seeds 1-300 the curve is monotonic but for 1-8, see MECHANICS_GUIDE 10). Battles run 6.8 to 16.5 actions. The Rime Scholar hits Gareth's copies strong, so strong hits now outnumber weak ones, and stages of Gareths need more power; their Wide Sweeps make flawless wins rare there (18-20% of wins). Cold Rebuke fires once in 8 to 25 battles: both kits crit at 2.5%, as Jakub keeps crit out of Gareth's kit, so it rarely meets a critical hit in Zone 1; it is the roster's only control (T19).
 
 The sections below are the proof of concept's baseline (commit `8dd9a26`, 2026-10-06, 39 tests): thirteen champions and ten stages that no longer exist, kept as the reference for a full roster.
 
@@ -507,9 +507,10 @@ Paste it into the pull request description.
 | T13 | Team size is 3 (RSL 4-5, SWGOH 5). Formation slots, zone spawns, the HUD and every balance number depend on it. | decide early; 3, 4 or 5 |
 | T14 | Team-building levers are few: no leader skills or auras, and formation is visual only (the front row does not protect the back). | leader skills or auras; positional rules |
 | T15 | Five stats: no Accuracy or Resistance (a debuff lands on a flat chance) and no crit damage stat. | add Accuracy/Resistance, crit damage; or keep five on purpose |
-| T16 | Status variety: no immunities, no revives, ally-target skills unused (T8), two passive kinds. | grow the vocabulary with the roster; every new protection needs an answer (DY6) |
+| T16 | Status variety: no immunities, no revives, ally-target skills unused (T8), three passive kinds. | grow the vocabulary with the roster; every new protection needs an answer (DY6) |
 | T17 | Modes: the campaign is the only mode; no dungeons, boss modes or events; PvP is excluded. | decide which modes the game has |
 | T18 | Platform: a 640x360 web canvas with mouse and keyboard; RSL and SWGOH are phone games (touch, short sessions). | web only; or phones too (touch-first input, layout) |
+| T19 | Crit is load-bearing for Cold Rebuke, but crit is kept out of Gareth's kit (2.5%, the floor of the norms) and Zone 1's enemies are copies of the two, so the passive fires once in 8 to 25 battles there. Jakub: crit must be taught at or before the point Cold Rebuke first fires meaningfully. | Jakub decides: enemies that crit (Zone 1's real enemies, or Zone 2), a crit teacher among the champions, or the Academy alone |
 
 ## 9. Decision log
 
@@ -522,6 +523,7 @@ Record every change that moves a dynamic out of its band, changes a band, or cha
 | 2026-10-10 | Jakub's design decisions replace the proof-of-concept content ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)): the four category enums (Ember / Bloom / Tide, Common / Elite / Heroic / Mythic, Tank / Damage / Support, four factions), the two starting champions, Zone 1 of ten stages on a new map and background; everything else of the proof of concept removed | AE3, AE5 | every dynamic: thirteen champions become two (stand-in bodies and kits), ten stages become Zone 1 with stand-in enemies; impact cannot be measured below six champions | section 6.1-6.4 -> 6.0 | approved by Jakub ("go, implement the changes"). Stand-ins until he designs them: names, kits, stats, bodies, enemies, the size of an affinity edge, rarity budgets; Zone 1's art is a first take on his notes. The first stage fields two weak copies (power 0.35) so the first battle lasts about five actions instead of two |
 | 2026-10-10 | The campaign map: the edge of a continent with a rift in the west and jungle in the east, nothing beyond its north and south edges; one node per area whose stage list opens as a popup instead of a dot per stage; stages unnamed; a second node (Zone 2, its stages not designed) | AE2, AE6 | none: the same stages and powers | ten dots on the map -> two nodes; names -> ids | set by Jakub |
 | 2026-10-10 | Faction standards: the Court of Root a brown claw on green, the Ashveil Reign one white bone across a dark grey (about 80%), the Azure Crown's crown confirmed gold | AE5 | none | question marks -> designed medallions | set by Jakub |
+| 2026-10-10 | Jakub's Starter Heroes record: Captain Gareth (Line Cut; Iron Blow, ATK Up on himself after the hit; Wide Sweep, damage only; no passive) and the Rime Scholar (Pale Strike; Rimebind, Slow on every enemy; no A3; Cold Rebuke: below 35% HP, a critical hit on her freezes its attacker for 1 turn, with a cooldown), their looks and art. Rules: a champion may have two skills; the passive kind `rebuke`; a status placed during its holder's own turn starts counting at its next turn (needed for Iron Blow's two turns and for the Freeze to cost the attacker a turn); SPD Down named Slow | AE1, AE2, AE5, AE6 | the curve, re-tuned: stage powers 0.48-1.03 (were 0.35-0.89); 3-star share down on stages of Gareths; skipped turns appear (0.01-0.08 per battle) | section 6.0 re-measured | set by Jakub ("also generate high quality new art"). Stand-ins: stats (crit at the 2.5% floor, as crit is not introduced on Gareth), multipliers, cooldowns, Slow's 2 turns, Cold Rebuke's 3-turn rest, the titles, the heads and faces his record leaves open, the effects |
 | 2026-10-10 | The gear system: the two-triangle layout, spools with a main stat (Ashen, Silver, Gilded) and strands, attunement, the MATRIX tab; DEF and CRIT closed on ATK and HP in the rules (damage x 40 / DEF, crits x2, every champion's DEF remapped and crit halved so battles stay the same) | AE1, AE3 | impact within ±3 points, curve -1 to +4 points; the impact measure now plays 960 battles per champion (240 flagged noise as a failure) | section 6 stays the reference; numbers moved inside the noise | approved by Jakub ("this looks like a good gear system"). Weave Patterns and spool sources are not defined yet; stage powers are re-measured once sources set how fast spools arrive |
 
 ## 10. Keeping this document true

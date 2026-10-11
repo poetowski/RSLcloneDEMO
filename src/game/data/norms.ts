@@ -85,5 +85,13 @@ export function auditChampion(c: ChampionDef): string[] {
       if (hard && (st.chance ?? 1) >= 1 && s.slot < STATUS_NORMS.guaranteedControlSlot) out.push(`${s.id}: guaranteed ${st.status} on A${s.slot}`);
     }
   });
+  // a passive's control lasts a single turn too, and a passive that answers blows has to rest between answers
+  const p = c.passive;
+  for (const st of p?.statuses ?? []) {
+    const hard = st.status === 'stun' || st.status === 'freeze';
+    if (hard && st.turns > STATUS_NORMS.maxControlTurns) out.push(`${p!.id}: ${st.status} for ${st.turns} turns`);
+    if (!hard && st.turns > STATUS_NORMS.maxTurns) out.push(`${p!.id}: ${st.status} for ${st.turns} turns`);
+  }
+  if (p?.kind === 'rebuke' && !(p.cooldown && p.cooldown >= 1)) out.push(`${p.id}: a rebuke needs a cooldown`);
   return out;
 }

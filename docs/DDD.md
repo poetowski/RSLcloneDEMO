@@ -46,6 +46,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Hit | one damage instance of a skill against every target; one per hit frame of the animation | `HitDef`, `BattleEvent.hit` |
 | Multiplier | the ATK factor of a hit; a skill's total multiplier is the sum over its hits | `HitDef.mult`, `totalMult` |
 | Status | a buff or debuff with a duration in the holder's own turns | `StatusId`, `StatusDef`, `StatusInst` |
+| Fresh status | a status placed during its holder's own turn (a self-buff, a Rebuke's Freeze on the attacker); it starts counting at the holder's next turn | `StatusInst.fresh`, `Battle.acting` |
 | Status application | the rule that places a status: chance, turns, recipients, value, per hit | `StatusApp` |
 | RESIST | a debuff whose chance roll failed | `resist` event |
 | Shield | absorbs damage before HP; its value is a fraction of the caster's max HP | `shield`, `StatusInst.value` |
@@ -57,7 +58,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Turn meter boost / drain | adds to the other allies' meters, or takes from the targets' | `tmAllies`, `tmTargets`, `tm` event |
 | Kept meter | the actor ends its turn with this meter instead of 0 | `selfTm`, `Unit.pendingTm` |
 | Counterattack | the `counter` status, and the A1 it answers with | `counter`, `SkillResult.counter` |
-| Passive | a rule that wakes by itself: Undying, Overdrive | `PassiveDef.kind`, `Unit.revived`, `Unit.overdriven` |
+| Passive | a rule that wakes by itself: Undying, Overdrive, Rebuke (answers a critical hit below a threshold, then rests) | `PassiveDef.kind`, `PassiveDef.cooldown`, `Unit.revived`, `Unit.overdriven`, `Unit.cooldowns[passive id]` |
 | Boss | an enemy slot with x1.6 HP, a crown and an intro | `EnemySlot.boss`, `BOSS_HP` |
 | Power | a stage's multiplier on enemy HP and ATK | `StageDef.power`, `BattleOptions.enemyPower` |
 | Battle event | one fact the rules produced, for the view to present | `BattleEvent` |
@@ -70,13 +71,13 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Term | Meaning | In code |
 | --- | --- | --- |
 | Champion | the definition of a hero, enemy or boss: identity, stats, kit, lore | `ChampionDef` |
-| Kit | a champion's three skills and its passive | `ChampionDef.skills`, `.passive` |
+| Kit | a champion's two or three skills and its passive | `ChampionDef.skills`, `.passive` |
 | Rarity | Common, Elite, Heroic, Mythic; sets the stat budget and the card frame (what it gates in play is not decided) | `Rarity`, `RARITIES`, `RARITY_BUDGET` |
 | Affinity | Ember, Bloom, Tide, a cycle: Ember beats Bloom, Bloom beats Tide, Tide beats Ember (no Void) | `Affinity`, `AFFINITIES`, `affinityEdge` |
 | Role | Tank, Damage, Support: how the budget is spent (no fourth role; Control, Bruiser and the like are descriptive tags) | `Role`, `ROLES` |
 | Faction | one of four powers: the Azure Crown, the Sanguine Dominion, the Court of Root, the Ashveil Reign; story and standard, no mechanics | `FactionId`, `FACTIONS`, `FactionDef.standard` |
 | Standard | a faction's heraldry: the Azure Crown a gold crown on blue, the Sanguine Dominion a red hexagon on black, the Court of Root a brown claw on green, the Ashveil Reign a white bone across a dark grey | `FactionDef.standard`, `emblem_<faction>` |
-| Signature hue | the champion's colour in the UI and its art; for today's stand-in bodies, their faction's colour | `ChampionDef.color` |
+| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost), never its faction's | `ChampionDef.color`, `ChampionArt.iconBg` |
 | Muzzle | where projectiles leave a ranged champion's sprite | `ChampionDef.muzzle` |
 | Approach | how the actor travels before the attack | `Approach` |
 | Stat score, budget | weighted stat sum, and its target per rarity (±5%) | `statScore`, `budgetDelta`, `BUDGET_TOLERANCE` |
@@ -179,7 +180,7 @@ The language of [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) section 1. None of it
 | Archivist | the player, more celestial than physical, who collects and reconstructs champions to repair the loom | `MasterArchivist` (the save) |
 | Recollection | the central verb: champions are fragmented souls of legendary champions, collected and reconstructed | `HeroSoulFile` (the record of one) |
 | World (of a faction) | the Azure Crown and the Sanguine Dominion come from separate worlds and meet only where the loom connects them | `FactionDef.desc` |
-| Starter, second champion | the Azure Crown warrior who is there from the start, the Sanguine Dominion support who joins after the first battle; names to come | `azure_warrior`, `sanguine_support`, `STARTERS` |
+| Starter, second champion | Captain Gareth of the Azure Crown, there from the start, and the Rime Scholar of the Sanguine Dominion, who joins after the first battle (DESIGN_DECISIONS.md 8) | `captain_gareth`, `rime_scholar`, `STARTERS` |
 
 ## 3. Bounded contexts
 
@@ -247,7 +248,7 @@ The language of [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) section 1. None of it
 
 ### 4.1 Combat (C1)
 
-- **Aggregate root: `Battle`.** The consistency boundary is one fight. It owns the units, the seeded `Rng` and the turn counter. State changes go through its methods: `advance`, `startTurn`, `useSkill`, `endTurn`, `addStatus`, `applyDamage`, `heal`.
+- **Aggregate root: `Battle`.** The consistency boundary is one fight. It owns the units, the seeded `Rng`, the turn counter and the acting unit (`acting`, from `startTurn` to `endTurn`). State changes go through its methods: `advance`, `startTurn`, `useSkill`, `endTurn`, `addStatus`, `applyDamage`, `heal`.
 - **Entity: `Unit`.** Identity is team plus slot (`p0`-`e2`). Mutable state: `hp`, `tm`, `statuses`, `cooldowns`, `alive`, `revived`, `overdriven`, `pendingTm`. Its fields are public: tests, `BattleScene.demo` (which resets units between loops) and the `?hp=` screenshot option write them directly. Treat those writes as exceptions; new code goes through `Battle` (R-10).
 - **Inside a unit:** `StatusInst` is unique per `StatusId` on a unit; its `turns` and `value` change in place.
 - **Value objects:** `Stats`, `Combatant`, `BattleOptions`, `Decision`, `HitDef`, `StatusApp`.
@@ -271,14 +272,14 @@ winner()           checked before choosing and after every action
 1. Targets: Taunt narrows single-target enemy skills; counterattacks ignore Taunt; a target that is not valid falls back to the first valid one.
 2. Cooldown: set to `cooldown + 1`, because `endTurn` of this same turn ticks it once.
 3. Dispel: every buff removed from the targets (events at hit 0).
-4. For each hit `k`, for each living target: roll damage, then apply it (the shield absorbs first and expires at 0; then death, Undying or Overdrive), then the lifesteal heal, then the per-hit status rolls.
+4. For each hit `k`, for each living target: roll damage, then apply it (the shield absorbs first and expires at 0; then death, Undying or Overdrive), then, on a critical hit, the target's Rebuke (its statuses land on the actor), then the lifesteal heal, then the per-hit status rolls.
 5. On the last hit: ally heals, cleanse, status applications in the order written in the skill (recipients by `to`), target meter change, ally meter change.
 6. The kept meter (`selfTm`) waits for `endTurn`.
 7. Counterattacks: each damaged, living enemy defender that holds Counter and is neither stunned nor frozen answers once with its A1 at the actor. Counters set no cooldown, keep no meter and are never countered.
 
 ### 4.2 Catalog (C2)
 
-- **`ChampionDef` is the root of a definition:** identity, stats, exactly three skills (a tuple type), an optional passive. Definitions are treated as immutable at runtime, by convention only: they are plain objects, not frozen.
+- **`ChampionDef` is the root of a definition:** identity, stats, two or three skills (a tuple type: A1, A2 and an optional A3), an optional passive. Definitions are treated as immutable at runtime, by convention only: they are plain objects, not frozen.
 - **Registries:** `CHAMPIONS` (array order = collection order), `STATUSES` (keyed by `StatusId`, exhaustive by type), `LOCATIONS` (array order = campaign order; stage order inside a location = unlock order), `ZONES`, `CHAPTERS`, and `RARITIES`, `AFFINITIES`, `FACTIONS`, `ROLES` (keyed by their union types, exhaustive by type).
 - **Lookups fail fast:** `champion()`, `stage()`, `locationOf()`, `zone()` and `chapter()` throw on an unknown id.
 - **Ids are the integration keys between contexts**, and therefore published identifiers:
@@ -360,7 +361,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C2 | The next actor has the smallest (100 - TM) / SPD; ties go to higher SPD, then unit order | code; test "fastest unit acts first" |
 | INV-C3 | TM stays within 0-100; after acting it is 0 or the kept meter (max 99); a dead unit has TM 0 | code; tests on reset and `selfTm` |
 | INV-C4 | A status appears at most once per unit; reapplying keeps the longer duration and the larger shield | code (`addStatus`); no test |
-| INV-C5 | Durations count the holder's own turns and tick at its turn end, also on a skipped turn | code in both turn loops; test on Freeze |
+| INV-C5 | Durations count the holder's own turns and tick at its turn end, also on a skipped turn; a status placed during the holder's own turn first ticks at its next turn end | code in both turn loops; tests on Freeze and on a self-buff |
 | INV-C6 | A skill with cooldown N is unavailable for the holder's next N turns | code; test (a synthetic A2 on cooldown 3) |
 | INV-C7 | Single-target enemy skills must target a taunter while one lives; AoE and counterattacks ignore Taunt | code; test (Taunt vs single and AoE; the counter case is untested) |
 | INV-C8 | Every hit deals at least 1; shields absorb before HP, except Poison and Burn | code; tests on shields and ticks |
@@ -370,6 +371,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C12 | Overdrive fires once, only on a non-lethal hit that ends below `value` | code; tests |
 | INV-C13 | A dead unit has no statuses and is never a target | code; test |
 | INV-C14 | A battle ends when one side has no living unit; it always ends | code; test (40 seeded auto battles); termination relies on every A1 dealing damage |
+| INV-C15 | A Rebuke answers only a critical, non-lethal hit by an enemy that leaves its holder below `value`; then it rests for `cooldown` of the holder's turns | code; tests |
 
 ### 6.2 Catalog
 
@@ -377,20 +379,20 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | --- | --- | --- |
 | INV-K1 | Champion ids are unique; rarity, affinity, faction and role exist | test |
 | INV-K2 | Stats within ±5% of the rarity budget and inside the limits | test, balance 1 |
-| INV-K3 | Slots in order A1-A2-A3; cooldowns, multipliers, durations and the guaranteed-control slot within the norms | type (tuple of three), test, balance 2 |
+| INV-K3 | Slots in order A1-A2(-A3); cooldowns, multipliers, durations and the guaranteed-control slot within the norms; a passive's control lasts one turn and a Rebuke has a cooldown | type (tuple of two or three), test, balance 2 |
 | INV-K4 | `hits.length` equals the hit frames of the animation; leap needs `jump`, `actorFx` needs `cast`; Undying needs `rise` | test |
 | INV-K5 | Every effect a skill names exists; a champion with a projectile has a `muzzle` | test |
 | INV-K6 | Every champion has an atlas, a portrait and one icon per skill | test |
 | INV-K7 | Every status has an icon and is taught in the Academy; Academy demos and icons exist | test |
 | INV-K8 | Every faction, affinity, role and rarity has its UI part (`emblem_`, `gem_`, `role_`, `card_`) | convention: screens throw on a missing part (R-6) |
 | INV-K9 | Every A1 targets a single enemy, because counterattacks answer with A1 | convention, true today (R-6) |
-| INV-K10 | Effect names are unique across effect modules (a later module would silently override an earlier one) | convention, true today: 63 names (R-6) |
+| INV-K10 | Effect names are unique across effect modules (a later module would silently override an earlier one) | convention, true today: 72 names (R-6) |
 | INV-K11 | Every faction has a deliberate home zone | convention: `homeZone()` returns the first zone for every faction until zones belong to factions (DR-12) |
-| INV-K12 | Numbers in skill descriptions equal the data | convention, true today for all 39 skills (R-1) |
+| INV-K12 | Numbers in skill descriptions equal the data | convention, true today for all 5 skills and the passive (R-1) |
 | INV-K13 | Numbers in the Academy, its figures and the stat tips equal the rules | test for the turn-meter numbers it quotes; the rest by convention (DR-5, R-1) |
 | INV-K14 | Definitions do not change at runtime | convention: objects are not frozen |
 | INV-K15 | The interface ramps repeat the category colours: `UIR.rarity` and `UIR.affinity` base entries (`palette.ts`) equal the colours in `meta.ts`; faction medallions follow the standards instead (the Azure Crown's crown is gold on its blue field) | convention, true today for all 7 (R-6) |
-| INV-K16 | Jakub's locked decisions hold: the four enums and their order, the affinity cycle, the factions' names, the two starting champions' rarity, role, faction and affinity, the second joining after the first battle, a ten-stage first zone | test ("design decisions" in `tests/content.test.ts`); a change there is a change to his design |
+| INV-K16 | Jakub's locked decisions hold: the four enums and their order, the affinity cycle, the factions' names, the two starting champions' names, rarity, role, faction and affinity, their kits' skills, shapes and riders (Starter Heroes), the second joining after the first battle, a ten-stage first zone | test ("design decisions" in `tests/content.test.ts`); a change there is a change to his design |
 
 ### 6.3 Campaign and progression
 
@@ -526,8 +528,8 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | DR-11 | low | `src/game/screens/battle.ts`, `src/main.ts` | the battle route checks neither stage access nor ownership: deep links can record clears out of order | intended for screenshots; R-13 if progress ever carries value |
 | DR-12 | low | `src/game/data/zones.ts` | `homeZone()` maps factions in code; a new faction silently gets Frostfang. Since 2026-10-10 it returns the first zone for every faction (one zone exists) | R-6 |
 | DR-13 | low | `src/game/view/scene.ts` | choreography keyed by id: the Arrow Rain volley, projectile trails as hex literals, arcs, slow projectiles, `crack` / `holy` / `ice_spikes`, the `ADDITIVE` list; each new projectile or light effect needs a code edit | R-9 |
-| DR-14 | low | `src/game/view/scene.ts` | `applyEvent` is not exhaustive: a new event kind compiles and shows nothing; `passive` always reads `OVERDRIVE!` whatever the passive | R-5 |
-| DR-15 | low | `src/game/profile.ts` (now `archivist.ts`), screens | profile fields are written from several screens and stored ids are never validated: a renamed champion makes `champion()` throw on load | R-10, R-11; in part 2026-10-08: loading drops unknown ids, and the NEW badge goes through `Reliquary.markSeen` |
+| DR-14 | low | `src/game/view/scene.ts` | `applyEvent` is not exhaustive: a new event kind compiles and shows nothing; `passive` always reads `OVERDRIVE!` whatever the passive | R-5; in part 2026-10-10: the `passive` event carries its `effect`, and a Rebuke has its own cue |
+| DR-15 | low | `src/game/profile.ts` (now `archivist.ts`), screens | profile fields are written from several screens and stored ids are never validated: a renamed champion makes `champion()` throw on load | R-10, R-11; in part 2026-10-08: loading drops unknown ids, and the NEW badge goes through `Reliquary.markSeen`; 2026-10-10: a team whose champions are all gone (the stand-ins renamed to `captain_gareth` and `rime_scholar`) starts over from the starters (test) |
 | DR-16 | low | `src/game/screens/base.ts` | menu dioramas draw shadows with `ctx.ellipse` (anti-aliased); battle shadows are built pixel by pixel | build the diorama shadow the same way |
 | DR-17 | low | `src/game/screens/battle.ts` | battle seeds come from `Math.random` and are never shown: a reported battle cannot be replayed | R-12 |
 | DR-18 | low | `tools/balance.ts` | re-implements the mulberry32 generator instead of using `Rng` | import `Rng` |
@@ -535,7 +537,8 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | DR-20 | trivial | MECHANICS_GUIDE 2 | says the actor's meter resets to `selfTm`; the code caps it at 99 | add "(at most 99)" |
 | DR-21 | medium | `src/main.ts`, `src/game/screens/academy.ts`, `src/game/screens/options.ts` | placeholder content is named in engine code: the deep-link defaults (`knight`, `monk`), the Academy demo cast and figures (`knight`, `monk`, `frostmage`, `tomblord`), the default zone `frostfang`; replacing the content breaks them | closed 2026-10-10: the defaults, the turn-meter racers, the skills figure and the dioramas come from the data (first and last champion, first zone); the demo line-up repeats a small roster |
 | DR-26 | low | `src/game/data/campaign.ts` | Zone 1's enemies are copies of the two champions the player owns (stand-ins for the warriors of both worlds), so every stage is a near mirror match and the balance curve has one team per stage | design the enemies of Zone 1 (Jakub) |
-| DR-27 | low | `tools/art/fx/`, `tools/art/palette.ts` | the effect groups are named after the proof of concept's zones (`sunscar.ts`, `nyota.ts`) and hold effects no champion uses any more; 28 of the 52 `MAT` materials (skin tones, metals, glows, `jackal`) are used by no module today | regroup by use when the kits are designed; keep the materials as a library, renaming the champion-named ones when they are next used |
+| DR-27 | low | `tools/art/fx/`, `tools/art/palette.ts` | the effect groups are named after the proof of concept's zones (`sunscar.ts`, `nyota.ts`) and hold effects no champion uses any more; 31 of the 57 `MAT` materials are used by no module today | regroup by use; keep the materials as a library. In part 2026-10-10: the starters' effects live in faction modules (`azure_crown.ts`, `sanguine_dominion.ts`) |
+| DR-28 | trivial | `tests/battle.test.ts`, `BattleScene.demo` | a status counts as fresh only when `startTurn` named its holder the acting unit: rule tests and demos that call `useSkill` alone place nothing fresh, so a self-buff there ticks at the next `endTurn` (the old rule). The fresh-status test calls `startTurn` first; the demo never ends a turn | call `startTurn` before `useSkill` in any new test about durations |
 | DR-22 | medium | `src/game/battle/battle.ts` (`speed`, `attack`, `defense`) | status sizes (ATK Up/Down 25%, DEF Up 40%, DEF Down 30%, SPD Up/Down 25%) live in rule code instead of `StatusDef`; the status texts restate them | R-8: sizes as status data, texts built from them |
 | DR-23 | low | `src/game/profile.ts` (now `archivist.ts`) | the save key `oathbound.profile.v1` carries the placeholder name; renaming the game, or a champion (DR-15), loses or breaks saves | closed 2026-10-08: the name is final and the save moved to `tlrol.save.v2`; a version 1 save is migrated once |
 | DR-24 | low | `src/game/view/fx.ts` (`FxLayer.text`) | floating battle words stack by count, not by size: `RESIST` and `CRITICAL` can print over a damage number (seen with critical hits and resisted debuffs) | stack by each text's height, or give words and numbers their own lanes |

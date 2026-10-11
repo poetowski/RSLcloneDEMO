@@ -66,11 +66,11 @@ Visual review — look at every image at 2x before calling it done:
 ```bash
 # first look at docs/images/zone_<id>.png (the static composition), then check it live:
 npm run dev
-npx tsx tools/shots.ts "http://localhost:5173/?unlockall=1&screen=battle&stage=<a stage using it>&team=azure_warrior,sanguine_support" out "w6000,ka,B6:700"
+npx tsx tools/shots.ts "http://localhost:5173/?unlockall=1&screen=battle&stage=<a stage using it>&team=captain_gareth,rime_scholar" out "w6000,ka,B6:700"
 npx tsx tools/shots.ts "http://localhost:5173/?unlockall=1&screen=team&stage=<stage>" out "w2500,B1:0"
 ```
 
-Pick a test team with a light, a dark and a saturated champion (today the Sanguine Support's white linen and the Azure Warrior's fur and red; add a dark champion when the roster has one): all must read against the floor, their HP bars and numbers must stay legible over the wall, and nothing in the foreground may cover them.
+Pick a test team with a light, a dark and a saturated champion (today Captain Gareth's steel and amber and the Rime Scholar's dark green and blonde; add a light and a saturated champion when the roster has them): all must read against the floor, their HP bars and numbers must stay legible over the wall, and nothing in the foreground may cover them.
 
 ## 5. Done means
 

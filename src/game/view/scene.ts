@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'ember_cut', 'ember_sweep', 'iron_impact', 'cold_flare']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -223,8 +223,9 @@ export class BattleScene {
   private outro(w: TeamId) {
     this.winner = w;
     for (const v of this.views.values()) {
-      if (v.dead) continue;
-      if (v.team === w && v.hasAnim('skill')) void v.play('skill').then(() => v.play('idle'));
+      if (v.dead || v.team !== w) continue;
+      const pose = v.hasAnim('victory') ? 'victory' : v.hasAnim('skill') ? 'skill' : null;
+      if (pose) void v.play(pose).then(() => v.play('idle'));
     }
     const survivors = this.battle.alive('player').length;
     const outcome: BattleOutcome = { winner: w, survivors, stars: starsFor(this.setup.player.length, survivors), turns: this.battle.turn };
@@ -477,6 +478,7 @@ export class BattleScene {
           grave_orb: ['#e4ffd8', '#8af07a', '#155a1e'],
           sun_javelin: ['#e8fff8', '#36d0c0', '#b02a8c'],
           sound_ring: ['#e8fff8', '#90f5e2', '#18908a'],
+          pale_shard: ['#f2feff', '#c8f0ff', '#5cc4ea'],
         };
         const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10 };
         const slow = skill.projectile === 'ice_shard' || skill.projectile === 'grave_orb' || skill.projectile === 'sound_ring';
@@ -493,6 +495,7 @@ export class BattleScene {
       } else {
         targets.forEach((t) => groupFx(t));
       }
+      applyWhere((e) => e.hit === k && e.target === actor.uid && e.kind === 'status' && STATUSES[e.status].buff && !targets.includes(actor));
       landed++;
       if (skill.shake) this.shake(skill.shake);
     };
@@ -549,11 +552,16 @@ export class BattleScene {
       }
       await Promise.all(ws);
     }
-    applyWhere(() => true);
+    const later = (e: BattleEvent) => e.target === actor.uid && (e.kind === 'status' || e.kind === 'resist') && (e.status === 'freeze' || e.status === 'stun');
+    applyWhere((e) => !later(e));
     await this.clock.wait(skill.target === 'allies' ? 300 : 180);
 
     if (!actor.dead) actor.play('idle');
     if (moved) await this.goHome(actor, blinked);
+    if (res.events.some((e) => remaining.has(e))) {
+      applyWhere(() => true);
+      await this.clock.wait(420);
+    }
     await this.settleDeaths();
     // counterattacks answer once the attacker is back in formation; the
     // battle already resolved them, so displayed HP snaps only at the very end
@@ -717,8 +725,26 @@ export class BattleScene {
         })();
         break;
       case 'passive': {
-        // a passive wakes mid-fight (Overdrive): banner, the burst on the body, its name over the head
         this.hud.showBanner(e.name, v.team === 'player' ? '#ffe9a0' : '#ffc0b0');
+        if (e.effect === 'rebuke') {
+          // a blow answered: the cold flares around the holder and a shard of it strikes the attacker
+          void this.fx.spawn('cold_rebuke', v.x, v.y + 1, { layer: 'top' });
+          void this.fx.spawn('cold_flare', v.chest().x, v.chest().y, { layer: 'top', additive: true });
+          this.fx.text(v.uid, v.x, top() - 6, 'REBUKE!', { color: '#c8f0ff', variant: 'display', outline: '#10284a' });
+          this.flash = Math.max(this.flash, 0.1);
+          this.shake(2);
+          const src = e.source ? this.views.get(e.source) : undefined;
+          if (src) {
+            void (async () => {
+              await this.clock.wait(160);
+              await this.fx.projectile('pale_shard', v.chest(), src.chest(), { speed: 560, trail: ['#f2feff', '#c8f0ff', '#5cc4ea'] });
+              const c = src.chest();
+              void this.fx.spawn('ice_burst', c.x, c.y, { layer: 'top' });
+            })();
+          }
+          break;
+        }
+        // a passive wakes mid-fight (Overdrive): banner, the burst on the body, its name over the head
         void this.fx.spawn('overdrive', v.x, v.y + 1, { layer: 'top', additive: true });
         this.fx.text(v.uid, v.x, top() - 6, 'OVERDRIVE!', { color: '#ffd860', variant: 'display', outline: '#3a1a06' });
         this.flash = Math.max(this.flash, 0.12);
@@ -908,7 +934,10 @@ export class BattleScene {
     }
     if (k === 'a') this.toggleAuto();
     else if (k === 's') this.cycleSpeed();
-    else if (c && ['1', '2', '3'].includes(k)) this.pickSkill(c.actor.champion.skills[Number(k) - 1]);
+    else if (c && ['1', '2', '3'].includes(k)) {
+      const s = c.actor.champion.skills[Number(k) - 1];
+      if (s) this.pickSkill(s);
+    }
     else if (c && (k === 'ArrowLeft' || k === 'ArrowRight' || k === 'ArrowUp' || k === 'ArrowDown')) {
       // cycle targets with the arrows
       const list = this.validTargets().map((u) => this.view(u)).sort((p, q) => p.y - q.y);

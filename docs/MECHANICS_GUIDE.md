@@ -24,7 +24,7 @@ then         TM_j += SPD_j * t_min  for every living champion
 
 - Meters start at a random 0-12%.
 - After acting, the actor's TM resets to **0**, or to `selfTm` if the skill grants it (Mirage Assault: 25%).
-- Effective Speed = base x (1 + 0.25 with SPD Up) x (1 - 0.25 with SPD Down).
+- Effective Speed = base x (1 + 0.25 with SPD Up) x (1 - 0.25 with Slow).
 - `tmTargets` adds to or drains targets' meters (Arrow Rain: -15%).
 
 ## 3. Turn structure
@@ -39,7 +39,7 @@ perform(result)            the view plays it (section 12)
 endTurn(actor)             TM = 0 (or selfTm); the actor's statuses tick down 1; its cooldowns tick down 1
 ```
 
-Status durations count **the affected champion's own turns**: a 1-turn Stun means "skip your next turn".
+Status durations count **the affected champion's own turns**: a 1-turn Stun means "skip your next turn". A status placed on a champion **during its own turn** starts counting at its next turn: it does not tick at the end of the turn it was placed in. So Iron Blow's 2-turn ATK Up covers Gareth's next two turns, and a Freeze that a Rebuke places on an attacker in the middle of the attacker's turn still takes the attacker's next turn (`StatusInst.fresh` in `battle.ts`). Refreshing such a status compares what is left after this turn's tick with the new duration.
 
 ## 4. Skills
 
@@ -74,7 +74,7 @@ interface SkillDef {
 }
 ```
 
-`ChampionDef` adds identity (`name, title, role, rarity, affinity, faction, color, lore`), `stats`, the three skills, an optional `passive` (`undying` or `overdrive`) and, for ranged champions, a `muzzle` point where projectiles leave the sprite.
+`ChampionDef` adds identity (`name, title, role, rarity, affinity, faction, color, lore`), `stats`, two or three skills (A1, A2 and usually an A3: the Rime Scholar has none, and the `3` key does nothing on her turn), an optional `passive` (`undying`, `overdrive` or `rebuke`) and, for champions that throw projectiles, a `muzzle` point where projectiles leave the sprite.
 
 ### 4.2 Targeting
 
@@ -138,7 +138,7 @@ Three affinities in a cycle (Jakub's, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)
 | Poison | debuff | -5% max HP at turn start, ignores shields |
 | Burn | debuff | -6% max HP at turn start, ignores shields |
 | DEF Down | debuff | -12% Defense |
-| SPD Down | debuff | -25% Speed |
+| Slow | debuff | -25% Speed (id `spd_down`; Jakub's name for it) |
 | ATK Down | debuff | -25% Attack |
 | Weaken | debuff | +25% damage taken |
 | Heal Block | debuff | cannot be healed: heals, Regen and lifesteal show `HEAL BLOCKED` |
@@ -159,17 +159,20 @@ Three affinities in a cycle (Jakub's, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)
 | Turn Meter boost | `tmAllies` adds to every other ally's turn meter on the last hit; `tmTargets` drains enemies |
 | Undying (passive) | the first lethal hit leaves the champion at `value` x max HP with every debuff removed |
 | Overdrive (passive) | the first time a hit leaves the champion alive below `value` x max HP, it gains the passive's `statuses`; a lethal hit never triggers it. Shows as a `passive` event: banner, core-flare, `OVERDRIVE!` |
+| Rebuke (passive) | while the champion is below `value` x max HP **after** a hit, an enemy whose **critical** hit landed on it receives the passive's `statuses` (Cold Rebuke: Freeze, 1 turn); then the passive rests for `cooldown` of the champion's own turns. A hit that kills never triggers it. Shows as a `passive` event with the attacker as `source`: the passive's banner, a burst of ice round the holder, `REBUKE!`, a shard flying to the attacker; the Freeze lands once the attacker is back in formation |
 
-No champion of today's roster uses turn meter boosts, Counterattack, control, Undying or Overdrive; the rules stay in the engine and are proven by the rule tests on synthetic champions (`tests/fixtures.ts`).
+No champion of today's roster uses turn meter boosts, Counterattack, Undying or Overdrive, and none places control with a skill; the rules stay in the engine and are proven by the rule tests on synthetic champions (`tests/fixtures.ts`). The roster's only control is the Rime Scholar's Cold Rebuke.
 
 ## 9. Champion kits
 
-The two champions' kits are not designed yet ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 7). The proof of concept's berserker and sun priestess stand in, with their mechanics unchanged and their skills renamed plainly:
+The kits are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 8, Starter Heroes): which skills, their shapes and riders, and Cold Rebuke's 35% threshold and 1-turn Freeze. The numbers he has not set are stand-ins, in italics:
 
-| Champion | A1 | A2 (CD 3) | A3 (CD 4) |
-| --- | --- | --- | --- |
-| **Azure Warrior**, Damage, Ember | Strike 2 x 0.6 | Whirlwind: all, 2 x 0.5 | Leaping Blow (leap) 2.2, x1.5 below 50%, DEF Down 2t |
-| **Sanguine Support**, Support, Tide | Bolt (ranged) 1.0, 35% Burn 2t | Mending: heal 15%, ATK Up 2t | Smite: all 0.85, Heal Block 2t, 60% Burn 2t |
+| Champion | A1 | A2 | A3 | Passive |
+| --- | --- | --- | --- | --- |
+| **Captain Gareth**, Damage, Ember | Line Cut: one enemy, *1.0* | Iron Blow (CD *3*): one enemy, *1.5*; then ATK Up on himself for 2 turns, after the hit, never gated by a crit | Wide Sweep (CD *4*): all enemies, *0.95*, damage only | none |
+| **Rime Scholar**, Support, Tide | Pale Strike: one enemy, *1.0*, a pale shard thrown from her hand, nothing else | Rimebind (CD *3*): all enemies, *0.5*; Slow for *2* turns on every enemy | none | Cold Rebuke: below 35% HP, an enemy whose critical hit lands on her is Frozen for 1 turn; rests *3* turns |
+
+Stats (stand-ins inside the Elite budget): Gareth HP 1150, ATK 122, DEF 62, SPD 104, CRIT 2.5% (score 422: his crit sits at the floor of the norms, as crit is deliberately not introduced on him); the Rime Scholar HP 1250, ATK 96, DEF 66, SPD 106, CRIT 2.5% (score 414, her passive paid for from the budget). Zone 1's enemies are copies of the two and crit as rarely, so Cold Rebuke seldom fires there; Jakub's note is that crit must be taught at or before the point Cold Rebuke first fires meaningfully.
 
 ## 10. Difficulty guardrails
 
@@ -185,20 +188,20 @@ Numbers are tuned against explicit norms, not by feel. `src/game/data/norms.ts` 
 | Impact | `npm run balance` section 3: random 3v3 teams that include the champion win **40-60%** against random teams (960 battles per champion). It needs six champions for two teams of three and is skipped below that (today's roster has two) |
 | Campaign curve | section 4: every team the player can own at that point (three champions, or all of them while they own fewer), auto-battled 20 times: first stage 85-100%, normal 55-92%, boss 40-80% (humans win more than the AI) |
 
-Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take `BOSS_HP = 1.6` x HP. In Zone 1 the player owns at most the two champions, so every stage has one team; its powers were chosen against 300 battles each for a smooth decline, and the report's 20-battle sample checks them:
+Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take `BOSS_HP = 1.6` x HP. In Zone 1 the player owns at most the two champions, so every stage has one team; its powers were chosen against 300 battles each for a smooth decline (retuned 2026-10-10 for the Starter Heroes kits), and the report's 20-battle sample checks them. The Rime Scholar hits Gareth's copies strong and they hit her weak, so stages of Gareths take more power than stages with a Rime Scholar; three Gareths (1-8) fall off a cliff between 0.76 and 0.80:
 
 | Stage | Enemies | Power | Win (300) | Win (report) | Band |
 | --- | --- | --- | --- | --- | --- |
-| 1-1 | 2 warriors | 0.35 | 95% | 90% | first |
-| 1-2 | warrior, support | 0.84 | 89% | 85% | normal |
-| 1-3 | 2 warriors | 0.78 | 85% | 60% | normal |
-| 1-4 | warrior, support | 0.89 | 82% | 85% | normal |
-| 1-5 | 2 warriors, support | 0.54 | 79% | 80% | normal |
-| 1-6 | warrior, 2 supports | 0.66 | 76% | 75% | normal |
-| 1-7 | 2 warriors, support | 0.59 | 71% | 70% | normal |
-| 1-8 | 3 warriors | 0.66 | 69% | 65% | normal |
-| 1-9 | 2 warriors, support | 0.59 | 67% | 75% | normal |
-| 1-10 | warrior (boss), 2 supports | 0.59 | 61% | 60% | boss |
+| 1-1 | 2 Gareths | 0.48 | 93% | 95% | first |
+| 1-2 | Gareth, Rime Scholar | 0.81 | 87% | 90% | normal |
+| 1-3 | 2 Gareths | 1.03 | 85% | 90% | normal |
+| 1-4 | Gareth, Rime Scholar | 0.86 | 82% | 80% | normal |
+| 1-5 | 2 Gareths, Rime Scholar | 0.67 | 81% | 85% | normal |
+| 1-6 | Gareth, 2 Rime Scholars | 0.68 | 75% | 80% | normal |
+| 1-7 | 2 Gareths, Rime Scholar | 0.70 | 72% | 85% | normal |
+| 1-8 | 3 Gareths | 0.775 | 75% | 55% | normal |
+| 1-9 | 2 Gareths, Rime Scholar | 0.71 | 66% | 75% | normal |
+| 1-10 | Gareth (boss), 2 Rime Scholars | 0.59 | 66% | 70% | boss |
 
 ## 11. AI (`src/game/battle/ai.ts`)
 
@@ -219,7 +222,7 @@ status  { target, status, turns, hit }     resist  { target, status, hit }
 cleanse { target, status, hit }            dispel  { target, status, hit }
 expire  { target, status }                 tm      { target, delta, hit }
 revive  { target, hp, hit }                death   { target, hit }
-passive { target, name, hit }              (a passive wakes mid-fight: Overdrive)
+passive { target, name, hit, effect, source? }   (a passive wakes mid-fight: Overdrive; Rebuke names the attacker)
 ```
 
 The view (`BattleScene.perform`) turns that into choreography:
@@ -230,9 +233,10 @@ The view (`BattleScene.perform`) turns that into choreography:
 4. **Animation**: every time the animation enters hit frame `k`, effects play and the events with `hit === k` are presented. Projectiles leave the champion's `muzzle` and present their events when they land; AoE effects are staggered across the line; ground-anchored effects stand on the target's feet.
 5. **Impact feel**: hit-stop (55 ms, 90 ms on crits), white flash, sprite shake, sparks, screen shake for heavy skills, floating numbers (crits in the larger title face with `CRITICAL`, `STRONG HIT` / `WEAK HIT` tags).
 6. **Lifesteal** sends soul wisps back to the actor before the heal number.
-7. The actor returns home; death and revive animations finish (Undying: fall, tomb-light helix, `UNDYING!`, `rise`). An Overdrive shows the passive's name as a banner, the core-flare on the champion and `OVERDRIVE!` the moment the hit lands.
+7. The actor returns home; death and revive animations finish (Undying: fall, tomb-light helix, `UNDYING!`, `rise`). An Overdrive shows the passive's name as a banner, the core-flare on the champion and `OVERDRIVE!` the moment the hit lands. A Rebuke shows its banner, the ice burst and `REBUKE!` on the holder the moment the critical hit lands, and a shard flies to the attacker; buffs the actor gives itself appear on the hit that grants them (Iron Blow's ATK Up), while control placed on the actor (the Rebuke's Freeze) lands once it is back in formation.
 8. **Counterattacks** then play in order, each with its own approach.
 9. Displayed HP snaps to the rules' state at the end of the whole action, so the view can never drift from the truth.
+10. **Victory**: the winners play their `victory` animation (the captain's salute, the Rime Scholar's lifted censer), or their in-place cast when they have none.
 
 This split keeps the rules testable without a browser (`npm test`) and lets the presentation change freely.
 
@@ -240,7 +244,7 @@ This split keeps the rules testable without a browser (`npm test`) and lets the 
 
 | Input | Action |
 | --- | --- |
-| Click a skill / `1` `2` `3` | select A1 / A2 / A3 |
+| Click a skill / `1` `2` `3` | select A1 / A2 / A3 (`3` does nothing for a champion without an A3) |
 | Click a highlighted unit / arrows + `Enter` | use the selected skill on it |
 | Click an AoE / ally skill again, `Enter` / `Space` | confirm |
 | `A` or AUTO | auto battle (saved as the default) |
@@ -249,7 +253,7 @@ This split keeps the rules testable without a browser (`npm test`) and lets the 
 | Campaign map | drag to move; arrows jump between stages; `W` `A` `S` `D` or `Shift` + arrows slide; `M` whole map; `Enter` opens a stage, then PREPARE |
 | MATRIX tab (champion page) | click a slot, then a lit spool in the stock to weave it; TAKE OUT returns the slot's spool to the stock |
 
-URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=1-5`, `&team=azure_warrior,sanguine_support`, `&champion=sanguine_support`, `&chapter=buffs`, `?demo=<skill_id>` (loops one skill), `?unlockall=1`, `?reset=1`, `?spools=1` (adds 24 sample spools to the stock), and for screenshots `&hp=0.1` (scales enemy HP).
+URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=1-5`, `&team=captain_gareth,rime_scholar`, `&champion=rime_scholar`, `&chapter=buffs`, `?demo=<skill_id>` (loops one skill), `?unlockall=1`, `?reset=1`, `?spools=1` (adds 24 sample spools to the stock), and for screenshots `&hp=0.1` (scales enemy HP).
 
 ## 14. The Weaver Matrix (`src/game/reliquary/`, `src/game/data/matrix.ts`)
 

@@ -145,6 +145,7 @@ export class ChampionScreen extends BaseScreen {
     // animation preview buttons
     const anims: [string, string][] = [['IDLE', 'idle'], ['RUN', 'run'], ...c.skills.map((s, i) => [`A${i + 1}`, s.anim] as [string, string])];
     if (art.json.anims.rise) anims.push(['RISE', 'rise']);
+    if (art.json.anims.victory) anims.push(['WIN', 'victory']);
     const bw = 36, gap = 4, bx0 = Math.round(sx - (anims.length * (bw + gap) - gap) / 2);
     anims.forEach(([label, an], i) => ui.button(ctx, 'anim_' + label, bx0 + i * (bw + gap), H - 40, bw, 18, label, { click: () => this.play(an), kind: 'small', active: this.anim === an }));
     ui.text(ctx, 'Preview animations', sx, H - 18, { color: COLORS.faint, align: 'center' });
@@ -364,8 +365,17 @@ export class ChampionScreen extends BaseScreen {
     });
     const p = this.c.passive;
     if (p) {
-      ui.text(ctx, `PASSIVE: ${p.name}`, x, cy, { color: '#a2f56a', variant: 'bold' });
-      ui.para(ctx, p.desc, x, cy + 12, w, { color: COLORS.text }, 10);
+      // a passive with its own icon reads like a skill row
+      const icon = this.a.ui.json.icons[p.id];
+      const tx = icon ? x + 50 : x;
+      if (icon) {
+        ctx.fillStyle = COLORS.ink;
+        ctx.fillRect(x, cy, 42, 42);
+        blit(ctx, this.a.ui.img, icon, x + 1, cy + 1);
+      }
+      ui.text(ctx, p.name, tx, cy, { color: '#a2f56a', variant: 'bold' });
+      ui.text(ctx, 'Passive', tx + ui.measure(p.name, 'bold') + 8, cy, { color: COLORS.faint });
+      ui.para(ctx, p.desc, tx, cy + 12, w - (tx - x), { color: COLORS.text }, 10);
     }
   }
 

@@ -6,7 +6,7 @@ import { FRAME_H, FRAME_W, PIVOT, renderAnim } from './char.ts';
 import { HEROES } from './champions/index.ts';
 import { Bitmap, hex } from './raster.ts';
 
-const [id = 'azure_warrior', out = 'review.png', scaleArg = '2', side = 'right', only] = process.argv.slice(2);
+const [id = 'captain_gareth', out = 'review.png', scaleArg = '2', side = 'right', only] = process.argv.slice(2);
 const c = HEROES[id];
 if (!c) throw new Error(`unknown hero ${id}`);
 const facings: (1 | -1)[] = side === 'both' ? [1, -1] : side === 'left' ? [-1] : [1];

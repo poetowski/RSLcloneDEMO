@@ -14,7 +14,7 @@ export const STATUSES: Record<StatusId, StatusDef> = {
   poison: { id: 'poison', name: 'Poison', buff: false, desc: 'Loses 5% max HP at the start of each turn. Ignores shields.', color: '#9dff5a' },
   burn: { id: 'burn', name: 'Burn', buff: false, desc: 'Loses 6% max HP at the start of each turn. Ignores shields.', color: '#ff9a40' },
   def_down: { id: 'def_down', name: 'DEF Down', buff: false, desc: '-12% Defense.', color: '#d0a0ff' },
-  spd_down: { id: 'spd_down', name: 'SPD Down', buff: false, desc: '-25% Speed.', color: '#a0b4ff' },
+  spd_down: { id: 'spd_down', name: 'Slow', buff: false, desc: '-25% Speed: the Turn Meter fills more slowly.', color: '#a0b4ff' },
   atk_down: { id: 'atk_down', name: 'ATK Down', buff: false, desc: '-25% Attack.', color: '#ff9a9a' },
   weaken: { id: 'weaken', name: 'Weaken', buff: false, desc: 'Takes 25% more damage from every hit.', color: '#ff8ab0' },
   heal_block: { id: 'heal_block', name: 'Heal Block', buff: false, desc: 'Cannot be healed, including Regen and lifesteal.', color: '#ff6a6a' },

@@ -100,6 +100,8 @@ function validated(a: MasterArchivist): MasterArchivist {
   for (const id of STARTERS) a.reliquary.recruit(id, false);
   for (const s of allStages()) if (s.recruit && cleared(a, s.id)) a.reliquary.recruit(s.recruit, false);
   a.team = a.team.filter((id) => a.reliquary.has(id));
+  // a save whose team is gone (champions renamed or removed) starts from the starters
+  if (!a.team.length) a.team = [...STARTERS];
   return a;
 }
 

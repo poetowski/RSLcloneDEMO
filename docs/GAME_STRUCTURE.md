@@ -44,10 +44,10 @@ The roster today:
 
 | Champion | Rarity | Affinity | Role | Faction | How you get them |
 | --- | --- | --- | --- | --- | --- |
-| Azure Warrior (name to come) | Elite | Ember | Damage | Azure Crown | starter |
-| Sanguine Support (name to come) | Elite | Tide | Support | Sanguine Dominion | after the first battle (clear 1-1) |
+| Captain Gareth (`captain_gareth`) | Elite | Ember | Damage | Azure Crown | starter |
+| Rime Scholar (`rime_scholar`) | Elite | Tide | Support | Sanguine Dominion | after the first battle (clear 1-1) |
 
-Their names, personalities, kits and art are not designed: the proof of concept's berserker and sun priestess stand in for their bodies, stats and skills, with plainly renamed skills.
+Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8): Gareth's Line Cut, Iron Blow and Wide Sweep, no passive; the Rime Scholar's Pale Strike and Rimebind, no A3, and the passive Cold Rebuke. Their stats and the numbers in their skills are stand-ins ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 9). A champion has two or three skills; a save whose champions no longer exist (the stand-ins `azure_warrior` and `sanguine_support`) keeps its progress, regains the champions its cleared stages bring and starts its team over from the starters.
 
 ## 3. The campaign (`src/game/data/campaign.ts`)
 
@@ -59,7 +59,7 @@ Their names, personalities, kits and art are not designed: the proof of concept'
 
 | Location | Zone | Stages |
 | --- | --- | --- |
-| I. A Dim Island | `zone1` | 1-1 to 1-10 (1-1 brings the Sanguine Support; 1-10 is the boss) |
+| I. A Dim Island | `zone1` | 1-1 to 1-10 (1-1 brings the Rime Scholar; 1-10 is the boss) |
 | II. A Mystic Arena (after 1-10) | none yet | not designed |
 
 Zone 1 follows Jakub's working notes (DESIGN_DECISIONS.md 5.3), which are not locked: the stage texts quote them (contact, the settlement, escalation, the turning point, leaving). Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed. Zone 2 (the mystic arena in a Court of Root forest) has its node in the jungle and no stages yet. The world map follows his brief (DESIGN_DECISIONS.md 5.4a): the edge of a continent, a rift in the west, jungle toward the east, nothing beyond its north and south edges.
@@ -105,12 +105,12 @@ Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `r
 | Main menu | `src/game/screens/menu.ts` | `?screen=menu` (default) |
 | Campaign map | `screens/campaign.ts` | `?screen=campaign&stage=1-6` |
 | Team select | `screens/team.ts` | `?screen=team&stage=1-2` |
-| Battle | `screens/battle.ts` + `view/scene.ts` | `?screen=battle&stage=1-3&team=azure_warrior,sanguine_support` |
+| Battle | `screens/battle.ts` + `view/scene.ts` | `?screen=battle&stage=1-3&team=captain_gareth,rime_scholar` |
 | Collection | `screens/collection.ts` | `?screen=collection` |
-| Champion page | `screens/champion.ts` | `?screen=champion&champion=azure_warrior` |
+| Champion page | `screens/champion.ts` | `?screen=champion&champion=captain_gareth` |
 | Academy | `screens/academy.ts` | `?screen=academy&chapter=debuffs` |
 | Options | `screens/options.ts` | `?screen=options` |
-| Recruit ceremony | `screens/recruit.ts` | `?screen=recruit&champion=sanguine_support` |
-| Skill demo | `screens/battle.ts` (demo mode) | `?demo=leaping_blow` |
+| Recruit ceremony | `screens/recruit.ts` | `?screen=recruit&champion=rime_scholar` |
+| Skill demo | `screens/battle.ts` (demo mode) | `?demo=iron_blow` |
 
 All navigation goes through `app.router` (`src/main.ts`), which wraps each switch in a dithered dissolve. `?unlockall=1`, `?reset=1` and `?spools=1` change the save before the first screen opens.

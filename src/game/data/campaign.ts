@@ -20,7 +20,7 @@ import { LocationDef, StageDef } from './types';
 export const WORLD_MAP = { w: 1280, h: 360, overview: 2 };
 
 /** Champions the player owns from the start. */
-export const STARTERS = ['azure_warrior'];
+export const STARTERS = ['captain_gareth'];
 
 const CONTACT = 'Azure Crown and Sanguine Dominion warriors meet where they should not be able to.';
 const SETTLEMENT = 'The settlement and its surroundings.';
@@ -38,62 +38,62 @@ export const LOCATIONS: LocationDef[] = [
       {
         id: '1-1',
         blurb: `${CONTACT} The first battle.`,
-        enemies: [{ champion: 'azure_warrior' }, { champion: 'azure_warrior' }],
-        power: 0.35,
-        recruit: 'sanguine_support',
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }],
+        power: 0.48,
+        recruit: 'rime_scholar',
       },
       {
         id: '1-2',
         blurb: CONTACT,
-        enemies: [{ champion: 'azure_warrior' }, { champion: 'sanguine_support' }],
-        power: 0.84,
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
+        power: 0.81,
       },
       {
         id: '1-3',
         blurb: `${SETTLEMENT} The pair fight together for the first time.`,
-        enemies: [{ champion: 'azure_warrior' }, { champion: 'azure_warrior' }],
-        power: 0.78,
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }],
+        power: 1.03,
       },
       {
         id: '1-4',
         blurb: SETTLEMENT,
-        enemies: [{ champion: 'azure_warrior' }, { champion: 'sanguine_support' }],
-        power: 0.89,
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
+        power: 0.86,
       },
       {
         id: '1-5',
         blurb: SETTLEMENT,
-        enemies: [{ champion: 'azure_warrior' }, { champion: 'azure_warrior' }, { champion: 'sanguine_support' }],
-        power: 0.54,
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
+        power: 0.67,
       },
       {
         id: '1-6',
         blurb: ESCALATION,
-        enemies: [{ champion: 'azure_warrior' }, { champion: 'sanguine_support' }, { champion: 'sanguine_support' }],
-        power: 0.66,
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'rime_scholar' }],
+        power: 0.68,
       },
       {
         id: '1-7',
         blurb: ESCALATION,
-        enemies: [{ champion: 'azure_warrior' }, { champion: 'azure_warrior' }, { champion: 'sanguine_support' }],
-        power: 0.59,
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
+        power: 0.7,
       },
       {
         id: '1-8',
         blurb: ESCALATION,
-        enemies: [{ champion: 'azure_warrior' }, { champion: 'azure_warrior' }, { champion: 'azure_warrior' }],
-        power: 0.66,
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }, { champion: 'captain_gareth' }],
+        power: 0.775,
       },
       {
         id: '1-9',
         blurb: 'The turning point.',
-        enemies: [{ champion: 'azure_warrior' }, { champion: 'sanguine_support' }, { champion: 'azure_warrior' }],
-        power: 0.59,
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'captain_gareth' }],
+        power: 0.71,
       },
       {
         id: '1-10',
         blurb: 'Leaving the island, on to the next area.',
-        enemies: [{ champion: 'azure_warrior', boss: true }, { champion: 'sanguine_support' }, { champion: 'sanguine_support' }],
+        enemies: [{ champion: 'captain_gareth', boss: true }, { champion: 'rime_scholar' }, { champion: 'rime_scholar' }],
         power: 0.59,
       },
     ],

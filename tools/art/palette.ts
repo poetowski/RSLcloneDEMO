@@ -37,6 +37,8 @@ export const MAT = {
   bronze: m('bronze', 'metal', ['#2a1606', '#5a3410', '#8a5418', '#ba7e2a', '#e2aa48', '#fff0a8']),
   jackal: m('jackal', 'metal', ['#060408', '#100c18', '#1c1628', '#2c2440', '#463c60', '#8a80b0']),
   ebony: m('ebony', 'metal', ['#08060a', '#16101a', '#271c24', '#3c2c30', '#5a4442', '#a08a7a']),
+  /** darkened gold: Captain Gareth's insignia and clasp */
+  oldGold: m('oldGold', 'metal', ['#1c1206', '#3a2a0e', '#5c4316', '#86672a', '#ad8c40', '#dcc278']),
 
   // --- leathers / woods ----------------------------------------------------
   leather: m('leather', 'matte', ['#1f120d', '#36201a', '#573323', '#7e4e30', '#a97245', '#cf9d6a']),
@@ -66,6 +68,12 @@ export const MAT = {
   teal: m('teal', 'cloth', ['#04181c', '#08303a', '#0c4a56', '#147078', '#2aa0a0', '#70d8c8']),
   terracotta: m('terracotta', 'matte', ['#1e0a06', '#4a1c10', '#7a3420', '#a8502e', '#cc7444', '#eaa070']),
   calabash: m('calabash', 'matte', ['#1e1008', '#4a2a10', '#7a4a1c', '#a8702c', '#cc9a48', '#ecc478']),
+  /** deep amber-brown: Captain Gareth's coat and tabard */
+  amber: m('amber', 'cloth', ['#180905', '#321307', '#4f230d', '#743815', '#9a5420', '#c27a32']),
+  /** a cloak faded by sun and road: Captain Gareth */
+  faded: m('faded', 'cloth', ['#1a1411', '#3a2e27', '#5c4a3c', '#7f6852', '#a2876a', '#c4a888']),
+  /** dark green: the Rime Scholar's dress */
+  pine: m('pine', 'cloth', ['#050e0c', '#0b1c17', '#123020', '#1b452c', '#2a5f3b', '#41804e']),
 
   // --- furs ----------------------------------------------------------------
   furWhite: m('furWhite', 'fur', ['#262838', '#4b5068', '#7a849c', '#b0bccc', '#dbe4ee', '#fbfdff']),
@@ -83,6 +91,7 @@ export const MAT = {
   hairGinger: m('hairGinger', 'hair', ['#250a08', '#4f140c', '#7f2412', '#b33a1c', '#dc5d2c', '#f88f4a']),
   hairSilver: m('hairSilver', 'hair', ['#24263a', '#4f5878', '#8794b4', '#c2cee6', '#e6eef9', '#ffffff']),
   hairDark: m('hairDark', 'hair', ['#0e0a10', '#1c1520', '#2c2230', '#3e3244', '#56475c', '#7a6880']),
+  hairBrown: m('hairBrown', 'hair', ['#110907', '#22140c', '#372214', '#4f311c', '#6b4527', '#8c6036']),
 
   // --- emissive (unlit, glow outward) --------------------------------------
   glowViolet: m('glowViolet', 'glow', ['#2a0a3a', '#5a1a8a', '#8a2ad0', '#b84cff', '#df9aff', '#fbe4ff']),
@@ -137,6 +146,11 @@ export const ACCENT = {
   lipRose: hex('#b0524a'),
   smearCyan: hex('#90f5e2'),
   smearMagenta: hex('#ff9ad8'),
+  /** Captain Gareth: his Ember shows in what he does with the sword, the smear of the cut */
+  smearEmber: hex('#ff8a3a'),
+  emberCore: hex('#ffe6b0'),
+  /** the Rime Scholar's ice flakes */
+  flake: hex('#e8f8ff'),
 };
 
 /** Single accent colors used for decals (eyes, mouths, paint). */

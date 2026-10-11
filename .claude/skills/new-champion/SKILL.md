@@ -9,7 +9,7 @@ A champion is two modules that must agree, plus the content around them:
 
 | Piece | File | Proven by |
 | --- | --- | --- |
-| Rules: identity, stats, three skills, passive | `src/game/data/champions/<id>.ts` + `champions/index.ts` | `tests/content.test.ts` (norms), `npm run balance` |
+| Rules: identity, stats, two or three skills, passive | `src/game/data/champions/<id>.ts` + `champions/index.ts` | `tests/content.test.ts` (norms), `npm run balance` |
 | Pixels: rig, animations, skill icons | `tools/art/champions/<id>.ts` + `champions/index.ts` | `npm run audit`, contact sheets |
 | Effects the skills name | `tools/art/fx/<faction>.ts` | content tests (fx exist) |
 | Where the player meets and recruits them | `src/game/data/campaign.ts` | content tests, balance curve |
@@ -28,7 +28,7 @@ Read first: `docs/DESIGN_DECISIONS.md` (Jakub's world, categories, factions and 
    - Tank: a taunt or shield A2/A3, high HP/DEF, A1 with a defensive rider (DEF Down, Weaken).
    - Damage: multi-hit or execute, high ATK/SPD/CRIT, low DEF. Tagged *bruiser*: sustain (lifesteal, shields) plus a big A3. Tagged *control*: chance-based debuffs on A1/A2, one guaranteed 1-turn control on A3.
    - Support: heal/cleanse/buff on A2, a team-wide payoff on A3.
-4. Give the kit one idea the roster does not have yet. The engine has Counterattack, Undying, ally Turn Meter, Overdrive, Dispel and control with no champion using them today; check `docs/MECHANICS_GUIDE.md` sections 8-9 for what exists. A passive is `undying` or `overdrive` (`PassiveDef` in `types.ts`); a new kind follows step 2.6.
+4. Give the kit one idea the roster does not have yet. The engine has Counterattack, Undying, ally Turn Meter, Overdrive, Dispel and skill control with no champion using them today; check `docs/MECHANICS_GUIDE.md` sections 8-9 for what exists. A passive is `undying`, `overdrive` or `rebuke` (`PassiveDef` in `types.ts`; the Rime Scholar's Cold Rebuke); a new kind follows step 2.6. A kit has two or three skills (the Rime Scholar has no A3). A status the champion places on itself starts counting at its next turn (Iron Blow's ATK Up covers two turns).
 5. Choose an **affinity** that makes the stage that brings the champion interesting against the player's likely teams (team select shows strong/weak counts).
 
 ## 2. Rules module
@@ -48,7 +48,7 @@ Read first: `docs/DESIGN_DECISIONS.md` (Jakub's world, categories, factions and 
 4. The silhouette feature must survive a solid-black fill; check it in the collection (locked cards) or by filling the lineup.
    Check the details at pixel level with `npx tsx tools/art/zoom.ts <id> idle 0 out.png 9`. Typical problems it catches: a band drawn as a capsule along a limb turns into a blob (draw thin rings across the limb instead), jewellery hidden behind the jaw, a hat that reads as a different hat.
 5. Animations: `idle` (6-8 frames, whole-pixel breathing), `run` (8), every `anim` the skills name, `hurt` (3), `death` (6, last frame 600 ms; capes below the feet are clipped automatically), plus `rise` if the champion has Undying. Attacks follow anticipation -> strike (`hit: true`, `smear: true`) -> follow-through -> recovery. Events: `shoot`, `jump`, `cast`; pose channel `turn: 1` flips one frame.
-6. Icons: three entries in `icons`, keys equal to the skill ids, built with `glyph()` + `compose(iconBg, ...)` from `tools/art/icons.ts`; reuse the weapon function so the icon matches the sprite, or write a compact icon version of it when the full weapon does not fit 40x40 (`iconSpear` in `sunspear.ts`). Review: `npx tsx tools/art/iconpreview.ts <id>,<neighbour> out.png 6`.
+6. Icons: one entry in `icons` per skill, keys equal to the skill ids (a passive may add one under its own id, shown on the champion page), built with `glyph()` + `compose(iconBg, ...)` from `tools/art/icons.ts`; reuse the weapon function so the icon matches the sprite, or write a compact icon version of it when the full weapon does not fit 40x40 (`iconSpear` in `sunspear.ts`). Review: `npx tsx tools/art/iconpreview.ts <id>,<neighbour> out.png 6`.
 
 ## 4. Effects
 
@@ -56,7 +56,7 @@ New `fx` names go into `tools/art/fx/<faction>.ts` (or `common.ts`), built from 
 
 ## 5. Campaign placement
 
-Set `recruit` to its id on the stage whose first clear brings the champion (`src/game/data/campaign.ts`); it may be among that stage's enemies or not (the Sanguine Support joins after the first battle without being fought). An enemy goes into a stage's `enemies`; a boss gets `boss: true` (x1.6 HP, crown, boss intro). A new stage needs a `map` position on the world map (`WORLD_MAP` pixels, 1280x360) that does not overlap other nodes, also on the overview at half the size; the road follows the stage order automatically after `npm run art -- map`.
+Set `recruit` to its id on the stage whose first clear brings the champion (`src/game/data/campaign.ts`); it may be among that stage's enemies or not (the Rime Scholar joins after the first battle without being fought). An enemy goes into a stage's `enemies`; a boss gets `boss: true` (x1.6 HP, crown, boss intro). A new stage needs a `map` position on the world map (`WORLD_MAP` pixels, 1280x360) that does not overlap other nodes, also on the overview at half the size; the road follows the stage order automatically after `npm run art -- map`.
 
 ## 6. Build and verify (all must pass)
 

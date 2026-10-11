@@ -82,7 +82,7 @@ async function boot() {
   };
 
   // deep links: ?screen=campaign|team|battle|collection|champion|academy|options|recruit
-  //   &stage=1-2 &team=azure_warrior,sanguine_support &champion=azure_warrior &chapter=buffs   ?demo=<skill id>
+  //   &stage=1-2 &team=captain_gareth,rime_scholar &champion=captain_gareth &chapter=buffs   ?demo=<skill id>
   const r = app.router;
   const demo = params.get('demo');
   const stageId = params.get('stage') ?? '1-1';

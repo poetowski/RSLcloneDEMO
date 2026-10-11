@@ -104,5 +104,16 @@ export const overdrive = fixture('overdrive', {
   passive: { id: 'core', name: 'Core', desc: '', kind: 'overdrive', value: 0.5, statuses: [{ status: 'atk_up', turns: 2 }, { status: 'def_up', turns: 2 }] },
 });
 
+/** A2 hits, then grants itself ATK Up for 2 turns (a self-buff placed on its own turn). */
+export const brute = fixture('brute', {
+  skills: [undefined, skill('brute_blow', 2, { hits: [{ mult: 1.5 }], statuses: [{ status: 'atk_up', turns: 2, to: 'self' }] })],
+});
+
+/** Two skills only; Rebuke: below 35% HP a critical hit on it freezes the attacker for 1 turn, then it rests 3 turns. */
+export const rebuker = (() => {
+  const c = fixture('rebuker', { passive: { id: 'rebuke', name: 'Rebuke', desc: '', kind: 'rebuke', value: 0.35, statuses: [{ status: 'freeze', turns: 1 }], cooldown: 3 } });
+  return { ...c, skills: [c.skills[0], c.skills[1]] as ChampionDef['skills'] };
+})();
+
 /** The same striker in each affinity (strong and weak hits). */
 export const inAffinity = (affinity: Affinity) => fixture(`striker_${affinity}`, { affinity });

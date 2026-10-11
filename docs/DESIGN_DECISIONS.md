@@ -291,6 +291,9 @@ structural to who they are.
 
 - Both characters are deliberately **not locked** beyond the table above.
   Names, personalities, backstories, and the reason she joins are all open.
+- *(2026-10-10: names, appearance and kits decided in section 8, Starter
+  Heroes: Captain Gareth and the Rime Scholar. Her job there is to teach that
+  statuses exist, which replaces "sustain" in 4.2.)*
 - Whether champions are *fragments recovered during the campaign* or already
   whole at the start is undecided. This affects whether the starter is
   collected in Zone 1 or is present from the beginning.
@@ -437,14 +440,194 @@ open questions.
 - Role mechanics (whether roles change battle rules, AI, or nothing)
 - Faction mechanics (synergies, team-building constraints, UI filtering)
 - Champion schema (what fields a champion has beyond the enums)
-- Kit / skill design
+- Kit / skill design *(the starter pair's kits decided 2026-10-10, section 8;
+  their numbers are not)*
 - Art pipeline specification
 - Save and progression
 - Campaign count of zones
-- Names of the starter pair
+- Names of the starter pair *(decided 2026-10-10, section 8)*
 - Whether champions are fragments collected during play or present from the
   start
 - Whether the Archivist appears as a character or as a presence
 - The relationship of Ashveil Reign to the loom's breaking
 - Whether Court of Root wants the loom repaired
 - Whether Court of Root and Ashveil Reign come from their own worlds
+
+---
+
+## 8. Starter Heroes (received 2026-10-10)
+
+Jakub's record, verbatim (headings one level down).
+
+### Starter Heroes
+
+The two champions the player begins the game with.
+
+Both are **Elite** rarity. Both are fragments recollected by the Archivist.
+Both come from worlds that would never naturally meet — the broken loom is
+the only reason they can be in the same place.
+
+---
+
+### Captain Gareth
+
+| | |
+|---|---|
+| Rarity | Elite |
+| Role | Damage |
+| Faction | Azure Crown |
+| Affinity | Ember |
+| Joins | From the start |
+
+#### Character
+
+An Azure Crown captain. His faction comes from its own world; he would never
+naturally meet anyone from Sanguine Dominion. He is a fragment now — the
+Archivist reassembles him, but he remembers being Captain Gareth.
+
+His job in the game is to **teach the player how damage works**.
+
+#### Appearance
+
+**Weapon.** A straight single-handed sword. Functional, worn at the grip, no
+ornament. No glow or fire effect on the weapon itself — his Ember affinity is
+expressed in what he does with the sword, not in the sword.
+
+**Wearing.** Mid-weight military armor: breastplate, pauldrons, greaves, in
+dull steel and worn leather. A tabard or coat underneath in deep amber-brown.
+A short, faded cloak. A captain's insignia on the pauldron or chest, small
+and worn.
+
+**Colors.** Steel, worn leather, deep amber-brown, small amounts of darkened
+gold. Warm, weathered, functional.
+
+**Heraldry note.** He does not wear Azure Crown's standard colors. He serves
+a faction with a blue-and-crown standard, but his armor is field armor, not
+parade dress. Faction standards are heraldry — banners, sigils — and
+champions in the field are not walking banners.
+
+#### Skills
+
+**A1 — Line Cut**
+Single-target basic attack.
+
+**A2 — Iron Blow**
+Single-target heavy strike. On hit, Gareth gains **Attack Up** on himself for
+2 turns. The buff is applied *after* the hit, so Iron Blow's own damage is not
+boosted by the buff it grants.
+
+**A3 — Wide Sweep**
+AoE hit on all enemies. Deals damage only; no rider, no secondary effect.
+
+**Passive — none.**
+
+#### What Gareth teaches
+
+- **A1** — attacking exists.
+- **A2** — skills hit harder than basics, and skills can change your future
+  turns (the buff).
+- **A3** — skills have shapes, not just sizes. AoE is different from
+  single-target, not just bigger.
+
+#### Notes
+
+- **No crit gate on Iron Blow's buff.** The buff is unconditional. Crit is
+  deliberately not introduced on this champion.
+- **No faction word in any skill name.** His skills never say "Azure," and
+  never say "Ember." Faction is his identity; affinity is expressed in
+  visuals, not names.
+
+---
+
+### Rime Scholar
+
+| | |
+|---|---|
+| Rarity | Elite |
+| Role | Support |
+| Faction | Sanguine Dominion |
+| Affinity | Tide |
+| Joins | After the first battle |
+
+#### Character
+
+A Sanguine Dominion ice mage. Her world's name means **blood = life**; she is
+not evil-coded, and neither is her faction. Black-and-red is heraldry, not
+menace.
+
+She is a fragment, like Gareth. She and Gareth come from worlds that would
+never naturally meet. Their being together is only possible because the
+broken loom has connected them.
+
+Her job in the game is to **teach the player that statuses exist** — and that
+Support can mean "deny the enemy" rather than "heal."
+
+#### Appearance
+
+**Weapon.** A censer, with small ice flakes flowing around it. She does not
+swing it in combat; it is a focus. Her basic attack (Pale Strike) is a short
+close motion, almost incidental.
+
+**Wearing.** Long blonde hair, normal skin tone — not pale. A dark green
+dress with a blue circle on the back.
+
+**Silhouette.** Tall and still. She reads as *cold*, and cold is motionless.
+When she moves, it is deliberate.
+
+**Heraldry note.** She does not wear Sanguine Dominion's standard colors. The
+dark green dress is not faction dress; the blue circle is not a faction mark.
+
+#### Skills
+
+**A1 — Pale Strike**
+A plain single-target attack. No rider, no status, no secondary effect.
+
+**A2 — Rimebind**
+An AoE attack that applies **Slow** to all enemies, with small damage. The
+slow is the payload; the damage is incidental.
+
+**Passive — Cold Rebuke**
+While Rime Scholar is below 35% HP, an enemy that lands a **critical hit** on
+her is **Frozen** for 1 turn. The passive has a cooldown.
+
+#### What Rime Scholar teaches
+
+- **A1** — attacking exists (reinforced, no new mechanic).
+- **A2** — statuses exist, and a Support can affect every enemy at once.
+- **Passive** — statuses can be reactive: things can happen *in response* to
+  being hurt.
+
+- **Affinity has nothing to do with in-world symbols.** The blue circle on
+  her back is not an affinity marker and not a faction mark. It is a detail
+  of her dress.
+- **Cold Rebuke depends on crit existing.** Crit is load-bearing for her
+  passive. Wherever crit is taught in the game, it should come at or before
+  the point Cold Rebuke first fires meaningfully.
+
+---
+
+### The Pair
+
+#### Deliberate faction / affinity mismatch
+
+| Champion | Faction | Affinity |
+|---|---|---|
+| Captain Gareth | Azure Crown | **Ember** (fire) |
+| Rime Scholar | Sanguine Dominion | **Tide** (water) |
+
+The mismatch is **intentional**. Players who assume "Azure Crown = Tide" or
+"Sanguine Dominion = Ember" are meant to be wrong. Faction and affinity are
+orthogonal axes, and the starter pair demonstrates this from the first two
+champions.
+
+#### Structural subtext
+
+Ember loses to Tide. Gareth and Rime Scholar are therefore **structural
+counters**: if they ever fought, she would win. They travel together from the
+first zone onward. This is subtext, not mechanics.
+
+#### Under the premise
+
+They come from **different worlds**. Under the broken loom, they would never
+have met naturally. They are in the same place only because reality is
+broken. This is structural to who they are, not incidental backstory.

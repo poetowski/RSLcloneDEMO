@@ -33,6 +33,10 @@ export interface FaceCfg {
   /** Head radii. */
   rx?: number;
   ry?: number;
+  /** Profile: 'strong' (default) or a smaller nose and a softer chin. */
+  profile?: 'strong' | 'soft';
+  /** Lashes past the eye. */
+  lash?: RGBA;
 }
 
 /**
@@ -48,11 +52,10 @@ export function face(d: Draw, s: Skel, c: FaceCfg) {
   const rx = c.rx ?? 6.4, ry = c.ry ?? 6.9;
   d.ellipse({ mat: c.skin, z, group: g }, H(-0.6, 0.7), rx, ry, ha);
   // jaw + chin + nose silhouette
-  d.poly(
-    { mat: c.skin, z: z + 0.05, group: g },
-    [H(-1.5, -1.2), H(1.6, -5.3), H(4.4, -6.3), H(5.8, -5.2), H(6.1, -3.4), H(6.2, -2.3), H(7.4, -1.6), H(6.4, 0.6), H(5.8, 2.4), H(2, 3)],
-    { kind: 'dome', c: H(1, 0.2), r: 7.5, bevel: 0.8 },
-  );
+  const jaw = c.profile === 'soft'
+    ? [H(-1.5, -1.2), H(1.4, -4.9), H(3.8, -6.0), H(5.1, -5.1), H(5.5, -3.7), H(5.6, -2.5), H(6.6, -1.3), H(5.9, 0.4), H(5.5, 2.4), H(2, 3)]
+    : [H(-1.5, -1.2), H(1.6, -5.3), H(4.4, -6.3), H(5.8, -5.2), H(6.1, -3.4), H(6.2, -2.3), H(7.4, -1.6), H(6.4, 0.6), H(5.8, 2.4), H(2, 3)];
+  d.poly({ mat: c.skin, z: z + 0.05, group: g }, jaw, { kind: 'dome', c: H(1, 0.2), r: 7.5, bevel: 0.8 });
   if (c.ear !== 'none') {
     if (c.ear === 'elf') {
       d.poly({ mat: c.skin, z: z + 0.1, group: g, line: 'soft' }, [H(-0.4, -2.4), H(-1.8, 0.8), H(-5.6, 4.2), H(-2.6, 0.2), H(-1.6, -2.8)], { kind: 'bevel', w: 1 });
@@ -77,7 +80,9 @@ export function face(d: Draw, s: Skel, c: FaceCfg) {
     const yB = bs === 'angry' ? 1.4 : bs === 'calm' ? 2.1 : 2.0;
     pts.push({ p: H(2.4, yA), c: brow }, { p: H(3.5, (yA + yB) / 2), c: brow }, { p: H(4.6, yB), c: brow });
   }
-  if (c.mouth === 'line') pts.push({ p: H(4.9, -3.7), c: c.lip ?? c.skin.ramp[1] }, { p: H(5.6, -3.7), c: c.lip ?? c.skin.ramp[1] });
+  if (c.lash) pts.push({ p: H(4.4, 1.3), c: c.lash });
+  const my = c.profile === 'soft' ? -3.5 : -3.7;
+  if (c.mouth === 'line') pts.push({ p: H(c.profile === 'soft' ? 4.6 : 4.9, my), c: c.lip ?? c.skin.ramp[1] }, { p: H(c.profile === 'soft' ? 5.2 : 5.6, my), c: c.lip ?? c.skin.ramp[1] });
   if (c.mouth === 'shout') pts.push({ p: H(4.8, -3.4), c: INK.black }, { p: H(5.5, -3.4), c: INK.black }, { p: H(5.2, -4.3), c: INK.black });
   d.pixels({ mat: c.skin, z: z + 0.3, group: g }, pts);
 }

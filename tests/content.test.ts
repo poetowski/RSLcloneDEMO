@@ -140,12 +140,25 @@ describe('design decisions', () => {
     expect(Object.values(FACTIONS).map((f) => f.name)).toEqual(['Azure Crown', 'Sanguine Dominion', 'Court of Root', 'Ashveil Reign']);
   });
 
-  it('starts with the Azure Crown warrior and brings the Sanguine Dominion support after the first battle', () => {
+  it('starts with Captain Gareth and brings the Rime Scholar after the first battle (the Starter Heroes record)', () => {
     const [first] = CHAMPIONS, second = CHAMPIONS[1];
-    expect([first.rarity, first.role, first.faction, first.affinity]).toEqual(['elite', 'Damage', 'azure_crown', 'ember']);
-    expect([second.rarity, second.role, second.faction, second.affinity]).toEqual(['elite', 'Support', 'sanguine_dominion', 'tide']);
+    expect([first.name, first.rarity, first.role, first.faction, first.affinity]).toEqual(['Captain Gareth', 'elite', 'Damage', 'azure_crown', 'ember']);
+    expect([second.name, second.rarity, second.role, second.faction, second.affinity]).toEqual(['Rime Scholar', 'elite', 'Support', 'sanguine_dominion', 'tide']);
     expect(STARTERS).toEqual([first.id]);
     expect(allStages()[0].recruit).toBe(second.id);
+    // his kit: Line Cut, Iron Blow (ATK Up on himself after the hit, no crit gate), Wide Sweep (damage only), no passive
+    expect(first.skills.map((k) => k.name)).toEqual(['Line Cut', 'Iron Blow', 'Wide Sweep']);
+    expect(first.skills[1].statuses).toEqual([{ status: 'atk_up', turns: 2, to: 'self' }]);
+    expect(first.skills[2]?.target).toBe('enemies');
+    expect(first.skills[2]?.statuses ?? []).toEqual([]);
+    expect(first.passive).toBeUndefined();
+    // hers: Pale Strike (plain), Rimebind (Slow on every enemy), no A3, Cold Rebuke
+    expect(second.skills.map((k) => k.name)).toEqual(['Pale Strike', 'Rimebind']);
+    expect(second.skills[0].statuses ?? []).toEqual([]);
+    expect(second.skills[1].target).toBe('enemies');
+    expect(second.skills[1].statuses?.map((x) => x.status)).toEqual(['spd_down']);
+    expect(STATUSES.spd_down.name).toBe('Slow');
+    expect(second.passive && [second.passive.name, second.passive.kind, second.passive.value, second.passive.statuses]).toEqual(['Cold Rebuke', 'rebuke', 0.35, [{ status: 'freeze', turns: 1 }]]);
   });
 
   it('opens with a ten-stage first zone', () => {
@@ -320,6 +333,13 @@ describe('save', () => {
     const p = readSave(text);
     expect(isUnlocked(p, first.recruit!)).toBe(true);
     expect(p.team).toEqual([...STARTERS, first.recruit]);
+  });
+
+  it('starts the team over from the starters when the saved team is gone (the stand-in champions renamed)', () => {
+    const text = JSON.stringify({ version: 3, stars: {}, team: ['azure_warrior', 'sanguine_support'], read: [], settings: { speed: 1, auto: false }, reliquary: {} });
+    const p = readSave(text);
+    expect(p.team).toEqual([...STARTERS]);
+    expect(isUnlocked(p, STARTERS[0])).toBe(true);
   });
 
   it('keeps everything through a save and a load, spools included', () => {

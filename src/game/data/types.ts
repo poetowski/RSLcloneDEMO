@@ -110,10 +110,14 @@ export interface PassiveDef {
   /**
    * undying:   the first lethal hit leaves the champion at `value` x max HP instead
    * overdrive: the first time HP drops below `value` x max HP, `statuses` are granted
+   * rebuke:    while below `value` x max HP, an enemy whose critical hit lands on the
+   *            champion receives `statuses`; then the passive rests for `cooldown` turns
    */
-  kind: 'undying' | 'overdrive';
+  kind: 'undying' | 'overdrive' | 'rebuke';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
+  /** rebuke: the champion's own turns before it can answer again */
+  cooldown?: number;
 }
 
 export interface Stats {
@@ -137,7 +141,8 @@ export interface ChampionDef {
   /** where projectiles leave the sprite: [forward, up] px from the feet (ranged champions) */
   muzzle?: [number, number];
   stats: Stats;
-  skills: [SkillDef, SkillDef, SkillDef];
+  /** A1, A2 and, for most champions, A3 (the Rime Scholar has no A3) */
+  skills: [SkillDef, SkillDef] | [SkillDef, SkillDef, SkillDef];
   passive?: PassiveDef;
   lore: string;
 }
