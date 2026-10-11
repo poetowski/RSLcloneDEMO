@@ -152,6 +152,8 @@ describe('design decisions', () => {
     expect(first.skills[2]?.target).toBe('enemies');
     expect(first.skills[2]?.statuses ?? []).toEqual([]);
     expect(first.passive).toBeUndefined();
+    // no subtitles (Jakub, 2026-10-11)
+    for (const c of CHAMPIONS) expect('title' in c, `${c.id} has a subtitle`).toBe(false);
     // hers: Pale Strike (plain), Rimebind (Slow on every enemy), no A3, Cold Rebuke
     expect(second.skills.map((k) => k.name)).toEqual(['Pale Strike', 'Rimebind']);
     expect(second.skills[0].statuses ?? []).toEqual([]);
@@ -228,7 +230,7 @@ describe('font', () => {
 
   it('has a glyph in regular and bold for every character of the game text', () => {
     const texts = [
-      ...CHAMPIONS.flatMap((c) => [c.name, c.title, c.lore, ...c.skills.flatMap((s) => [s.name, s.tag, s.desc]), c.passive?.name ?? '', c.passive?.desc ?? '']),
+      ...CHAMPIONS.flatMap((c) => [c.name, c.lore, ...c.skills.flatMap((s) => [s.name, s.tag, s.desc]), c.passive?.name ?? '', c.passive?.desc ?? '']),
       ...Object.values(STATUSES).flatMap((s) => [s.name, s.desc]),
       ...[RARITIES, AFFINITIES, FACTIONS].flatMap((m) => Object.values(m).flatMap((d) => [d.name, 'desc' in d ? d.desc : ''])),
       ...Object.values(ROLES).flatMap((r) => [r.id, r.desc]),

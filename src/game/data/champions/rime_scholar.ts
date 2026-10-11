@@ -6,11 +6,11 @@ import { ChampionDef } from '../types';
 // no A3, and the passive Cold Rebuke (below 35% HP, a critical hit on her
 // freezes its attacker for 1 turn; it has a cooldown). Her job is to teach
 // that statuses exist. Stand-ins until Jakub sets them: the stats, the
-// multipliers, Slow's 2 turns, Cold Rebuke's 3-turn rest and the title.
+// multipliers, Slow's 2 turns and Cold Rebuke's 3-turn rest. Champions carry
+// no subtitle (Jakub, 2026-10-11).
 export const rimeScholar: ChampionDef = {
   id: 'rime_scholar',
   name: 'Rime Scholar',
-  title: 'Sanguine Dominion ice mage',
   role: 'Support',
   rarity: 'elite',
   affinity: 'tide',

@@ -97,7 +97,7 @@ export class TeamScreen extends BaseScreen {
       const c = champion(id);
       ui.blit(ctx, 'gem_' + c.affinity, x - ui.measure(c.name) / 2 - 13, y + 11);
       ui.text(ctx, c.name, x, y + 12, { color: c.color, align: 'center' });
-      ui.regions.push({ id: 'slot' + i, x: x - 24, y: y - 72, w: 48, h: 80, click: () => this.toggle(id), tip: () => ({ title: c.name, sub: 'Click to remove', body: c.title, color: c.color }) });
+      ui.regions.push({ id: 'slot' + i, x: x - 24, y: y - 72, w: 48, h: 80, click: () => this.toggle(id), tip: () => ({ title: c.name, sub: 'Click to remove', body: `${RARITIES[c.rarity].name} ${c.role}, ${AFFINITIES[c.affinity].name}`, color: c.color }) });
     }
     this.s.enemies.forEach((e, i) => {
       const [x, y] = sp.enemy[i];

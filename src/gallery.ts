@@ -44,7 +44,7 @@ function cell(grid: HTMLElement, label: string, w: number, h: number, draw: (g: 
 function heroes(a: Assets) {
   for (const h of CHAMPIONS) {
     const art = a.champions[h.id];
-    const grid = section(`${h.name}, ${h.title}`, `${RARITIES[h.rarity].name} ${h.role} - ${FACTIONS[h.faction].name}. Sprite height ${art.json.pivotY - art.json.frames['R/idle/0'][5]}px, frame box ${art.json.frameW}x${art.json.frameH}.`, h.color);
+    const grid = section(h.name, `${RARITIES[h.rarity].name} ${h.role} - ${FACTIONS[h.faction].name}. Sprite height ${art.json.pivotY - art.json.frames['R/idle/0'][5]}px, frame box ${art.json.frameW}x${art.json.frameH}.`, h.color);
     for (const [name, an] of Object.entries(art.json.anims)) {
       const total = an.ms.reduce((s, m) => s + m, 0);
       const skill = h.skills.find((s) => s.anim === name);

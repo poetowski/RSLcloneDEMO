@@ -131,7 +131,6 @@ export interface Stats {
 export interface ChampionDef {
   id: string;
   name: string;
-  title: string;
   role: Role;
   rarity: Rarity;
   affinity: Affinity;

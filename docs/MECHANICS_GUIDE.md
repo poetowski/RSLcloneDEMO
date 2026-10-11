@@ -74,7 +74,7 @@ interface SkillDef {
 }
 ```
 
-`ChampionDef` adds identity (`name, title, role, rarity, affinity, faction, color, lore`), `stats`, two or three skills (A1, A2 and usually an A3: the Rime Scholar has none, and the `3` key does nothing on her turn), an optional `passive` (`undying`, `overdrive` or `rebuke`) and, for champions that throw projectiles, a `muzzle` point where projectiles leave the sprite.
+`ChampionDef` adds identity (`name, role, rarity, affinity, faction, color, lore`; champions carry no subtitle), `stats`, two or three skills (A1, A2 and usually an A3: the Rime Scholar has none, and the `3` key does nothing on her turn), an optional `passive` (`undying`, `overdrive` or `rebuke`) and, for champions that throw projectiles, a `muzzle` point where projectiles leave the sprite.
 
 ### 4.2 Targeting
 

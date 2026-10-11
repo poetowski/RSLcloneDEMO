@@ -89,21 +89,20 @@ export class RecruitScreen extends BaseScreen {
     ctx.globalAlpha = a;
     this.a.font.draw(ctx, 'NEW CHAMPION', W / 2, 18, { color: '#fff6c0', gradient: '#f0a020', variant: 'display', align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
     ui.text(ctx, c.name, W / 2, 268, { color: c.color, variant: 'display', align: 'center' });
-    ui.text(ctx, c.title, W / 2, 288, { color: COLORS.dim, align: 'center' });
     const aff = AFFINITIES[c.affinity], fac = FACTIONS[c.faction];
     const line = `${rar.name}   ${aff.name}   ${c.role}   ${fac.name}`;
     const lw = ui.measure(line) + 30;
     let lx = Math.round(W / 2 - lw / 2);
-    ui.text(ctx, rar.name, lx, 302, { color: rar.color, variant: 'bold' });
+    ui.text(ctx, rar.name, lx, 290, { color: rar.color, variant: 'bold' });
     lx += ui.measure(rar.name, 'bold') + 8;
-    ui.blit(ctx, 'gem_' + c.affinity, lx, 301);
-    ui.text(ctx, aff.name, lx + 13, 302, { color: aff.color });
+    ui.blit(ctx, 'gem_' + c.affinity, lx, 289);
+    ui.text(ctx, aff.name, lx + 13, 290, { color: aff.color });
     lx += 13 + ui.measure(aff.name) + 8;
-    ui.blit(ctx, 'role_' + c.role, lx, 301);
-    ui.text(ctx, c.role, lx + 11, 302, { color: COLORS.text });
+    ui.blit(ctx, 'role_' + c.role, lx, 289);
+    ui.text(ctx, c.role, lx + 11, 290, { color: COLORS.text });
     lx += 11 + ui.measure(c.role) + 8;
-    ui.blit(ctx, 'emblem_' + c.faction, lx, 298);
-    ui.text(ctx, fac.name, lx + 17, 302, { color: fac.color });
+    ui.blit(ctx, 'emblem_' + c.faction, lx, 286);
+    ui.text(ctx, fac.name, lx + 17, 290, { color: fac.color });
     ctx.globalAlpha = 1;
     if (bt > 1400) {
       ui.button(ctx, 'view', W / 2 - 130, H - 34, 124, 24, 'VIEW CHAMPION', { click: () => this.app.router.champion(c.id), icon: 'mi_champions' });

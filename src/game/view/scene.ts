@@ -210,7 +210,7 @@ export class BattleScene {
     );
     const boss = vs.find((v) => v.boss);
     if (boss && !this.demoSkill) {
-      this.hud.showTitle('BOSS', '#ffd0c0', '#c02020', `${boss.champion.name}, ${boss.champion.title}`);
+      this.hud.showTitle('BOSS', '#ffd0c0', '#c02020', boss.champion.name);
       void this.fx.spawn('taunt', boss.x, boss.head().y - 8, { layer: 'top' });
       this.shake(3);
       await this.clock.wait(1300);
@@ -869,7 +869,7 @@ export class BattleScene {
         const tip = () => ({
           title: v.champion.name,
           sub: `${v.champion.role}  -  HP ${Math.round(v.hp)}/${v.maxHp}  SPD ${this.battle.get(v.uid).stats.spd}`,
-          body: v.statuses.map((s) => `${STATUSES[s.id].name} (${s.turns})`).join(', ') || v.champion.title,
+          body: v.statuses.map((s) => `${STATUSES[s.id].name} (${s.turns})`).join(', ') || 'No buffs or debuffs.',
           color: v.champion.color,
         });
         const region = hud.regions.find((r) => r.x === b.x && r.y === b.y && r.click);

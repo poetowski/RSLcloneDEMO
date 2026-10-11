@@ -7,7 +7,7 @@ Fill this in before writing code, and show it to the user when they are around: 
 | Field | Value | Rule |
 | --- | --- | --- |
 | id | | lowercase, one word, unique (`src/game/data/champions/index.ts`) |
-| Name, title | | "Name" + "the Title"; name fits on a 112 px card (about 14 characters) |
+| Name | | fits on a 112 px card (about 14 characters); champions carry no subtitle (Jakub, 2026-10-11) |
 | Faction | | Azure Crown, Sanguine Dominion, Court of Root, Ashveil Reign (`meta.ts`; DESIGN_DECISIONS.md 3) |
 | Role | | Tank, Damage, Support; tags such as bruiser or control describe the kit |
 | Rarity | | Common, Elite, Heroic, Mythic; sets the stat budget: 390, 425, 440, 455 |

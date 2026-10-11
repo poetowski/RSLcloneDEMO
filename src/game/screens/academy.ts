@@ -103,7 +103,7 @@ export class AcademyScreen extends BaseScreen {
     if (this.ch.demo) {
       const d = this.ch.demo;
       const owner = champion(ownerOf(d.skill));
-      ui.text(ctx, `${owner.name}, ${owner.title}`, px + 14, py + ph - 24, { color: COLORS.faint });
+      ui.text(ctx, owner.name, px + 14, py + ph - 24, { color: COLORS.faint });
       // the button grows with its label (skill names vary in length)
       const label = d.label.toUpperCase();
       const bw = Math.max(144, ui.measure(label, 'bold') + 40);

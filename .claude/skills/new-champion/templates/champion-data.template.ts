@@ -8,7 +8,6 @@ import { ChampionDef } from '../types';
 export const spearwarden: ChampionDef = {
   id: 'spearwarden',
   name: 'Template',
-  title: 'the Spear Warden',
   role: 'Damage', // Tank | Damage | Support (bruiser, control and the like are tags, not roles)
   rarity: 'heroic', // common | elite | heroic | mythic  (sets the stat budget)
   affinity: 'bloom', // ember > bloom > tide > ember

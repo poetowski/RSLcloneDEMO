@@ -5,12 +5,11 @@ import { ChampionDef } from '../types';
 // Iron Blow (ATK Up on himself after the hit, never gated by a crit) and Wide
 // Sweep (damage only); no passive. His job is to teach how damage works.
 // Stand-ins until Jakub sets them: the stats (his crit chance sits at the
-// floor of the norms, as crit is not introduced on him), every multiplier,
-// the cooldowns and the title.
+// floor of the norms, as crit is not introduced on him), every multiplier and
+// the cooldowns. Champions carry no subtitle (Jakub, 2026-10-11).
 export const captainGareth: ChampionDef = {
   id: 'captain_gareth',
   name: 'Captain Gareth',
-  title: 'Azure Crown captain',
   role: 'Damage',
   rarity: 'elite',
   affinity: 'ember',

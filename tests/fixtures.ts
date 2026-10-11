@@ -29,7 +29,6 @@ export function fixture(id: string, o: { affinity?: Affinity; stats?: Partial<St
   return {
     id,
     name: id,
-    title: '',
     role: 'Damage',
     rarity: 'elite',
     affinity: o.affinity ?? 'ember',

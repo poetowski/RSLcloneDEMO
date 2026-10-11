@@ -158,9 +158,8 @@ export class Hud extends Ui {
     ctx.fillRect(x + 7, y + 7, 30, 30);
     blit(ctx, this.a.ui.img, p, x + 8, y + 8);
     blit(ctx, this.a.ui.img, this.part('gem_' + c.affinity), x + 30, y + 30);
-    this.text(ctx, c.name, x + 44, y + 6, { color: c.color, variant: 'bold' });
-    this.text(ctx, c.title, x + 44, y + 17, { color: COLORS.dim });
-    const bx = x + 44, by = y + 29, bw = 134;
+    this.text(ctx, c.name, x + 44, y + 7, { color: c.color, variant: 'bold' });
+    const bx = x + 44, by = y + 22, bw = 134;
     ctx.fillStyle = COLORS.ink;
     ctx.fillRect(bx - 1, by - 1, bw + 2, 7);
     ctx.fillStyle = '#2a1018';
