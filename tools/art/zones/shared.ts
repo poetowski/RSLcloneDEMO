@@ -42,16 +42,33 @@ export interface PropKind {
   /** static: frame 0 | loop: cycle frames every `ms` | pulse: frame 1 breathes over frame 0 */
   mode: 'static' | 'loop' | 'pulse';
   ms?: number;
-  /** a fire burns on top: `flame` frames drawn after the units at this offset, embers and a light pool */
-  fire?: { dy: number };
+  /**
+   * a fire burns here: embers and a light pool at this offset, and the shared
+   * `flame` frames drawn after the units, unless `flame: false` (the prop paints its own fire)
+   */
+  fire?: { dy: number; flame?: boolean };
+  /** drifts up and down by `amp` px, once every `ms` (floating islands) */
+  bob?: { amp: number; ms: number };
 }
 
 export interface PropPlacement {
   kind: string;
   x: number;
   y: number;
-  /** back: behind units, before floor props | floor: on the ground | fg: in front of everything */
-  layer: 'back' | 'floor' | 'fg';
+  /** far: behind the tiles (sky, distant scenery) | back: behind units, before floor props | floor: on the ground | fg: in front of everything */
+  layer: 'far' | 'back' | 'floor' | 'fg';
+}
+
+/** Sparks born along a line of the scene (a rift's lips): they drift off and twinkle out. */
+export interface SparkEmitter {
+  /** polyline in screen pixels */
+  path: [number, number][];
+  /** colors a spark steps through as it dies, brightest first */
+  colors: string[];
+  /** ms between two sparks */
+  every: number;
+  /** drift speed in px per second */
+  speed: number;
 }
 
 export interface ZoneArt {
@@ -67,6 +84,8 @@ export interface ZoneArt {
   layout(id: (name: string) => number): { ground: number[]; wall: number[]; props: PropPlacement[] };
   /** backdrop y where land meets sky (heat haze band, mist) */
   horizon: number;
+  /** spark emitters drawn with the far layer */
+  sparks?: SparkEmitter[];
 }
 
 export interface ZoneJson {
@@ -85,6 +104,7 @@ export interface ZoneJson {
   propFrames: Record<string, Rect4>;
   spawns: { player: [number, number][]; enemy: [number, number][] };
   horizon: number;
+  sparks: SparkEmitter[];
 }
 
 // ---------------------------------------------------------------------------
@@ -177,6 +197,7 @@ export function buildZone(z: ZoneArt, out: string): ZoneJson {
     propFrames: placed,
     spawns: SPAWNS,
     horizon: z.horizon,
+    sparks: z.sparks ?? [],
   };
   const dir = path.join(out, 'zones', z.id);
   atlas.save(path.join(dir, 'tiles.png'));
@@ -192,6 +213,17 @@ export function buildZone(z: ZoneArt, out: string): ZoneJson {
 export function composeZone(map: ZoneJson, atlas: Bitmap, bd: Bitmap, props: Bitmap): Bitmap {
   const out = new Bitmap(SCREEN_W, SCREEN_H);
   out.blit(bd, 0, 0);
+  const drawProp = (p: PropPlacement) => {
+    const k = map.kinds[p.kind];
+    const f = map.propFrames[`${p.kind}/${k.mode === 'pulse' ? 1 : 0}`];
+    out.blit(props, Math.round(p.x - f[2] * k.anchor[0]), Math.round(p.y - f[3] * k.anchor[1]), { src: { x: f[0], y: f[1], w: f[2], h: f[3] } });
+    if (k.fire && k.fire.flame !== false) {
+      const fl = map.propFrames['flame/0'];
+      if (fl) out.blit(props, Math.round(p.x - fl[2] / 2), Math.round(p.y + k.fire.dy - fl[3] + 8), { src: { x: fl[0], y: fl[1], w: fl[2], h: fl[3] } });
+    }
+  };
+  // the far layer stands behind the tiles
+  for (const p of map.props) if (p.layer === 'far') drawProp(p);
   const drawLayer = (layer: number[]) => {
     for (let r = 0; r < map.rows; r++) {
       for (let c = 0; c < map.cols; c++) {
@@ -203,15 +235,7 @@ export function composeZone(map: ZoneJson, atlas: Bitmap, bd: Bitmap, props: Bit
   };
   drawLayer(map.layers.ground);
   drawLayer(map.layers.wall);
-  const order = { back: 0, floor: 1, fg: 2 } as const;
-  for (const p of [...map.props].sort((a, b) => order[a.layer] - order[b.layer] || a.y - b.y)) {
-    const k = map.kinds[p.kind];
-    const f = map.propFrames[`${p.kind}/${k.mode === 'pulse' ? 1 : 0}`];
-    out.blit(props, Math.round(p.x - f[2] * k.anchor[0]), Math.round(p.y - f[3] * k.anchor[1]), { src: { x: f[0], y: f[1], w: f[2], h: f[3] } });
-    if (k.fire) {
-      const fl = map.propFrames['flame/0'];
-      if (fl) out.blit(props, Math.round(p.x - fl[2] / 2), Math.round(p.y + k.fire.dy - fl[3] + 8), { src: { x: fl[0], y: fl[1], w: fl[2], h: fl[3] } });
-    }
-  }
+  const order = { far: -1, back: 0, floor: 1, fg: 2 } as const;
+  for (const p of [...map.props].filter((q) => q.layer !== 'far').sort((a, b) => order[a.layer] - order[b.layer] || a.y - b.y)) drawProp(p);
   return out;
 }

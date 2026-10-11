@@ -26,8 +26,18 @@ export interface PropKind {
   anchor: [number, number];
   mode: 'static' | 'loop' | 'pulse';
   ms?: number;
-  fire?: { dy: number };
+  fire?: { dy: number; flame?: boolean };
+  /** drifts up and down by `amp` px, once every `ms` */
+  bob?: { amp: number; ms: number };
   frames: number;
+}
+
+/** Sparks born along a line of the scene (tools/art/zones/shared.ts SparkEmitter). */
+export interface SparkEmitter {
+  path: [number, number][];
+  colors: string[];
+  every: number;
+  speed: number;
 }
 
 export interface ZoneJson {
@@ -39,11 +49,12 @@ export interface ZoneJson {
   tiles: string[];
   atlasCols: number;
   layers: { ground: number[]; wall: number[] };
-  props: { kind: string; x: number; y: number; layer: 'back' | 'fg' | 'floor' }[];
+  props: { kind: string; x: number; y: number; layer: 'far' | 'back' | 'fg' | 'floor' }[];
   kinds: Record<string, PropKind>;
   spawns: { player: [number, number][]; enemy: [number, number][] };
   propFrames: Record<string, Rect4>;
   horizon: number;
+  sparks?: SparkEmitter[];
 }
 
 export interface UiJson {

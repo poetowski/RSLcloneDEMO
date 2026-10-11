@@ -194,7 +194,8 @@ export interface ZoneDef {
   id: string;
   name: string;
   subtitle: string;
-  ambient: 'snow' | 'sand' | 'motes';
+  /** snow, blowing sand, star-dust with shooting stars, or autumn leaves tumbling in the wind */
+  ambient: 'snow' | 'sand' | 'motes' | 'leaves';
   /** color of brazier light pools */
   glow: [number, number, number];
   /** unit shadows: offset away from the key light and horizontal stretch */

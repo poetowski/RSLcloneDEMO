@@ -109,8 +109,9 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Zone (combat background) | where battles happen: behaviour, art, built layout, runtime renderer | `ZoneDef`, `ZoneArt` (art module), `ZoneJson`, `ZoneView` |
 | Home zone | the zone a faction's champions stand in outside battle | `homeZone()` |
 | Diorama | a living zone behind a menu, with champions standing in it | `Diorama`, `Figure` |
-| Prop, prop kind | a zone sprite and how it behaves: static, loop, pulse, fire | `PropKind`, `PropPlacement` |
-| Ambient | the zone's weather: snow, sand, motes | `ZoneDef.ambient` |
+| Prop, prop kind | a zone sprite and how it behaves: static, loop, pulse, fire (its own flames or the shared one), bob; in a layer: far, back, floor, fg | `PropKind`, `PropPlacement` |
+| Spark emitter | a line of a zone that sheds sparks (Zone 1's rift) | `SparkEmitter`, `ZoneJson.sparks` |
+| Ambient | the zone's weather: snow, sand, motes, leaves | `ZoneDef.ambient` |
 | Effect (fx) | a named visual sequence: impact, projectile, cast circle, actor flare | `FxDef`, `fx.json`, `FxLayer` |
 | Hit frame | the animation frame where a hit lands | atlas `anims.<name>.hits` |
 | Animation event | `jump`, `shoot`, `cast` on a frame | atlas `anims.<name>.events` |
@@ -521,7 +522,7 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | DR-4 | medium | `src/game/battle/sim.ts`, `src/game/view/scene.ts` | the turn structure is written twice; the balance numbers come from one copy, play from the other | R-7 |
 | DR-5 | low | `statuses.ts`, `codex.ts`, `screens/academy.ts`, `screens/champion.ts` | rule numbers restated by hand: status texts, the Academy damage figure (4.8, ±20%, x1.25, x1.5, 0.92-1.08), the turn-meter figure's SPD values, the stat tips, the list of factions | R-1, R-8 |
 | DR-6 | low | `.claude/skills/new-champion/templates/` | worksheet and data template list factions without `nyota`; the worksheet says only `undying` exists as a passive (`overdrive` does too) | closed 2026-10-10: the lists name today's categories and both passives |
-| DR-7 | low | `.claude/skills/new-combat-background/templates/worksheet.md` | ambient options list `snow` and `sand`, not `motes` | update the list |
+| DR-7 | low | `.claude/skills/new-combat-background/templates/worksheet.md` | ambient options list `snow` and `sand`, not `motes` (nor `leaves`, since 2026-10-11) | update the list |
 | DR-8 | low | `src/game/data/statuses.ts` | the header points to `tools/art/ui.ts STATUS`; icons live in `tools/art/ui/status.ts` | fix the comment |
 | DR-9 | low | `tools/review.sh` | passes `seed=` and `target=` in the URL; the game reads neither (demos use seed 7 and the first target) | read them in `main.ts`, or drop them |
 | DR-10 | low | CLAUDE.md, `tools/balance.ts` | "numbers stay inside norms.ts", but the impact and curve bands live in the balance tool and the rule constants in `battle.ts` | state the rule precisely, or move the bands into `norms.ts` |

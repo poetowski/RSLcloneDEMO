@@ -361,6 +361,19 @@ deliberate.
    touching, or is the contact disorienting and unexplained to them?
 6. Does the Archivist know what broke the loom, or is that the mystery?
 
+### 5.3a Zone 1's battle background (decided 2026-10-11)
+
+Jakub's brief for the redesign, in his words where possible:
+
+- Less symmetrical, "something more broken".
+- A cartwheel on the right side.
+- Maybe some field, and something burning, on the left side.
+- The floating islands bulkier and less flat.
+- In the background, a big rift in the cosmos that lights in blue and white
+  sparks, with cosmic fabrics waving from the rift around it; some animation.
+- Autumn on the ground; the light of dawn.
+- "Be creative."
+
 ### 5.4 Zone 2 — working sketch
 
 **Setting:** a **mystic arena in a deep forest**, inside Court of Root

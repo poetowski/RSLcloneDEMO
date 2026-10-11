@@ -5,14 +5,15 @@ import { FactionId, ZoneDef } from './types';
 
 export const ZONES: ZoneDef[] = [
   {
-    // Zone 1 from Jakub's working notes: open sky, a dim island, a small settlement
+    // Zone 1 from Jakub's working notes, redesigned on his brief (2026-10-11): dawn in autumn,
+    // a burning field, a broken cart, a rift torn in the cosmos; leaves blowing in the wind
     id: 'zone1',
     name: 'A Dim Island',
-    subtitle: 'Open sky over a small settlement',
-    ambient: 'motes',
-    glow: [255, 176, 96],
-    shadow: { dx: 2, stretch: 1.1 },
-    tint: { color: '#3c4a78', alpha: 0.07, op: 'soft-light' },
+    subtitle: 'Dawn after a raid, under a torn sky',
+    ambient: 'leaves',
+    glow: [255, 150, 70],
+    shadow: { dx: 4, stretch: 1.25 },
+    tint: { color: '#ff9a60', alpha: 0.05, op: 'soft-light' },
   },
 ];
 

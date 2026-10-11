@@ -73,7 +73,7 @@ Both follow Jakub's record: Gareth wears field armour, not the Azure Crown's blu
 ## 3. Light
 
 - **One key light for the whole game**: from the **top-left, slightly in front** (`LIGHT_DIR = normalize(-0.5, -0.65, 0.58)` in screen space).
-- Every backdrop places its light source in the upper-left to justify it: the veiled dusk sun over the dim island of Zone 1. Tiles are lit the same way (top/left edges bright, bottom/right edges dark), and so are carvings: in sunk relief the upper-left lip of a cut is in shadow and the lower-right wall catches the light.
+- Every backdrop places its light source in the upper-left to justify it: the dawn sun rising between the far peaks of Zone 1. A second, colored light may live in the sky (Zone 1's rift lights the clouds and the islands' right flanks blue), never on the champions. Tiles are lit the same way (top/left edges bright, bottom/right edges dark), and so are carvings: in sunk relief the upper-left lip of a cut is in shadow and the lower-right wall catches the light.
 - Because the light must stay top-left, sprites are **rendered** for both facings instead of mirrored. A mirrored sprite would light its right side.
 - Runtime light only adds: additive glow pools around fires (`ZoneDef.glow`), a mood tint (`ZoneDef.tint`), and unit shadows offset away from the light (`ZoneDef.shadow`: a low sun throws them longer and further right).
 
@@ -199,18 +199,19 @@ A zone is one module exporting a `ZoneArt` (contract in `zones/shared.ts`):
 | Rows | 0-1 sky, **2-5 the back wall**, **6-11 the floor** where units stand |
 | Tiles | 32 x 32, **seamless by construction**: stones put their joints on the right and bottom edges and their bevel light on the top and left |
 | Openings | gates, arches and colonnade gaps are transparent so the backdrop shows through; put something worth seeing behind them |
-| Props | sprites with a `PropKind`: `static`, `loop` (cycles frames), `pulse` (frame 1 breathes over frame 0), optional `fire` (flame, embers and a light pool) |
-| Layers | `back` (on the wall), `floor` (under units), `fg` (in front of everything, keep to the screen edges) |
+| Props | sprites with a `PropKind`: `static`, `loop` (cycles frames), `pulse` (frame 1 breathes over frame 0), optional `fire` (embers and a light pool, plus the shared `flame` on top unless `flame: false` when the prop paints its own fire), optional `bob` (drifts a pixel or two up and down: floating islands) |
+| Layers | `far` (behind the tiles: sky pieces and distant scenery, the rift, islands, a tree behind the wall), `back` (on the wall), `floor` (under units), `fg` (in front of everything, keep to the screen edges). A `floor` prop is drawn after every `back` prop, so it must not overlap one it should sit under |
+| Sparks | optional `sparks` emitters (`SparkEmitter`): lines of the scene that shed sparks drifting off and twinkling out, drawn with the far layer (the lips of Zone 1's rift) |
 | Value | the floor is mid value and low contrast so outlined champions always pop; reserve the brightest values for sky and sparkle |
 | Budget | backdrop at most 220 colors, tileset at most 160 (`npm run audit`) |
 
-Runtime behaviour lives in `src/game/data/zones.ts` (`ZoneDef`): ambience (`snow`, `sand` or `motes`: drifting star-dust plus shooting stars behind the architecture), glow color of fires, ember colors (`embers`, default firelight), shadow offset and stretch, mood tint, birds (any flying sprite named `bird`: vultures, sky-skiffs), heat haze. `homeZone()` picks a faction's background for its Academy demos and champion dioramas.
+Runtime behaviour lives in `src/game/data/zones.ts` (`ZoneDef`): ambience (`snow`, `sand`, `motes`: drifting star-dust plus shooting stars behind the architecture, or `leaves`: autumn leaves tumbling across in the wind), glow color of fires, ember colors (`embers`, default firelight), shadow offset and stretch, mood tint, birds (any flying sprite named `bird`: vultures, sky-skiffs), heat haze. `homeZone()` picks a faction's background for its Academy demos and champion dioramas.
 
 | A Dim Island (`zone1.ts`) |
 | --- |
 | ![A Dim Island](images/zone_zone1.png) |
 
-Zone 1, a first take on Jakub's working notes (open sky, a dim island, a small settlement, two worlds touching): the green at the edge of the settlement, a dry-stone wall with a gap where the path leaves for the island's edge, cottages with lit windows, fire baskets on the gateposts, the two standards framing the field in the foreground, other islands drifting in a dusk sky (one upside down) over a sea of cloud. The kind of settlement (village, ruin, outpost or camp) is still open in the notes.
+Zone 1, redesigned on Jakub's brief of 2026-10-11 (DESIGN_DECISIONS.md 5.3a: less symmetrical, more broken, a cartwheel on the right, a field and something burning on the left, bulky islands, a rift in the cosmos with blue and white sparks and cosmic fabric waving from it, autumn, dawn): the morning after a raid on the island's farm. On the left a stubble field with its sheaves behind a broken fence, a haystack burning, its smoke leaning east, and the Azure Crown's standard torn and leaning in the foreground. On the right what is left of a dry-stone wall (a broken end, a breach, autumn ivy), an autumn tree behind it, and a hay cart tipped over with a wheel off, pumpkins spilled and the Sanguine Dominion's standard snapped across it. Between them the road runs out to a farm burnt in the night. Above, the dawn sun rising between lilac peaks in a sea of mist, bulky floating islands of strata and crags with autumn trees and a waterfall, bobbing; on the right the rift, a jagged tear of deep space with a blue nebula and white-hot lips, cracks running into the sky, pulsing and shedding sparks, three veils of star-threaded cosmic fabric waving out of it. Autumn leaves tumble across the arena. Everything the brief did not name (the raid, the fence, the cart's load, the burnt farm, the arrows, the tree) is a first take.
 
 Floor tiles repeat across the arena, so a crack or a stain painted into a common variant repeats everywhere: keep damage to one rarely placed variant, and keep organic floors seamless by sharing one base field across variants and fading each variant's own detail in away from the tile border (`grass()` in `zone1.ts`). Large ground features (a worn path, a trampled patch) are `floor` props, not tiles.
 

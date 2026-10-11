@@ -18,6 +18,11 @@ export interface Particle {
   sway: number;
   phase: number;
   additive?: boolean;
+  /** tumbling (leaves): alternates between a w x h rect in `color` and an h x w rect in `alt`, about `spin` times per second */
+  spin?: number;
+  alt?: string;
+  w?: number;
+  h?: number;
 }
 
 export class Particles {
@@ -85,6 +90,13 @@ export class Particles {
         c = p.fade[Math.min(p.fade.length - 1, Math.floor(k * p.fade.length))];
       }
       ctx.globalCompositeOperation = p.additive ? 'lighter' : 'source-over';
+      if (p.spin) {
+        const flip = Math.floor(p.phase * p.spin * 0.5) % 2 === 1;
+        const w = p.w ?? p.size, h = p.h ?? p.size;
+        ctx.fillStyle = flip ? p.alt ?? c : c;
+        ctx.fillRect(Math.round(p.x), Math.round(p.y), flip ? h : w, flip ? w : h);
+        continue;
+      }
       ctx.fillStyle = c;
       ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
     }

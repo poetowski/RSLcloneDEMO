@@ -7,7 +7,7 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 ![Battle](docs/images/battle.gif)
 
 - **2 champions**: Captain Gareth of the Azure Crown and the Rime Scholar of the Sanguine Dominion, each with idle, run, every skill, hurt, death and a victory pose, rendered for both facings. Four factions: the Azure Crown, the Sanguine Dominion, the Court of Root and the Ashveil Reign.
-- **A combat background** for Zone 1, *A Dim Island*: the green at the edge of a small settlement, under an open dusk sky with other islands drifting in it.
+- **A combat background** for Zone 1, *A Dim Island*: dawn in autumn after a raid, a haystack burning by a stubble field, a hay cart overturned with a wheel off, bulky floating islands, and a rift torn in the cosmos waving veils of cosmic fabric, with leaves blowing across.
 - **A campaign** on a painted world map two screens wide, the edge of a continent with a rift in the west and jungle in the east: one node per area, each opening its list of stages (drag the map, step between areas with the arrows, or press `M` for the whole world). Zone 1 holds 10 stages; Zone 2's node waits for its stages. The second champion joins after the first battle.
 - **A Weaver Matrix** for every champion: six slots in two triangles holding Thread Spools, each with a main stat and strands, on the champion page's MATRIX tab (spools have no sources yet; `?spools=1` adds a sample).
 - **A collection** of champions with locked silhouettes, rarities, affinities, factions and roles, and a detail page with every animation and skill.
@@ -61,7 +61,7 @@ The campaign is a line of areas crossed from left to right. Zone 1, *A Dim Islan
 | A Dim Island |
 | --- |
 | ![A Dim Island](docs/images/zone_zone1.png) |
-| The green at the edge of a small settlement under an open dusk sky: a low dry-stone wall with a gap where the path leaves for the island's edge, thatched cottages with lit windows, fire baskets on the gateposts, and the standards of the Azure Crown and the Sanguine Dominion framing the field. Beyond the wall the island ends over a sea of cloud, with other islands drifting in the sky, one of them upside down. |
+| Dawn in autumn, the morning after a raid: on the left a stubble field, a haystack burning and the Azure Crown's torn standard; on the right a broken dry-stone wall, an autumn tree and a hay cart tipped over with a wheel off and the Sanguine Dominion's standard snapped across it. Above, the sun rising between lilac peaks, bulky floating islands, and a rift torn in the cosmos, shedding blue and white sparks and waving veils of cosmic fabric. |
 
 ![World map](docs/images/world_map.png)
 

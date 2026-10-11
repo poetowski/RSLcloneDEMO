@@ -35,7 +35,7 @@ Rules that are not negotiable:
 3. **Backdrop** (640x200): sky ramp top to `horizon`, the light source upper-left with a dithered halo, then distance layers from far (low contrast, hazy, cooler) to near (warmer, more contrast). Set `horizon` to where land meets sky.
 4. **Tiles** (32x32 painters `(b, seed) => void`): floor variants (6-9 so the grid does not repeat visibly), edge transitions (drifts, rubble), wall pieces (plain, dark, crown, base, special pieces), multi-tile set pieces cut from a 64x64 painting (see `quarter()` in `sunscar.ts`). Each tile is painted once and repeated wherever it is placed: a crack or stain in a common floor variant shows up all over the arena, so keep damage to one rarely placed variant.
 5. **Props**: one bitmap list per kind; describe each in `kinds` with an `anchor` and a `mode` (`static`, `loop` with `ms`, `pulse` = frame 1 breathes over frame 0) and `fire: { dy }` for anything that burns (needs a `flame` kind). Characters-like props (statues, urns) can use the champion renderer (`sprite()` in `sunscar.ts`) so they share the champions' shading. When a prop gets a dark `outline()`, outline the solid parts only and paint water, spray, smoke and light after it: an outline around every dithered droplet turns a waterfall into a chain.
-6. **Layout**: fill `ground` rows 6-11 and `wall` rows 1-5 by tile name; place props with layers `back` (on the wall), `floor` (under units), `fg` (edges only).
+6. **Layout**: fill `ground` rows 6-11 and `wall` rows 1-5 by tile name; place props with layers `far` (behind the tiles: sky pieces, distant scenery), `back` (on the wall), `floor` (under units), `fg` (edges only). Floating things can `bob`; a prop that paints its own fire sets `fire: { dy, flame: false }`; a line that sheds sparks (a rift, a crackling crystal) is a `sparks` emitter on the `ZoneArt`. Every `floor` prop is drawn after every `back` prop: keep them apart where the back prop should stand in front.
 
 ## 3. Behaviour entry
 
@@ -43,7 +43,7 @@ Add a `ZoneDef` with the same id to `src/game/data/zones.ts`:
 
 | Field | Meaning |
 | --- | --- |
-| `ambient` | `snow`, `sand` or `motes` (star-dust and shooting stars); a new kind needs code in `src/game/view/zone.ts` `spawnAmbient` |
+| `ambient` | `snow`, `sand`, `motes` (star-dust and shooting stars) or `leaves` (autumn leaves tumbling in the wind); a new kind needs code in `src/game/view/zone.ts` `spawnAmbient` |
 | `embers` | optional colors of the embers rising from fire props (first color, then the fade), e.g. teal for plasma braziers |
 | `glow` | RGB of the light pools around fire props |
 | `shadow` | `{ dx, stretch }` of unit shadows: high light `1 / 1`, low sun `6 / 1.35` |

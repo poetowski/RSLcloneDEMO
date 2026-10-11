@@ -1,8 +1,11 @@
-// Renders a combat background: backdrop, pre-baked tile layers, props driven
-// by their kind (static, looping, pulsing, burning), the ambience of the zone
-// (falling snow, blowing sand or drifting star-dust with shooting stars,
-// circling birds, heat haze), light pools, a mood tint and the vignette. Everything zone-specific comes from the zone's
-// JSON (art) and ZoneDef (behaviour), so a new zone needs no code here.
+// Renders a combat background: backdrop, the far layer (sky pieces and distant
+// scenery behind the tiles, some of them bobbing), spark emitters, pre-baked
+// tile layers, props driven by their kind (static, looping, pulsing, burning),
+// the ambience of the zone (falling snow, blowing sand, drifting star-dust with
+// shooting stars, or autumn leaves tumbling in the wind; circling birds, heat
+// haze), light pools, a mood tint and the vignette. Everything zone-specific
+// comes from the zone's JSON (art) and ZoneDef (behaviour), so a new zone
+// needs no code here.
 import { Particles } from '../../engine/particles';
 import { H, W } from '../../engine/screen';
 import { ZoneDef } from '../data/types';
@@ -27,6 +30,9 @@ export class ZoneView {
   /** shooting stars cross the sky behind the architecture */
   private sky = new Particles();
   private starT = 1500;
+  /** sparks shed by the zone's emitters (a rift's lips), drawn with the far layer */
+  private sparks = new Particles();
+  private sparkT: number[] = [];
   readonly json: ZoneJson;
   private art: ZoneArt;
   private birds: Bird[] = [];
@@ -42,8 +48,9 @@ export class ZoneView {
     this.tilesLayer = this.bakeTiles();
     this.light = makeGlow(64, 40, def.glow);
     this.vignette = makeVignette();
-    const n = def.ambient === 'snow' ? 90 : 70;
+    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : 70;
     for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
+    this.sparkT = (this.json.sparks ?? []).map(() => 0);
     for (let i = 0; i < (def.birds ?? 0); i++) {
       this.birds.push({ cx: 380 + Math.random() * 200, cy: 22 + Math.random() * 26, r: 30 + Math.random() * 40, ry: 6 + Math.random() * 6, a: Math.random() * Math.PI * 2, speed: (0.00025 + Math.random() * 0.0002) * (i % 2 ? 1 : -1) });
     }
@@ -69,6 +76,29 @@ export class ZoneView {
   }
 
   private spawnAmbient(x = -4, y = -4) {
+    if (this.def.ambient === 'leaves') {
+      // autumn leaves tumbling across in the wind from the left, a few close to the camera
+      const respawn = x < 0;
+      const near = Math.random() < 0.3;
+      const tone = Math.floor(Math.random() * 4);
+      const [c, alt] = [['#c8682a', '#8a3a16'], ['#d89a3a', '#9a6420'], ['#a8441c', '#6a2410'], ['#b88a40', '#7a5428']][tone];
+      const fromLeft = respawn && Math.random() < 0.55;
+      this.ambient.add({
+        x: respawn ? (fromLeft ? -4 : Math.random() * W) : x,
+        y: respawn ? (fromLeft ? Math.random() * H * 0.8 : -4) : y,
+        vx: near ? 30 + Math.random() * 20 : 16 + Math.random() * 16,
+        vy: near ? 16 + Math.random() * 10 : 8 + Math.random() * 8,
+        life: Infinity,
+        size: near ? 2 : 1,
+        w: near ? 3 : 2,
+        h: near ? 2 : 1,
+        color: c,
+        alt,
+        spin: 2 + Math.random() * 3,
+        sway: near ? 18 : 10,
+      });
+      return;
+    }
     if (this.def.ambient === 'motes') {
       // star-dust: glowing motes rising slowly through the air, kindling and fading as they go
       const respawn = x < 0;
@@ -128,7 +158,7 @@ export class ZoneView {
     const speedUp = this.def.ambient === 'sand' && this.gust > 0 ? 2.2 : 1;
     amb.update(dt * speedUp);
     for (const p of amb.list) if (p.y > H + 4 || p.y < -6 || p.x > W + 8 || p.x < -60) p.life = 0;
-    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.gust > 0 ? 150 : 70;
+    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.gust > 0 ? 150 : 70;
     while (amb.list.length < target) this.spawnAmbient();
     if (this.def.ambient === 'sand') {
       // every few seconds a gust sweeps a veil of sand across the arena
@@ -157,6 +187,25 @@ export class ZoneView {
         }
       }
     }
+    // sparks crackle off the emitters' lines, drift away and twinkle out
+    this.sparks.update(dt);
+    (this.json.sparks ?? []).forEach((e, i) => {
+      this.sparkT[i] -= dt;
+      while (this.sparkT[i] <= 0) {
+        this.sparkT[i] += e.every * (0.5 + Math.random());
+        const seg = Math.floor(Math.random() * (e.path.length - 1));
+        const [x0, y0] = e.path[seg], [x1, y1] = e.path[seg + 1];
+        const k = Math.random();
+        const a = Math.random() * Math.PI * 2, sp = e.speed * (0.4 + Math.random() * 0.8);
+        const life = 500 + Math.random() * 1100;
+        this.sparks.add({
+          x: x0 + (x1 - x0) * k, y: y0 + (y1 - y0) * k,
+          vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+          life, max: life, size: Math.random() < 0.2 ? 2 : 1,
+          color: e.colors[0], fade: e.colors, drag: 0.6, sway: 3, additive: true,
+        });
+      }
+    });
     this.embers.update(dt);
     const em = this.def.embers ?? ['#ffd060', '#fff0b0', '#ffb84a', '#f2731e', '#c8361a'];
     for (const p of this.json.props) {
@@ -177,9 +226,12 @@ export class ZoneView {
     const k = this.json.kinds[p.kind];
     if (!k) return;
     const img = this.art.props;
-    const place = (r: Rect4) => [p.x - r[2] * k.anchor[0], p.y - r[3] * k.anchor[1]] as const;
+    // a bobbing prop drifts a pixel or two up and down, each on its own phase
+    const bob = k.bob ? Math.round(Math.sin((this.t / k.bob.ms) * Math.PI * 2 + p.x * 0.05) * k.bob.amp) : 0;
+    const place = (r: Rect4) => [p.x - r[2] * k.anchor[0], p.y + bob - r[3] * k.anchor[1]] as const;
     if (k.mode === 'loop') {
-      const f = Math.floor(this.t / (k.ms ?? 150) + p.x * 0.01) % k.frames;
+      // each placement runs on its own phase (props left of the screen edge included)
+      const f = ((Math.floor(this.t / (k.ms ?? 150) + p.x * 0.01) % k.frames) + k.frames) % k.frames;
       const r = this.frame(p.kind, f);
       blit(ctx, img, r, ...place(r));
     } else if (k.mode === 'pulse') {
@@ -219,6 +271,8 @@ export class ZoneView {
         ctx.restore();
       }
     }
+    for (const p of this.json.props) if (p.layer === 'far') this.drawProp(ctx, p);
+    this.sparks.draw(ctx);
     ctx.drawImage(this.tilesLayer, 0, 0);
     for (const layer of ['back', 'floor'] as const) for (const p of this.json.props) if (p.layer === layer) this.drawProp(ctx, p);
   }
@@ -229,7 +283,7 @@ export class ZoneView {
     const flame = this.json.kinds.flame;
     for (const p of this.json.props) {
       const k = this.json.kinds[p.kind];
-      if (!k?.fire || !flame) continue;
+      if (!k?.fire || k.fire.flame === false || !flame) continue;
       const f = Math.floor(this.t / (flame.ms ?? 90) + p.x) % flame.frames;
       const r = this.frame('flame', f);
       blit(ctx, img, r, p.x - r[2] / 2, p.y + k.fire.dy - r[3] + 8);

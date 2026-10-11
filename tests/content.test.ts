@@ -178,7 +178,14 @@ describe('zones', () => {
         expect(k, `${z.id} prop ${p.kind}`).toBeTruthy();
         expect(k.frames, `${z.id} ${p.kind} frames`).toBeGreaterThan(0);
         if (k.mode === 'pulse') expect(k.frames, `${z.id} ${p.kind} pulse needs 2 frames`).toBeGreaterThanOrEqual(2);
-        if (k.fire) expect(zj.kinds.flame, `${z.id} fire props need flame frames`).toBeTruthy();
+        if (k.fire && k.fire.flame !== false) expect(zj.kinds.flame, `${z.id} fire props need flame frames`).toBeTruthy();
+        if (p.layer === 'far') expect(k.fire, `${z.id} ${p.kind}: nothing burns in the far layer`).toBeFalsy();
+      }
+      // spark emitters run along lines inside the screen
+      for (const e of zj.sparks ?? []) {
+        expect(e.path.length, `${z.id} spark path`).toBeGreaterThanOrEqual(2);
+        for (const [x, y] of e.path) expect(x >= 0 && x < 640 && y >= 0 && y < 360, `${z.id} spark point ${x},${y}`).toBe(true);
+        expect(e.colors.length).toBeGreaterThan(0);
       }
       if (z.birds) expect(zj.kinds.bird, `${z.id} birds need bird frames`).toBeTruthy();
       expect(zj.spawns.player.length).toBe(3);
