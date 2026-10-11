@@ -235,7 +235,7 @@ describe('font', () => {
       ...[RARITIES, AFFINITIES, FACTIONS].flatMap((m) => Object.values(m).flatMap((d) => [d.name, 'desc' in d ? d.desc : ''])),
       ...Object.values(ROLES).flatMap((r) => [r.id, r.desc]),
       ...LOCATIONS.flatMap((l) => [l.chapter, l.name, l.blurb, ...l.stages.flatMap((s) => [s.id, s.blurb])]),
-      ...ZONES.flatMap((z) => [z.name, z.subtitle]),
+      ...ZONES.map((z) => z.name),
       ...CHAPTERS.flatMap((ch) => [ch.title, ch.demo?.label ?? '', ...ch.blocks.flatMap((b) => ('text' in b ? [b.text] : b.kind === 'list' ? b.items : []))]),
     ];
     expect(missing('regular', texts)).toEqual([]);

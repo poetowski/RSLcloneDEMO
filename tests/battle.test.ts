@@ -1,7 +1,7 @@
 // Battle rules. Every rule is proven on the synthetic champions of
 // tests/fixtures.ts; the last block runs the real roster through full battles.
 import { describe, expect, it } from 'vitest';
-import { Battle, combatants } from '../src/game/battle/battle';
+import { Battle, combatants, landShare } from '../src/game/battle/battle';
 import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
@@ -377,6 +377,63 @@ describe('statuses', () => {
     const r = b.useSkill(b.get('p0'), skill(twin, 'twin_chop'), 'e0');
     expect(c.alive).toBe(false);
     expect(r.events.some((e) => e.kind === 'passive')).toBe(false);
+  });
+});
+
+describe('accuracy and resistance', () => {
+  /** how often the freezer's certain Freeze lands on the striker, over 1000 seeds */
+  const freezeRate = (acc: number, res: number) => {
+    let landed = 0;
+    for (let seed = 1; seed <= 1000; seed++) {
+      const b = new Battle([{ def: freezer, stats: { ...freezer.stats, acc } }], [{ def: striker, stats: { ...striker.stats, res } }], { seed });
+      const r = b.useSkill(b.get('p0'), skill(freezer, 'freeze_bolt'), 'e0');
+      const freeze = r.events.filter((e) => (e.kind === 'status' || e.kind === 'resist') && e.status === 'freeze');
+      expect(freeze).toHaveLength(1);
+      if (freeze[0].kind === 'status') landed++;
+    }
+    return landed / 1000;
+  };
+
+  it("lands a debuff by the placer's ACC against the target's RES", () => {
+    expect(freezeRate(0, 0)).toBe(1);
+    expect(freezeRate(50, 50)).toBe(1);
+    expect(freezeRate(80, 20)).toBe(1); // ACC above RES adds nothing
+    expect(freezeRate(0, 100)).toBeCloseTo(0.5, 1);
+    expect(freezeRate(20, 120)).toBeCloseTo(0.5, 1);
+    expect(landShare(0, 100)).toBe(0.5);
+    expect(landShare(0, 300)).toBe(0.25);
+    expect(landShare(40, 20)).toBe(1);
+  });
+
+  it('cuts a chance debuff by the same share, and never touches buffs', () => {
+    // Fangs: Poison at 50% per hit, two hits; RES 100 over ACC leaves 25% per hit
+    let poisons = 0;
+    for (let seed = 1; seed <= 1000; seed++) {
+      const b = new Battle(combatants([stalker]), [{ def: twin, stats: { ...twin.stats, res: 100 } }], { seed });
+      const r = b.useSkill(b.get('p0'), skill(stalker, 'fangs'), 'e0');
+      poisons += r.events.filter((e) => e.kind === 'status' && e.status === 'poison').length;
+    }
+    expect(poisons / 2000).toBeCloseTo(0.25, 1);
+    // the drummer's SPD Up lands on every ally, whatever their RES
+    const b = new Battle(
+      [drummer, guard, twin].map((def) => ({ def, stats: { ...def.stats, res: 1000 } })),
+      combatants([striker]),
+      { seed: 4 },
+    );
+    const r = b.useSkill(b.get('p0'), skill(drummer, 'march'));
+    expect(r.events.filter((e) => e.kind === 'status' && e.status === 'spd_up')).toHaveLength(3);
+  });
+
+  it("lets RES resist Cold Rebuke's Freeze too", () => {
+    const crit = { ...striker, stats: { ...striker.stats, crit: 1, res: 1e9 } };
+    const b = new Battle(combatants([rebuker]), [{ def: crit }], { seed: 2 });
+    const t = b.get('p0'), a = b.get('e0');
+    t.hp = Math.round(t.maxHp * 0.6);
+    b.startTurn(a);
+    const r = b.useSkill(a, crit.skills[0], 'p0');
+    expect(r.events.some((e) => e.kind === 'passive' && e.effect === 'rebuke')).toBe(true);
+    expect(r.events.some((e) => e.kind === 'resist' && e.status === 'freeze' && e.target === 'e0')).toBe(true);
+    expect(b.has(a, 'freeze')).toBe(false);
   });
 });
 

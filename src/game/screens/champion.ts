@@ -266,7 +266,7 @@ export class ChampionScreen extends BaseScreen {
         ui.text(ctx, statValue(k, wov[k]), cx0 + 72, yy, { color: up ? COLORS.good : COLORS.text, align: 'right' });
         ui.regions.push({
           x: cx0, y: yy - 1, w: 74, h: 11,
-          tip: () => ({ title: STAT_NAME[k], sub: `base ${statValue(k, base[k])}${up ? `, with the matrix ${statValue(k, wov[k])}` : ''}`, body: k === 'acc' || k === 'res' ? 'Carried and shown; no battle rule uses it yet.' : k === 'critDmg' ? 'What a critical hit adds: 100% is double damage.' : '' }),
+          tip: () => ({ title: STAT_NAME[k], sub: `base ${statValue(k, base[k])}${up ? `, with the matrix ${statValue(k, wov[k])}` : ''}`, body: k === 'acc' ? 'Compared against the target\'s RES when placing a debuff: while RES is higher, the debuff can be resisted.' : k === 'res' ? 'Resists debuffs from an enemy whose ACC is lower: the wider the gap, the more often.' : k === 'critDmg' ? 'What a critical hit adds: 100% is double damage.' : '' }),
         });
       });
     });
@@ -440,8 +440,8 @@ export class ChampionScreen extends BaseScreen {
     // the stats with no budget yet: critical damage, accuracy, resistance
     const extra: [StatId, string][] = [
       ['critDmg', 'Critical damage: what a critical hit adds. 100% is double damage.'],
-      ['acc', 'Accuracy. Carried by spools and patterns; no battle rule uses it yet.'],
-      ['res', 'Resistance. Carried by spools and patterns; no battle rule uses it yet.'],
+      ['acc', 'Accuracy: compared against the target\'s RES when placing a debuff. While RES is higher, the debuff can be resisted.'],
+      ['res', 'Resistance: resists debuffs from an enemy whose ACC is lower. The wider the gap, the more often.'],
     ];
     extra.forEach(([k, tip], i) => {
       const ex = x + i * Math.floor(w / 3);

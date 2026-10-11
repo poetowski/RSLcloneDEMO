@@ -327,7 +327,7 @@ winner()           checked before choosing and after every action
 - **Domain service: `WeavePatternEvaluator`.** Counts spools per pattern over the whole matrix, never by slot; a pattern is woven `floor(count / pieces)` times; results follow catalog order; an unknown pattern throws.
 - **Spool rules:** `threadSpool` enforces them (main value from the grade, strand count by grade, no repeats, values in range, SPD strands +1); `rollSpool` draws a valid spool. `attunedStats`, `strandValue`, `matrixBonus` (SPD strands capped at +4) and `wovenStats` turn a matrix into stats; the archivist's `battleStats` hands them to `Combatant.stats`.
 - **Persistence:** `toJSON` and `fromJSON` (`ReliquaryJson`) keep spools by slot index. Loading puts a spool back into its slot when the slot still takes it, otherwise into the stock, and drops malformed entries and spools of a pattern the catalog no longer has.
-- **Built (2026-10-10, 2026-10-11):** the layout, grades, strands, attunement, the bridge into combat and the MATRIX tab; Jakub's slot names and his eight core Weave Patterns, whose bonuses `wovenStats` adds once per weave. **Not defined yet:** where spools and materials come from, and what ACC and RES do in battle; the stage powers are measured again once sources exist.
+- **Built (2026-10-10, 2026-10-11):** the layout, grades, strands, attunement, the bridge into combat and the MATRIX tab; Jakub's slot names and his eight core Weave Patterns, whose bonuses `wovenStats` adds once per weave. **Not defined yet:** where spools and materials come from; the stage powers are measured again once sources exist.
 
 ## 5. Domain events
 
@@ -373,6 +373,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C13 | A dead unit has no statuses and is never a target | code; test |
 | INV-C14 | A battle ends when one side has no living unit; it always ends | code; test (40 seeded auto battles); termination relies on every A1 dealing damage |
 | INV-C15 | A Rebuke answers only a critical, non-lethal hit by an enemy that leaves its holder below `value`; then it rests for `cooldown` of the holder's turns | code; tests |
+| INV-C16 | A debuff placed on an enemy lands with at most its chance: all of it while the placer's ACC is at least the target's RES, cut by `landShare` above; buffs and effects on allies never meet RES; when ACC is at least RES the random draws are the same as without the rule | code (`tryApply`); tests |
 
 ### 6.2 Catalog
 

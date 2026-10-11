@@ -144,7 +144,8 @@ Three affinities in a cycle (Jakub's, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)
 | Heal Block | debuff | cannot be healed: heals, Regen and lifesteal show `HEAL BLOCKED` |
 
 - Reapplying a status refreshes it to the longer duration (and the larger shield); it never stacks.
-- A status with a failed `chance` shows `RESIST` (debuffs only).
+- **Accuracy against Resistance** (Jakub, 2026-10-11): a debuff placed on an enemy, by a skill or a passive, compares the placer's ACC against the target's RES. While ACC is at least RES the debuff keeps its chance; above it, the chance is multiplied by 100 / (100 + RES − ACC), so RES 100 over ACC halves it and 300 over leaves a quarter, and even a certain debuff can be resisted (the curve is a stand-in: `landShare`, `RES_SCALE` in `battle.ts`). ACC above RES adds nothing. Buffs, and effects on allies, never meet RES. Every champion has ACC 0 and RES 0, so only the Weaver Matrix moves them.
+- A debuff that fails its roll shows `RESIST`; a failed buff roll is silent.
 - Death removes all statuses and empties the turn meter.
 
 ## 8. Special mechanics
@@ -312,4 +313,4 @@ The last column is how the game reads his values (a stand-in until he confirms i
 
 **Stats with the matrix:** ATK, HP and DEF = base x (1 + the summed % + the woven fractions) + the flat sum, rounded; SPD = base + the summed SPD + base x the woven fraction, rounded; C.RATE and C.DMG rise by the summed points; ACC and RES by the flat sum. The MATRIX tab on the champion page shows the result and the woven patterns.
 
-**Critical damage, Accuracy and Resistance.** Every champion starts at C.DMG 100%, so a critical hit deals double damage as before (section 5); the matrix raises it. ACC and RES are carried and shown, but no battle rule uses them yet: debuffs still land on their flat chance until Jakub defines what the two stats do.
+**Critical damage, Accuracy and Resistance.** Every champion starts at C.DMG 100%, so a critical hit deals double damage as before (section 5); the matrix raises it. ACC and RES decide whether a debuff lands (section 7).

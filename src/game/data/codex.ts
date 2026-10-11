@@ -101,7 +101,7 @@ export const CHAPTERS: Chapter[] = [
     title: 'Debuffs',
     icon: 'status_weaken',
     blocks: [
-      { kind: 'p', text: 'Debuffs are harmful effects, shown with a red rim. Many skills only have a chance to place them; when the roll fails the target shows RESIST. Like buffs, they count down at the end of the holder\'s turns and refresh instead of stacking.' },
+      { kind: 'p', text: 'Debuffs are harmful effects, shown with a red rim. Many skills only have a chance to place them, and the placer\'s Accuracy (ACC) is compared against the target\'s Resistance (RES): while RES is higher, even a certain debuff can be resisted, the more often the wider the gap. When the roll fails the target shows RESIST. Like buffs, they count down at the end of the holder\'s turns and refresh instead of stacking.' },
       { kind: 'statuses', ids: ['atk_down', 'def_down', 'spd_down', 'weaken', 'poison', 'burn', 'heal_block'] },
       { kind: 'tip', text: 'Weaken and DEF Down stack with each other: put both on a boss before your strongest skill.' },
     ],

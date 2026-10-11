@@ -88,6 +88,17 @@ const DAMAGE_SCALE = 4.8;
 const DEF_SCALE = 40;
 const DEF_UP = 0.16;
 const DEF_DOWN = 0.12;
+/** RES over the placer's ACC resists debuffs: RES_SCALE points over halve their chance (a stand-in) */
+const RES_SCALE = 100;
+
+/**
+ * The share of a debuff's chance that lands on an enemy (Jakub, 2026-10-11:
+ * the placer's ACC is compared against the target's RES): all of it while ACC
+ * is at least RES, then RES_SCALE / (RES_SCALE + RES - ACC).
+ */
+export function landShare(acc: number, res: number): number {
+  return res > acc ? RES_SCALE / (RES_SCALE + res - acc) : 1;
+}
 
 export interface BattleOptions {
   seed?: number;
@@ -349,7 +360,9 @@ export class Battle {
   }
 
   private tryApply(actor: Unit, r: Unit, status: StatusId, turns: number, chance: number | undefined, value: number | undefined, hit: number, events: BattleEvent[]) {
-    if (chance !== undefined && !this.rng.chance(chance)) {
+    // a debuff on an enemy meets its RES; a certain one rolls only when RES cuts it
+    const land = (chance ?? 1) * (!STATUSES[status].buff && r.team !== actor.team ? landShare(actor.stats.acc, r.stats.res) : 1);
+    if ((chance !== undefined || land < 1) && !this.rng.chance(land)) {
       if (!STATUSES[status].buff) events.push({ kind: 'resist', target: r.uid, status, hit });
       return;
     }
@@ -454,10 +467,7 @@ export class Battle {
     // the rest counts the holder's own turns: one more if it is its turn now
     t.cooldowns[p.id] = (p.cooldown ?? 0) + (t === this.acting ? 1 : 0);
     events.push({ kind: 'passive', target: t.uid, name: p.name, hit, effect: 'rebuke', source: attacker.uid });
-    for (const st of p.statuses ?? []) {
-      this.addStatus(attacker, st.status, st.turns, 0, t.uid);
-      events.push({ kind: 'status', target: attacker.uid, status: st.status, turns: st.turns, hit });
-    }
+    for (const st of p.statuses ?? []) this.tryApply(t, attacker, st.status, st.turns, undefined, undefined, hit, events);
   }
 
   winner(): TeamId | null {

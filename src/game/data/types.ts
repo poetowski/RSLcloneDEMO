@@ -129,7 +129,7 @@ export interface Stats {
   crit: number;
   /** critical damage: what a critical hit adds (1 = +100%: double damage) */
   critDmg: number;
-  /** accuracy and resistance (Jakub's Weaver Matrix, 2026-10-11): carried and shown; no battle rule uses them yet */
+  /** accuracy and resistance (Jakub, 2026-10-11): a debuff placed on an enemy compares the placer's ACC against its RES (`landShare`) */
   acc: number;
   res: number;
 }
@@ -198,7 +198,6 @@ export interface RoleDef {
 export interface ZoneDef {
   id: string;
   name: string;
-  subtitle: string;
   /** snow, blowing sand, star-dust with shooting stars, or autumn leaves tumbling in the wind */
   ambient: 'snow' | 'sand' | 'motes' | 'leaves';
   /** color of brazier light pools */

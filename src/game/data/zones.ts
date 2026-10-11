@@ -9,7 +9,6 @@ export const ZONES: ZoneDef[] = [
     // a burning field, a broken cart, a rift torn in the cosmos; leaves blowing in the wind
     id: 'zone1',
     name: 'A Dim Island',
-    subtitle: 'Dawn after a raid, under a torn sky',
     ambient: 'leaves',
     glow: [255, 150, 70],
     shadow: { dx: 4, stretch: 1.25 },

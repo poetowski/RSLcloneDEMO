@@ -1,10 +1,30 @@
-# Design Decisions — Export
+# Design Decisions
 
-Consolidated record of decisions made in design conversation.
-
-Covers: enum design, faction naming, the game premise, and the current state
-of campaign zone thinking. Campaign zones are **not locked** — they are
+The living record of Jakub's design decisions: the premise, the enums and the
+factions, the starter champions, the campaign, the Weaver Matrix, the combat
+rules and champion stats, and the game's name and lexicon. Records he handed
+over keep his words; when a later decision changes one, the change is marked
+where it stands, with its date. Campaign zones are **not locked** — they are
 working notes.
+
+Stand-ins (the numbers, texts and art the game needs before he sets them) are
+not recorded here: CLAUDE.md lists them, and each is marked where it lives.
+Section 7 lists what is not decided.
+
+### Changes
+
+| Date | Change | Section |
+|---|---|---|
+| 2026-10-10 | First export: premise, enums, factions, starter champions, campaign notes | 1-7 |
+| 2026-10-10 | The gold of the Azure Crown confirmed; standards of the Court of Root and the Ashveil Reign | 3.6 |
+| 2026-10-10 | The map and campaign nodes | 5.4a |
+| 2026-10-10 | Starter Heroes: Captain Gareth and the Rime Scholar | 8 |
+| 2026-10-11 | Zone 1's battle background (brief, then "i like how it looks now in game") | 5.3a |
+| 2026-10-11 | Champions carry no subtitle | 10 |
+| 2026-10-11 | Weaver Matrix slot names and the core Weave Patterns | 9.3 |
+| 2026-10-11 | Accuracy against Resistance decides whether a debuff lands | 10 |
+| 2026-10-11 | Recorded here from earlier approvals: the name, direction and lexicon (2026-10-08), the gear system (2026-10-08, 2026-10-10) and its combat rules | 9, 10, 11 |
+| 2026-10-11 | Cleanup: section 4 points to section 8, answered questions closed, section 7 refreshed | 4, 5.3, 7 |
 
 ---
 
@@ -236,6 +256,9 @@ yet designed" in the first export).*
 
 ## 4. Starter champions (locked)
 
+The core of the starters as first decided. Section 8 is the full record:
+names, looks, kits, what each teaches, and the pair.
+
 ### 4.1 Starter — male warrior
 
 | Field | Value |
@@ -258,45 +281,24 @@ His job is to teach the player how damage works.
 | Affinity | Tide |
 | Joins | After the first battle |
 
-Her job is to teach the player sustain.
+Her job is to teach the player that statuses exist. *(2026-10-10: section 8
+replaced "sustain" with this.)*
 
-### 4.3 Deliberate faction / affinity mismatch
+### 4.3 The pair
 
-Azure Crown (blue standard) is paired with **Ember** (fire).
-Sanguine Dominion (black-and-red standard) is paired with **Tide** (water).
+The deliberate faction / affinity mismatch, the structural subtext (Ember
+loses to Tide) and the pair under the premise are recorded in section 8, The
+Pair. *(2026-10-11: moved there, as the two copies repeated each other.)*
 
-The mismatch is intentional. Players who assume "Azure Crown = Tide" or
-"Sanguine Dominion = Ember" are meant to be wrong. Faction and affinity are
-orthogonal axes and the assignment demonstrates that from the first two
-champions.
+### 4.4 Settled since
 
-### 4.4 Structural subtext
-
-Ember loses to Tide. The starter and the second champion are therefore
-structural counters: if they ever fought, she would win. They travel together
-from the first zone onward. This is subtext, not mechanics.
-
-### 4.5 The pair under the premise
-
-The starter is Azure Crown; the second is Sanguine Dominion. Under the
-premise, these two would **never naturally meet** — they come from different
-worlds. They are together only because the broken loom has connected them,
-and because both are now fragments being reconstructed by the Archivist.
-
-Their pairing is not "two soldiers from two nations." It is **two people
-from two realities, standing in the same impossible place.** This is
-structural to who they are.
-
-### 4.6 Open
-
-- Both characters are deliberately **not locked** beyond the table above.
-  Names, personalities, backstories, and the reason she joins are all open.
-- *(2026-10-10: names, appearance and kits decided in section 8, Starter
-  Heroes: Captain Gareth and the Rime Scholar. Her job there is to teach that
-  statuses exist, which replaces "sustain" in 4.2.)*
-- Whether champions are *fragments recovered during the campaign* or already
-  whole at the start is undecided. This affects whether the starter is
-  collected in Zone 1 or is present from the beginning.
+- Names, looks and kits: section 8 (2026-10-10), Captain Gareth and the Rime
+  Scholar.
+- Both are **fragments** recollected by the Archivist. Gareth is with the
+  Archivist from the start; the Rime Scholar joins after the first battle
+  (section 8). This answers whether champions are fragments or already whole,
+  and whether the starter is found in Zone 1.
+- Still open: their backstories, and why she joins (5.3, question 3).
 
 ---
 
@@ -350,7 +352,8 @@ deliberate.
 
 **Open questions:**
 1. Is the starter fragment already with the Archivist, or is Zone 1 where
-   they find him?
+   they find him? *(Answered 2026-10-10, section 8: he is with the Archivist
+   from the start.)*
 2. Is the Archivist present as a character in the scene, or only as a
    celestial presence guiding the fragments?
 3. Why does the second champion join? Both are fragments; the pair is
@@ -360,6 +363,10 @@ deliberate.
 5. When the two worlds touch in Zone 1, do the factions *know* they are
    touching, or is the contact disorienting and unexplained to them?
 6. Does the Archivist know what broke the loom, or is that the mystery?
+7. Is the rift in Zone 1's sky (5.3a) the rift in the west of the map (5.4a)?
+   Zone 1's node is the first on the road that starts at it. *(Asked
+   2026-10-11.)*
+8. Zone 1's name: "A Dim Island" is to be replaced (2026-10-11).
 
 ### 5.3a Zone 1's battle background (decided 2026-10-11)
 
@@ -373,6 +380,18 @@ Jakub's brief for the redesign, in his words where possible:
   sparks, with cosmic fabrics waving from the rift around it; some animation.
 - Autumn on the ground; the light of dawn.
 - "Be creative."
+
+**As built** (2026-10-11; Jakub: "i like how it looks now in game"): the
+morning after a raid on the island's farm. On the left, a stubble field with
+its sheaves behind a broken fence, a haystack burning, its smoke leaning east,
+scorched ground, and the Azure Crown's standard torn and leaning. On the
+right, what is left of a dry-stone wall with autumn ivy, an autumn tree, a hay
+cart tipped over with a wheel off and pumpkins spilled, and the Sanguine
+Dominion's standard snapped across it. Between them the road runs past arrows
+in the ground to a farm burnt in the night. In the sky, the dawn sun between
+lilac peaks, bulky floating islands that slowly bob, and the rift: a tear of
+deep space with white-hot lips that pulses and sheds sparks, three veils of
+star-threaded cosmic fabric waving out of it. Leaves tumble across the arena.
 
 ### 5.4 Zone 2 — working sketch
 
@@ -423,7 +442,8 @@ fragments of champions would be known to be.
 Zone 1 and Zone 2 should contrast clearly so the horizontal scroll reads as
 "arriving somewhere new":
 - Zone 1: open sky, dim island, small settlement, contact between worlds,
-  recent and disorienting.
+  recent and disorienting. *(As built: a farm at dawn in autumn, under the
+  rift, 5.3a.)*
 - Zone 2: enclosed forest, ancient ritual, deliberately apart from the world.
 
 ---
@@ -448,23 +468,38 @@ open questions.
 
 ## 7. Explicitly not decided
 
-- Affinity mechanics (multipliers, what they affect, visibility)
-- Rarity gating (stats, kits, ascension, recruit pools)
+- Affinity mechanics (multipliers, what they affect, visibility) *(the game
+  stands in ±20% damage)*
+- Rarity gating (stats, kits, ascension, recruit pools) *(the game stands in a
+  stat budget per rarity)*
 - Role mechanics (whether roles change battle rules, AI, or nothing)
 - Faction mechanics (synergies, team-building constraints, UI filtering)
-- Champion schema (what fields a champion has beyond the enums)
+- Champion schema (what fields a champion has beyond the enums) *(partly
+  decided 2026-10-11: no subtitle, eight stats; section 10)*
 - Kit / skill design *(the starter pair's kits decided 2026-10-10, section 8;
   their numbers are not)*
 - Art pipeline specification
-- Save and progression
+- Save and progression *(gear decided: the Weaver Matrix, section 9; levels,
+  ranks, ascension and skill upgrades are not)*
+- Where spools and materials come from
+- How far Resistance must exceed Accuracy to resist a debuff *(the game
+  stands in a curve, section 10)*
+- Zone 1's enemies *(the game stands in copies of the two starters)*
+- Where crit is taught, at or before the point Cold Rebuke first fires
+  meaningfully (section 8, the Rime Scholar's notes)
+- Zone names *(Zone 1's "A Dim Island" is to be replaced; Zone 2 shows "A
+  Mystic Arena"; both come from the sketches)*
+- Team size *(the game uses 3)* and how champions are acquired *(one recruit
+  per first clear)*
 - Campaign count of zones
-- Names of the starter pair *(decided 2026-10-10, section 8)*
-- Whether champions are fragments collected during play or present from the
-  start
 - Whether the Archivist appears as a character or as a presence
 - The relationship of Ashveil Reign to the loom's breaking
 - Whether Court of Root wants the loom repaired
 - Whether Court of Root and Ashveil Reign come from their own worlds
+
+Decided since the first export: the names of the starter pair, and that
+champions are fragments, the first one with the Archivist from the start
+(section 8).
 
 ---
 
@@ -647,7 +682,35 @@ broken. This is structural to who they are, not incidental backstory.
 
 ---
 
-## 9. Weaver Matrix: slots and Weave Patterns (received 2026-10-11)
+## 9. Weaver Matrix (gear)
+
+Champions grow through gear: every champion has a Weaver Matrix of six slots
+that hold Thread Spools. The full rules, with the stand-in numbers, are in
+[MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14.
+
+### 9.1 Outline (approved 2026-10-08)
+
+- Six slots, each with a stat node: fixed (one stat) or variable (one stat
+  from a list).
+- Two triangles: slots 1, 3 and 5 fixed (ATK, DEF, HP); slots 2, 4 and 6
+  choice slots (SPD or a %, CRIT or a %, a %). *(Names and what each takes
+  set in 9.3.)*
+- Thread Spools fill the slots. Weave Patterns are 2- and 4-piece sets,
+  counted wherever their spools sit; a 2-piece pattern can be woven up to
+  three times.
+
+### 9.2 Spools (approved 2026-10-10)
+
+- A spool has a grade (Ashen, Silver, Gilded), one main stat whose value the
+  grade sets, and strands: additional stats, one per grade step, rolled once,
+  never repeating a stat.
+- SPD strands add at most +4 to a matrix.
+- Attunement: each fixed slot attunes the two choice slots beside it; a strand
+  there whose stat matches the fixed slot gains +1.
+- The MATRIX tab on the champion page. Jakub: "this looks like a good gear
+  system". The combat rules approved with it are in section 10.
+
+### 9.3 Slots and Weave Patterns (received 2026-10-11)
 
 Jakub's record, verbatim. The names of the Weaver Matrix slots:
 
@@ -680,3 +743,42 @@ The real Weave Pattern sets, replacing every placeholder pattern:
 How the game reads the values, and what the record leaves open, are in
 [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14: stand-ins until Jakub confirms
 them.
+
+---
+
+## 10. Combat rules and champion stats
+
+- **Defense divides damage** (approved 2026-10-10 with the gear system,
+  option A, "100%"): damage taken is multiplied by 40 / DEF, so twice the DEF
+  takes half the damage; DEF Up is +16% and DEF Down −12%. This brought DEF
+  and CRIT level with ATK and HP.
+- **Critical hits** deal 1 + C.DMG times the damage; every champion starts at
+  C.DMG 100%, double damage (2026-10-10: double; 2026-10-11: C.DMG, from the
+  Apex pattern).
+- **Eight stats** (2026-10-11, the stats of the core Weave Patterns): HP,
+  ATK, DEF, SPD, C.RATE, C.DMG, ACC, RES.
+- **Accuracy and Resistance** (2026-10-11), Jakub's words: "ACC and RES works
+  for detrimental effects. If you want to place debuff on enemy, your acc is
+  compared against enemy res." How far RES must exceed ACC to resist is a
+  stand-in ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 7).
+- **No subtitles** (2026-10-11): champions carry no title anywhere in the
+  game. Jakub: "i actually dont like these subtitles at all".
+
+---
+
+## 11. Name, direction and lexicon (approved 2026-10-08)
+
+- **Name:** The Loom: Reliquary of Legends (code name TLROL). "Reliquary of
+  Legends" is the subtitle; heroes stay *champions*, and recruiting stays
+  *recruit*.
+- **Direction:** high fantasy with a gothic arcane look. No science fiction,
+  and no literal yarn or craft look: the loom's threads, spools and patterns
+  are arcane relics, never sewing things.
+- **Logo:** a gothic rose window (six jewelled lobes, as the Weaver Matrix
+  holds six spools) before THE LOOM in cast gold, with RELIQUARY OF LEGENDS
+  beneath.
+- **Lexicon:** the Master Archivist (the player), the Reliquary (the vault of
+  everything the Archivist holds), a Hero Soul File (one champion's record),
+  the Weaver Matrix (a champion's gear), a Thread Spool (one piece of gear), a
+  Weave Pattern (a set bonus). The Spindle of Fate is a placeholder name with
+  no meaning yet.
