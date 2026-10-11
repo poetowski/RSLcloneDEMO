@@ -27,6 +27,7 @@ Section 7 lists what is not decided.
 | 2026-10-11 | Cleanup: section 4 points to section 8, answered questions closed, section 7 refreshed | 4, 5.3, 7 |
 | 2026-10-11 | Zone names: Zone 1 the Fracture Reach, Zone 2 the Verdant Grove; Zone 2 is not about an arena | 5.3, 5.4, 7 |
 | 2026-10-11 | The world map redrawn: no edges, the rift reworked, the areas and the forest closer, growing east area by area | 5.4a |
+| 2026-10-11 | The redrawn world map approved as built ("i love it") | 5.4a |
 
 ---
 
@@ -455,6 +456,17 @@ fragments of champions would be known to be.
 - The map will be extended to the east, area by area; for now it need not be
   very wide. Horizontally scrollable.
 - Fantasy, very big detail.
+
+**As built** (2026-10-11; Jakub: "i love it"): the land fills the map in
+autumn, with forest along both edges. In the west a rift torn diagonally from
+the west edge to the south edge onto the cosmos, pieces of land floating in
+it, dark cracks fanning out from it, and beyond it the broken land with an
+old watchtower and the old road ending at a broken bridge. East of it the
+Fracture Reach: the village (cottages, a chapel, a windmill, a well, a farm
+burnt in the night, a haystack burning) in its fields, the standards of the
+two worlds by the road. Then the river under a stone bridge and the forest,
+autumn turning green, around the Verdant Grove's glade. The map is 960 pixels
+wide and grows east area by area.
 
 ### 5.5 Visual throughline
 

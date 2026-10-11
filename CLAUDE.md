@@ -4,12 +4,12 @@ A turn-based hero battler (RAID / SWGOH style) in TypeScript + Canvas. All art i
 
 ## Content approval
 
-The game is **The Loom: Reliquary of Legends** (code name TLROL), and its content is Jakub's. Every decision he has made is in [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), the one source for content work: the premise, enums and factions (1-3, 6), the starters (4, 8), the campaign, Zone 1 and the map (5), the Weaver Matrix (9), the combat rules and stats (10), the name, direction and lexicon (11); section 7 lists what is not decided. Jakub, the game's designer, approves or rejects every piece of real content before it is built: names, stats, numbers, mechanics, texts and art. On 2026-10-11 he said of the game as it looked then (Zone 1, the champions, the matrix): "i like how it looks now in game"; new art is still proposed with previews first.
+The game is **The Loom: Reliquary of Legends** (code name TLROL), and its content is Jakub's. Every decision he has made is in [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), the one source for content work: the premise, enums and factions (1-3, 6), the starters (4, 8), the campaign, Zone 1 and the map (5), the Weaver Matrix (9), the combat rules and stats (10), the name, direction and lexicon (11); section 7 lists what is not decided. Jakub, the game's designer, approves or rejects every piece of real content before it is built: names, stats, numbers, mechanics, texts and art. On 2026-10-11 he said of the game as it looked then (Zone 1, the champions, the matrix): "i like how it looks now in game", and of the redrawn world map: "i love it"; new art is still proposed with previews first.
 
 Stand-ins fill the gaps until he designs them, each marked as such where it lives:
 
 - **Starters:** their stats and every number in their kits (multipliers, cooldowns, Slow's 2 turns, Cold Rebuke's 3-turn rest; crit at the 2.5% floor because crit is not introduced on Gareth).
-- **Campaign:** Zone 1's enemies (copies of the two), its stage texts (quoted from his notes; stages have no names) and the area blurbs; on the world map (redrawn on his brief, DESIGN_DECISIONS.md 5.4a) what the brief did not name: the village's buildings, the fields, the river and its bridge, the ruins beyond the rift and the land floating in it.
+- **Campaign:** Zone 1's enemies (copies of the two), its stage texts (quoted from his notes; stages have no names) and the area blurbs.
 - **Rules:** the size of an affinity edge (±20%), the rarity budgets (carried over), how far RES must exceed ACC to resist a debuff (`landShare`), team size 3 and one recruit per first clear.
 - **Weaver Matrix:** the spool main values, strands and attunement, and the reading of his pattern values (fractions of base for SPD, ATK, DEF and HP, points for C.RATE and C.DMG, flat ACC and RES).
 - **Texts:** the Academy, the role descriptions, rule numbers, norms and effects.
