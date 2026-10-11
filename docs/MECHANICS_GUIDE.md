@@ -251,7 +251,7 @@ This split keeps the rules testable without a browser (`npm test`) and lets the 
 | `A` or AUTO | auto battle (saved as the default) |
 | `S` or the speed button | x1 / x2 / x3 (saved as the default) |
 | `Esc` / `P` or MENU | pause menu: resume, auto, speed, retreat |
-| Campaign map | drag to move; arrows jump between stages; `W` `A` `S` `D` or `Shift` + arrows slide; `M` whole map; `Enter` opens a stage, then PREPARE |
+| Campaign map | drag to move; arrows jump between areas; `W` `A` `S` `D` or `Shift` + arrows slide; `M` whole map; `Enter` opens a stage, then PREPARE |
 | MATRIX tab (champion page) | click a slot, then a lit spool in the stock to weave it; TAKE OUT returns the slot's spool to the stock |
 
 URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=1-5`, `&team=captain_gareth,rime_scholar`, `&champion=rime_scholar`, `&chapter=buffs`, `?demo=<skill_id>` (loops one skill), `?unlockall=1`, `?reset=1`, `?spools=1` (adds 24 sample spools to the stock), and for screenshots `&hp=0.1` (scales enemy HP).

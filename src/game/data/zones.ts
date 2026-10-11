@@ -8,7 +8,7 @@ export const ZONES: ZoneDef[] = [
     // Zone 1 from Jakub's working notes, redesigned on his brief (2026-10-11): dawn in autumn,
     // a burning field, a broken cart, a rift torn in the cosmos; leaves blowing in the wind
     id: 'zone1',
-    name: 'A Dim Island',
+    name: 'Fracture Reach',
     ambient: 'leaves',
     glow: [255, 150, 70],
     shadow: { dx: 4, stretch: 1.25 },

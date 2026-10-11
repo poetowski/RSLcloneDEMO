@@ -25,6 +25,8 @@ Section 7 lists what is not decided.
 | 2026-10-11 | Accuracy against Resistance decides whether a debuff lands | 10 |
 | 2026-10-11 | Recorded here from earlier approvals: the name, direction and lexicon (2026-10-08), the gear system (2026-10-08, 2026-10-10) and its combat rules | 9, 10, 11 |
 | 2026-10-11 | Cleanup: section 4 points to section 8, answered questions closed, section 7 refreshed | 4, 5.3, 7 |
+| 2026-10-11 | Zone names: Zone 1 the Fracture Reach, Zone 2 the Verdant Grove; Zone 2 is not about an arena | 5.3, 5.4, 7 |
+| 2026-10-11 | The world map redrawn: no edges, the rift reworked, the areas and the forest closer, growing east area by area | 5.4a |
 
 ---
 
@@ -366,7 +368,7 @@ deliberate.
 7. Is the rift in Zone 1's sky (5.3a) the rift in the west of the map (5.4a)?
    Zone 1's node is the first on the road that starts at it. *(Asked
    2026-10-11.)*
-8. Zone 1's name: "A Dim Island" is to be replaced (2026-10-11).
+8. Zone 1's name. *(Answered 2026-10-11: the **Fracture Reach**.)*
 
 ### 5.3a Zone 1's battle background (decided 2026-10-11)
 
@@ -394,6 +396,10 @@ deep space with white-hot lips that pulses and sheds sparks, three veils of
 star-threaded cosmic fabric waving out of it. Leaves tumble across the arena.
 
 ### 5.4 Zone 2 — working sketch
+
+*(2026-10-11: the area is the **Verdant Grove**. It is not about an arena:
+its battles only take place in something that looks like one. Its art waits
+for Jakub.)*
 
 **Setting:** a **mystic arena in a deep forest**, inside Court of Root
 territory.
@@ -431,11 +437,24 @@ fragments of champions would be known to be.
 
 - The world map is the edge of a continent: a band of land running west to
   east; north and south of it there is nothing to see, only its edges.
+  *(Changed 2026-10-11: no edges, the land fills the map; below.)*
 - In the west, a rift.
 - Going east, the land turns to jungle.
 - Stages are not dots on the map: each area is one campaign node, and its
   stages open from it (a popup). A second node stands in the jungle.
 - Stages are not named.
+
+**Redrawn (2026-10-11)**, Jakub's brief:
+
+- Zone 1 and Zone 2 closer together.
+- No map edge at the top or the bottom: every pixel is map.
+- In the west a rift, reworked, and not vertical; the details of the west
+  part reworked, then the village.
+- The forest much closer, worked in even at some points near the edges.
+- Zone 2 is not about an arena (5.4), and its artwork is not made yet.
+- The map will be extended to the east, area by area; for now it need not be
+  very wide. Horizontally scrollable.
+- Fantasy, very big detail.
 
 ### 5.5 Visual throughline
 
@@ -487,8 +506,6 @@ open questions.
 - Zone 1's enemies *(the game stands in copies of the two starters)*
 - Where crit is taught, at or before the point Cold Rebuke first fires
   meaningfully (section 8, the Rime Scholar's notes)
-- Zone names *(Zone 1's "A Dim Island" is to be replaced; Zone 2 shows "A
-  Mystic Arena"; both come from the sketches)*
 - Team size *(the game uses 3)* and how champions are acquired *(one recruit
   per first clear)*
 - Campaign count of zones
@@ -499,7 +516,8 @@ open questions.
 
 Decided since the first export: the names of the starter pair, and that
 champions are fragments, the first one with the Archivist from the start
-(section 8).
+(section 8); the zone names, the Fracture Reach and the Verdant Grove (5.3,
+5.4).
 
 ---
 

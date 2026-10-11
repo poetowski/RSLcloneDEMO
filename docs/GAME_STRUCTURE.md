@@ -55,12 +55,12 @@ Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8):
 - A **stage** lists up to three enemies in formation order (front, back-top, back-bottom), a `power` multiplier for their HP and ATK, an optional boss flag per enemy (x1.6 HP, a crown), a map position (world pixels, see below) and the champion its first clear brings (`recruit`), who need not be among its enemies: the second champion joins after the first battle without being fought there.
 - A stage opens when the previous stage of its location is cleared; the first stage of a location opens when the location does.
 - Difficulty follows the curve in [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) section 10; tune `power` with `npm run balance`.
-- The **world map** is `WORLD_MAP` (1280x360, two screens wide and one tall): the campaign is a line of areas crossed from left to right (DESIGN_DECISIONS.md 5.1). Location `map` positions are in its pixels. The campaign screen scrolls it under a camera: drag to move (a click fires on release), Left and Right step between areas in campaign order and the camera keeps the focused node in view, `W` `A` `S` `D` or `Shift` + arrows slide it, and `M` (or WHOLE MAP) shows the overview, the same world drawn at half the size on one screen; clicking the overview goes there. Coming back from team select or a battle opens the stage list on that stage.
+- The **world map** is `WORLD_MAP` (960x360, a screen and a half wide and one tall, growing east area by area: ART_GUIDE.md 10): the campaign is a line of areas crossed from left to right (DESIGN_DECISIONS.md 5.1). Location `map` positions are in its pixels. The campaign screen scrolls it under a camera: drag to move (a click fires on release), Left and Right step between areas in campaign order and the camera keeps the focused node in view, `W` `A` `S` `D` or `Shift` + arrows slide it, and `M` (or WHOLE MAP) shows the overview, the same world drawn at half the size on one screen; clicking the overview goes there. Coming back from team select or a battle opens the stage list on that stage.
 
 | Location | Zone | Stages |
 | --- | --- | --- |
-| I. A Dim Island | `zone1` | 1-1 to 1-10 (1-1 brings the Rime Scholar; 1-10 is the boss) |
-| II. A Mystic Arena (after 1-10) | none yet | not designed |
+| I. Fracture Reach | `zone1` | 1-1 to 1-10 (1-1 brings the Rime Scholar; 1-10 is the boss) |
+| II. Verdant Grove (after 1-10) | none yet | not designed |
 
 Zone 1 follows Jakub's working notes (DESIGN_DECISIONS.md 5.3), which are not locked: the stage texts quote them (contact, the settlement, escalation, the turning point, leaving). Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed. Zone 2 (the mystic arena in a Court of Root forest) has its node in the jungle and no stages yet. The world map follows his brief (DESIGN_DECISIONS.md 5.4a): the edge of a continent, a rift in the west, jungle toward the east, nothing beyond its north and south edges.
 

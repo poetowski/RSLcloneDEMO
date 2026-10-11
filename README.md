@@ -7,8 +7,8 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 ![Battle](docs/images/battle.gif)
 
 - **2 champions**: Captain Gareth of the Azure Crown and the Rime Scholar of the Sanguine Dominion, each with idle, run, every skill, hurt, death and a victory pose, rendered for both facings. Four factions: the Azure Crown, the Sanguine Dominion, the Court of Root and the Ashveil Reign.
-- **A combat background** for Zone 1, *A Dim Island*: dawn in autumn after a raid, a haystack burning by a stubble field, a hay cart overturned with a wheel off, bulky floating islands, and a rift torn in the cosmos waving veils of cosmic fabric, with leaves blowing across.
-- **A campaign** on a painted world map two screens wide, the edge of a continent with a rift in the west and jungle in the east: one node per area, each opening its list of stages (drag the map, step between areas with the arrows, or press `M` for the whole world). Zone 1 holds 10 stages; Zone 2's node waits for its stages. The second champion joins after the first battle.
+- **A combat background** for Zone 1, the *Fracture Reach*: dawn in autumn after a raid, a haystack burning by a stubble field, a hay cart overturned with a wheel off, bulky floating islands, and a rift torn in the cosmos waving veils of cosmic fabric, with leaves blowing across.
+- **A campaign** on a painted world map a screen and a half wide that grows east area by area: a rift torn diagonally through the land in the west, the Fracture Reach's village in its autumn fields, the river, and the forest around the Verdant Grove; one node per area, each opening its list of stages (drag the map, step between areas with the arrows, or press `M` for the whole world). Zone 1 holds 10 stages; Zone 2's node waits for its stages. The second champion joins after the first battle.
 - **A Weaver Matrix** for every champion: six named slots in two triangles holding Thread Spools, each with a main stat and strands, and eight Weave Patterns that two spools of a kind weave, on the champion page's MATRIX tab (spools have no sources yet; `?spools=1` adds a sample).
 - **A collection** of champions with locked silhouettes, rarities, affinities, factions and roles, and a detail page with every animation and skill.
 - **The Academy**: an in-game codex that teaches combat, the turn meter, damage, affinities, all buffs, debuffs and special mechanics, with live demonstrations.
@@ -36,7 +36,7 @@ Open http://localhost:5173. The sprite gallery (every animation, effect and icon
 | mouse | everything: click skills, targets and buttons; hover anything for a tooltip |
 | `1` `2` `3`, arrows, `Enter` | pick a skill, cycle targets, confirm |
 | `A`, `S`, `Esc` | auto battle, speed x1/x2/x3, pause menu (and back in menus) |
-| campaign map | drag to move; arrows jump between stages; `W` `A` `S` `D` or `Shift` + arrows slide the map; `M` shows the whole world |
+| campaign map | drag to move; arrows jump between areas; `W` `A` `S` `D` or `Shift` + arrows slide the map; `M` shows the whole world |
 | arrows + `Enter` in menus | move between buttons, activate |
 
 Deep links: `?screen=campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=1-5`, `&team=captain_gareth,rime_scholar`, `&champion=rime_scholar`, `&chapter=buffs`; `?demo=<skill_id>` loops one skill; `?unlockall=1`, `?progress=1-4` (clear up to a stage), `?reset=1`, `?spools=1` (a sample stock of Thread Spools).
@@ -56,11 +56,11 @@ Both are Jakub's ([docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md) 8, Starte
 
 ## The world
 
-The campaign is a line of areas crossed from left to right. Zone 1, *A Dim Island*, follows Jakub's working notes: ten stages in the arc contact, the settlement, escalation, the turning point and leaving. The notes are not locked; the stages' enemies are copies of the two champions until enemies are designed.
+The campaign is a line of areas crossed from left to right. Zone 1, the *Fracture Reach*, follows Jakub's working notes: ten stages in the arc contact, the settlement, escalation, the turning point and leaving. The notes are not locked; the stages' enemies are copies of the two champions until enemies are designed.
 
-| A Dim Island |
+| Fracture Reach |
 | --- |
-| ![A Dim Island](docs/images/zone_zone1.png) |
+| ![Fracture Reach](docs/images/zone_zone1.png) |
 | Dawn in autumn, the morning after a raid: on the left a stubble field, a haystack burning and the Azure Crown's torn standard; on the right a broken dry-stone wall, an autumn tree and a hay cart tipped over with a wheel off and the Sanguine Dominion's standard snapped across it. Above, the sun rising between lilac peaks, bulky floating islands, and a rift torn in the cosmos, shedding blue and white sparks and waving veils of cosmic fabric. |
 
 ![World map](docs/images/world_map.png)

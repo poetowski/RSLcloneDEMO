@@ -4,20 +4,23 @@
 // stage of a location opens the next location. Difficulty is tuned with
 // `npm run balance` (see docs/MECHANICS_GUIDE.md, "Difficulty curve").
 //
-// Zone 1 follows Jakub's working notes (docs/DESIGN_DECISIONS.md section 5):
-// ten stages on a dim island, in the arc contact, the settlement, escalation,
-// the turning point and leaving. The notes are not locked. Stages have no
+// Zone 1, the Fracture Reach, follows Jakub's working notes
+// (docs/DESIGN_DECISIONS.md section 5): ten stages in the arc contact, the
+// settlement, escalation, the turning point and leaving. The notes are not locked. Stages have no
 // names; their texts quote the notes; the enemies are copies of the two
 // champions that exist, standing in for the warriors of both worlds until
-// enemies are designed. Zone 2 is a node on the map whose stages wait for him.
+// enemies are designed. Zone 2, the Verdant Grove, is a node on the map whose
+// stages wait for him. Both names are his (2026-10-11).
 import { LocationDef, StageDef } from './types';
 
 /**
- * The campaign world map in pixels: two screens wide and one tall, scrolled
- * sideways. Location `map` positions (the campaign nodes) are in this space;
- * `overview` is how many times smaller the whole-world overview is drawn.
+ * The campaign world map in pixels: one screen tall and a screen and a half
+ * wide, scrolled sideways. Location `map` positions (the campaign nodes) are in
+ * this space; `overview` is how many times smaller the whole-world overview is
+ * drawn. The map grows east area by area: a new area widens it by its stretch,
+ * and everything west of the stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 1280, h: 360, overview: 2 };
+export const WORLD_MAP = { w: 960, h: 360, overview: 2 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];
@@ -30,10 +33,10 @@ export const LOCATIONS: LocationDef[] = [
   {
     id: 'zone1',
     chapter: 'I',
-    name: 'A Dim Island',
+    name: 'Fracture Reach',
     zone: 'zone1',
-    blurb: 'A small settlement on a dim island under an open sky. The broken loom has connected warriors from two worlds here, the Azure Crown and the Sanguine Dominion, who would never meet naturally.',
-    map: { x: 300, y: 152 },
+    blurb: 'A farming settlement in the reach of the rift, under an open sky. The broken loom has connected warriors from two worlds here, the Azure Crown and the Sanguine Dominion, who would never meet naturally.',
+    map: { x: 322, y: 198 },
     stages: [
       {
         id: '1-1',
@@ -92,20 +95,20 @@ export const LOCATIONS: LocationDef[] = [
       },
       {
         id: '1-10',
-        blurb: 'Leaving the island, on to the next area.',
+        blurb: 'Leaving the reach, on to the next area.',
         enemies: [{ champion: 'captain_gareth', boss: true }, { champion: 'rime_scholar' }, { champion: 'rime_scholar' }],
         power: 0.59,
       },
     ],
   },
   {
-    // Zone 2 of the notes (DESIGN_DECISIONS.md 5.4): a node on the map, its stages not designed yet
+    // Zone 2 of the notes (DESIGN_DECISIONS.md 5.4): a node on the map, its stages and its art not designed yet
     id: 'zone2',
     chapter: 'II',
-    name: 'A Mystic Arena',
-    blurb: 'A mystic arena in a deep forest, inside Court of Root territory.',
+    name: 'Verdant Grove',
+    blurb: 'A grove deep in the forest, inside Court of Root territory.',
     requires: '1-10',
-    map: { x: 1040, y: 152 },
+    map: { x: 722, y: 206 },
     stages: [],
   },
 ];

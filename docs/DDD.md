@@ -97,7 +97,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Collection | every champion, owned or locked | `CollectionScreen` |
 | Open / cleared / locked | a stage the player may fight / has won / may not fight yet | `stageOpen`, `cleared` |
 | Frontier | the newest playable stage | `frontier()` |
-| World map, overview | the campaign map in world pixels (1280x360), scrolled sideways under a camera: the campaign is a line of areas crossed from left to right; the overview draws the same world on one screen | `WORLD_MAP`, `CampaignScreen` |
+| World map, overview | the campaign map in world pixels (960x360, growing east area by area), scrolled sideways under a camera: the campaign is a line of areas crossed from left to right; the overview draws the same world on one screen | `WORLD_MAP`, `CampaignScreen` |
 | Stars | 3, 2 or 1 by champions lost; the best is kept | `starsFor`, `MasterArchivist.stars` |
 | Master Archivist | the player and their save: stars, last team, Academy chapters read, settings, and the Reliquary | `MasterArchivist`, `loadArchivist`, `saveArchivist`, `readSave`, `writeSave` |
 | Fresh (NEW) | recruited, not yet opened on the champion page | `HeroSoulFile.fresh`, `isFresh`, `Reliquary.markSeen` |

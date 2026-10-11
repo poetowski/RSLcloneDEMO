@@ -1,4 +1,4 @@
-// Zone "A Dim Island": Zone 1 of Jakub's working notes (docs/DESIGN_DECISIONS.md
+// Zone "Fracture Reach": Zone 1 of Jakub's working notes (docs/DESIGN_DECISIONS.md
 // 5.3, 5.5), redesigned on his brief of 2026-10-11: less symmetrical, more
 // broken; autumn on the ground, the light of dawn. The morning after a raid on
 // the island's farm. On the left a stubble field with its sheaves behind a
@@ -1374,7 +1374,7 @@ function sparks(): SparkEmitter[] {
 
 export const zone1: ZoneArt = {
   id: 'zone1',
-  name: 'A Dim Island',
+  name: 'Fracture Reach',
   tiles: P,
   backdrop: () => backdrop(),
   props: () => ({

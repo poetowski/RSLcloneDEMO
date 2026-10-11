@@ -244,7 +244,7 @@ Spread: roles Damage 1, Support 1, Tank 0; affinities Ember 1, Tide 1, Bloom 0; 
 
 ### ME4 The campaign
 
-Zone 1, *A Dim Island*, from Jakub's working notes (DESIGN_DECISIONS.md 5.3, not locked). Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed, so the leans are thin: the warrior copies are Ember, the support copies Tide.
+Zone 1, the *Fracture Reach*, from Jakub's working notes (DESIGN_DECISIONS.md 5.3, not locked). Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed, so the leans are thin: the warrior copies are Ember, the support copies Tide.
 
 | Stage | Enemies | Power | Kind | Lean (Ember / Tide attackers) | First introduces |
 | --- | --- | --- | --- | --- | --- |
@@ -529,6 +529,7 @@ Record every change that moves a dynamic out of its band, changes a band, or cha
 | 2026-10-11 | Jakub's Weaver Matrix record (DESIGN_DECISIONS.md 9): the slots named Zenith, East Meridian, East Horizon, Nadir, West Horizon, West Meridian; the fixed slots take flat ATK, DEF and HP, the choice slots a base stat in % or their own (SPD; C.RATE or C.DMG; ACC or RES); his eight core Weave Patterns replace the draft ones, each 2-piece and adding one stat per weave. New stats: C.DMG (every champion 100%, so crits still deal double), ACC and RES (no rule uses them yet, T15) | AE1, AE3 | none in play: spools have no sources, so the curve and the impact measure are unchanged (`npm run balance` all ok) | crit x2 -> x (1 + C.DMG); draft patterns -> core patterns | set by Jakub; the spool values, strands and the reading of the pattern values are stand-ins |
 | 2026-10-11 | Accuracy against Resistance (Jakub: "ACC and RES works for detrimental effects. If you want to place debuff on enemy, your acc is compared against enemy res."): a debuff on an enemy keeps its chance while ACC is at least RES, else x 100 / (100 + RES - ACC), a stand-in curve; Cold Rebuke's Freeze included. T15 resolved | AE1, AE4 | none in play: every champion has ACC 0 and RES 0 and spools have no sources (`npm run balance` unchanged, stage for stage) | debuffs on a flat chance -> the chance cut by RES over ACC | set by Jakub; the curve is a stand-in |
 | 2026-10-11 | DESIGN_DECISIONS.md cleaned up into the living record: a change list, section 4 pointing to 8, answered questions closed, section 7 refreshed (with the defaults he never set: team size, acquisition, zone names), and the earlier approvals recorded there (gear, combat rules, name, direction, lexicon) | AE5 | none | - | Jakub: "cleanup docs" |
+| 2026-10-11 | Zone 1 named the Fracture Reach and Zone 2 the Verdant Grove (not about an arena); the world map redrawn on Jakub's brief: the land fills the map with forest along both edges, the rift diagonal with dark cracks fanning out and land floating in it, the village reworked in its fields, the two nodes 400 px apart instead of 740, the map 960 px wide and growing east area by area | AE5, AE6 | none: the same stages | 1280 px with void north and south -> 960 px of land | set by Jakub; the village's buildings, the ruins and the floating land are first takes |
 
 ## 10. Keeping this document true
 

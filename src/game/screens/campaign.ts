@@ -2,7 +2,7 @@
 // opens the area's stage list in a panel over the map: every stage with its
 // stars, its lock or the boss crown, and for the selected stage its story, the
 // enemy line-up, the reward and the way into team select. Stages have no place
-// on the map of their own. The world is two screens wide and scrolls sideways:
+// on the map of their own. The world is wider than the screen and scrolls sideways:
 // a camera follows the keyboard focus from node to node, the map can be dragged
 // or slid with W A S D (or Shift + arrows), and M shows the whole world at once.
 import { H, W } from '../../engine/screen';
