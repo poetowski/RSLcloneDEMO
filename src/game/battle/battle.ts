@@ -79,7 +79,6 @@ export interface SkillResult {
 }
 
 export const TURN_FULL = 100;
-const CRIT_MULT = 2;
 const POISON_PCT = 0.05;
 const BURN_PCT = 0.06;
 const REGEN_PCT = 0.075;
@@ -381,7 +380,8 @@ export class Battle {
     dmg *= 1 + edge * AFFINITY_BONUS;
     if (this.has(t, 'weaken')) dmg *= WEAKEN_MULT;
     if (s.execute && t.hp / t.maxHp < s.execute.below) dmg *= s.execute.mult;
-    if (crit) dmg *= CRIT_MULT;
+    // a critical hit adds the attacker's critical damage (1 = +100%: double damage)
+    if (crit) dmg *= 1 + a.stats.critDmg;
     dmg *= this.rng.range(0.92, 1.08);
     return { amount: Math.max(1, Math.round(dmg)), crit, edge };
   }

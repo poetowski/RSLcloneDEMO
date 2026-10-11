@@ -4,7 +4,7 @@
 // keep proving the rules whatever the roster becomes.
 import { Affinity, ChampionDef, PassiveDef, SkillDef, Stats } from '../src/game/data/types';
 
-const BASE: Stats = { hp: 1200, atk: 100, def: 60, spd: 100, crit: 0.05 };
+const BASE: Stats = { hp: 1200, atk: 100, def: 60, spd: 100, crit: 0.05, critDmg: 1, acc: 0, res: 0 };
 
 /** A skill with test defaults: one full hit on one enemy, the slot's usual cooldown. */
 export function skill(id: string, slot: 1 | 2 | 3, o: Partial<SkillDef> = {}): SkillDef {

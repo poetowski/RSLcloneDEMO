@@ -9,43 +9,43 @@ import { recruitStage, STARTERS } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../data/meta';
 import { STAT_LIMITS } from '../data/norms';
-import { ATTUNE_BONUS, GRADES, MATRIX_LAYOUT, PATTERN_NAMES } from '../data/matrix';
-import { ChampionDef, StatId, StatNode } from '../data/types';
+import { ATTUNE_BONUS, CORE_WEAVE_PATTERNS, GRADES, MATRIX_LAYOUT, pattern, patternBonusText, SLOT_NAMES, SPOOL_STAT_NAME, STAT_NAME } from '../data/matrix';
+import { ChampionDef, SpoolStat, StatId, StatNode } from '../data/types';
 import { homeZone } from '../data/zones';
-import { attunedStats, fits, sameSpool, SlotIndex, StatBonus, strandValue, ThreadSpool, WeaverMatrix, wovenStats } from '../reliquary/matrix';
+import { attunedStats, fits, sameSpool, SlotIndex, StatBonus, strandValue, ThreadSpool, WeavePatternEvaluator, WeaverMatrix, wovenStats } from '../reliquary/matrix';
 import { COLORS } from '../ui/ui';
 import { blit, nine } from '../view/assets';
 import { drawChampion, frameAt } from '../view/unit';
 import { BaseScreen, Diorama } from './base';
 
 type Tab = 'skills' | 'stats' | 'matrix' | 'lore';
-const STAT: Record<StatId, string> = { hp: 'HP', atk: 'ATK', def: 'DEF', spd: 'SPD', crit: 'CRIT' };
-/** text colour of each pattern: the light step of its spool's thread */
+/** text colour of each pattern: the light step of its spool's thread (tools/art/ui/matrix.ts); Pulse a step deeper, apart from Needle's gold */
 const PATTERN_TINT: Record<string, string> = {
-  lifethread: '#a2f56a', tension: '#ffd060', selvage: '#dff2ff', glint: '#ff8ad0', quickweft: '#ffe890', fraybite: '#d89cff', bloodweft: '#ff6a5a', wardknot: '#90f5e2',
+  pattern_pulse: '#ffa030', pattern_sunder: '#ff6a5a', pattern_ward: '#9fd0ff', pattern_vigor: '#a2f56a',
+  pattern_needle: '#ffe890', pattern_apex: '#ff8ad0', pattern_focus: '#d89cff', pattern_tranquility: '#6ad8bc',
 };
 /** grade name colour: the cap metal */
 const GRADE_TINT = ['#a08a7a', '#cfd8e6', '#efc04a'];
+const patternName = (id: string) => pattern(id)?.name ?? id;
 
-/** "ATK +7%", "SPD +3" */
-function statText(s: StatId, v: number): string {
-  return s === 'spd' ? `${STAT[s]} +${v}` : `${STAT[s]} +${v}%`;
+/** "ATK +8", "ATK % +7%", "C.DMG +10%", "ACC +14" */
+function statText(s: SpoolStat, v: number): string {
+  const pct = s === 'atkPct' || s === 'hpPct' || s === 'defPct' || s === 'crit' || s === 'critDmg';
+  return `${SPOOL_STAT_NAME[s].replace(' %', '')} +${v}${pct ? '%' : ''}`;
 }
 
-/** What a slot takes: "DEF", "SPD, or ATK, HP or DEF %", "ATK, HP or DEF %". */
+/** What a slot takes: "flat ATK", "SPD or a base stat in %", "C.RATE, C.DMG or a base stat in %". */
 function ruleText(n: StatNode): string {
-  if (n.kind === 'fixed') return STAT[n.stat];
-  const special = n.stats.filter((s) => s === 'spd' || s === 'crit');
-  const p = n.stats.filter((s) => s !== 'spd' && s !== 'crit').map((s) => STAT[s]);
-  const pct = `${p.slice(0, -1).join(', ')} or ${p[p.length - 1]} %`;
-  return special.length ? `${special.map((s) => STAT[s]).join(', ')}, or ${pct}` : pct;
+  if (n.kind === 'fixed') return `flat ${SPOOL_STAT_NAME[n.stat]}`;
+  const special = n.stats.filter((s) => s !== 'atkPct' && s !== 'hpPct' && s !== 'defPct').map((s) => SPOOL_STAT_NAME[s]);
+  return `${special.join(', ')} or a base stat in %`;
 }
 
-/** The rule written inside an empty slot. */
+/** The rule written inside an empty slot: its own stats, one a line, then "or %". */
 function emptyLabel(n: StatNode): string[] {
-  if (n.kind === 'fixed') return [STAT[n.stat]];
-  const special = n.stats.find((s) => s === 'spd' || s === 'crit');
-  return special ? [STAT[special], 'or %'] : ['%'];
+  if (n.kind === 'fixed') return [SPOOL_STAT_NAME[n.stat]];
+  const special = n.stats.filter((s) => s !== 'atkPct' && s !== 'hpPct' && s !== 'defPct');
+  return [...(special.includes('crit') ? ['CRIT'] : special.map((s) => SPOOL_STAT_NAME[s])), 'or %'];
 }
 
 /** A strand as it counts in its slot: "ATK +2% +1" when attuned. */
@@ -54,6 +54,10 @@ function strandText(m: WeaverMatrix, i: SlotIndex, st: StatBonus): string {
   return `${statText(st.stat, st.value)}${extra ? ` +${extra}` : ''}`;
 }
 
+/** A champion stat's value as shown: "1150", "2.5%", "100%". */
+function statValue(k: StatId, v: number): string {
+  return k === 'crit' || k === 'critDmg' ? `${Math.round(v * 1000) / 10}%` : String(v);
+}
 
 export class ChampionScreen extends BaseScreen {
   private c: ChampionDef;
@@ -201,7 +205,7 @@ export class ChampionScreen extends BaseScreen {
     else this.lore(ctx, bx, by, bwid);
   }
 
-  /** The Weaver Matrix: the rose of six slots, the chosen slot's spool, the stats it gives and the stock. */
+  /** The Weaver Matrix: the rose of six slots, the chosen slot's spool, the woven patterns, the stats it gives and the stock. */
   private matrix(ctx: CanvasRenderingContext2D, x: number, y: number, w: number) {
     const ui = this.ui;
     const img = this.a.ui.img;
@@ -212,7 +216,11 @@ export class ChampionScreen extends BaseScreen {
     const sel = this.slot;
     const isFixed = (i: number) => m.slots[i].node.kind === 'fixed';
     const grade = (s: ThreadSpool) => GRADES[s.grade];
-    const name = (s: ThreadSpool) => PATTERN_NAMES[s.pattern as keyof typeof PATTERN_NAMES] ?? s.pattern;
+    const name = (s: ThreadSpool) => patternName(s.pattern);
+    const spoolBody = (s: ThreadSpool) => {
+      const p = pattern(s.pattern);
+      return `${grade(s)}. Main ${statText(s.main.stat, s.main.value)}; strands ${s.strands.map((st) => statText(st.stat, st.value)).join(', ')}.${p ? ` ${p.pieces} ${p.name} spools weave ${patternBonusText(p)}.` : ''}`;
+    };
 
     // the rose: the fixed triangle in gold, the choice triangle in arcane light
     const rx = x, ry = y - 2, half = 72;
@@ -228,7 +236,8 @@ export class ChampionScreen extends BaseScreen {
       if (s) blit(ctx, img, ui.part(`spool_${s.pattern}_${s.grade}`), lx - 9, ly - 9);
       else {
         const lines = emptyLabel(slot.node);
-        lines.forEach((t, k) => ui.text(ctx, t, lx, ly - (lines.length === 1 ? 4 : 9) + k * 10, { color: isFixed(i) ? '#c8a050' : '#7fb4f0', align: 'center' }));
+        const pitch = lines.length > 2 ? 9 : 10, top = ly - 4 - Math.floor(((lines.length - 1) * pitch) / 2);
+        lines.forEach((t, k) => ui.text(ctx, t, lx, top + k * pitch, { color: isFixed(i) ? '#c8a050' : '#7fb4f0', align: 'center' }));
       }
       if (i === sel) blit(ctx, img, ui.part('lobe_sel'), lx - 23, ly - 23);
       else if (neighbours.includes(i)) blit(ctx, img, ui.part('lobe_attune'), lx - 23, ly - 23);
@@ -236,54 +245,54 @@ export class ChampionScreen extends BaseScreen {
         id: `mx_slot_${i}`, x: lx - 18, y: ly - 18, w: 36, h: 36,
         click: () => (this.slot = i as SlotIndex),
         tip: () => (s
-          ? { title: `Slot ${i + 1}: ${name(s)} spool`, body: `${grade(s)}. Main ${statText(s.main.stat, s.main.value)}; strands ${s.strands.map((st) => strandText(m, i as SlotIndex, st)).join(', ')}.`, color: PATTERN_TINT[s.pattern] }
-          : { title: `Slot ${i + 1}: empty`, body: `${isFixed(i) ? 'Fixed' : 'Choice'} slot. Takes ${ruleText(slot.node)}.` }),
+          ? { title: `${SLOT_NAMES[i]}: ${name(s)} spool`, body: `${grade(s)}. Main ${statText(s.main.stat, s.main.value)}; strands ${s.strands.map((st) => strandText(m, i as SlotIndex, st)).join(', ')}.`, color: PATTERN_TINT[s.pattern] }
+          : { title: `${SLOT_NAMES[i]}: empty`, body: `${isFixed(i) ? 'Fixed' : 'Choice'} slot. Takes ${ruleText(slot.node)}.` }),
       });
     });
     const gem = ui.part('gem_' + c.affinity);
     blit(ctx, img, gem, rx + half - Math.floor(gem[2] / 2), ry + half - Math.floor(gem[3] / 2));
 
-    // stats with the matrix, under the rose
-    const sy = y + 150;
+    // stats with the matrix, under the rose, in two columns
+    const sy = y + 148;
     ui.text(ctx, 'WITH MATRIX', x, sy, { color: COLORS.goldHi, variant: 'bold' });
     const base = c.stats, wov = wovenStats(base, m);
-    const pct = (k: number) => `${Math.round(k * 1000) / 10}%`;
-    const rows: [string, string, number, string][] = [
-      ['HP', String(wov.hp), wov.hp - base.hp, `+${wov.hp - base.hp}`],
-      ['ATK', String(wov.atk), wov.atk - base.atk, `+${wov.atk - base.atk}`],
-      ['DEF', String(wov.def), wov.def - base.def, `+${wov.def - base.def}`],
-      ['SPD', String(wov.spd), wov.spd - base.spd, `+${wov.spd - base.spd}`],
-      ['CRIT', pct(wov.crit), wov.crit - base.crit, `+${Math.round((wov.crit - base.crit) * 1000) / 10}`],
-    ];
-    rows.forEach(([n, v, d, dt], i) => {
-      const yy = sy + 13 + i * 11;
-      ui.text(ctx, n, x, yy, { color: COLORS.dim, variant: 'bold' });
-      ui.text(ctx, v, x + 76, yy, { color: COLORS.text, align: 'right' });
-      if (d > 1e-9) ui.text(ctx, dt, x + 82, yy, { color: COLORS.good });
+    const cols: StatId[][] = [['hp', 'atk', 'def', 'spd'], ['crit', 'critDmg', 'acc', 'res']];
+    cols.forEach((keys, ci) => {
+      const cx0 = x + ci * 78;
+      keys.forEach((k, ri) => {
+        const yy = sy + 13 + ri * 11;
+        const up = wov[k] - base[k] > 1e-9;
+        ui.text(ctx, STAT_NAME[k], cx0, yy, { color: COLORS.dim, variant: 'bold' });
+        ui.text(ctx, statValue(k, wov[k]), cx0 + 72, yy, { color: up ? COLORS.good : COLORS.text, align: 'right' });
+        ui.regions.push({
+          x: cx0, y: yy - 1, w: 74, h: 11,
+          tip: () => ({ title: STAT_NAME[k], sub: `base ${statValue(k, base[k])}${up ? `, with the matrix ${statValue(k, wov[k])}` : ''}`, body: k === 'acc' || k === 'res' ? 'Carried and shown; no battle rule uses it yet.' : k === 'critDmg' ? 'What a critical hit adds: 100% is double damage.' : '' }),
+        });
+      });
     });
 
     // the chosen slot and its spool
-    const x2 = x + 154, cw = w - 154;
+    const x2 = x + 158, cw = w - 158;
     const node = m.slots[sel].node;
-    ui.text(ctx, `SLOT ${sel + 1}`, x2, y, { color: isFixed(sel) ? COLORS.gold : '#5aa8ff', variant: 'bold' });
-    ui.text(ctx, isFixed(sel) ? 'FIXED' : 'CHOICE', x2 + ui.measure(`SLOT ${sel + 1}`, 'bold') + 6, y, { color: COLORS.faint, variant: 'bold' });
+    ui.text(ctx, SLOT_NAMES[sel].toUpperCase(), x2, y, { color: isFixed(sel) ? COLORS.gold : '#5aa8ff', variant: 'bold' });
+    ui.text(ctx, isFixed(sel) ? 'FIXED' : 'CHOICE', x2 + ui.measure(SLOT_NAMES[sel].toUpperCase(), 'bold') + 6, y, { color: COLORS.faint, variant: 'bold' });
     ui.text(ctx, `Takes ${ruleText(node)}`, x2, y + 11, { color: COLORS.dim });
     const tuned = attunedStats(m, sel);
-    if (tuned.length) ui.text(ctx, `Attuned: ${tuned.map((s) => STAT[s]).join(' and ')} strands +${ATTUNE_BONUS}`, x2, y + 22, { color: '#c8a050' });
-    const py = y + 36, ph = 88;
+    if (tuned.length) ui.text(ctx, `Attuned: ${tuned.map((s) => STAT_NAME[s]).join(' and ')} strands +${ATTUNE_BONUS}`, x2, y + 22, { color: '#c8a050' });
+    const py = y + 34, ph = 70;
     ui.panel(ctx, 'dark', x2, py, cw, ph);
     const held = m.slots[sel].spool;
     if (held) {
-      blit(ctx, img, ui.part(`spool_${held.pattern}_${held.grade}`), x2 + 8, py + 8);
-      ui.text(ctx, name(held).toUpperCase(), x2 + 30, py + 8, { color: PATTERN_TINT[held.pattern], variant: 'bold' });
-      ui.text(ctx, grade(held).toUpperCase(), x2 + 30, py + 19, { color: GRADE_TINT[held.grade] });
-      ui.text(ctx, 'MAIN', x2 + 10, py + 36, { color: COLORS.faint, variant: 'bold' });
-      ui.text(ctx, statText(held.main.stat, held.main.value), x2 + 44, py + 32, { color: COLORS.goldHi, variant: 'display' });
-      ui.text(ctx, 'STRANDS', x2 + 10, py + 56, { color: COLORS.faint, variant: 'bold' });
+      blit(ctx, img, ui.part(`spool_${held.pattern}_${held.grade}`), x2 + 8, py + 7);
+      ui.text(ctx, name(held).toUpperCase(), x2 + 30, py + 6, { color: PATTERN_TINT[held.pattern], variant: 'bold' });
+      ui.text(ctx, grade(held).toUpperCase(), x2 + 30, py + 16, { color: GRADE_TINT[held.grade] });
+      // two columns: the main stat, and the strands one a line
+      const tx = x2 + 88;
+      ui.text(ctx, 'MAIN', x2 + 10, py + 28, { color: COLORS.faint, variant: 'bold' });
+      ui.text(ctx, statText(held.main.stat, held.main.value), x2 + 10, py + 38, { color: COLORS.goldHi, variant: 'bold' });
+      ui.text(ctx, 'STRANDS', tx, py + 28, { color: COLORS.faint, variant: 'bold' });
       held.strands.forEach((st, k) => {
-        const line = statText(st.stat, st.value);
-        ui.text(ctx, line, x2 + 70, py + 56 + k * 11, { color: COLORS.text });
-        if (strandValue(m, sel, st) > st.value) ui.text(ctx, `+${ATTUNE_BONUS} ATTUNED`, x2 + 70 + ui.measure(line) + 6, py + 56 + k * 11, { color: COLORS.gold });
+        ui.text(ctx, strandText(m, sel, st), tx, py + 38 + k * 10, { color: strandValue(m, sel, st) > st.value ? COLORS.gold : COLORS.text });
       });
       if (own) {
         ui.button(ctx, 'mx_out', x2 + cw - 72, py + 6, 64, 16, 'TAKE OUT', {
@@ -295,9 +304,41 @@ export class ChampionScreen extends BaseScreen {
         });
       }
     } else {
-      ui.text(ctx, 'EMPTY', x2 + 10, py + 10, { color: COLORS.faint, variant: 'bold' });
-      ui.para(ctx, own ? 'Pick a spool from the stock below. It keeps the slot until you take it out.' : `Recruit ${c.name} to weave a matrix.`, x2 + 10, py + 24, cw - 20, { color: COLORS.dim }, 10);
+      ui.text(ctx, 'EMPTY', x2 + 10, py + 8, { color: COLORS.faint, variant: 'bold' });
+      ui.para(ctx, own ? 'Pick a spool from the stock below. It keeps the slot until you take it out.' : `Recruit ${c.name} to weave a matrix.`, x2 + 10, py + 22, cw - 20, { color: COLORS.dim }, 10);
     }
+
+    // the woven patterns: what every complete set adds, on up to two lines
+    const wy = py + ph + 5, wx0 = x2 + ui.measure('WOVEN', 'bold') + 6, wEnd = x2 + cw - 4;
+    const pieces = CORE_WEAVE_PATTERNS[0].pieces;
+    ui.text(ctx, 'WOVEN', x2, wy, { color: COLORS.goldHi, variant: 'bold' });
+    ui.regions.push({
+      x: x2, y: wy - 1, w: wx0 - x2 - 2, h: 11,
+      tip: () => ({ title: 'Weave Patterns', body: `Every ${pieces} spools of one pattern, wherever they sit, weave it once: ${CORE_WEAVE_PATTERNS.map((p) => `${p.name} ${patternBonusText(p)}`).join(', ')}.` }),
+    });
+    const woven = new WeavePatternEvaluator(CORE_WEAVE_PATTERNS).evaluate(m);
+    if (!woven.length) ui.text(ctx, `none: ${pieces} spools of one pattern`, wx0, wy, { color: COLORS.faint });
+    const flow = (labels: string[]) => {
+      let lx = wx0, row = 0;
+      return labels.map((label) => {
+        const lw = ui.measure(label);
+        if (lx > wx0 && lx + lw > wEnd) {
+          lx = wx0;
+          row++;
+        }
+        const at = { label, x: lx, y: wy + row * 10, w: lw };
+        lx += lw + 8;
+        return at;
+      });
+    };
+    // names and bonuses when they fit on two lines, else the bonuses alone (the names are in the tooltips)
+    let placed = flow(woven.map((wp) => `${wp.pattern.name}${wp.times > 1 ? ` x${wp.times}` : ''} ${patternBonusText(wp.pattern, wp.times)}`));
+    if (placed.some((p) => p.y > wy + 10)) placed = flow(woven.map((wp) => patternBonusText(wp.pattern, wp.times)));
+    placed.forEach((at, k) => {
+      const wp = woven[k];
+      ui.text(ctx, at.label, at.x, at.y, { color: PATTERN_TINT[wp.pattern.id] });
+      ui.regions.push({ x: at.x, y: at.y - 1, w: at.w, h: 11, tip: () => ({ title: wp.pattern.name, sub: `${wp.pattern.pieces}-piece Weave Pattern, woven ${wp.times} time${wp.times > 1 ? 's' : ''}`, body: `${patternBonusText(wp.pattern)} for every ${wp.pattern.pieces} ${wp.pattern.name} spools, wherever they sit.`, color: PATTERN_TINT[wp.pattern.id] }) });
+    });
 
     // the stock: spools that fit the chosen slot are lit, the others dimmed
     const groups: { s: ThreadSpool; n: number }[] = [];
@@ -307,12 +348,13 @@ export class ChampionScreen extends BaseScreen {
       else groups.push({ s, n: 1 });
     }
     groups.sort((a, b) => Number(fits(node, b.s)) - Number(fits(node, a.s)) || b.s.grade - a.s.grade);
-    const ky = y + 130, per = 8, max = per * 3;
+    const ky = wy + 24, per = 8, max = per * 3;
     ui.text(ctx, 'STOCK', x2, ky, { color: COLORS.goldHi, variant: 'bold' });
-    const total = rel.spools().length;
-    ui.text(ctx, total ? `${total} spools, lit ones fit slot ${sel + 1}` : 'empty', x2 + ui.measure('STOCK', 'bold') + 6, ky, { color: COLORS.faint });
+    const total = rel.spools().length, sx0 = x2 + ui.measure('STOCK', 'bold') + 6;
+    const lit = [`${total} spools, lit ones fit ${SLOT_NAMES[sel]}`, `${total} spools, lit ones fit the slot`].find((t) => sx0 + ui.measure(t) <= x2 + cw - 4);
+    ui.text(ctx, total ? (lit ?? `${total} spools`) : 'empty', sx0, ky, { color: COLORS.faint });
     groups.slice(0, max).forEach(({ s, n }, i) => {
-      const gx = x2 + (i % per) * 23, gy = ky + 12 + Math.floor(i / per) * 22;
+      const gx = x2 + (i % per) * 22, gy = ky + 11 + Math.floor(i / per) * 21;
       const ok = fits(node, s);
       ctx.save();
       if (!ok) ctx.globalAlpha = 0.3;
@@ -327,7 +369,7 @@ export class ChampionScreen extends BaseScreen {
         } : undefined,
         tip: () => ({
           title: `${name(s)} spool`,
-          body: `${grade(s)}. Main ${statText(s.main.stat, s.main.value)}; strands ${s.strands.map((st) => statText(st.stat, st.value)).join(', ')}. ${ok ? `Fits slot ${sel + 1}.` : `Slot ${sel + 1} cannot take ${STAT[s.main.stat]}.`}`,
+          body: `${spoolBody(s)} ${ok ? `Fits ${SLOT_NAMES[sel]}.` : `${SLOT_NAMES[sel]} cannot take ${SPOOL_STAT_NAME[s.main.stat]}.`}`,
           color: PATTERN_TINT[s.pattern],
         }),
       });
@@ -335,7 +377,7 @@ export class ChampionScreen extends BaseScreen {
     if (groups.length > max) ui.text(ctx, `+${groups.length - max} more`, x2 + cw - 4, ky, { color: COLORS.faint, align: 'right' });
 
     // legend
-    const ly0 = y + 212;
+    const ly0 = y + 214;
     const key = (lx: number, color: string, label: string, dotted = false) => {
       ctx.fillStyle = color;
       if (dotted) for (let k = 0; k < 7; k += 2) ctx.fillRect(lx + k, ly0 + 2, 1, 5);
@@ -346,7 +388,6 @@ export class ChampionScreen extends BaseScreen {
     let kx = key(x2, COLORS.gold, 'fixed');
     kx = key(kx, '#5aa8ff', 'choice');
     key(kx, COLORS.gold, 'attunes', true);
-    void w;
   }
 
   private skills(ctx: CanvasRenderingContext2D, x: number, y: number, w: number) {
@@ -386,17 +427,29 @@ export class ChampionScreen extends BaseScreen {
       ['ATK', st.atk, STAT_LIMITS.atk, '#ff8a5a', 'Attack: the base of every damaging skill.'],
       ['DEF', st.def, STAT_LIMITS.def, '#5aa8ff', 'Defense: damage taken is multiplied by 40 / DEF. Twice the DEF, half the damage.'],
       ['SPD', st.spd, STAT_LIMITS.spd, '#ffe070', 'Speed: how fast the Turn Meter fills.'],
-      ['CRIT', st.crit, STAT_LIMITS.crit, '#ff5ac0', 'Critical rate: chance for each hit to deal double damage.'],
+      ['C.RATE', st.crit, STAT_LIMITS.crit, '#ff5ac0', 'Critical rate: the chance of each hit to be critical.'],
     ];
     rows.forEach(([name, val, [lo, hi], color, tip], i) => {
-      const cy = y + i * 20;
+      const cy = y + i * 17;
       ui.text(ctx, name, x, cy + 2, { color: COLORS.dim, variant: 'bold' });
       const k = 0.15 + ((val - lo) / (hi - lo)) * 0.85;
-      ui.bar(ctx, x + 40, cy + 3, w - 100, 6, k, color, '#ffffff');
-      ui.text(ctx, name === 'CRIT' ? `${Math.round(val * 100)}%` : String(val), x + w, cy + 2, { color: COLORS.text, align: 'right' });
-      ui.regions.push({ x, y: cy, w, h: 16, tip: () => ({ title: name, body: tip }) });
+      ui.bar(ctx, x + 48, cy + 3, w - 108, 6, k, color, '#ffffff');
+      ui.text(ctx, name === 'C.RATE' ? statValue('crit', val) : String(val), x + w, cy + 2, { color: COLORS.text, align: 'right' });
+      ui.regions.push({ x, y: cy, w, h: 14, tip: () => ({ title: name, body: tip }) });
     });
-    let cy = y + 108;
+    // the stats with no budget yet: critical damage, accuracy, resistance
+    const extra: [StatId, string][] = [
+      ['critDmg', 'Critical damage: what a critical hit adds. 100% is double damage.'],
+      ['acc', 'Accuracy. Carried by spools and patterns; no battle rule uses it yet.'],
+      ['res', 'Resistance. Carried by spools and patterns; no battle rule uses it yet.'],
+    ];
+    extra.forEach(([k, tip], i) => {
+      const ex = x + i * Math.floor(w / 3);
+      ui.text(ctx, STAT_NAME[k], ex, y + 88, { color: COLORS.dim, variant: 'bold' });
+      ui.text(ctx, statValue(k, st[k]), ex + ui.measure(STAT_NAME[k], 'bold') + 6, y + 88, { color: COLORS.text });
+      ui.regions.push({ x: ex, y: y + 86, w: Math.floor(w / 3) - 4, h: 13, tip: () => ({ title: STAT_NAME[k], body: tip }) });
+    });
+    let cy = y + 112;
     const aff = AFFINITIES[this.c.affinity];
     const beats = AFFINITIES[aff.beats].name;
     const loses = Object.values(AFFINITIES).find((a) => a.beats === this.c.affinity)?.name;

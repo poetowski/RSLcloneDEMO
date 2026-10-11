@@ -29,7 +29,7 @@ describe('damage rules', () => {
     expect(total(withStats(twin, { def: 40 })) / total(withStats(twin, { def: 80 }))).toBeCloseTo(2, 1);
   });
 
-  it('doubles damage on a critical hit', () => {
+  it("adds the attacker's critical damage on a critical hit: 100% doubles it", () => {
     const always = withStats(striker, { crit: 1 }), never = withStats(striker, { crit: 0 });
     const hit = (actor: ChampionDef) => {
       const b = new Battle(combatants([actor]), combatants([twin]), { seed: 5 });
@@ -39,6 +39,10 @@ describe('damage rules', () => {
     const a = hit(always), n = hit(never);
     expect(a?.kind === 'damage' && a.crit).toBe(true);
     expect(a?.kind === 'damage' && n?.kind === 'damage' && a.amount / n.amount).toBeCloseTo(2, 1);
+    for (const critDmg of [0.5, 1.2]) {
+      const c = hit(withStats(striker, { crit: 1, critDmg }));
+      expect(c?.kind === 'damage' && n?.kind === 'damage' && c.amount / n.amount).toBeCloseTo(1 + critDmg, 1);
+    }
   });
 
   it('uses the stats a combatant brings, as a Weaver Matrix gives them', () => {

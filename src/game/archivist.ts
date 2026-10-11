@@ -5,7 +5,7 @@
 // (private windows) and the game must still run.
 import { LOCATIONS, STARTERS, allStages, stage } from './data/campaign';
 import { champion, CHAMPIONS } from './data/champions';
-import { MATRIX_LAYOUT } from './data/matrix';
+import { MATRIX_LAYOUT, PATTERN_IDS } from './data/matrix';
 import { LocationDef, Stats } from './data/types';
 import { wovenStats } from './reliquary/matrix';
 import { Reliquary, ReliquaryJson } from './reliquary/reliquary';
@@ -66,7 +66,7 @@ export function readSave(raw: string | null, rawOld: string | null = null): Mast
     if (raw) {
       const s = JSON.parse(raw) as Partial<SaveJson>;
       if (s.version !== 3) return a;
-      a.reliquary = Reliquary.fromJSON(s.reliquary ?? {}, MATRIX_LAYOUT);
+      a.reliquary = Reliquary.fromJSON(s.reliquary ?? {}, MATRIX_LAYOUT, PATTERN_IDS);
       a.stars = { ...s.stars };
       if (Array.isArray(s.team)) a.team = [...s.team];
       keepHabits(a, s);

@@ -6,36 +6,37 @@
 // docs/MECHANICS_GUIDE.md 14). Patterns and fixture layouts here are test
 // fixtures, not content.
 import { describe, expect, it } from 'vitest';
-import { MAIN_VALUE, MATRIX_LAYOUT, SPD_STRAND_CAP, STAT_IDS, STRAND_COUNT, STRAND_RANGE } from '../src/game/data/matrix';
-import { MatrixLayout, StatId, StatNode, WeavePatternDef } from '../src/game/data/types';
+import { CORE_WEAVE_PATTERNS, MAIN_VALUE, MATRIX_LAYOUT, SLOT_NAMES, SPD_STRAND_CAP, SPOOL_STATS, STRAND_COUNT, STRAND_RANGE, STRAND_STATS } from '../src/game/data/matrix';
+import { MatrixLayout, SpoolStat, StatNode, Stats, WeavePatternDef } from '../src/game/data/types';
 import {
   attunedStats, Grade, matrixBonus, rollSpool, sameSpool, SlotIndex, threadSpool, ThreadSpool, WeavePatternEvaluator, WeaverMatrix, wovenStats,
 } from '../src/game/reliquary/matrix';
 import { Reliquary, ReliquaryJson } from '../src/game/reliquary/reliquary';
 
-const ANY: StatNode = { kind: 'variable', stats: STAT_IDS };
+const ANY: StatNode = { kind: 'variable', stats: SPOOL_STATS };
 const OPEN: MatrixLayout = [ANY, ANY, ANY, ANY, ANY, ANY];
 /** A layout with rules: three fixed nodes, then three variable ones. */
 const MIXED: MatrixLayout = [
   { kind: 'fixed', stat: 'atk' },
   { kind: 'fixed', stat: 'def' },
   { kind: 'fixed', stat: 'hp' },
-  { kind: 'variable', stats: ['spd', 'atk', 'def'] },
-  { kind: 'variable', stats: ['crit', 'hp'] },
+  { kind: 'variable', stats: ['spd', 'atkPct', 'defPct'] },
+  { kind: 'variable', stats: ['crit', 'hpPct'] },
   ANY,
 ];
 const CATALOG: WeavePatternDef[] = [
-  { id: 'pair_a', name: 'Pair A', pieces: 2, desc: 'fixture' },
-  { id: 'quad', name: 'Quad', pieces: 4, desc: 'fixture' },
-  { id: 'pair_b', name: 'Pair B', pieces: 2, desc: 'fixture' },
+  { id: 'pair_a', name: 'Pair A', pieces: 2, bonus: { stat: 'spd', value: 0.1 } },
+  { id: 'quad', name: 'Quad', pieces: 4, bonus: { stat: 'atk', value: 0.2 } },
+  { id: 'pair_b', name: 'Pair B', pieces: 2, bonus: { stat: 'acc', value: 10 } },
 ];
+const BASE: Stats = { hp: 1000, atk: 100, def: 60, spd: 100, crit: 0.05, critDmg: 1, acc: 0, res: 0 };
 const evaluator = new WeavePatternEvaluator(CATALOG);
 const woven = (m: WeaverMatrix) => evaluator.evaluate(m).map((w) => `${w.pattern.id}x${w.times}`).join(',');
 
 /** A valid spool with the lowest strands, in a fixed order, unless strands are given. */
-function sp(pattern: string, stat: StatId, grade: Grade = 1, strands?: [StatId, number][]): ThreadSpool {
-  const order: StatId[] = ['hp', 'atk', 'def', 'crit', 'spd'].filter((s) => s !== stat) as StatId[];
-  const fill = order.slice(0, STRAND_COUNT[grade]).map((s): [StatId, number] => [s, s === 'spd' ? 1 : STRAND_RANGE[grade][0]]);
+function sp(pattern: string, stat: SpoolStat, grade: Grade = 1, strands?: [SpoolStat, number][]): ThreadSpool {
+  const order = STRAND_STATS.filter((s) => s !== stat);
+  const fill = order.slice(0, STRAND_COUNT[grade]).map((s): [SpoolStat, number] => [s, s === 'spd' ? 1 : STRAND_RANGE[grade][0]]);
   return threadSpool(pattern, grade, stat, strands ?? fill);
 }
 
@@ -61,38 +62,40 @@ describe('thread spools', () => {
     const a = sp('pair_a', 'atk');
     expect(sameSpool(a, sp('pair_a', 'atk'))).toBe(true);
     expect(sameSpool(a, sp('pair_b', 'atk'))).toBe(false);
-    expect(sameSpool(a, sp('pair_a', 'atk', 1, [['hp', 2], ['def', 1]]))).toBe(false);
+    expect(sameSpool(a, sp('pair_a', 'atk', 1, [['hpPct', 2], ['defPct', 1]]))).toBe(false);
     expect(sameSpool(a, sp('pair_a', 'atk', 2))).toBe(false);
     expect(Object.isFrozen(a) && Object.isFrozen(a.main) && Object.isFrozen(a.strands) && Object.isFrozen(a.strands[0])).toBe(true);
   });
 
   it('take their main value from the grade', () => {
-    for (const s of STAT_IDS) for (const g of [0, 1, 2] as Grade[]) expect(sp('pair_a', s, g).main.value).toBe(MAIN_VALUE[s][g]);
+    for (const s of SPOOL_STATS) for (const g of [0, 1, 2] as Grade[]) expect(sp('pair_a', s, g).main.value).toBe(MAIN_VALUE[s][g]);
   });
 
   it('carry one strand per grade step, never repeating a stat', () => {
     expect(sp('pair_a', 'atk', 0).strands).toHaveLength(1);
     expect(sp('pair_a', 'atk', 1).strands).toHaveLength(2);
     expect(sp('pair_a', 'atk', 2).strands).toHaveLength(3);
-    expect(() => threadSpool('pair_a', 1, 'atk', [['hp', 1]])).toThrow(); // too few
-    expect(() => threadSpool('pair_a', 0, 'atk', [['hp', 1], ['def', 1]])).toThrow(); // too many
-    expect(() => threadSpool('pair_a', 1, 'atk', [['atk', 1], ['hp', 1]])).toThrow(); // repeats the main stat
-    expect(() => threadSpool('pair_a', 1, 'atk', [['hp', 1], ['hp', 2]])).toThrow(); // repeats a strand
+    expect(() => threadSpool('pair_a', 1, 'atk', [['hpPct', 1]])).toThrow(); // too few
+    expect(() => threadSpool('pair_a', 0, 'atk', [['hpPct', 1], ['defPct', 1]])).toThrow(); // too many
+    expect(() => threadSpool('pair_a', 1, 'atkPct', [['atkPct', 1], ['hpPct', 1]])).toThrow(); // repeats the main stat
+    expect(() => threadSpool('pair_a', 1, 'atk', [['hpPct', 1], ['hpPct', 2]])).toThrow(); // repeats a strand
+    expect(() => threadSpool('pair_a', 1, 'atk', [['acc', 1], ['hpPct', 1]])).toThrow(); // ACC is never a strand
+    expect(() => threadSpool('pair_a', 1, 'atk', [['hp', 1], ['defPct', 1]])).toThrow(); // nor flat HP
   });
 
   it('keep strands inside the grade range, and a SPD strand is always +1', () => {
-    expect(() => threadSpool('pair_a', 0, 'atk', [['hp', 2]])).toThrow(); // Ashen rolls +1 only
-    expect(() => threadSpool('pair_a', 1, 'atk', [['hp', 3], ['def', 1]])).toThrow(); // Silver +1 to 2
-    expect(() => threadSpool('pair_a', 2, 'atk', [['hp', 3], ['def', 0], ['crit', 1]])).toThrow();
-    expect(() => threadSpool('pair_a', 2, 'atk', [['hp', 1.5], ['def', 1], ['crit', 1]])).toThrow();
-    expect(() => threadSpool('pair_a', 2, 'atk', [['spd', 2], ['def', 1], ['crit', 1]])).toThrow();
-    expect(threadSpool('pair_a', 2, 'atk', [['spd', 1], ['def', 3], ['crit', 1]]).strands).toHaveLength(3);
+    expect(() => threadSpool('pair_a', 0, 'atk', [['hpPct', 2]])).toThrow(); // Ashen rolls +1 only
+    expect(() => threadSpool('pair_a', 1, 'atk', [['hpPct', 3], ['defPct', 1]])).toThrow(); // Silver +1 to 2
+    expect(() => threadSpool('pair_a', 2, 'atk', [['hpPct', 3], ['defPct', 0], ['crit', 1]])).toThrow();
+    expect(() => threadSpool('pair_a', 2, 'atk', [['hpPct', 1.5], ['defPct', 1], ['crit', 1]])).toThrow();
+    expect(() => threadSpool('pair_a', 2, 'atk', [['spd', 2], ['defPct', 1], ['crit', 1]])).toThrow();
+    expect(threadSpool('pair_a', 2, 'atk', [['spd', 1], ['defPct', 3], ['crit', 1]]).strands).toHaveLength(3);
   });
 
   it('refuse an empty pattern, an unknown grade or an unknown stat', () => {
     expect(() => sp('', 'atk')).toThrow();
     expect(() => threadSpool('pair_a', 3 as Grade, 'atk', [])).toThrow();
-    expect(() => threadSpool('pair_a', 0, 'luck' as never, [['hp', 1]])).toThrow();
+    expect(() => threadSpool('pair_a', 0, 'luck' as never, [['hpPct', 1]])).toThrow();
     expect(() => threadSpool('pair_a', 0, 'atk', [['luck' as never, 1]])).toThrow();
   });
 
@@ -100,20 +103,26 @@ describe('thread spools', () => {
     const r = rngFor(3);
     for (let i = 0; i < 3000; i++) {
       const g = (i % 3) as Grade;
-      const stat = STAT_IDS[i % STAT_IDS.length];
+      const stat = SPOOL_STATS[i % SPOOL_STATS.length];
       const s = rollSpool('pair_a', g, stat, r);
       expect(s.strands).toHaveLength(STRAND_COUNT[g]);
       expect(new Set([stat, ...s.strands.map((t) => t.stat)]).size).toBe(STRAND_COUNT[g] + 1);
+      expect(s.strands.every((t) => STRAND_STATS.includes(t.stat))).toBe(true);
     }
   });
 });
 
 describe('weaver matrix', () => {
-  it('has two triangles: ATK, DEF and HP fixed, SPD only in slot 2 and CRIT only in slot 4', () => {
+  it('has the six named slots: Zenith, East Horizon and West Horizon fixed to flat ATK, DEF and HP; the meridians and Nadir take the base stats in % and their own', () => {
+    expect(SLOT_NAMES).toEqual(['Zenith', 'East Meridian', 'East Horizon', 'Nadir', 'West Horizon', 'West Meridian']);
     expect(MATRIX_LAYOUT.map((n) => (n.kind === 'fixed' ? n.stat : 'choice'))).toEqual(['atk', 'choice', 'def', 'choice', 'hp', 'choice']);
-    const takes = (s: StatId) => MATRIX_LAYOUT.flatMap((n, i) => ((n.kind === 'fixed' ? n.stat === s : n.stats.includes(s)) ? [i] : []));
+    const takes = (s: SpoolStat) => MATRIX_LAYOUT.flatMap((n, i) => ((n.kind === 'fixed' ? n.stat === s : n.stats.includes(s)) ? [i] : []));
     expect(takes('spd')).toEqual([1]);
     expect(takes('crit')).toEqual([3]);
+    expect(takes('critDmg')).toEqual([3]);
+    expect(takes('acc')).toEqual([5]);
+    expect(takes('res')).toEqual([5]);
+    for (const s of ['atkPct', 'hpPct', 'defPct'] as SpoolStat[]) expect(takes(s)).toEqual([1, 3, 5]);
   });
 
   it('has six slots that take only what their stat nodes accept', () => {
@@ -121,7 +130,7 @@ describe('weaver matrix', () => {
     expect(m.slots.map((s) => s.index)).toEqual([0, 1, 2, 3, 4, 5]);
     expect(m.spools()).toEqual([]);
     expect(() => m.equip(0, sp('pair_a', 'hp'))).toThrow(); // fixed: atk only
-    expect(() => m.equip(4, sp('pair_a', 'atk'))).toThrow(); // variable: crit or hp
+    expect(() => m.equip(4, sp('pair_a', 'atk'))).toThrow(); // variable: crit or hp %
     expect(m.equip(4, sp('pair_a', 'crit')).matrix.spools()).toHaveLength(1);
     expect(m.equip(5, sp('pair_a', 'spd')).matrix.spools()).toHaveLength(1);
   });
@@ -148,30 +157,62 @@ describe('weaver matrix', () => {
     expect([0, 1, 2, 3, 4, 5].map((i) => attunedStats(m, i as SlotIndex))).toEqual([[], ['atk', 'def'], [], ['def', 'hp'], [], ['hp', 'atk']]);
   });
 
-  it('adds main stats, strands and attunement', () => {
+  it('adds main stats, strands and attunement: a strand gains in a slot beside the fixed slot of its stat', () => {
     let m = WeaverMatrix.empty(MATRIX_LAYOUT);
-    m = m.equip(0, sp('pair_a', 'atk', 2, [['hp', 3], ['def', 2], ['crit', 1]])).matrix; // fixed: no attunement
-    m = m.equip(1, sp('pair_a', 'hp', 1, [['atk', 2], ['crit', 1]])).matrix; // ATK strand attuned in slot 2
+    m = m.equip(0, sp('pair_a', 'atk', 2, [['hpPct', 3], ['defPct', 2], ['crit', 1]])).matrix; // fixed: no attunement
+    m = m.equip(1, sp('pair_b', 'hpPct', 1, [['atkPct', 2], ['crit', 1]])).matrix; // ATK % strand attuned in East Meridian
     const b = matrixBonus(m);
-    expect(b).toEqual({ atk: 10 + 2 + 1, hp: 3 + 7, def: 2, crit: 1 + 1, spd: 0 });
+    expect(b).toMatchObject({ atk: 11, atkPct: 2 + 1, hpPct: 3 + 7, defPct: 2, crit: 1 + 1, spd: 0, hp: 0, def: 0, critDmg: 0, acc: 0, res: 0 });
   });
 
   it('caps what SPD strands add at the matrix cap', () => {
     let m = WeaverMatrix.empty(OPEN);
-    for (let i = 0; i < 6; i++) m = m.equip(i as SlotIndex, sp('pair_a', 'atk', 1, [['spd', 1], ['hp', 1]])).matrix;
+    for (let i = 0; i < 6; i++) m = m.equip(i as SlotIndex, sp('pair_a', 'atk', 1, [['spd', 1], ['hpPct', 1]])).matrix;
     expect(matrixBonus(m).spd).toBe(SPD_STRAND_CAP);
   });
 
-  it('turns a matrix into stats: percent of base for ATK, HP and DEF, points for CRIT, flat SPD', () => {
+  it('turns a matrix into stats: % of base for the base stats, flat for flat ATK, HP and DEF, points for critical rate and damage', () => {
     let m = WeaverMatrix.empty(MATRIX_LAYOUT);
-    m = m.equip(0, sp('pair_a', 'atk', 2, [['hp', 3], ['def', 2], ['crit', 1]])).matrix;
-    m = m.equip(1, sp('pair_a', 'spd', 0, [['def', 1]])).matrix; // DEF strand attuned: +2
-    const w = wovenStats({ hp: 1000, atk: 100, def: 60, spd: 100, crit: 0.05 }, m);
-    expect(w).toEqual({ hp: 1030, atk: 110, def: 62, spd: 102, crit: 0.06 });
+    m = m.equip(0, sp('pair_a', 'atk', 2, [['hpPct', 3], ['defPct', 2], ['crit', 1]])).matrix;
+    m = m.equip(1, sp('pair_b', 'spd', 0, [['defPct', 1]])).matrix; // DEF % strand attuned: +2
+    m = m.equip(3, sp('quad', 'critDmg', 1, [['atkPct', 1], ['crit', 2]])).matrix;
+    m = m.equip(5, sp('quad', 'acc', 0, [['hpPct', 1]])).matrix; // HP % strand attuned beside West Horizon: +2
+    const w = wovenStats(BASE, m, CATALOG);
+    expect(w).toEqual({ hp: Math.round(1000 * 1.05), atk: Math.round(100 * 1.01 + 11), def: Math.round(60 * 1.04), spd: 102, crit: 0.08, critDmg: 1.1, acc: 8, res: 0 });
+  });
+
+  it('adds each woven pattern once per weave: fractions of base for SPD, ATK, DEF and HP, points for critical rate and damage, flat ACC and RES', () => {
+    const core = (id: string) => sp(id, 'res', 0, [['hpPct', 1]]);
+    let m = WeaverMatrix.empty(OPEN);
+    // two Pulse: +12% SPD; two Apex: +20 points of critical damage; two Focus: +20 ACC
+    for (const [i, id] of ['pattern_pulse', 'pattern_pulse', 'pattern_apex', 'pattern_apex', 'pattern_focus', 'pattern_focus'].entries()) m = m.equip(i as SlotIndex, core(id)).matrix;
+    const w = wovenStats(BASE, m);
+    expect(w.spd).toBe(112);
+    expect(w.critDmg).toBe(1.2);
+    expect(w.acc).toBe(20);
+    expect(w.res).toBe(6 * MAIN_VALUE.res[0]);
+    expect(w.hp).toBe(1060);
+    // six Sunder: woven three times, +45% ATK
+    let s = WeaverMatrix.empty(OPEN);
+    for (let i = 0; i < 6; i++) s = s.equip(i as SlotIndex, core('pattern_sunder')).matrix;
+    expect(wovenStats(BASE, s).atk).toBe(145);
   });
 });
 
 describe('weave patterns', () => {
+  it('are the eight core patterns, each a 2-piece set with its stat and value', () => {
+    expect(CORE_WEAVE_PATTERNS.map((p) => [p.id, p.name, p.bonus.stat, p.bonus.value, p.pieces])).toEqual([
+      ['pattern_pulse', 'Pulse', 'spd', 0.12, 2],
+      ['pattern_sunder', 'Sunder', 'atk', 0.15, 2],
+      ['pattern_ward', 'Ward', 'def', 0.15, 2],
+      ['pattern_vigor', 'Vigor', 'hp', 0.15, 2],
+      ['pattern_needle', 'Needle', 'crit', 0.12, 2],
+      ['pattern_apex', 'Apex', 'critDmg', 0.2, 2],
+      ['pattern_focus', 'Focus', 'acc', 20, 2],
+      ['pattern_tranquility', 'Tranquility', 'res', 20, 2],
+    ]);
+  });
+
   const cases: [string[], string][] = [
     [['pair_a', 'pair_a'], 'pair_ax1'],
     [['pair_a', 'pair_a', 'pair_a'], 'pair_ax1'],
@@ -273,14 +314,14 @@ describe('reliquary', () => {
   });
 
   it('drops malformed entries without losing a valid spool, and never trusts a stored main value', () => {
-    const good = { pattern: 'pair_a', grade: 1, main: { stat: 'atk', value: 99 }, strands: [{ stat: 'hp', value: 1 }, { stat: 'def', value: 2 }] };
+    const good = { pattern: 'pair_a', grade: 1, main: { stat: 'atk', value: 99 }, strands: [{ stat: 'hpPct', value: 1 }, { stat: 'defPct', value: 2 }] };
     const saved = {
       files: [
-        { champion: 'alpha', fresh: false, slots: [good, { ...good, strands: [{ stat: 'atk', value: 1 }, { stat: 'hp', value: 1 }] }, null] },
+        { champion: 'alpha', fresh: false, slots: [good, { ...good, strands: [{ stat: 'hpPct', value: 1 }, { stat: 'hpPct', value: 1 }] }, null] },
         { champion: 'alpha', fresh: true, slots: [good] },
         { champion: 7 },
       ],
-      stock: [good, 'junk', { ...good, grade: 5 }, { ...good, strands: [{ stat: 'hp', value: 1 }] }],
+      stock: [good, 'junk', { ...good, grade: 5 }, { ...good, strands: [{ stat: 'hpPct', value: 1 }] }],
     } as unknown as ReliquaryJson;
     const r = Reliquary.fromJSON(saved, MIXED);
     expect(r.files().map((f) => f.champion)).toEqual(['alpha']);
@@ -289,6 +330,15 @@ describe('reliquary', () => {
     expect(r.file('alpha').matrix.slots[0].spool!.main.value).toBe(MAIN_VALUE.atk[1]);
     // the stocked spool, and the one from the duplicated file
     expect(r.spools()).toHaveLength(2);
+  });
+
+  it('drops spools of a pattern the catalog no longer has (the placeholder patterns, gone 2026-10-11)', () => {
+    const r = stocked();
+    r.equip('alpha', 0, spools[0]);
+    const json = JSON.parse(JSON.stringify(r.toJSON())) as ReliquaryJson;
+    const kept = Reliquary.fromJSON(json, MIXED, ['pair_b', 'quad']);
+    expect(kept.file('alpha').matrix.spools()).toEqual([]);
+    expect(count(kept)).toBe(spools.filter((s) => s.pattern !== 'pair_a').length);
   });
 
   it('drops the soul files of champions the catalog no longer has, keeping their spools', () => {

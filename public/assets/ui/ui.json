@@ -466,145 +466,145 @@
    32,
    18
   ],
-  "spool_lifethread_0": [
+  "spool_pattern_pulse_0": [
    147,
    227,
    18,
    18
   ],
-  "spool_lifethread_1": [
+  "spool_pattern_pulse_1": [
    166,
    227,
    18,
    18
   ],
-  "spool_lifethread_2": [
+  "spool_pattern_pulse_2": [
    185,
    227,
    18,
    18
   ],
-  "spool_tension_0": [
+  "spool_pattern_sunder_0": [
    204,
    227,
    18,
    18
   ],
-  "spool_tension_1": [
+  "spool_pattern_sunder_1": [
    223,
    227,
    18,
    18
   ],
-  "spool_tension_2": [
+  "spool_pattern_sunder_2": [
    242,
    227,
    18,
    18
   ],
-  "spool_selvage_0": [
+  "spool_pattern_ward_0": [
    261,
    227,
    18,
    18
   ],
-  "spool_selvage_1": [
+  "spool_pattern_ward_1": [
    280,
    227,
    18,
    18
   ],
-  "spool_selvage_2": [
+  "spool_pattern_ward_2": [
    299,
    227,
    18,
    18
   ],
-  "spool_glint_0": [
+  "spool_pattern_vigor_0": [
    318,
    227,
    18,
    18
   ],
-  "spool_glint_1": [
+  "spool_pattern_vigor_1": [
    337,
    227,
    18,
    18
   ],
-  "spool_glint_2": [
+  "spool_pattern_vigor_2": [
    356,
    227,
    18,
    18
   ],
-  "spool_quickweft_0": [
+  "spool_pattern_needle_0": [
    375,
    227,
    18,
    18
   ],
-  "spool_quickweft_1": [
+  "spool_pattern_needle_1": [
    394,
    227,
    18,
    18
   ],
-  "spool_quickweft_2": [
+  "spool_pattern_needle_2": [
    413,
    227,
    18,
    18
   ],
-  "spool_fraybite_0": [
+  "spool_pattern_apex_0": [
    432,
    227,
    18,
    18
   ],
-  "spool_fraybite_1": [
+  "spool_pattern_apex_1": [
    451,
    227,
    18,
    18
   ],
-  "spool_fraybite_2": [
+  "spool_pattern_apex_2": [
    470,
    227,
    18,
    18
   ],
-  "spool_bloodweft_0": [
+  "spool_pattern_focus_0": [
    489,
    227,
    18,
    18
   ],
-  "spool_bloodweft_1": [
+  "spool_pattern_focus_1": [
    508,
    227,
    18,
    18
   ],
-  "spool_bloodweft_2": [
+  "spool_pattern_focus_2": [
    527,
    227,
    18,
    18
   ],
-  "spool_wardknot_0": [
+  "spool_pattern_tranquility_0": [
    546,
    227,
    18,
    18
   ],
-  "spool_wardknot_1": [
+  "spool_pattern_tranquility_1": [
    565,
    227,
    18,
    18
   ],
-  "spool_wardknot_2": [
+  "spool_pattern_tranquility_2": [
    584,
    227,
    18,

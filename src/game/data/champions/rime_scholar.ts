@@ -17,7 +17,7 @@ export const rimeScholar: ChampionDef = {
   faction: 'sanguine_dominion',
   color: '#a6d8f0',
   muzzle: [27, 48],
-  stats: { hp: 1250, atk: 96, def: 66, spd: 106, crit: 0.025 },
+  stats: { hp: 1250, atk: 96, def: 66, spd: 106, crit: 0.025, critDmg: 1, acc: 0, res: 0 },
   lore: 'An ice mage of the Sanguine Dominion. The name of her world means that blood is life; she is not evil, and neither is her faction: its black and red are heraldry, not menace. She is a fragment, like Gareth. Their worlds would never naturally meet; only the broken loom lets them stand together.',
   skills: [
     {

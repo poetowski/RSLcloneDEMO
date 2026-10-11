@@ -4,31 +4,34 @@
 // colour its pattern. Same rules as the rest of the interface art: light from
 // the top-left, 1px dark outlines, ramps from palette.ts. Used by the MATRIX tab
 // (src/game/screens/champion.ts); layout in docs/UI_GUIDE.md.
+import { PATTERN_IDS } from '../../../src/game/data/matrix.ts';
 import { FXR, MAT, UIR } from '../palette.ts';
 import { dith, outline, rampDither } from '../paint.ts';
 import { Bitmap, RGBA } from '../raster.ts';
 import { v, V } from '../rig.ts';
 import { arc, castMetal, Stroke } from './menu.ts';
 
-/** The draft pattern ids (src/game/data/matrix.ts PATTERN_IDS; a content test keeps them equal). */
-export const PATTERNS = ['lifethread', 'tension', 'selvage', 'glint', 'quickweft', 'fraybite', 'bloodweft', 'wardknot'] as const;
-export type PatternKey = (typeof PATTERNS)[number];
-const THREAD: Record<PatternKey, RGBA[]> = {
-  lifethread: FXR.green,
-  tension: FXR.fire,
-  selvage: FXR.steel,
-  glint: FXR.magenta,
-  quickweft: FXR.gold,
-  fraybite: FXR.violet,
-  bloodweft: FXR.blood,
-  wardknot: FXR.hardlight,
+/**
+ * The thread colour of each core Weave Pattern (src/game/data/matrix.ts), one
+ * hue each: Pulse orange-gold, Sunder red, Ward steel blue, Vigor green,
+ * Needle gold, Apex magenta, Focus violet, Tranquility turquoise.
+ */
+const THREAD: Record<string, RGBA[]> = {
+  pattern_pulse: FXR.chi,
+  pattern_sunder: FXR.blood,
+  pattern_ward: FXR.steel,
+  pattern_vigor: FXR.green,
+  pattern_needle: FXR.gold,
+  pattern_apex: FXR.magenta,
+  pattern_focus: FXR.violet,
+  pattern_tranquility: FXR.turquoise,
 };
 /** cap metal by grade: ebony (Ashen), silver, gold (Gilded) */
 const METAL: RGBA[][] = [MAT.ebony.ramp.slice(1), MAT.silver.ramp.slice(1), UIR.gold];
 const G = UIR.gold;
 
 /** An 18x18 spool: a pointed cap, a crystal holding the thread's spiral, a pointed foot. */
-export function spool(p: PatternKey, grade: number): Bitmap {
+export function spool(p: string, grade: number): Bitmap {
   const b = new Bitmap(18, 18);
   const M = METAL[grade];
   const T = THREAD[p];
@@ -125,6 +128,9 @@ function ring(r0: number, r1: number, solid: boolean): Bitmap {
 
 export function matrixParts(): Record<string, Bitmap> {
   const out: Record<string, Bitmap> = { matrix_rose: matrixRose(), lobe_sel: ring(20.2, 22.4, true), lobe_attune: ring(20.4, 21.6, false) };
-  for (const p of PATTERNS) for (const g of [0, 1, 2]) out[`spool_${p}_${g}`] = spool(p, g);
+  for (const p of PATTERN_IDS) {
+    if (!THREAD[p]) throw new Error(`no thread colour for weave pattern ${p}`);
+    for (const g of [0, 1, 2]) out[`spool_${p}_${g}`] = spool(p, g);
+  }
   return out;
 }

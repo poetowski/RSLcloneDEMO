@@ -111,7 +111,7 @@ damage = ATK x mult x 4.8
        x 1.2 strong hit / 0.8 weak hit   (affinity, section 6)
        x 1.25                            (target Weakened)
        x execute bonus                   (target HP below the threshold)
-       x 2                               (critical hit, chance = CRIT, rolled per hit)
+       x (1 + C.DMG)                     (critical hit, chance = C.RATE, rolled per hit; C.DMG 100% = double)
        x random 0.92-1.08
 ATK x (1 +/- 0.25) with ATK Up / ATK Down;  DEF x 1.16 with DEF Up, x 0.88 with DEF Down
 ```
@@ -181,7 +181,7 @@ Numbers are tuned against explicit norms, not by feel. `src/game/data/norms.ts` 
 | Guardrail | Rule |
 | --- | --- |
 | Stat budget | `statScore = HP/12 + ATK x 1.1 + (DEF - 40) x 2.25 + SPD x 1.3 + CRIT x 300` within **5%** of the rarity budget: Common 390, Elite 425, Heroic 440, Mythic 455 (the proof of concept's Common, Rare, Epic and Legendary budgets carried over: what rarity gates is not decided). A passive is paid for from the budget. |
-| Stat limits | HP 900-1700, ATK 70-130, DEF 56-80, SPD 90-125, CRIT 2.5-15% |
+| Stat limits | HP 900-1700, ATK 70-130, DEF 56-80, SPD 90-125, CRIT 2.5-15%; every champion has C.DMG 100%, ACC 0 and RES 0, outside the budget until Jakub sets base values |
 | Skill multipliers (sum of hits) | A1 single 0.9-1.25 / AoE 0.5-0.8; A2 1.1-1.6 / 0.5-1.1; A3 1.3-2.6 / 0.7-1.2 |
 | Cooldowns | A1 0, A2 3, A3 4-5 |
 | Statuses | hard control lasts 1 turn and is guaranteed only on an A3; anything else at most 3 turns |
@@ -257,33 +257,59 @@ URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|o
 
 ## 14. The Weaver Matrix (`src/game/reliquary/`, `src/game/data/matrix.ts`)
 
-Every owned champion has a Weaver Matrix: six slots in two triangles that hold Thread Spools. What the matrix adds reaches battle as the champion's stats (`Combatant.stats`, built by `battleStats`); enemies wear no spools. Weave Patterns and the sources of spools are not defined yet: spools carry a draft pattern id that only colours them, and the stock stays empty in play (`?spools=1` adds a sample for development).
+Every owned champion has a Weaver Matrix: six slots in two triangles that hold Thread Spools. What the matrix adds reaches battle as the champion's stats (`Combatant.stats`, built by `battleStats`); enemies wear no spools. The slot names, what each slot takes and the eight core Weave Patterns are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 9, 2026-10-11); the spool values, the strands, attunement and the way the pattern values are read below are stand-ins. Spools have no sources yet: the stock stays empty in play (`?spools=1` adds a sample for development).
 
-| Slot | Kind | Takes a spool whose main stat is |
-| --- | --- | --- |
-| 1 (top) | fixed | ATK |
-| 2 | choice | SPD, or ATK, HP or DEF % |
-| 3 | fixed | DEF |
-| 4 (bottom) | choice | CRIT, or ATK, HP or DEF % |
-| 5 | fixed | HP |
-| 6 | choice | ATK, HP or DEF % |
+| Slot | Name | Kind | Takes a spool whose main stat is |
+| --- | --- | --- | --- |
+| 1 (top) | Zenith | fixed | flat ATK |
+| 2 | East Meridian | choice | SPD, or ATK, HP or DEF % |
+| 3 | East Horizon | fixed | flat DEF |
+| 4 (bottom) | Nadir | choice | C.RATE or C.DMG, or ATK, HP or DEF % |
+| 5 | West Horizon | fixed | flat HP |
+| 6 | West Meridian | choice | ACC or RES, or ATK, HP or DEF % |
 
-**Spools.** A spool has a grade (Ashen, Silver, Gilded), one main stat whose value the grade sets, and strands: additional stats, one per grade step.
+"Base stats" in his record are read as ATK, HP and DEF in % of the champion's base.
+
+**Spools.** A spool has a Weave Pattern, a grade (Ashen, Silver, Gilded), one main stat whose value the grade sets, and strands: additional stats, one per grade step. Strands are ATK, HP or DEF %, C.RATE or SPD; never a flat stat, C.DMG, ACC or RES.
 
 | | Ashen | Silver | Gilded |
 | --- | --- | --- | --- |
-| Main ATK, HP, DEF | +4% | +7% | +10% |
-| Main CRIT (chance) | +4% | +7% | +10% |
+| Main flat ATK | +5 | +8 | +11 |
+| Main flat HP | +50 | +85 | +120 |
+| Main flat DEF | +3 | +5 | +7 |
+| Main ATK, HP or DEF % | +4% | +7% | +10% |
 | Main SPD | +2 | +3 | +4 |
+| Main C.RATE | +4% | +7% | +10% |
+| Main C.DMG | +6% | +10% | +15% |
+| Main ACC or RES | +8 | +14 | +20 |
 | Strands | 1 | 2 | 3 |
-| Each ATK, HP, DEF or CRIT strand | +1 | +1 to 2 | +1 to 3 |
+| Each ATK, HP or DEF % or C.RATE strand | +1 | +1 to 2 | +1 to 3 |
 | Each SPD strand | +1 | +1 | +1 |
 
+The flat main values are sized to what 4, 7 and 10% of a starter's base stat give.
+
+**Weave Patterns** (Jakub's `CoreWeavePatterns`). Every spool carries one of the eight. Every 2 spools of one pattern in a matrix, wherever they sit, weave it once; 4 weave it twice and 6 three times, and each weave adds its value again.
+
+| Pattern | Pieces | His stat and value | Each weave adds |
+| --- | --- | --- | --- |
+| Pulse | 2 | Speed 0.12 | +12% of base SPD |
+| Sunder | 2 | Attack 0.15 | +15% of base ATK |
+| Ward | 2 | Defense 0.15 | +15% of base DEF |
+| Vigor | 2 | Health 0.15 | +15% of base HP |
+| Needle | 2 | CritRate 0.12 | +12% C.RATE (points) |
+| Apex | 2 | CritDamage 0.20 | +20% C.DMG (points) |
+| Focus | 2 | Accuracy 20 | +20 ACC |
+| Tranquility | 2 | Resistance 20 | +20 RES |
+
+The last column is how the game reads his values (a stand-in until he confirms it): fractions for the four base stats, points for critical rate and damage, flat for ACC and RES. A save holding spools of a pattern the catalog no longer has (the draft patterns, removed 2026-10-11) drops them on load.
+
 **Rules.**
-1. A strand never repeats the spool's main stat, and a spool never carries the same strand twice.
+1. A strand never repeats the spool's main stat, and a spool never carries the same strand twice (a flat ATK spool may carry an ATK % strand).
 2. Strand values are rolled once, when the spool is found, and never change.
 3. A matrix's strands add at most +4 SPD together.
-4. **Attunement:** each fixed slot attunes the two choice slots beside it. A strand on a choice slot gains +1 when its stat matches a neighbouring fixed slot: slot 2 is attuned to ATK and DEF, slot 4 to DEF and HP, slot 6 to HP and ATK.
+4. **Attunement:** each fixed slot attunes the two choice slots beside it. A strand on a choice slot gains +1 when its stat belongs to a neighbouring fixed slot (an ATK % strand counts as ATK): East Meridian is attuned to ATK and DEF, Nadir to DEF and HP, West Meridian to HP and ATK.
 5. Weaving a spool into a slot and taking it out are free; a spool you take out returns to the stock.
 
-**Stats with the matrix:** ATK, HP and DEF rise by the summed percent of the champion's base stat (rounded), CRIT by the summed points of chance, SPD by the flat sum. The MATRIX tab on the champion page shows the result.
+**Stats with the matrix:** ATK, HP and DEF = base x (1 + the summed % + the woven fractions) + the flat sum, rounded; SPD = base + the summed SPD + base x the woven fraction, rounded; C.RATE and C.DMG rise by the summed points; ACC and RES by the flat sum. The MATRIX tab on the champion page shows the result and the woven patterns.
+
+**Critical damage, Accuracy and Resistance.** Every champion starts at C.DMG 100%, so a critical hit deals double damage as before (section 5); the matrix raises it. ACC and RES are carried and shown, but no battle rule uses them yet: debuffs still land on their flat chance until Jakub defines what the two stats do.

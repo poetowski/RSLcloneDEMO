@@ -3,19 +3,19 @@
 // returns a new matrix. A spool carries a main stat and strands; a strand on a
 // choice slot that matches a neighbouring fixed slot's stat is attuned. Weave
 // Patterns count spools over the whole matrix; where a spool sits never matters
-// to them. Rules: docs/MECHANICS_GUIDE.md 14; terms and invariants: docs/DDD.md
-// 2.6, 4.7, 6.5.
-import { ATTUNE_BONUS, MAIN_VALUE, SPD_STRAND, SPD_STRAND_CAP, STAT_IDS, STRAND_COUNT, STRAND_RANGE } from '../data/matrix';
-import { MatrixLayout, PatternId, StatId, Stats, StatNode, WeavePatternDef } from '../data/types';
+// to them, and each woven pattern adds its stat. Rules: docs/MECHANICS_GUIDE.md
+// 14; terms and invariants: docs/DDD.md 2.6, 4.7, 6.5.
+import { ATTUNE_BONUS, CORE_WEAVE_PATTERNS, MAIN_VALUE, SPD_STRAND, SPD_STRAND_CAP, SPOOL_STATS, STAT_OF, STRAND_COUNT, STRAND_RANGE, STRAND_STATS } from '../data/matrix';
+import { MatrixLayout, PatternId, SpoolStat, StatId, Stats, StatNode, WeavePatternDef } from '../data/types';
 
 export type SlotIndex = 0 | 1 | 2 | 3 | 4 | 5;
 
 /** 0 Ashen, 1 Silver, 2 Gilded. */
 export type Grade = 0 | 1 | 2;
 
-/** One stat a spool carries: ATK, HP and DEF in % of base, CRIT in points of chance, SPD flat. */
+/** One stat a spool carries: flat or % ATK, HP and DEF, critical rate and damage in points, SPD, ACC and RES flat. */
 export interface StatBonus {
-  readonly stat: StatId;
+  readonly stat: SpoolStat;
   readonly value: number;
 }
 
@@ -36,15 +36,15 @@ export interface ThreadSpool {
  * or another strand; strand values stay inside the grade's range, and a SPD
  * strand is always +1. Throws on anything else.
  */
-export function threadSpool(pattern: PatternId, grade: Grade, stat: StatId, strands: readonly (readonly [StatId, number])[]): ThreadSpool {
+export function threadSpool(pattern: PatternId, grade: Grade, stat: SpoolStat, strands: readonly (readonly [SpoolStat, number])[]): ThreadSpool {
   if (typeof pattern !== 'string' || !pattern) throw new Error(`a spool needs a pattern, got ${String(pattern)}`);
   if (grade !== 0 && grade !== 1 && grade !== 2) throw new Error(`unknown grade ${String(grade)}`);
-  if (!STAT_IDS.includes(stat)) throw new Error(`unknown stat "${String(stat)}"`);
+  if (!SPOOL_STATS.includes(stat)) throw new Error(`unknown stat "${String(stat)}"`);
   if (!Array.isArray(strands) || strands.length !== STRAND_COUNT[grade]) throw new Error(`a grade ${grade} spool has ${STRAND_COUNT[grade]} strands`);
-  const seen = new Set<StatId>([stat]);
+  const seen = new Set<SpoolStat>([stat]);
   const [lo, hi] = STRAND_RANGE[grade];
   const out = strands.map(([s, v]) => {
-    if (!STAT_IDS.includes(s)) throw new Error(`unknown strand "${String(s)}"`);
+    if (!STRAND_STATS.includes(s)) throw new Error(`unknown strand "${String(s)}"`);
     if (seen.has(s)) throw new Error(`strand ${s} repeats a stat of the spool`);
     seen.add(s);
     const ok = s === 'spd' ? v === SPD_STRAND : Number.isInteger(v) && v >= lo && v <= hi;
@@ -55,10 +55,10 @@ export function threadSpool(pattern: PatternId, grade: Grade, stat: StatId, stra
 }
 
 /** Rolls a new spool: random strands that obey the rules. */
-export function rollSpool(pattern: PatternId, grade: Grade, stat: StatId, rng: () => number): ThreadSpool {
-  const pool = STAT_IDS.filter((s) => s !== stat);
+export function rollSpool(pattern: PatternId, grade: Grade, stat: SpoolStat, rng: () => number): ThreadSpool {
+  const pool = STRAND_STATS.filter((s) => s !== stat);
   const [lo, hi] = STRAND_RANGE[grade];
-  const strands: [StatId, number][] = [];
+  const strands: [SpoolStat, number][] = [];
   for (let i = 0; i < STRAND_COUNT[grade]; i++) {
     const s = pool.splice(Math.floor(rng() * pool.length), 1)[0];
     strands.push([s, s === 'spd' ? SPD_STRAND : lo + Math.floor(rng() * (hi - lo + 1))]);
@@ -144,25 +144,25 @@ export class WeavePatternEvaluator {
   }
 }
 
-/** The stats a choice slot is attuned to: the fixed stats of its two neighbours. */
+/** The champion stats a choice slot is attuned to: those of the fixed slots beside it. */
 export function attunedStats(matrix: WeaverMatrix, index: SlotIndex): StatId[] {
   if (matrix.slots[index].node.kind === 'fixed') return [];
   const out: StatId[] = [];
   for (const j of [(index + 5) % 6, (index + 1) % 6]) {
     const n = matrix.slots[j].node;
-    if (n.kind === 'fixed') out.push(n.stat);
+    if (n.kind === 'fixed') out.push(STAT_OF[n.stat]);
   }
   return out;
 }
 
-/** The value of a strand in its slot: +ATTUNE_BONUS when the slot is attuned to its stat. */
+/** The value of a strand in its slot: +ATTUNE_BONUS when the slot is attuned to the stat it adds to. */
 export function strandValue(matrix: WeaverMatrix, index: SlotIndex, strand: StatBonus): number {
-  return strand.value + (attunedStats(matrix, index).includes(strand.stat) ? ATTUNE_BONUS : 0);
+  return strand.value + (attunedStats(matrix, index).includes(STAT_OF[strand.stat]) ? ATTUNE_BONUS : 0);
 }
 
-/** Everything a matrix adds: main stats, strands with attunement, SPD strands capped at SPD_STRAND_CAP. */
-export function matrixBonus(matrix: WeaverMatrix): Record<StatId, number> {
-  const add: Record<StatId, number> = { hp: 0, atk: 0, def: 0, spd: 0, crit: 0 };
+/** Everything a matrix's spools add, by spool stat: main stats, strands with attunement, SPD strands capped at SPD_STRAND_CAP. */
+export function matrixBonus(matrix: WeaverMatrix): Record<SpoolStat, number> {
+  const add = Object.fromEntries(SPOOL_STATS.map((s) => [s, 0])) as Record<SpoolStat, number>;
   let spdStrands = 0;
   for (const slot of matrix.slots) {
     if (!slot.spool) continue;
@@ -177,14 +177,25 @@ export function matrixBonus(matrix: WeaverMatrix): Record<StatId, number> {
   return add;
 }
 
-/** A champion's stats with its matrix: ATK, HP and DEF by %, CRIT by points, SPD flat. */
-export function wovenStats(base: Stats, matrix: WeaverMatrix): Stats {
+/**
+ * A champion's stats with its matrix: the spools' percents and the woven
+ * patterns' fractions of the base, then the flat additions; critical rate and
+ * damage by points; ACC and RES flat.
+ */
+export function wovenStats(base: Stats, matrix: WeaverMatrix, patterns: readonly WeavePatternDef[] = CORE_WEAVE_PATTERNS): Stats {
   const b = matrixBonus(matrix);
+  const woven = Object.fromEntries(Object.keys(base).map((k) => [k, 0])) as Record<StatId, number>;
+  for (const w of new WeavePatternEvaluator(patterns).evaluate(matrix)) woven[w.pattern.bonus.stat] += w.pattern.bonus.value * w.times;
+  const pct = (k: 'hp' | 'atk' | 'def', p: number, flat: number) => Math.round(base[k] * (1 + p / 100 + woven[k]) + flat);
+  const r3 = (v: number) => Math.round(v * 1000) / 1000;
   return {
-    hp: Math.round(base.hp * (1 + b.hp / 100)),
-    atk: Math.round(base.atk * (1 + b.atk / 100)),
-    def: Math.round(base.def * (1 + b.def / 100)),
-    spd: base.spd + b.spd,
-    crit: Math.round((base.crit + b.crit / 100) * 1000) / 1000,
+    hp: pct('hp', b.hpPct, b.hp),
+    atk: pct('atk', b.atkPct, b.atk),
+    def: pct('def', b.defPct, b.def),
+    spd: base.spd + b.spd + Math.round(base.spd * woven.spd),
+    crit: r3(base.crit + b.crit / 100 + woven.crit),
+    critDmg: r3(base.critDmg + b.critDmg / 100 + woven.critDmg),
+    acc: base.acc + b.acc + woven.acc,
+    res: base.res + b.res + woven.res,
   };
 }

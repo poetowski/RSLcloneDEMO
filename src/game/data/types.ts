@@ -125,7 +125,13 @@ export interface Stats {
   atk: number;
   def: number;
   spd: number;
+  /** critical rate: the chance of each hit to be critical */
   crit: number;
+  /** critical damage: what a critical hit adds (1 = +100%: double damage) */
+  critDmg: number;
+  /** accuracy and resistance (Jakub's Weaver Matrix, 2026-10-11): carried and shown; no battle rule uses them yet */
+  acc: number;
+  res: number;
 }
 
 export interface ChampionDef {
@@ -249,28 +255,36 @@ export interface LocationDef {
 // The catalog side of the Reliquary (src/game/reliquary): the stats a spool
 // can carry, the six stat nodes of a matrix and the Weave Patterns.
 
-/** A combat stat a Thread Spool can carry. */
+/** A champion's combat stat. */
 export type StatId = keyof Stats;
 
-/** Catalog id of a Weave Pattern ('tension', 'fray_bite'). */
+/**
+ * A stat a Thread Spool can carry: ATK, HP and DEF flat (`atk`, `hp`, `def`)
+ * or in % of the champion's base (`atkPct`, `hpPct`, `defPct`, the "base
+ * stats"), SPD flat, critical rate and critical damage in points, ACC and RES flat.
+ */
+export type SpoolStat = 'atk' | 'hp' | 'def' | 'atkPct' | 'hpPct' | 'defPct' | 'spd' | 'crit' | 'critDmg' | 'acc' | 'res';
+
+/** Catalog id of a Weave Pattern ('pattern_pulse'). */
 export type PatternId = string;
 
 /** What a matrix slot accepts as a spool's main stat: one stat, or one from a list. */
 export type StatNode =
-  | { readonly kind: 'fixed'; readonly stat: StatId }
-  | { readonly kind: 'variable'; readonly stats: readonly StatId[] };
+  | { readonly kind: 'fixed'; readonly stat: SpoolStat }
+  | { readonly kind: 'variable'; readonly stats: readonly SpoolStat[] };
 
 /** The six stat nodes of every Weaver Matrix: slot 0 at the top, then clockwise. */
 export type MatrixLayout = readonly [StatNode, StatNode, StatNode, StatNode, StatNode, StatNode];
 
 /**
- * A Weave Pattern: woven by `pieces` spools of this pattern, in any slots.
- * What a woven pattern gives is not modelled yet: it waits for the approved
- * Weaver Matrix proposal (docs/DDD.md 4.7).
+ * A Weave Pattern: woven by `pieces` spools of this pattern, in any slots,
+ * once for every `pieces` of them. Each time it is woven it adds `bonus`:
+ * SPD, ATK, DEF and HP by a fraction of the champion's base (0.12 = +12%),
+ * critical rate and critical damage by points (0.12 = +12%), ACC and RES flat.
  */
 export interface WeavePatternDef {
   id: PatternId;
   name: string;
   pieces: 2 | 4;
-  desc: string;
+  bonus: { stat: StatId; value: number };
 }

@@ -644,3 +644,39 @@ first zone onward. This is subtext, not mechanics.
 They come from **different worlds**. Under the broken loom, they would never
 have met naturally. They are in the same place only because reality is
 broken. This is structural to who they are, not incidental backstory.
+
+---
+
+## 9. Weaver Matrix: slots and Weave Patterns (received 2026-10-11)
+
+Jakub's record, verbatim. The names of the Weaver Matrix slots:
+
+```csharp
+        Zenith       = 1, // Fixed Flat ATK
+        EastMeridian = 2, // Variable SPD / Base Stats
+        EastHorizon  = 3, // Fixed Flat DEF
+        Nadir        = 4, // Variable C.RATE / C.DMG / Base Stats
+        WestHorizon  = 5, // Fixed Flat HP
+        WestMeridian = 6  // Variable ACC / RES / Base Stats
+```
+
+The real Weave Pattern sets, replacing every placeholder pattern:
+
+```csharp
+    public static class CoreWeavePatterns
+    {
+        public static readonly WeavePattern Pulse       = new("pattern_pulse", "Pulse", StatType.Speed, 0.12f, 2);
+        public static readonly WeavePattern Sunder      = new("pattern_sunder", "Sunder", StatType.Attack, 0.15f, 2);
+        public static readonly WeavePattern Ward        = new("pattern_ward", "Ward", StatType.Defense, 0.15f, 2);
+        public static readonly WeavePattern Vigor       = new("pattern_vigor", "Vigor", StatType.Health, 0.15f, 2);
+        public static readonly WeavePattern Needle      = new("pattern_needle", "Needle", StatType.CritRate, 0.12f, 2);
+        public static readonly WeavePattern Apex        = new("pattern_apex", "Apex", StatType.CritDamage, 0.20f, 2);
+        public static readonly WeavePattern Focus       = new("pattern_focus", "Focus", StatType.Accuracy, 20f, 2);
+        public static readonly WeavePattern Tranquility = new("pattern_tranquility", "Tranquility", StatType.Resistance, 20f, 2);
+    }
+}
+```
+
+How the game reads the values, and what the record leaves open, are in
+[MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14: stand-ins until Jakub confirms
+them.

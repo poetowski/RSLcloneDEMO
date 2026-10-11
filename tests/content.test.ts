@@ -356,15 +356,24 @@ describe('save', () => {
     recordClear(p, allStages()[0].id, 2);
     p.read.push(CHAPTERS[0].id);
     p.settings = { speed: 2, auto: true };
-    const spool = threadSpool('test', 2, 'crit', [['spd', 1], ['atk', 3], ['hp', 2]]);
+    const spool = threadSpool('pattern_needle', 2, 'crit', [['spd', 1], ['atkPct', 3], ['hpPct', 2]]);
     p.reliquary.addSpool(spool);
-    p.reliquary.addSpool(threadSpool('test', 0, 'hp', [['def', 1]]));
+    p.reliquary.addSpool(threadSpool('pattern_vigor', 0, 'hp', [['defPct', 1]]));
     p.reliquary.equip(STARTERS[0], 3, spool);
     const text = writeSave(p);
     const q = readSave(text);
     expect(writeSave(q)).toBe(text);
     expect(q.reliquary.file(STARTERS[0]).matrix.slots[3].spool).toEqual(spool);
     expect(q.reliquary.spools()).toHaveLength(1);
+  });
+
+  it('drops spools of the placeholder patterns the core Weave Patterns replaced', () => {
+    const p = newArchivist();
+    p.reliquary.addSpool(threadSpool('pattern_ward', 1, 'def', [['hpPct', 1], ['crit', 2]]));
+    const save = JSON.parse(writeSave(p)) as { reliquary: { stock: { pattern: string }[] } };
+    save.reliquary.stock.push({ ...save.reliquary.stock[0], pattern: 'lifethread' });
+    const q = readSave(JSON.stringify(save));
+    expect(q.reliquary.spools().map((s) => s.pattern)).toEqual(['pattern_ward']);
   });
 
   it('starts a new game from another version or unreadable text', () => {

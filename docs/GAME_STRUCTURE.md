@@ -76,7 +76,7 @@ The Master Archivist (`src/game/archivist.ts`) is the player and their save, sto
 | `settings` | default battle speed and auto |
 | `reliquary` | the champions owned, starters included |
 
-The Reliquary (`src/game/reliquary/`) holds one Hero Soul File per owned champion, with its NEW badge (recruited, not yet opened on the champion page) and its Weaver Matrix of six slots, and the loose Thread Spools. The Weaver Matrix has its approved slots, grades, strands and attunement ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14) and shows on the champion page's MATRIX tab. Spools have no sources yet and Weave Patterns are not defined, so the stock stays empty in play; `?spools=1` adds a sample for development.
+The Reliquary (`src/game/reliquary/`) holds one Hero Soul File per owned champion, with its NEW badge (recruited, not yet opened on the champion page) and its Weaver Matrix of six slots, and the loose Thread Spools. The Weaver Matrix has its approved slots (named by Jakub: Zenith, East Meridian, East Horizon, Nadir, West Horizon, West Meridian), grades, strands, attunement and his eight core Weave Patterns ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14) and shows on the champion page's MATRIX tab. Spools have no sources yet, so the stock stays empty in play; `?spools=1` adds a sample for development.
 
 Loading drops champion and stage ids the catalog no longer has, and gives every cleared stage's champion its soul file (so a save survives a stage that changes what it brings). An older save (`tlrol.save.v2` from before Jakub's content, or the proof of concept's `oathbound.profile.v1`) holds champions and stages that no longer exist: only its settings and the Academy chapters read carry over, once, into a new game, and the old entry is left in place.
 

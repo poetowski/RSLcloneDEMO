@@ -2,7 +2,7 @@ import './style.css';
 import { H, Screen as Canvas, W } from './engine/screen';
 import { App } from './game/app';
 import { newArchivist, recordClear, saveArchivist, unlockEverything } from './game/archivist';
-import { PATTERN_IDS, STAT_IDS } from './game/data/matrix';
+import { PATTERN_IDS, SPOOL_STATS } from './game/data/matrix';
 import { Grade, rollSpool } from './game/reliquary/matrix';
 import { CHAMPIONS } from './game/data/champions';
 import { allStages, STARTERS } from './game/data/campaign';
@@ -56,7 +56,7 @@ async function boot() {
   if (params.get('spools') === '1') {
     let seed = 11;
     const rnd = () => (seed = (seed * 48271) % 2147483647) / 2147483647;
-    for (let i = 0; i < 24; i++) app.archivist.reliquary.addSpool(rollSpool(PATTERN_IDS[i % PATTERN_IDS.length], (i % 3) as Grade, STAT_IDS[i % STAT_IDS.length], rnd));
+    for (let i = 0; i < 24; i++) app.archivist.reliquary.addSpool(rollSpool(PATTERN_IDS[i % PATTERN_IDS.length], (i % 3) as Grade, SPOOL_STATS[(i * 5) % SPOOL_STATS.length], rnd));
     saveArchivist(app.archivist);
   }
   // ?progress=2-1 clears every stage up to and including 2-1 (3 stars, recruits included)

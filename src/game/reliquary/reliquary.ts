@@ -3,7 +3,7 @@
 // the aggregate root and the only writer of both, so a spool is always in
 // exactly one place: the stock or one slot. Terms and invariants:
 // docs/DDD.md 2.6, 4.7, 6.5.
-import { MatrixLayout, PatternId, StatId } from '../data/types';
+import { MatrixLayout, PatternId, SpoolStat } from '../data/types';
 import { fits, Grade, sameSpool, SlotIndex, threadSpool, ThreadSpool, WeaverMatrix } from './matrix';
 
 /** Hero Soul File: an entity, one champion's record in the Reliquary. Identity: the champion id. */
@@ -30,16 +30,18 @@ export class Reliquary {
   /**
    * Rebuilds a saved Reliquary without losing a valid spool: each goes back
    * into its slot when the slot still takes it, otherwise into the stock.
-   * Malformed entries are dropped.
+   * Malformed entries are dropped, and so are spools of a pattern not in
+   * `patterns` when it is given (the placeholder patterns, gone 2026-10-11).
    */
-  static fromJSON(json: Partial<ReliquaryJson>, layout: MatrixLayout): Reliquary {
+  static fromJSON(json: Partial<ReliquaryJson>, layout: MatrixLayout, patterns?: readonly PatternId[]): Reliquary {
     const r = new Reliquary(layout);
-    for (const raw of json.stock ?? []) r.salvage(raw);
+    const known = (raw: unknown) => !patterns || patterns.includes((raw as { pattern?: string } | null)?.pattern ?? '');
+    for (const raw of json.stock ?? []) if (known(raw)) r.salvage(raw);
     for (const f of json.files ?? []) {
       if (typeof f?.champion !== 'string') continue;
       const first = !r.souls.has(f.champion);
       if (first) r.recruit(f.champion, !!f.fresh);
-      (f.slots ?? []).forEach((raw, i) => r.salvage(raw, first && i < 6 ? [f.champion, i as SlotIndex] : undefined));
+      (f.slots ?? []).forEach((raw, i) => known(raw) && r.salvage(raw, first && i < 6 ? [f.champion, i as SlotIndex] : undefined));
     }
     return r;
   }
@@ -144,8 +146,8 @@ function readSpool(raw: unknown): ThreadSpool | null {
   if (!raw || typeof raw !== 'object') return null;
   const s = raw as { pattern?: unknown; grade?: unknown; main?: { stat?: unknown }; strands?: { stat?: unknown; value?: unknown }[] };
   try {
-    const strands = (s.strands ?? []).map((t) => [t.stat as StatId, t.value as number] as const);
-    return threadSpool(s.pattern as PatternId, s.grade as Grade, s.main?.stat as StatId, strands);
+    const strands = (s.strands ?? []).map((t) => [t.stat as SpoolStat, t.value as number] as const);
+    return threadSpool(s.pattern as PatternId, s.grade as Grade, s.main?.stat as SpoolStat, strands);
   } catch {
     return null;
   }

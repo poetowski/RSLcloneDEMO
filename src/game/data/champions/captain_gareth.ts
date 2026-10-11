@@ -15,7 +15,7 @@ export const captainGareth: ChampionDef = {
   affinity: 'ember',
   faction: 'azure_crown',
   color: '#e0a050',
-  stats: { hp: 1150, atk: 122, def: 62, spd: 104, crit: 0.025 },
+  stats: { hp: 1150, atk: 122, def: 62, spd: 104, crit: 0.025, critDmg: 1, acc: 0, res: 0 },
   lore: 'A captain of the Azure Crown, a power from a world of its own; he would never naturally meet anyone of the Sanguine Dominion. He is a fragment now. The Archivist reassembles him, but he remembers being Captain Gareth.',
   skills: [
     {

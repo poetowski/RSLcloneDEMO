@@ -34,7 +34,7 @@ Every screen is drawn into the same 640x360 buffer as the battle, with the pixel
 | `logo`, `divider`, `podium`, `arrow_l/r`, `banner` | title, section rules, formation and showcase podiums, paging, location and skill banners |
 | `mi_*` | 16x16 menu glyphs: campaign, champions, academy, options, back, fight, play |
 | `matrix_rose`, `lobe_sel`, `lobe_attune` | the MATRIX tab: the 144 px rose (gold rods join the fixed slots, a thread of arcane light the choice slots), the ring of the chosen slot, the dotted rings of the slots that attune it |
-| `spool_<pattern>_<grade>` | 18x18 spool icons: cap metal = grade, thread colour = pattern; spools that do not fit the chosen slot are drawn at 30% |
+| `spool_<pattern>_<grade>` | 18x18 spool icons, one per core Weave Pattern id and grade (`spool_pattern_pulse_0` ... `spool_pattern_tranquility_2`): cap metal = grade, thread colour = pattern; spools that do not fit the chosen slot are drawn at 30% |
 
 ## 3. Colors
 
