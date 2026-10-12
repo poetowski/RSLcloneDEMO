@@ -24,7 +24,7 @@ Every screen is drawn into the same 640x360 buffer as the battle, with the pixel
 | `well` | inset area inside panels (tips, formulas, key tables) |
 | `big_up/hover/down/off` | menu buttons (8 px corners), bold label, optional `mi_*` glyph |
 | `btn_up/hover/down/off` | small HUD and toggle buttons (4 px corners) |
-| `tab_on`, `tab_off` | tab strips (collection filters, champion page) |
+| `tab_on`, `tab_off` | tab strips (the collection's affinity and class filters, champion page) |
 | `card_<rarity>`, `card_locked` | card frames with transparent centers: draw the card content first, the frame last |
 | `gem_<affinity>`, `emblem_<faction>`, `role_<role>` | category glyphs; always next to their name the first time a screen shows them |
 | `star_s/m/l(_off)` | stage stars on the map (s), panels (m), results (l) |
@@ -59,6 +59,7 @@ Every text is drawn with a 1 px dark outline (`ink`), so it reads on any backgro
 - Screen changes use the dithered dissolve (`App.go`); input is ignored while it plays.
 - Animated sprites in menus use `drawChampion` / `frameAt`; hovering a recruited card plays its A1.
 - **The campaign map scrolls** under a camera (two `Scroller`s; the map is one screen tall, so it moves sideways today). Keyboard focus moves between the areas' nodes and the camera follows it; `W` `A` `S` `D` or `Shift` + arrows slide the map; dragging moves it at once. A screen that implements `drag` gets its click on release, and only when the pointer moved less than 3 px, so a drag never selects. `M` toggles the whole-world overview. Map regions are clipped to the view under the header, and a focused item outside its clip shows no tooltip.
+- **The collection** (Jakub, 2026-10-12) groups the cards by faction, in the factions' order, each group under its emblem and name; inside a group the rarest come first and every rarity starts rows of its own, so a row never holds two rarities. Filters by affinity and by class (Damage, Tank, Support) combine; a lit tab clicked again lets go of its filter, ALL lets go of both. The champion page's arrows walk the cards in this order.
 - **Anything that grows with the roster scrolls** instead of running off the screen: the collection grid (vertically) and the team-select roster strip (sideways). Use `Scroller` (`src/game/ui/scroll.ts`): `extent()` every frame, the wheel and paging keys move it, and `reveal()` pulls the keyboard-focused item into view. Clip the drawing to the window and give each item's region `clip: window` so a half-hidden card can never be clicked or hovered outside it; items scrolled fully out of view keep their region so arrow keys still reach them. Show where more content is: a scrollbar and a fading edge with a bobbing chevron (collection), or `arrow_l/r` that dim at the ends (roster strip); both are clickable for touch screens, which have no wheel.
 
 ## 5. Text rules

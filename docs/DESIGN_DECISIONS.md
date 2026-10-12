@@ -42,6 +42,7 @@ Section 7 lists what is not decided.
 | 2026-10-12 | Zone 1's battle background changed: a broken windmill, a calmer fire, a slower rift, a rare flash across the sky, more details | 5.3a |
 | 2026-10-12 | Zone 1: the flash every 10-25 s, things round the mill, distant rocks in the left sky, tools in the fields, more ravens on the left; the haystack's flames loop properly | 5.3a |
 | 2026-10-12 | The Dominion Medic, a Common of the Sanguine Dominion | 17 |
+| 2026-10-12 | The Champions screen: class filters beside the affinity ones, groups by faction, one rarity per row | 10 |
 
 ---
 
@@ -883,6 +884,11 @@ them.
   stand-in ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 7).
 - **No subtitles** (2026-10-11): champions carry no title anywhere in the
   game. Jakub: "i actually dont like these subtitles at all".
+- **The Champions screen** (2026-10-12), Jakub's words: "in champions screen, we now have top filters: all and then each affinity. also add class filters next to affinity like Damage, Tank, Support. then you should create groups per factions, so f.e. from top you will list Azure Crown heroes only. and regarding their rarity, put mythic in first row, then heroic in other, elite in other and common in other. so in one row we will never have 2 different rarities." Built: the
+  filters ALL, Ember, Bloom, Tide, then Damage, Tank, Support, an affinity
+  and a class combining; the cards in groups by faction in the factions'
+  order (the Azure Crown first), each under its emblem and name; in a group
+  the rarest first, every rarity on rows of its own.
 - **Stat passives** (2026-10-12), Jakub's words: "none passive giving permanent stat voost should get this boost from stat budget pool. this is just extra" and "and this passive is during combat, so when player is looking at enforcer stats in his collection, this crit chance bonus is not shown there, only as a passive description under skills. passive is applied during combat."
   A passive that raises a stat comes on top of the rarity's stat budget, and
   the champion's stats outside battle (the collection, the champion page)

@@ -1,31 +1,48 @@
 // Champion collection: every champion as a card. Recruited champions stand
 // in their idle loop (hover: they show off their basic attack); locked ones
-// are dark silhouettes with the stage that recruits them. The grid scrolls
-// (wheel, PageUp/PageDown, Home/End, the edge chevrons, keyboard focus) once
-// the roster outgrows the screen.
+// are dark silhouettes with the stage that recruits them. Filters by affinity
+// and by class (role) combine; the cards stand in groups by faction, each
+// under its emblem, the rarest first, every rarity on rows of its own (Jakub,
+// 2026-10-12). The grid scrolls (wheel, PageUp/PageDown, Home/End, the edge
+// chevrons, keyboard focus) once the roster outgrows the screen.
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
 import { frontier, isFresh, isUnlocked } from '../archivist';
 import { recruitStage, zoneOf } from '../data/campaign';
 import { CHAMPIONS } from '../data/champions';
-import { AFFINITIES, RARITIES } from '../data/meta';
-import { Affinity, ChampionDef } from '../data/types';
+import { AFFINITIES, FACTIONS, RARITIES } from '../data/meta';
+import { Affinity, ChampionDef, FactionId, Rarity, Role } from '../data/types';
 import { Scroller } from '../ui/scroll';
 import { COLORS } from '../ui/ui';
 import { nine, Rect4 } from '../view/assets';
 import { drawChampion, frameAt } from '../view/unit';
 import { BaseScreen, Diorama } from './base';
 
-const FILTERS: (Affinity | 'all')[] = ['all', ...(Object.keys(AFFINITIES) as Affinity[])];
+/** The filter tabs after ALL: one per affinity, then one per class. */
+const AFFINITY_TABS = Object.keys(AFFINITIES) as Affinity[];
+const ROLE_TABS: Role[] = ['Damage', 'Tank', 'Support'];
+/** Rarest first: in a faction's group every rarity has rows of its own (Jakub, 2026-10-12). */
+const RARITY_ROWS = (Object.keys(RARITIES) as Rarity[]).sort((a, b) => RARITIES[b].rank - RARITIES[a].rank);
 
 /** Card grid geometry and the window it scrolls in (below the filter tabs). */
 const CW = 112, CH = 140, GAP = 8, COLS = 5;
 const VIEW: Rect4 = [0, 54, W, H - 54];
 /** room above the first row for the NEW badges, and below the last */
 const PAD_TOP = 5, PAD_BOTTOM = 6;
+/** a faction's header above its cards, and the space before the next faction */
+const HEAD = 20, GROUP_GAP = 6;
+const GRID_W = COLS * CW + (COLS - 1) * GAP, GRID_X = Math.round(W / 2 - GRID_W / 2);
+
+/** A card's place in the scrolling grid (content pixels). */
+interface Slot {
+  c: ChampionDef;
+  x: number;
+  y: number;
+}
 
 export class CollectionScreen extends BaseScreen {
-  private filter: Affinity | 'all' = 'all';
+  private affinity: Affinity | 'all' = 'all';
+  private role: Role | null = null;
   private diorama: Diorama;
   private hoverSince = new Map<string, number>();
   private scroll = new Scroller();
@@ -33,7 +50,7 @@ export class CollectionScreen extends BaseScreen {
   constructor(app: App) {
     super(app);
     this.diorama = new Diorama(app, zoneOf(frontier(this.archivist)));
-    this.ui.focusId = 'card_' + CHAMPIONS[0].id;
+    this.ui.focusId = 'card_' + (this.layout().slots[0]?.c.id ?? CHAMPIONS[0].id);
   }
 
   protected back() {
@@ -58,8 +75,41 @@ export class CollectionScreen extends BaseScreen {
     else super.key(k);
   }
 
-  private list(): ChampionDef[] {
-    return CHAMPIONS.filter((c) => this.filter === 'all' || c.affinity === this.filter);
+  private setFilter(affinity: Affinity | 'all', role: Role | null) {
+    this.affinity = affinity;
+    this.role = role;
+    this.scroll.to(0);
+  }
+
+  private passes(c: ChampionDef): boolean {
+    return (this.affinity === 'all' || c.affinity === this.affinity) && (!this.role || c.role === this.role);
+  }
+
+  /**
+   * The cards in groups by faction, in the order of the factions: each group
+   * under its header, its champions the rarest first, every rarity starting a
+   * row of its own, so a row never holds two rarities (Jakub, 2026-10-12).
+   * Within a rarity, the order they join in.
+   */
+  private layout(): { slots: Slot[]; heads: { faction: FactionId; y: number }[]; height: number } {
+    const slots: Slot[] = [];
+    const heads: { faction: FactionId; y: number }[] = [];
+    let y = PAD_TOP;
+    for (const f of Object.keys(FACTIONS) as FactionId[]) {
+      const mine = CHAMPIONS.filter((c) => c.faction === f && this.passes(c));
+      if (!mine.length) continue;
+      heads.push({ faction: f, y });
+      y += HEAD;
+      for (const r of RARITY_ROWS) {
+        const row = mine.filter((c) => c.rarity === r);
+        for (let i = 0; i < row.length; i += COLS) {
+          row.slice(i, i + COLS).forEach((c, k) => slots.push({ c, x: GRID_X + k * (CW + GAP), y }));
+          y += CH + GAP;
+        }
+      }
+      y += GROUP_GAP;
+    }
+    return { slots, heads, height: slots.length ? y - GAP - GROUP_GAP + PAD_BOTTOM : 0 };
   }
 
   protected draw(ctx: CanvasRenderingContext2D) {
@@ -68,45 +118,59 @@ export class CollectionScreen extends BaseScreen {
     const owned = CHAMPIONS.filter((c) => isUnlocked(this.archivist, c.id)).length;
     this.header(ctx, 'CHAMPIONS', `${owned} / ${CHAMPIONS.length} recruited`);
 
-    // affinity filter tabs
+    // filter tabs: ALL, the affinities, then the classes; an affinity and a class combine,
+    // a lit tab clicked again lets go of its filter, ALL lets go of both
     let tx = 20;
-    for (const f of FILTERS) {
-      const label = f === 'all' ? 'ALL' : AFFINITIES[f].name.toUpperCase();
-      const w = ui.measure(label) + (f === 'all' ? 16 : 28);
-      const on = this.filter === f;
-      const id = 'tab_' + f;
+    const tab = (id: string, label: string, icon: string | null, on: boolean, click: () => void) => {
+      const w = ui.measure(label) + (icon ? 28 : 16);
       const hot = ui.hot(id, tx, 36, w, 16);
       nine(ctx, this.a.ui.img, ui.part(on ? 'tab_on' : 'tab_off'), tx, 36, w, 16, 5);
-      if (f !== 'all') ui.blit(ctx, 'gem_' + f, tx + 6, 39);
-      ui.text(ctx, label, tx + (f === 'all' ? 8 : 20), 40, { color: on || hot ? COLORS.goldHi : COLORS.dim });
-      ui.regions.push({
-        id, x: tx, y: 36, w, h: 16, click: () => {
-          this.filter = f;
-          this.scroll.to(0);
-        },
-      });
+      if (icon) {
+        const r = ui.part(icon);
+        ui.blit(ctx, icon, tx + 6 + Math.floor((11 - r[2]) / 2), 36 + Math.floor((16 - r[3]) / 2));
+      }
+      ui.text(ctx, label, tx + (icon ? 20 : 8), 40, { color: on || hot ? COLORS.goldHi : COLORS.dim });
+      ui.regions.push({ id, x: tx, y: 36, w, h: 16, click });
       tx += w + 4;
-    }
+    };
+    tab('tab_all', 'ALL', null, this.affinity === 'all' && !this.role, () => this.setFilter('all', null));
+    for (const f of AFFINITY_TABS) tab('tab_' + f, AFFINITIES[f].name.toUpperCase(), 'gem_' + f, this.affinity === f, () => this.setFilter(this.affinity === f ? 'all' : f, this.role));
+    tx += 10;
+    for (const r of ROLE_TABS) tab('tab_' + r, r.toUpperCase(), 'role_' + r, this.role === r, () => this.setFilter(this.affinity, this.role === r ? null : r));
 
-    const list = this.list();
-    const rows = Math.ceil(list.length / COLS);
+    const { slots, heads, height } = this.layout();
+    const order = slots.map((s) => s.c);
     const [vx, vy, vw, vh] = VIEW;
-    this.scroll.extent(PAD_TOP + rows * (CH + GAP) - GAP + PAD_BOTTOM, vh);
-    // keyboard focus pulls its card into view
-    const focused = list.findIndex((c) => 'card_' + c.id === ui.focusId);
-    if (ui.keyboard && focused >= 0) this.scroll.reveal(Math.floor(focused / COLS) * (CH + GAP), CH + PAD_TOP + PAD_BOTTOM, vh);
+    this.scroll.extent(height, vh);
+    // keyboard focus pulls its card (and the header above it) into view
+    const focused = slots.find((s) => 'card_' + s.c.id === ui.focusId);
+    if (ui.keyboard && focused) this.scroll.reveal(Math.max(0, focused.y - HEAD), CH + HEAD + PAD_BOTTOM, vh);
 
-    const x0 = Math.round(W / 2 - (COLS * CW + (COLS - 1) * GAP) / 2), y0 = vy + PAD_TOP - this.scroll.offset;
+    const oy = vy - this.scroll.offset;
     ctx.save();
     ctx.beginPath();
     ctx.rect(vx, vy, vw, vh);
     ctx.clip();
-    list.forEach((c, i) => {
-      const x = x0 + (i % COLS) * (CW + GAP), y = y0 + Math.floor(i / COLS) * (CH + GAP);
-      this.card(ctx, c, x, y, CW, CH, list);
-    });
+    for (const h of heads) this.head(ctx, h.faction, GRID_X, oy + h.y, GRID_W);
+    for (const sl of slots) this.card(ctx, sl.c, sl.x, oy + sl.y, CW, CH, order);
+    if (!slots.length) ui.text(ctx, 'No champion is both of these.', W / 2, vy + 60, { color: COLORS.dim, align: 'center' });
     ctx.restore();
     this.scrollHints(ctx);
+  }
+
+  /** A faction's header: its emblem, its name in its colour, a rule running on across the grid. */
+  private head(ctx: CanvasRenderingContext2D, f: FactionId, x: number, y: number, w: number) {
+    if (y + HEAD < VIEW[1] || y > VIEW[1] + VIEW[3]) return;
+    const ui = this.ui;
+    const fac = FACTIONS[f];
+    const name = fac.name.toUpperCase();
+    ui.blit(ctx, 'emblem_' + f, x, y);
+    ui.text(ctx, name, x + 20, y + 4, { color: fac.color, variant: 'bold' });
+    const lx = x + 26 + ui.measure(name, 'bold');
+    ctx.fillStyle = '#a8701e';
+    ctx.fillRect(lx, y + 8, x + w - lx, 1);
+    ctx.fillStyle = '#3a2810';
+    ctx.fillRect(lx, y + 9, x + w - lx, 1);
   }
 
   /** Scrollbar on the right, and a fade with a chevron at each edge that has more cards beyond it. */
