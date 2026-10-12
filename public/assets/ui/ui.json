@@ -224,18 +224,9 @@
    ],
    "buff": false
   },
-  "weaken": {
-   "rect": [
-    182,
-    42,
-    12,
-    12
-   ],
-   "buff": false
-  },
   "heal_block": {
    "rect": [
-    195,
+    182,
     42,
     12,
     12

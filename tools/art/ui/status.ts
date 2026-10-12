@@ -49,7 +49,6 @@ export const STATUS_ICONS: Record<string, StatusIconDef> = {
   def_down: { mask: 'shield', bg: '#4a2a6a', fg: '#e6d4ff', badge: 'down', buff: false },
   spd_down: { mask: 'boot', bg: '#2a3a6a', fg: '#d4ddff', badge: 'down', buff: false },
   atk_down: { mask: 'sword', bg: '#5a1a2a', fg: '#ffd0d0', badge: 'down', buff: false },
-  weaken: { mask: 'cracked', bg: '#6a1a3a', fg: '#ffc0d8', buff: false },
   heal_block: { mask: 'cross', bg: '#2a1418', fg: '#7ad06a', mask2: 'slash', fg2: '#ff5a3a', buff: false },
 };
 

@@ -80,12 +80,12 @@ export const mender = fixture('mender', {
   ],
 });
 
-/** A3 dispels before the hit and places Weaken; A2 grants Counterattack to the team. */
+/** A3 dispels before the hit and places DEF Down; A2 grants Counterattack to the team. */
 export const warden = fixture('warden', {
   skills: [
     undefined,
     skill('vigil', 2, { target: 'allies', hits: [{ mult: 0 }], statuses: [{ status: 'counter', turns: 2, to: 'allies' }] }),
-    skill('dispel_strike', 3, { stripBuffs: true, statuses: [{ status: 'weaken', turns: 2, to: 'targets' }] }),
+    skill('dispel_strike', 3, { stripBuffs: true, statuses: [{ status: 'def_down', turns: 2, to: 'targets' }] }),
   ],
 });
 

@@ -81,8 +81,7 @@ export interface SkillResult {
 export const TURN_FULL = 100;
 const POISON_PCT = 0.05;
 const BURN_PCT = 0.06;
-const REGEN_PCT = 0.075;
-const WEAKEN_MULT = 1.25;
+const REGEN_PCT = 0.15;
 const DAMAGE_SCALE = 4.8;
 /** damage taken is multiplied by DEF_SCALE / DEF: twice the DEF, half the damage */
 const DEF_SCALE = 40;
@@ -413,7 +412,6 @@ export class Battle {
     let dmg = this.attack(a) * mult * DAMAGE_SCALE;
     dmg *= DEF_SCALE / this.defense(t);
     dmg *= 1 + edge * AFFINITY_BONUS;
-    if (this.has(t, 'weaken')) dmg *= WEAKEN_MULT;
     if (s.execute && t.hp / t.maxHp < s.execute.below) dmg *= s.execute.mult;
     // a critical hit adds the attacker's critical damage (1 = +100%: double damage)
     if (crit) dmg *= 1 + a.stats.critDmg;

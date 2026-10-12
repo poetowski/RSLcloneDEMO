@@ -139,7 +139,7 @@ The `Baseline` lines below were measured on the proof of concept's roster and ca
 | Shield on an enemy | 3-1 (Imara) | Poison and Burn: Sylwen (starter), Akhet (2-1), Nefret (2-3); Dispel: Kha'zir (2-2) |
 | Overdrive | 3-3 (Mwamba) | Dispel: Kha'zir (2-2); burst from above half to low in one go |
 
-Debuffs on the player's team (SPD Down from 1-1, DEF Down from 1-2, Poison and Weaken from 2-1) are answered by Cleanse: Tenzo from 1-2 on, Kwesi from 3-3 on.
+Debuffs on the player's team (SPD Down from 1-1, DEF Down from 1-2, Poison from 2-1) are answered by Cleanse: Tenzo from 1-2 on, Kwesi from 3-3 on.
 
 - **Serves:** AE1, AE3 (each recruit is an answer), AE4.
 
@@ -199,12 +199,11 @@ The first source column is the truth. The last column lists every hand-written c
 | Critical hit | x2, rolled per hit with CRIT | `CRIT_MULT` | MECHANICS_GUIDE 5, Academy, champion page stat tip |
 | Spread | x0.92-1.08; at least 1 damage | `Battle.rollDamage` | MECHANICS_GUIDE 5, Academy figure |
 | Affinity | ±20% (Ember > Bloom > Tide > Ember; the size is the proof of concept's) | `AFFINITY_BONUS`, `affinityEdge` (`meta.ts`) | MECHANICS_GUIDE 6, Academy `affinity`, `AFFINITIES` texts |
-| Weaken | +25% damage taken | `WEAKEN_MULT` | `statuses.ts`, MECHANICS_GUIDE 5 and 7, Academy figure |
 | ATK Up / ATK Down | ±25% | `Battle.attack` (inline) | `statuses.ts`, MECHANICS_GUIDE 5 and 7 |
 | DEF Up / DEF Down | +16% / -12% | `DEF_UP`, `DEF_DOWN` (`battle.ts`) | `statuses.ts`, MECHANICS_GUIDE 5 and 7, Academy `damage` |
 | SPD Up / Slow | ±25% | `Battle.speed` (inline) | `statuses.ts`, MECHANICS_GUIDE 2 |
 | Poison / Burn | -5% / -6% max HP at turn start, through shields | `POISON_PCT`, `BURN_PCT` | `statuses.ts`, MECHANICS_GUIDE 3 and 7, Academy |
-| Regen | +7.5% max HP at turn start | `REGEN_PCT` | `statuses.ts`, MECHANICS_GUIDE 7 |
+| Regen | +15% max HP at turn start (Jakub, 2026-10-12) | `REGEN_PCT` | `statuses.ts`, MECHANICS_GUIDE 7 |
 | Shield | absorbs up to `value` x the caster's max HP | `Battle.tryApply`, `Battle.applyDamage` | MECHANICS_GUIDE 5 |
 | Durations | the holder's own turns, ticking at its turn end; a status placed during the holder's own turn starts counting at its next; reapplying refreshes to the longer one, never stacks | `Battle.endTurn`, `Battle.addStatus` (`StatusInst.fresh`) | MECHANICS_GUIDE 3 and 7, Academy `basics`, `buffs`, `debuffs` |
 | Cooldowns | A1 0, A2 3, A3 4-5 | `SKILL_NORMS` (`norms.ts`) | MECHANICS_GUIDE 4 and 10 |

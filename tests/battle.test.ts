@@ -132,18 +132,14 @@ describe('damage', () => {
     expect(avg(inAffinity('bloom')) / avg(inAffinity('tide'))).toBeGreaterThan(1.35);
   });
 
-  it('weaken increases damage taken', () => {
-    const run = (weak: boolean) => {
-      let sum = 0;
-      for (let seed = 1; seed <= 100; seed++) {
-        const b = new Battle(combatants([striker]), combatants([guard]), { seed });
-        if (weak) b.addStatus(b.get('e0'), 'weaken', 2, 0, 'test');
-        const r = b.useSkill(b.get('p0'), striker.skills[0], 'e0');
-        sum += r.events.reduce((s, e) => s + (e.kind === 'damage' ? e.amount : 0), 0);
-      }
-      return sum;
-    };
-    expect(run(true) / run(false)).toBeCloseTo(1.25, 1);
+  it('regen heals 15% max HP at the start of the turn', () => {
+    const b = new Battle(combatants([striker]), combatants([guard]), { seed: 1 });
+    const g = b.get('e0');
+    g.hp = 100;
+    b.addStatus(g, 'regen', 2, 0, 'test');
+    const { events } = b.startTurn(g);
+    const heal = events.find((e) => e.kind === 'heal');
+    expect(heal?.kind === 'heal' && heal.amount).toBe(Math.round(g.maxHp * 0.15));
   });
 
   it('kills at 0 HP and removes the unit from targeting', () => {
@@ -231,7 +227,7 @@ describe('statuses', () => {
     expect(r.events.filter((e) => e.kind === 'dispel').length).toBe(2);
     const hit = r.events.find((e) => e.kind === 'damage');
     expect(hit?.kind === 'damage' && hit.absorbed).toBe(0);
-    expect(b.has(k, 'weaken')).toBe(true);
+    expect(b.has(k, 'def_down')).toBe(true);
   });
 
   it('heals with an A1 that strikes nobody, and gives no counterattack with it', () => {

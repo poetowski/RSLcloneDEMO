@@ -31,7 +31,7 @@ then         TM_j += SPD_j * t_min  for every living champion
 
 ```
 advance()                  meters fill until someone reaches 100%
-startTurn(actor)           Poison -5% max HP, Burn -6% max HP (both ignore shields), Regen +7.5%
+startTurn(actor)           Poison -5% max HP, Burn -6% max HP (both ignore shields), Regen +15%
   if Stun or Freeze        the turn is skipped (STUNNED / FROZEN), statuses still tick
 choose                     player: skill (1/2/3 or click) and target;  enemy / auto: AI (section 11)
 useSkill(actor, skill, t)  resolve -> SkillResult, including any counterattacks it provoked
@@ -111,7 +111,6 @@ interface SkillDef {
 damage = ATK x mult x 4.8
        x 40 / DEF                        (twice the DEF, half the damage)
        x 1.2 strong hit / 0.8 weak hit   (affinity, section 6)
-       x 1.25                            (target Weakened)
        x execute bonus                   (target HP below the threshold)
        x (1 + C.DMG)                     (critical hit, chance = C.RATE, rolled per hit; C.DMG 100% = double)
        x random 0.92-1.08
@@ -133,7 +132,7 @@ Three affinities in a cycle (Jakub's, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)
 | SPD Up | buff | +25% Speed |
 | Shield | buff | absorbs damage up to its value |
 | Taunt | buff | enemies' single-target skills must target this champion |
-| Regen | buff | heals 7.5% max HP at turn start |
+| Regen | buff | heals 15% max HP at turn start |
 | Counterattack | buff | answers an enemy skill that damaged it with its A1, once per enemy action |
 | Stun | debuff | skips the next turn |
 | Freeze | debuff | skips the next turn (encased in ice) |
@@ -142,7 +141,6 @@ Three affinities in a cycle (Jakub's, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)
 | DEF Down | debuff | -12% Defense |
 | Slow | debuff | -25% Speed (id `spd_down`; Jakub's name for it) |
 | ATK Down | debuff | -25% Attack |
-| Weaken | debuff | +25% damage taken |
 | Heal Block | debuff | cannot be healed: heals, Regen and lifesteal show `HEAL BLOCKED` |
 
 - Reapplying a status refreshes it to the longer duration (and the larger shield); it never stacks.

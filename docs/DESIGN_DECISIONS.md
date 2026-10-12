@@ -44,6 +44,7 @@ Section 7 lists what is not decided.
 | 2026-10-12 | The Dominion Medic, a Common of the Sanguine Dominion | 17 |
 | 2026-10-12 | The Champions screen: class filters beside the affinity ones, groups by faction, one rarity per row | 10 |
 | 2026-10-12 | The main menu's Campaign glyph: proper crossed swords with longer blades | 10 |
+| 2026-10-12 | Regen heals 15% max HP; Weaken removed | 10 |
 
 ---
 
@@ -898,6 +899,9 @@ them.
   A passive that raises a stat comes on top of the rarity's stat budget, and
   the champion's stats outside battle (the collection, the champion page)
   never include it: there it is the passive's text under the skills.
+- **Regen and Weaken** (2026-10-12), Jakub's words: "regen should heal 15% max HP instead of 7.5%. change it. remove weken from debuffs."
+  Regen heals 15% of the holder's max HP at the start of each of its turns,
+  and Weaken (+25% damage taken) is gone from the game.
 
 ---
 

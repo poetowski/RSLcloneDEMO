@@ -20,7 +20,6 @@ export type StatusId =
   | 'def_down'
   | 'spd_down'
   | 'atk_down'
-  | 'weaken'
   | 'heal_block';
 
 export type TargetKind = 'enemy' | 'enemies' | 'ally' | 'allies' | 'self';
