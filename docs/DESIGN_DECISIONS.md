@@ -34,6 +34,7 @@ Section 7 lists what is not decided.
 | 2026-10-12 | The interface's affinity marks stay; Gareth's and the Skirmisher's cuts made plain | 2.1, 7 |
 | 2026-10-12 | Balance, the stage that brings each champion and every stage's enemies: Jakub dictates them later | 7 |
 | 2026-10-12 | The Quartermaster, a Common of the Azure Crown | 14 |
+| 2026-10-12 | The Quartermaster's affinity: Bloom (Tide before, the same day) | 14 |
 
 ---
 
@@ -935,12 +936,18 @@ and, the same day:
 quartermaster affinity should be tide.
 ```
 
+and then:
+
+```
+quartermaster affinity should be bloom. change it
+```
+
 | | |
 |---|---|
 | Rarity | Common |
 | Role | Support |
 | Faction | Azure Crown |
-| Affinity | Tide |
+| Affinity | Bloom *(Tide before, the same day)* |
 | Kit | A1 a basic hit, not strong; A2 heals all allies by 15% of his max HP, then grants 15% Turn Meter to the ally with the lowest HP after the heal (the brief names no A3 and no passive) |
 | Look | a walking stick; brown leather clothes; a backpack; a blue insignia on the front |
 

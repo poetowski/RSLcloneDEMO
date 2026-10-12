@@ -182,9 +182,9 @@ describe('design decisions', () => {
     expect(l?.passive).toBeUndefined();
   });
 
-  it("has the Quartermaster of his brief: a Common Support of the Azure Crown, Tide; A2 heals every ally by 15% of his max HP, then 15% Turn Meter to the ally lowest on HP", () => {
+  it("has the Quartermaster of his brief: a Common Support of the Azure Crown, Bloom; A2 heals every ally by 15% of his max HP, then 15% Turn Meter to the ally lowest on HP", () => {
     const q = CHAMPIONS.find((c) => c.id === 'quartermaster');
-    expect(q && [q.name, q.rarity, q.role, q.faction, q.affinity]).toEqual(['Quartermaster', 'common', 'Support', 'azure_crown', 'tide']);
+    expect(q && [q.name, q.rarity, q.role, q.faction, q.affinity]).toEqual(['Quartermaster', 'common', 'Support', 'azure_crown', 'bloom']);
     expect(q?.skills).toHaveLength(2);
     const a2 = q?.skills[1];
     expect(a2 && [a2.target, a2.healAllies, a2.healOf, a2.tmLowestAlly]).toEqual(['allies', 0.15, 'caster', 15]);

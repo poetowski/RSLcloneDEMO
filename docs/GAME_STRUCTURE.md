@@ -48,7 +48,7 @@ The roster today:
 | Rime Scholar (`rime_scholar`) | Elite | Tide | Support | Sanguine Dominion | after the first battle (clear 1-1) |
 | Skirmisher (`skirmisher`) | Common | Bloom | Damage | Azure Crown | clear 1-5 (a stand-in) |
 | Lineholder (`lineholder`) | Common | Tide | Tank | Azure Crown | clear 1-7 (a stand-in) |
-| Quartermaster (`quartermaster`) | Common | Tide | Support | Azure Crown | clear 1-9 (a stand-in) |
+| Quartermaster (`quartermaster`) | Common | Bloom | Support | Azure Crown | clear 1-9 (a stand-in) |
 
 Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8): Gareth's Line Cut, Iron Blow and Wide Sweep, no passive; the Rime Scholar's Pale Strike and Rimebind, no A3, and the passive Cold Rebuke. The Skirmisher is his brief of 2026-10-11 (DESIGN_DECISIONS.md 12): one A1 that always hits twice. The Lineholder is his brief of the same day (DESIGN_DECISIONS.md 13): Guard Cut, and Brace, DEF Up on himself for 2 turns. The Quartermaster is his brief of 2026-10-12 (DESIGN_DECISIONS.md 14): a plain A1, and an A2 that heals every ally by 15% of his max HP, then lends 15% Turn Meter to the ally lowest on HP. Their stats and the numbers in their skills are stand-ins ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 9). A champion has one to three skills; a save whose champions no longer exist (the stand-ins `azure_warrior` and `sanguine_support`) keeps its progress, regains the champions its cleared stages bring and starts its team over from the starters.
 

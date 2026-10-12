@@ -176,7 +176,7 @@ The kits are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 8, Starter Hero
 | **Captain Gareth**, Damage, Ember | Line Cut: one enemy, *1.0* | Iron Blow (CD *3*): one enemy, *1.5*; then ATK Up on himself for 2 turns, after the hit, never gated by a crit | Wide Sweep (CD *4*): all enemies, *0.95*, damage only | none |
 | **Rime Scholar**, Support, Tide | Pale Strike: one enemy, *1.0*, a pale shard thrown from her hand, nothing else | Rimebind (CD *3*): all enemies, *0.5*; Slow for *2* turns on every enemy | none | Cold Rebuke: below 35% HP, an enemy whose critical hit lands on her is Frozen for 1 turn; rests *3* turns |
 | **Skirmisher**, Damage, Bloom, Common | *Twin Cut*: one enemy, two hits of *0.6*, one with each short sword; always hits twice | none | none | none |
-| **Quartermaster**, Support, Tide, Common | *Stick Rap*: one enemy, *0.9*, a plain rap of the walking stick | *Field Rations* (CD *3*): heals every ally by 15% of his max HP, then 15% Turn Meter to the ally (not himself) lowest on HP after the heal | none | none |
+| **Quartermaster**, Support, Bloom, Common | *Stick Rap*: one enemy, *0.9*, a plain rap of the walking stick | *Field Rations* (CD *3*): heals every ally by 15% of his max HP, then 15% Turn Meter to the ally (not himself) lowest on HP after the heal | none | none |
 | **Lineholder**, Tank, Tide, Common | Guard Cut: one enemy, *1.0*, *a mace blow from behind the shield, damage only* | Brace (CD *3*): DEF Up on himself for 2 turns, no damage | none | none |
 
 Stats (stand-ins inside the Elite budget): Gareth HP 1150, ATK 122, DEF 62, SPD 104, CRIT 2.5% (score 422: his crit sits at the floor of the norms, as crit is deliberately not introduced on him); the Rime Scholar HP 1250, ATK 96, DEF 66, SPD 106, CRIT 2.5% (score 414, her passive paid for from the budget); the Skirmisher, on the Common budget, HP 960, ATK 108, DEF 57, SPD 110, CRIT 3.5% (score 391); the Lineholder, on the Common budget, HP 1320, ATK 78, DEF 72, SPD 92, CRIT 2.5% (score 395): the sturdiest and slowest of the five and the weakest hitter; the Quartermaster, on the Common budget, HP 1140, ATK 88, DEF 64, SPD 104, CRIT 2.5% (score 389): his heal is 171 HP to every ally. Zone 1's enemies are copies of the two and crit as rarely, so Cold Rebuke seldom fires there; Jakub's note is that crit must be taught at or before the point Cold Rebuke first fires meaningfully.
@@ -208,7 +208,7 @@ Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take
 | 1-7 | 2 Gareths, Rime Scholar | 0.82 | 74% | 85% | normal |
 | 1-8 | 3 Gareths | 0.71 | 71% | 73% | normal |
 | 1-9 | 2 Gareths, Rime Scholar | 0.74 | 65% | 66% | normal |
-| 1-10 | Gareth (boss), 2 Rime Scholars | 0.76 | 52% | 52% | boss |
+| 1-10 | Gareth (boss), 2 Rime Scholars | 0.76 | 49% | 49% | boss |
 
 ## 11. AI (`src/game/battle/ai.ts`)
 

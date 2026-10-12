@@ -1,7 +1,7 @@
 import { ChampionDef } from '../types';
 
 // The Quartermaster (docs/DESIGN_DECISIONS.md section 14, Jakub's brief of
-// 2026-10-12): a Common of the Azure Crown, Support, Tide. A1 a basic hit, not
+// 2026-10-12): a Common of the Azure Crown, Support, Bloom. A1 a basic hit, not
 // strong; A2 heals all allies by 15% of his max HP, then grants 15% Turn Meter
 // to the ally with the lowest HP after the heal. A walking stick, brown leather
 // clothes, a backpack, a blue insignia on the front. Stand-ins until Jakub sets
@@ -15,7 +15,7 @@ export const quartermaster: ChampionDef = {
   name: 'Quartermaster',
   role: 'Support',
   rarity: 'common',
-  affinity: 'tide',
+  affinity: 'bloom',
   faction: 'azure_crown',
   color: '#c89a68',
   stats: { hp: 1140, atk: 88, def: 64, spd: 104, crit: 0.025, critDmg: 1, acc: 0, res: 0 },
