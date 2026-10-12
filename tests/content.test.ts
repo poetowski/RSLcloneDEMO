@@ -192,6 +192,23 @@ describe('design decisions', () => {
     expect(q?.passive).toBeUndefined();
   });
 
+  it('has the Bloodhound of his brief: a Common Tank of the Sanguine Dominion, Ember; A2 a 1-turn Taunt on himself, cooldown 4', () => {
+    const b = CHAMPIONS.find((c) => c.id === 'bloodhound');
+    expect(b && [b.name, b.rarity, b.role, b.faction, b.affinity]).toEqual(['Bloodhound', 'common', 'Tank', 'sanguine_dominion', 'ember']);
+    expect(b?.skills).toHaveLength(2);
+    const a2 = b?.skills[1];
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'self', 4, [{ status: 'taunt', turns: 1, to: 'self' }]]);
+    expect(a2?.hits.every((h) => h.mult === 0)).toBe(true);
+    expect(b?.passive).toBeUndefined();
+  });
+
+  it('has the Enforcer of his brief: a Common of the Sanguine Dominion, Damage, Ember; an A1 and +10% C.RATE, always on', () => {
+    const e = CHAMPIONS.find((c) => c.id === 'enforcer');
+    expect(e && [e.name, e.rarity, e.role, e.faction, e.affinity]).toEqual(['Enforcer', 'common', 'Damage', 'sanguine_dominion', 'ember']);
+    expect(e?.skills).toHaveLength(1);
+    expect(e?.passive && [e.passive.kind, e.passive.stat, e.passive.value]).toEqual(['stat', 'crit', 0.1]);
+  });
+
   it('opens with a ten-stage first zone', () => {
     expect(LOCATIONS[0].stages).toHaveLength(10);
   });

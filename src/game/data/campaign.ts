@@ -90,12 +90,14 @@ export const LOCATIONS: LocationDef[] = [
         blurb: ESCALATION,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }, { champion: 'captain_gareth' }],
         power: 0.71,
+        // a stand-in: the stage that brings the Bloodhound is not Jakub's
+        recruit: 'bloodhound',
       },
       {
         id: '1-9',
         blurb: 'The turning point.',
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'captain_gareth' }],
-        power: 0.74,
+        power: 0.71,
         // a stand-in: the stage that brings the Quartermaster is not Jakub's
         recruit: 'quartermaster',
       },
@@ -103,7 +105,7 @@ export const LOCATIONS: LocationDef[] = [
         id: '1-10',
         blurb: 'Leaving the reach, on to the next area.',
         enemies: [{ champion: 'captain_gareth', boss: true }, { champion: 'rime_scholar' }, { champion: 'rime_scholar' }],
-        power: 0.76,
+        power: 0.72,
         // a stand-in: the stage that brings the Enforcer is not Jakub's
         recruit: 'enforcer',
       },

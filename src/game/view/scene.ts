@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -73,7 +73,8 @@ export class BattleScene {
   private resultsT = 0;
   private t = 0;
   private runId = 0;
-  private shadows: HTMLCanvasElement[];
+  /** ground shadows by footprint (1: a standing champion), each in four sizes as a unit rises */
+  private shadows = new Map<number, HTMLCanvasElement[]>();
   private lastReal = 0;
   paused = false;
   demoSkill: string | null = null;
@@ -90,8 +91,17 @@ export class BattleScene {
     this.auto = setup.auto;
     this.speedIdx = Math.max(0, this.speeds.indexOf(setup.speed));
     this.clock.speed = this.speeds[this.speedIdx];
-    this.shadows = [34, 28, 22, 16].map((w) => makeShadow(Math.round(w * setup.zone.shadow.stretch), w));
     this.build(setup.seed);
+  }
+
+  private shadowsFor(footprint: number): HTMLCanvasElement[] {
+    let set = this.shadows.get(footprint);
+    if (!set) {
+      const stretch = this.setup.zone.shadow.stretch;
+      set = [34, 28, 22, 16].map((w) => makeShadow(Math.round(w * stretch * footprint), w));
+      this.shadows.set(footprint, set);
+    }
+    return set;
   }
 
   private build(seed: number) {
@@ -812,7 +822,7 @@ export class BattleScene {
     for (const v of this.views.values()) {
       if ((v.dead && v.alpha < 0.05) || v.alpha <= 0) continue;
       const k = Math.min(3, Math.floor(v.h / 14));
-      const s = this.shadows[k];
+      const s = this.shadowsFor(v.footprint)[k];
       ctx.globalAlpha = v.alpha;
       ctx.drawImage(s, Math.round(v.x - s.width / 2 + sh.dx), Math.round(v.y - s.height / 2) + 1);
       ctx.globalAlpha = 1;

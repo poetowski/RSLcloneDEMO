@@ -46,6 +46,8 @@ export class UnitView {
   private stunT = 0;
   private readonly art: ChampionArt;
   readonly spriteH: number;
+  /** the shadow's width as a share of a standing champion's */
+  readonly footprint: number;
 
   constructor(
     readonly uid: string,
@@ -64,6 +66,7 @@ export class UnitView {
     this.hp = this.lagHp = this.maxHp = maxHp;
     const f = this.art.json.frames[`${this.facing}/idle/0`];
     this.spriteH = this.art.json.pivotY - f[5];
+    this.footprint = this.art.json.footprint ?? 1;
     // desync idle loops
     this.frame = Math.floor(Math.random() * this.art.json.anims.idle.ms.length);
   }

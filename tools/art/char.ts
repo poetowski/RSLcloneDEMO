@@ -42,6 +42,8 @@ export interface CharDef {
   anims: Record<string, AnimDef>;
   build(d: Draw, s: Skel, info: BuildInfo): void;
   render?: RenderOptions;
+  /** the shadow's width as a share of a standing champion's (1): a beast on four legs casts a longer one */
+  footprint?: number;
 }
 
 /**

@@ -25,6 +25,8 @@ export interface ChampionAtlasJson {
   frameH: number;
   pivotX: number;
   pivotY: number;
+  /** the shadow's width as a share of a standing champion's (CharDef.footprint) */
+  footprint?: number;
   /** key "R|L/anim/index" -> atlas rect + offset of the trimmed rect inside the frame box */
   frames: Record<string, [number, number, number, number, number, number]>;
   anims: Record<string, { loop: boolean; ms: number[]; hits: number[]; events: Record<string, string> }>;
@@ -66,6 +68,7 @@ function buildChampions(only?: string) {
       frameH: FRAME_H,
       pivotX: PIVOT.x,
       pivotY: PIVOT.y,
+      ...(c.footprint ? { footprint: c.footprint } : {}),
       frames: Object.fromEntries(frames.map((f) => [f.key, [f.x, f.y, f.w, f.h, ...offsets.get(f.key)!]])),
       anims,
     };

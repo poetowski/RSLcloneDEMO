@@ -83,6 +83,9 @@ export const MAT = {
   // --- furs ----------------------------------------------------------------
   furWhite: m('furWhite', 'fur', ['#262838', '#4b5068', '#7a849c', '#b0bccc', '#dbe4ee', '#fbfdff']),
   furBrown: m('furBrown', 'fur', ['#15100e', '#2a201d', '#43342d', '#615043', '#85725e', '#ab9a82']),
+  /** the Bloodhound's coat: tan on the head, the legs and the chest, black over the back, the ears and the tail */
+  furTan: m('furTan', 'fur', ['#1a0c0c', '#3a1a14', '#683419', '#9c5626', '#c57d42', '#e4a86c']),
+  furBlack: m('furBlack', 'fur', ['#080608', '#120e10', '#1e1719', '#2c2224', '#3e3133', '#5a484a']),
 
   // --- skins -------------------------------------------------------------
   skinLight: m('skinLight', 'skin', ['#2e1512', '#5c2a24', '#934c3c', '#d08262', '#f0ad86', '#ffd6b5']),

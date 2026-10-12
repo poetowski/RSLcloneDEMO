@@ -1,8 +1,10 @@
 // The Sanguine Dominion's effects. The Rime Scholar's: pale cold, rime and
 // ice; solid ice is drawn normally, only the cold flare is light. The
 // Enforcer's Heavy Cut: a plain line of light and chips, the light of the
-// steel, never his affinity (affinities are abstract, Jakub, 2026-10-11).
-// Light effects are additive in src/game/view/scene.ts.
+// steel; the Bloodhound's Bite: two rows of white teeth snapping shut, and his
+// Bay: rings of sound from his mouth. Never their affinity (affinities are
+// abstract, Jakub, 2026-10-11). Light effects are additive in
+// src/game/view/scene.ts.
 import { ACCENT } from '../palette.ts';
 import { disc, dith, ellipseFill, ellipseRing, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng, withAlpha } from '../raster.ts';
@@ -135,6 +137,59 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
       if (i < 6) cut(b, 10, 8, 74, 72, -3, th, DULL, heat, reach);
       if (i === 1 || i === 2) burst(b, 44, 42, 8, 2, [15, 10][i - 1], 1.5, DULL, 0.35);
       if (i >= 1) sparks(b, 44, 42, 16, 34, (i - 1) / 5, DULL, 101, 22);
+    },
+  },
+  /** Bite: two rows of white teeth close on the target, snap with a flash, and chips fly. */
+  bite: {
+    w: 64, h: 64, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 4, 6, 4],
+    draw: (b, t, i) => {
+      const cx = 32, cy = 31;
+      const gap = [11, 6, 1.5, 1, 1, 1, 1][i];
+      const heat = [1.2, 1.25, 1.35, 1.0, 0.75, 0.5, 0.3][i];
+      if (i < 6) {
+        for (const side of [-1, 1]) {
+          for (let x = -13; x <= 13; x++) {
+            const y = Math.round(cy + side * (gap + 0.045 * x * x));
+            const k = 1 - Math.abs(x) / 15;
+            b.set(cx + x, y, rampDither(DULL, Math.min(4, (1.4 + k * 2.2) * heat), cx + x, y));
+            if (Math.abs(x) < 12) b.set(cx + x, y + side, rampDither(DULL, Math.min(4, (0.9 + k * 1.6) * heat), cx + x, y + side));
+          }
+          // the teeth, pointing at each other: the fangs at the ends longest
+          for (const x of [-10, -6, -2, 2, 6, 10]) {
+            const len = Math.abs(x) >= 10 ? 4 : 2;
+            const y0 = Math.round(cy + side * (gap + 0.045 * x * x));
+            for (let s = 1; s <= len; s++) b.set(cx + x, y0 - side * s, s < len || heat > 0.9 ? W : DULL[3]);
+          }
+        }
+      }
+      if (i === 2 || i === 3) burst(b, cx, cy, 8, 2, [13, 9][i - 2], 1.4, DULL, 0.3);
+      if (i >= 2) sparks(b, cx, cy, 12, 26, (i - 2) / 4, DULL, 107, 18);
+    },
+  },
+  /**
+   * Bay: rings of sound open from the Bloodhound's mouth, up and forward. A
+   * hit on himself plays at his chest, so the anchor sits that far below and
+   * behind the rings (his mouth stands 25 px ahead of the chest and 31 above).
+   */
+  bay: {
+    w: 100, h: 84, n: 9, ms: 60, ax: 0.35, ay: 0.726, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 60, cy = 30;
+      for (let k = 0; k < 3; k++) {
+        const age = i - k * 1.5;
+        if (age < 0 || age > 6) continue;
+        const r = 5 + age * 4.2;
+        const fade = 1 - age / 6.5;
+        for (let deg = -88; deg <= 16; deg += 1.5) {
+          const a = (deg * Math.PI) / 180;
+          const edge = 1 - Math.abs(deg + 36) / 56;
+          for (const dr of [0, 0.8]) {
+            const x = Math.round(cx + Math.cos(a) * (r + dr)), y = Math.round(cy + Math.sin(a) * (r + dr));
+            if (!dith(x, y, Math.min(1, fade * 1.2) * (0.35 + edge * 0.75))) continue;
+            b.set(x, y, rampDither(DULL, Math.min(4, 1.2 + edge * 2.2 + fade), x, y));
+          }
+        }
+      }
     },
   },
   /** The cold flaring in her, the moment Cold Rebuke answers (additive light). */

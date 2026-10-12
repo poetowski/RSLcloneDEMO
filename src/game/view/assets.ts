@@ -14,6 +14,8 @@ export interface ChampionAtlasJson {
   frameH: number;
   pivotX: number;
   pivotY: number;
+  /** the shadow's width as a share of a standing champion's: a beast on four legs casts a longer one */
+  footprint?: number;
   frames: Record<string, Rect6>;
   anims: Record<string, { loop: boolean; ms: number[]; hits: number[]; events: Record<string, string> }>;
 }

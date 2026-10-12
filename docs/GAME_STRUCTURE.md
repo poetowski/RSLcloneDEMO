@@ -48,10 +48,11 @@ The roster today:
 | Rime Scholar (`rime_scholar`) | Elite | Tide | Support | Sanguine Dominion | after the first battle (clear 1-1) |
 | Skirmisher (`skirmisher`) | Common | Bloom | Damage | Azure Crown | clear 1-5 (a stand-in) |
 | Lineholder (`lineholder`) | Common | Tide | Tank | Azure Crown | clear 1-7 (a stand-in) |
+| Bloodhound (`bloodhound`) | Common | Ember | Tank | Sanguine Dominion | clear 1-8 (a stand-in) |
 | Quartermaster (`quartermaster`) | Common | Bloom | Support | Azure Crown | clear 1-9 (a stand-in) |
 | Enforcer (`enforcer`) | Common | Ember | Damage | Sanguine Dominion | clear 1-10 (a stand-in) |
 
-Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8): Gareth's Line Cut, Iron Blow and Wide Sweep, no passive; the Rime Scholar's Pale Strike and Rimebind, no A3, and the passive Cold Rebuke. The Skirmisher is his brief of 2026-10-11 (DESIGN_DECISIONS.md 12): one A1 that always hits twice. The Lineholder is his brief of the same day (DESIGN_DECISIONS.md 13): Guard Cut, and Brace, DEF Up on himself for 2 turns. The Quartermaster is his brief of 2026-10-12 (DESIGN_DECISIONS.md 14): a plain A1, and an A2 that heals every ally by 15% of his max HP, then lends 15% Turn Meter to the ally lowest on HP. The Enforcer is his brief of the same day (DESIGN_DECISIONS.md 15): a plain A1, and the passive Keen Edge, +10% C.RATE in every battle, extra to his stats and not shown with them outside battle. Their stats and the numbers in their skills are stand-ins ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 9). A champion has one to three skills; a save whose champions no longer exist (the stand-ins `azure_warrior` and `sanguine_support`) keeps its progress, regains the champions its cleared stages bring and starts its team over from the starters.
+Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8): Gareth's Line Cut, Iron Blow and Wide Sweep, no passive; the Rime Scholar's Pale Strike and Rimebind, no A3, and the passive Cold Rebuke. The Skirmisher is his brief of 2026-10-11 (DESIGN_DECISIONS.md 12): one A1 that always hits twice. The Lineholder is his brief of the same day (DESIGN_DECISIONS.md 13): Guard Cut, and Brace, DEF Up on himself for 2 turns. The Quartermaster is his brief of 2026-10-12 (DESIGN_DECISIONS.md 14): a plain A1, and an A2 that heals every ally by 15% of his max HP, then lends 15% Turn Meter to the ally lowest on HP. The Enforcer is his brief of the same day (DESIGN_DECISIONS.md 15): a plain A1, and the passive Keen Edge, +10% C.RATE in every battle, extra to his stats and not shown with them outside battle. The Bloodhound is his brief of the same day too (DESIGN_DECISIONS.md 16), the first champion on four legs: a plain A1, and an A2 that puts Taunt on himself for 1 turn, cooldown 4. Their stats and the numbers in their skills are stand-ins ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 9). A champion has one to three skills; a save whose champions no longer exist (the stand-ins `azure_warrior` and `sanguine_support`) keeps its progress, regains the champions its cleared stages bring and starts its team over from the starters.
 
 ## 3. The campaign (`src/game/data/campaign.ts`)
 
@@ -63,7 +64,7 @@ Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8):
 
 | Location | Zone | Stages |
 | --- | --- | --- |
-| I. Fracture Reach | `zone1` | 1-1 to 1-10 (1-1 brings the Rime Scholar, 1-5 the Skirmisher, 1-7 the Lineholder, 1-9 the Quartermaster; 1-10 is the boss and brings the Enforcer) |
+| I. Fracture Reach | `zone1` | 1-1 to 1-10 (1-1 brings the Rime Scholar, 1-5 the Skirmisher, 1-7 the Lineholder, 1-8 the Bloodhound, 1-9 the Quartermaster; 1-10 is the boss and brings the Enforcer) |
 | II. Verdant Grove (after 1-10) | none yet | not designed |
 
 Zone 1 follows Jakub's working notes (DESIGN_DECISIONS.md 5.3), which are not locked: the stage texts quote them (contact, the settlement, escalation, the turning point, leaving). Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed. Zone 2 (the mystic arena in a Court of Root forest) has its node in the jungle and no stages yet. The world map follows his brief (DESIGN_DECISIONS.md 5.4a): the edge of a continent, a rift in the west, jungle toward the east, nothing beyond its north and south edges.

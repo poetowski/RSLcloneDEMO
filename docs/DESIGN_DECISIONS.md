@@ -38,6 +38,7 @@ Section 7 lists what is not decided.
 | 2026-10-12 | The Enforcer, a Common of the Sanguine Dominion | 15 |
 | 2026-10-12 | A passive that gives a permanent stat boost is extra to the stat budget and works in combat only | 10, 15 |
 | 2026-10-12 | The Enforcer's helmet made less prominent: he should look weaker | 15 |
+| 2026-10-12 | The Bloodhound, a Common of the Sanguine Dominion and the first champion on four legs | 16 |
 
 ---
 
@@ -542,8 +543,8 @@ open questions.
   decided 2026-10-11: no subtitle, eight stats; section 10)*
 - Kit / skill design *(the starter pair's kits decided 2026-10-10, section 8,
   the Skirmisher's and the Lineholder's 2026-10-11, sections 12 and 13, and
-  the Quartermaster's and the Enforcer's 2026-10-12, sections 14 and 15;
-  their numbers are not)*
+  the Quartermaster's, the Enforcer's and the Bloodhound's 2026-10-12,
+  sections 14-16; their numbers are not)*
 - Art pipeline specification
 - Save and progression *(gear decided: the Weaver Matrix, section 9; levels,
   ranks, ascension and skill upgrades are not)*
@@ -1018,3 +1019,36 @@ name (Keen Edge) and text, the stats, the lore line, the stage that brings
 him (the first clear of 1-10), and the details of his art and effect. Read by
 the game: "class" is his role, "alligience" his faction; the hexagon is on
 his chest.
+
+## 16. The Bloodhound (received 2026-10-12)
+
+Jakub's brief, verbatim:
+
+```
+i want new sanguine dominion common tank hero.
+name = Bloodhound
+affinity = ember.
+design: this is first 4 legged animal dog. you can maybe put him somehow insignia, i dont know how, maybe on collar.
+kit = A1 is attack, A2 should be 1 turn taunt on CD 4.
+```
+
+| | |
+|---|---|
+| Rarity | Common |
+| Role | Tank |
+| Faction | Sanguine Dominion |
+| Affinity | Ember |
+| Kit | A1 an attack; A2 Taunt for 1 turn, cooldown 4 (the brief names no A3 and no passive) |
+| Look | the first champion on four legs: a dog; the Dominion's insignia, maybe on his collar |
+
+The cooldown of 4 on his A2 is Jakub's: the norms, which held every A2 at
+3, allow 3-4 since.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the skills' names
+(Bite, Bay) and texts, A1's multiplier (1.0, a plain attack), the stats, the
+lore line, the stage that brings him (the first clear of 1-8, which lowered
+the powers of 1-9 and 1-10), and the details of his art and effects: a
+bloodhound, as his name says, black and tan, waist-high to the others, the
+insignia a red hexagon hanging from a black collar. Read by the game: the
+Taunt is on himself, and as it is placed on his own turn it lasts until the
+end of his next turn.

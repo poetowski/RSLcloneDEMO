@@ -34,7 +34,8 @@ export const STAT_LIMITS = {
 /** Total damage multiplier (sum of hit mults) allowed per slot, single target vs AoE. */
 export const SKILL_NORMS: Record<1 | 2 | 3, { cooldown: [number, number]; single: [number, number]; aoe: [number, number] }> = {
   1: { cooldown: [0, 0], single: [0.9, 1.25], aoe: [0.5, 0.8] },
-  2: { cooldown: [3, 3], single: [1.1, 1.6], aoe: [0.5, 1.1] },
+  // A2 cooldown 4: Jakub's Bloodhound (2026-10-12), whose Taunt rests a turn longer
+  2: { cooldown: [3, 4], single: [1.1, 1.6], aoe: [0.5, 1.1] },
   3: { cooldown: [4, 5], single: [1.3, 2.6], aoe: [0.7, 1.2] },
 };
 
