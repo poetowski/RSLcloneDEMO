@@ -79,6 +79,8 @@ export const MAT = {
   /** crimson: the Enforcer's armour, the cloth over its plates (`crimsonPlate` is the same red on steel) */
   crimson: m('crimson', 'cloth', ['#1a0510', '#3a0a1e', '#64102c', '#9a1a38', '#c62c48', '#ee6660']),
   crimsonPlate: m('crimsonPlate', 'metal', ['#1a0510', '#3a0a1e', '#64102c', '#9a1a38', '#c62c48', '#ee6660']),
+  /** black cloth: the Dominion Medic's tunic between its red stripes */
+  blackCloth: m('blackCloth', 'cloth', ['#07060a', '#121016', '#1c1922', '#28242f', '#383341', '#4e4858']),
 
   // --- furs ----------------------------------------------------------------
   furWhite: m('furWhite', 'fur', ['#262838', '#4b5068', '#7a849c', '#b0bccc', '#dbe4ee', '#fbfdff']),
@@ -191,6 +193,8 @@ export const FXR = {
   tomb: fx(['#0a2410', '#155a1e', '#2fae4a', '#8af07a', '#e4ffd8']),
   curse: fx(['#120a1c', '#2a1440', '#4a2468', '#3f8a3a', '#9af07a']),
   blood: fx(['#3a0a10', '#7a1420', '#c02a30', '#ff6a5a', '#ffd0c0']),
+  /** the rose light of the Dominion Medic's potions */
+  rose: fx(['#4a1030', '#a03068', '#e0609a', '#ffa8cc', '#fff0f6']),
   magenta: fx(['#3a0a2c', '#8a1a64', '#d0409a', '#ff8ad0', '#ffe8f6']),
   cosmic: fx(['#1a0a3a', '#4a2a8a', '#4a8ae0', '#8af0f0', '#f0ffff']),
   core: fx(['#3a1a06', '#c06a12', '#ffc850', '#fff0a8', '#ffffff']),

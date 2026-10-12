@@ -368,11 +368,13 @@ export class Battle {
 
     const result: SkillResult = { actor: actor.uid, skill, target: primary?.uid, targets: targets.map((t) => t.uid), events, counter: asCounter, counters: [] };
 
-    // counterattacks: each damaged defender holding Counterattack answers once with A1
+    // counterattacks: each damaged defender holding Counterattack answers once with A1;
+    // one whose A1 strikes no enemy (the Dominion Medic's heal) has no answer to give
     if (!asCounter && actor.team !== undefined) {
       for (const d of damaged) {
         if (!d.alive || !actor.alive || d.team === actor.team) continue;
         if (!this.has(d, 'counter') || this.has(d, 'stun') || this.has(d, 'freeze')) continue;
+        if (d.champion.skills[0].target !== 'enemy') continue;
         result.counters.push(this.useSkill(d, d.champion.skills[0], actor.uid, true));
       }
     }

@@ -202,6 +202,16 @@ describe('design decisions', () => {
     expect(b?.passive).toBeUndefined();
   });
 
+  it('has the Dominion Medic of his brief: a Common Support, Tide; one skill, an A1 healing every ally by 10% of his max HP, nothing else', () => {
+    const m = CHAMPIONS.find((c) => c.id === 'dominion_medic');
+    expect(m && [m.name, m.rarity, m.role, m.affinity]).toEqual(['Dominion Medic', 'common', 'Support', 'tide']);
+    expect(m?.skills).toHaveLength(1);
+    const a1 = m?.skills[0];
+    expect(a1 && [a1.slot, a1.target, a1.healAllies, a1.healOf, a1.statuses ?? []]).toEqual([1, 'allies', 0.1, 'caster', []]);
+    expect(a1?.hits.every((h) => h.mult === 0)).toBe(true);
+    expect(m?.passive).toBeUndefined();
+  });
+
   it('has the Enforcer of his brief: a Common of the Sanguine Dominion, Damage, Ember; an A1 and +10% C.RATE, always on', () => {
     const e = CHAMPIONS.find((c) => c.id === 'enforcer');
     expect(e && [e.name, e.rarity, e.role, e.faction, e.affinity]).toEqual(['Enforcer', 'common', 'Damage', 'sanguine_dominion', 'ember']);

@@ -78,7 +78,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Role | Tank, Damage, Support: how the budget is spent (no fourth role; Control, Bruiser and the like are descriptive tags) | `Role`, `ROLES` |
 | Faction | one of four powers: the Azure Crown, the Sanguine Dominion, the Court of Root, the Ashveil Reign; story and standard, no mechanics | `FactionId`, `FACTIONS`, `FactionDef.standard` |
 | Standard | a faction's heraldry: the Azure Crown a gold crown on blue, the Sanguine Dominion a red hexagon on black, the Court of Root a brown claw on green, the Ashveil Reign a white bone across a dark grey | `FactionDef.standard`, `emblem_<faction>` |
-| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal, the Quartermaster's brown leather, the Enforcer's crimson, the Bloodhound's tan), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
+| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal, the Quartermaster's brown leather, the Enforcer's crimson, the Bloodhound's tan, the Dominion Medic's rose), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
 | Footprint | how long a champion's shadow is, as a share of a standing champion's: a beast on four legs casts a longer one (the Bloodhound 1.9) | `CharDef.footprint`, the atlas json, `UnitView.footprint` |
 | Muzzle | where projectiles leave a ranged champion's sprite | `ChampionDef.muzzle` |
 | Approach | how the actor travels before the attack | `Approach` |
@@ -390,10 +390,10 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-K6 | Every champion has an atlas, a portrait and one icon per skill | test |
 | INV-K7 | Every status has an icon and is taught in the Academy; Academy demos and icons exist | test |
 | INV-K8 | Every faction, affinity, role and rarity has its UI part (`emblem_`, `gem_`, `role_`, `card_`) | convention: screens throw on a missing part (R-6) |
-| INV-K9 | Every A1 targets a single enemy, because counterattacks answer with A1 | convention, true today (R-6) |
-| INV-K10 | Effect names are unique across effect modules (a later module would silently override an earlier one) | convention, true today: 81 names (R-6) |
+| INV-K9 | An A1 that strikes no enemy (the Dominion Medic's heal) never counterattacks, because counterattacks answer with A1; every other A1 targets a single enemy | code (`useSkill`), test |
+| INV-K10 | Effect names are unique across effect modules (a later module would silently override an earlier one) | convention, true today: 82 names (R-6) |
 | INV-K11 | Every faction has a deliberate home zone | convention: `homeZone()` returns the first zone for every faction until zones belong to factions (DR-12) |
-| INV-K12 | Numbers in skill descriptions equal the data | convention, true today for all 13 skills and both passives (R-1) |
+| INV-K12 | Numbers in skill descriptions equal the data | convention, true today for all 14 skills and both passives (R-1) |
 | INV-K13 | Numbers in the Academy, its figures and the stat tips equal the rules | test for the turn-meter numbers it quotes; the rest by convention (DR-5, R-1) |
 | INV-K14 | Definitions do not change at runtime | convention: objects are not frozen |
 | INV-K15 | The interface ramps repeat the category colours: `UIR.rarity` and `UIR.affinity` base entries (`palette.ts`) equal the colours in `meta.ts`; faction medallions follow the standards instead (the Azure Crown's crown is gold on its blue field) | convention, true today for all 7 (R-6) |

@@ -41,6 +41,7 @@ Section 7 lists what is not decided.
 | 2026-10-12 | The Bloodhound, a Common of the Sanguine Dominion and the first champion on four legs | 16 |
 | 2026-10-12 | Zone 1's battle background changed: a broken windmill, a calmer fire, a slower rift, a rare flash across the sky, more details | 5.3a |
 | 2026-10-12 | Zone 1: the flash every 10-25 s, things round the mill, distant rocks in the left sky, tools in the fields, more ravens on the left; the haystack's flames loop properly | 5.3a |
+| 2026-10-12 | The Dominion Medic, a Common of the Sanguine Dominion | 17 |
 
 ---
 
@@ -589,8 +590,8 @@ open questions.
   decided 2026-10-11: no subtitle, eight stats; section 10)*
 - Kit / skill design *(the starter pair's kits decided 2026-10-10, section 8,
   the Skirmisher's and the Lineholder's 2026-10-11, sections 12 and 13, and
-  the Quartermaster's, the Enforcer's and the Bloodhound's 2026-10-12,
-  sections 14-16; their numbers are not)*
+  the Quartermaster's, the Enforcer's, the Bloodhound's and the Dominion
+  Medic's 2026-10-12, sections 14-17; their numbers are not)*
 - Art pipeline specification
 - Save and progression *(gear decided: the Weaver Matrix, section 9; levels,
   ranks, ascension and skill upgrades are not)*
@@ -1098,3 +1099,36 @@ bloodhound, as his name says, black and tan, waist-high to the others, the
 insignia a red hexagon hanging from a black collar. Read by the game: the
 Taunt is on himself, and as it is placed on his own turn it lasts until the
 end of his next turn.
+
+## 17. The Dominion Medic (received 2026-10-12)
+
+Jakub's brief, verbatim:
+
+```
+i want to add new hero:
+name = Dominion Medic
+rarity common
+support, affinity tide.
+kit A1 heal all allies by 10% of this champion max HP.
+nothing else.
+design = field medic, no weapon, tunic in red and black stripes. add healing potions around his waist.
+```
+
+| | |
+|---|---|
+| Rarity | Common |
+| Role | Support |
+| Faction | Sanguine Dominion *(read from his name; the brief names none)* |
+| Affinity | Tide |
+| Kit | one skill: an A1 that heals all allies by 10% of his max HP; nothing else |
+| Look | a field medic, no weapon, a tunic in red and black stripes, healing potions around his waist |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the skill's name
+(Tonic) and text, the stats (ATK at the floor, as he never strikes), the lore
+line, the stage that brings him (the first clear of 1-6, which lowered the
+powers of 1-7, 1-9 and 1-10), and the details of his art and effect: his face
+and hair, the stripes running down the tunic, three red potions of pale glass
+at the belt and one in his hand when he heals, bandaged forearms, the rose
+light of the heal. Read by the game: his faction is the Sanguine Dominion;
+his heal includes himself; an A1 that strikes no enemy has no answer to give,
+so he never counterattacks.

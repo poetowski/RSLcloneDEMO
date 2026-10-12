@@ -120,6 +120,12 @@ export const rebuker = (() => {
   return { ...c, skills: [c.skills[0], c.skills[1]] as ChampionDef['skills'] };
 })();
 
+/** One skill only: an A1 that heals the team by a share of its own max HP and strikes nobody. */
+export const medic = (() => {
+  const c = fixture('medic', { stats: { hp: 1400 }, skills: [skill('tonic', 1, { target: 'allies', anim: 'skill', approach: 'none', hits: [{ mult: 0 }], healAllies: 0.1, healOf: 'caster' })] });
+  return { ...c, skills: [c.skills[0]] as ChampionDef['skills'] };
+})();
+
 /** A stat passive: +95% C.RATE in battle, so with its own 5% every hit is critical. */
 export const keen = fixture('keen', { passive: { id: 'keen', name: 'Keen', desc: '', kind: 'stat', stat: 'crit', value: 0.95 } });
 

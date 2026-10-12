@@ -6,7 +6,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { brute, cleaver, drummer, fixture, freezer, guard, inAffinity, keen, mender, overdrive, provisioner, rebuker, stalker, striker, twin, undying, warden } from './fixtures';
+import { brute, cleaver, drummer, fixture, freezer, guard, inAffinity, keen, medic, mender, overdrive, provisioner, rebuker, stalker, striker, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -232,6 +232,19 @@ describe('statuses', () => {
     const hit = r.events.find((e) => e.kind === 'damage');
     expect(hit?.kind === 'damage' && hit.absorbed).toBe(0);
     expect(b.has(k, 'weaken')).toBe(true);
+  });
+
+  it('heals with an A1 that strikes nobody, and gives no counterattack with it', () => {
+    const b = new Battle(combatants([medic, striker]), combatants([twin]), { seed: 3 });
+    const [m, s] = [b.get('p0'), b.get('p1')];
+    s.hp = 500;
+    const r = b.useSkill(m, medic.skills[0]);
+    expect(r.events.filter((e) => e.kind === 'heal').map((e) => e.kind === 'heal' && [e.target, e.amount])).toEqual([['p1', 140]]);
+    expect(r.events.some((e) => e.kind === 'damage')).toBe(false);
+    // even holding Counterattack, a champion whose A1 is a heal does not answer a blow with it
+    b.addStatus(m, 'counter', 2, 0, 'p0');
+    const hit = b.useSkill(b.get('e0'), twin.skills[0], 'p0');
+    expect(hit.counters).toEqual([]);
   });
 
   it('counterattacks once with A1 when a countering champion is hit', () => {

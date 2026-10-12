@@ -2,13 +2,14 @@
 // ice; solid ice is drawn normally, only the cold flare is light. The
 // Enforcer's Heavy Cut: a plain line of light and chips, the light of the
 // steel; the Bloodhound's Bite: two rows of white teeth snapping shut, and his
-// Bay: rings of sound from his mouth. Never their affinity (affinities are
+// Bay: rings of sound from his mouth; the Dominion Medic's Tonic: the rose light
+// of his potions rising round each ally. Never their affinity (affinities are
 // abstract, Jakub, 2026-10-11). Light effects are additive in
 // src/game/view/scene.ts.
 import { ACCENT } from '../palette.ts';
 import { disc, dith, ellipseFill, ellipseRing, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng, withAlpha } from '../raster.ts';
-import { burst, cut, FxDef, ramps, ring, shard, sparks, W } from './kit.ts';
+import { burst, cut, FxDef, motes, ramps, ring, shard, sparks, W } from './kit.ts';
 
 const I = ramps.ice;
 const DU = ramps.dust;
@@ -190,6 +191,29 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
           }
         }
       }
+    },
+  },
+  /** Tonic: the rose light of the Medic's potions gathers at an ally's feet, bubbles rising through it and bursting in white. */
+  tonic: {
+    w: 48, h: 72, n: 10, ms: 70, ax: 0.5, ay: 1, pad: [2, 4, 3, 4],
+    draw: (b, t, i) => {
+      const RO = ramps.rose;
+      const cx = 24, gy = 70;
+      const rr = [6, 11, 15, 17, 18, 18, 17, 15, 12, 8][i];
+      ellipseRing(b, cx, gy - 2, rr, rr * 0.28, 1.4, (x, y, a) => (dith(x, y, 1 - t * 0.7) ? rampDither(RO, 3 - t * 1.4 + Math.sin(a) * 0.6, x, y) : 0));
+      const r = rng(97);
+      for (let k = 0; k < 6; k++) {
+        const x0 = cx + (r() - 0.5) * 24, start = r() * 0.35, sp = 1.1 + r() * 0.5;
+        const tt = (t - start) * sp;
+        if (tt <= 0 || tt >= 1) continue;
+        const x = Math.round(x0 + Math.sin(tt * 7 + k) * 1.4), y = Math.round(gy - 6 - tt * 48);
+        // a bubble: a rose ring, white at its heart; near the top it bursts into a white point
+        if (tt < 0.8) {
+          for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(x + dx, y + dy, RO[2 + (tt > 0.5 ? 1 : 0)]);
+          b.set(x, y, W);
+        } else b.set(x, y, W);
+      }
+      motes(b, cx, gy - 6, 22, 38, 9, t, RO, 101);
     },
   },
   /** The cold flaring in her, the moment Cold Rebuke answers (additive light). */
