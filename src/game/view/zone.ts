@@ -3,7 +3,8 @@
 // tile layers, props driven by their kind (static, looping, pulsing, burning),
 // the ambience of the zone (falling snow, blowing sand, drifting star-dust with
 // shooting stars, or autumn leaves tumbling in the wind; circling birds, heat
-// haze), light pools, a mood tint and the vignette. Everything zone-specific
+// haze, now and then a flash of strange light across the sky), light pools, a
+// mood tint and the vignette. Everything zone-specific
 // comes from the zone's JSON (art) and ZoneDef (behaviour), so a new zone
 // needs no code here.
 import { Particles } from '../../engine/particles';
@@ -38,6 +39,14 @@ export class ZoneView {
   private birds: Bird[] = [];
   private gust = 0;
   private gustT = 4000;
+  /** the sky's rare flash: its mask, one tinted copy per colour, the time to the next one, how far into one we are (-1: none) */
+  private flashMask?: HTMLCanvasElement;
+  private flashTints = new Map<string, HTMLCanvasElement>();
+  private flashT = 0;
+  private flashAge = -1;
+  private flashColors: [string, string] = ['', ''];
+  /** ?skyflash=1 brings the flash every few seconds (previews and screenshots) */
+  private flashPreview = typeof location !== 'undefined' && new URLSearchParams(location.search).get('skyflash') === '1';
 
   constructor(
     a: Assets,
@@ -52,8 +61,42 @@ export class ZoneView {
     for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
     this.sparkT = (this.json.sparks ?? []).map(() => 0);
     for (let i = 0; i < (def.birds ?? 0); i++) {
-      this.birds.push({ cx: 380 + Math.random() * 200, cy: 22 + Math.random() * 26, r: 30 + Math.random() * 40, ry: 6 + Math.random() * 6, a: Math.random() * Math.PI * 2, speed: (0.00025 + Math.random() * 0.0002) * (i % 2 ? 1 : -1) });
+      const at = def.birdsAt;
+      this.birds.push(
+        at
+          ? // a few birds wheeling slowly over one spot
+            { cx: at[0] + (Math.random() - 0.5) * 36, cy: at[1] + (Math.random() - 0.5) * 12, r: 12 + Math.random() * 16, ry: 3 + Math.random() * 4, a: Math.random() * Math.PI * 2, speed: (0.00016 + Math.random() * 0.0001) * (i % 2 ? 1 : -1) }
+          : { cx: 380 + Math.random() * 200, cy: 22 + Math.random() * 26, r: 30 + Math.random() * 40, ry: 6 + Math.random() * 6, a: Math.random() * Math.PI * 2, speed: (0.00025 + Math.random() * 0.0002) * (i % 2 ? 1 : -1) },
+      );
     }
+    if (def.flash) {
+      this.flashMask = makeFlashMask(def.flash.at, this.json.horizon);
+      this.flashT = this.nextFlash() * (this.flashPreview ? 0.4 : 1);
+    }
+  }
+
+  private nextFlash(): number {
+    const f = this.def.flash!;
+    const [lo, hi] = this.flashPreview ? [2500, 4000] : f.every;
+    return lo + Math.random() * (hi - lo);
+  }
+
+  /** The flash mask filled with one colour (cached). */
+  private flashTint(color: string): HTMLCanvasElement {
+    let c = this.flashTints.get(color);
+    if (!c) {
+      const m = this.flashMask!;
+      c = document.createElement('canvas');
+      c.width = m.width;
+      c.height = m.height;
+      const g = c.getContext('2d')!;
+      g.drawImage(m, 0, 0);
+      g.globalCompositeOperation = 'source-in';
+      g.fillStyle = color;
+      g.fillRect(0, 0, c.width, c.height);
+      this.flashTints.set(color, c);
+    }
+    return c;
   }
 
   private bakeTiles(): HTMLCanvasElement {
@@ -197,7 +240,7 @@ export class ZoneView {
         const [x0, y0] = e.path[seg], [x1, y1] = e.path[seg + 1];
         const k = Math.random();
         const a = Math.random() * Math.PI * 2, sp = e.speed * (0.4 + Math.random() * 0.8);
-        const life = 500 + Math.random() * 1100;
+        const life = e.life ? e.life[0] + Math.random() * (e.life[1] - e.life[0]) : 500 + Math.random() * 1100;
         this.sparks.add({
           x: x0 + (x1 - x0) * k, y: y0 + (y1 - y0) * k,
           vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
@@ -210,16 +253,50 @@ export class ZoneView {
     const em = this.def.embers ?? ['#ffd060', '#fff0b0', '#ffb84a', '#f2731e', '#c8361a'];
     for (const p of this.json.props) {
       const k = this.json.kinds[p.kind];
-      if (k?.fire && Math.random() < dt / 140) {
+      if (k?.fire && Math.random() < dt / 180) {
+        // embers drift up slowly and wander rather than shoot out
         this.embers.add({
           x: p.x - 3 + Math.random() * 6, y: p.y + k.fire.dy - 4,
-          vx: (Math.random() - 0.5) * 8 + (this.def.ambient === 'sand' ? 6 : 0), vy: -18 - Math.random() * 14,
-          life: 900 + Math.random() * 700, color: em[0], fade: em.slice(1),
-          sway: 6, additive: true,
+          vx: (Math.random() - 0.5) * 6 + (this.def.ambient === 'sand' ? 6 : 0), vy: -10 - Math.random() * 9,
+          life: 1300 + Math.random() * 1000, color: em[0], fade: em.slice(1),
+          sway: 5, additive: true,
         });
       }
     }
     for (const b of this.birds) b.a += b.speed * dt;
+    const f = this.def.flash;
+    if (f) {
+      if (this.flashAge >= 0) {
+        this.flashAge += dt;
+        if (this.flashAge > f.ms) this.flashAge = -1;
+      } else if ((this.flashT -= dt) <= 0) {
+        const pick = () => f.colors[Math.floor(Math.random() * f.colors.length)];
+        const a = pick();
+        let b = pick();
+        for (let k = 0; k < 4 && b === a && f.colors.length > 1; k++) b = pick();
+        this.flashColors = [a, b];
+        this.flashAge = 0;
+        this.flashT = this.nextFlash();
+      }
+    }
+  }
+
+  /**
+   * The sky's flash, behind the islands and everything else in the sky: it
+   * swells, stutters once and fades, its colour turning from one to the other.
+   */
+  private drawFlash(ctx: CanvasRenderingContext2D) {
+    const f = this.def.flash;
+    if (!f || this.flashAge < 0 || !this.flashMask) return;
+    const u = this.flashAge / f.ms;
+    const env = u < 0.08 ? u / 0.08 : u < 0.15 ? 1 - ((u - 0.08) / 0.07) * 0.5 : u < 0.22 ? 0.5 + ((u - 0.15) / 0.07) * 0.45 : 0.95 * Math.pow(1 - (u - 0.22) / 0.78, 1.7);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = env * (1 - u);
+    ctx.drawImage(this.flashTint(this.flashColors[0]), 0, 0);
+    ctx.globalAlpha = env * u;
+    ctx.drawImage(this.flashTint(this.flashColors[1]), 0, 0);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
   }
 
   private drawProp(ctx: CanvasRenderingContext2D, p: ZoneJson['props'][number]) {
@@ -237,7 +314,8 @@ export class ZoneView {
     } else if (k.mode === 'pulse') {
       const dim = this.frame(p.kind, 0), bright = this.frame(p.kind, 1);
       blit(ctx, img, dim, ...place(dim));
-      ctx.globalAlpha = 0.35 + 0.35 * Math.sin(this.t / 700);
+      // one slow breath every `ms` (4.4 s unless the kind sets its own)
+      ctx.globalAlpha = 0.35 + 0.35 * Math.sin((this.t / (k.ms ?? 4400)) * Math.PI * 2);
       blit(ctx, img, bright, ...place(bright));
       ctx.globalAlpha = 1;
     } else {
@@ -251,6 +329,7 @@ export class ZoneView {
     const bd = this.art.backdrop;
     ctx.drawImage(bd, 0, 0);
     this.sky.draw(ctx);
+    this.drawFlash(ctx);
     if (this.def.haze) {
       // heat shimmer: the rows around the horizon wobble a pixel side to side
       const h0 = this.json.horizon - 26, h1 = Math.min(bd.height, this.json.horizon + 14);
@@ -262,7 +341,7 @@ export class ZoneView {
     if (this.birds.length && this.json.kinds.bird) {
       for (const b of this.birds) {
         const x = b.cx + Math.cos(b.a) * b.r, y = b.cy + Math.sin(b.a) * b.ry;
-        const f = this.frame('bird', Math.floor(this.t / 140 + b.cx) % this.json.kinds.bird.frames);
+        const f = this.frame('bird', Math.floor(this.t / (this.json.kinds.bird.ms ?? 140) + b.cx) % this.json.kinds.bird.frames);
         const left = Math.sin(b.a) * b.speed > 0;
         ctx.save();
         ctx.translate(Math.round(x), Math.round(y));
@@ -309,7 +388,8 @@ export class ZoneView {
     for (const p of this.json.props) {
       const k = this.json.kinds[p.kind];
       if (!k?.fire) continue;
-      const flick = 0.75 + 0.12 * Math.sin(this.t / 70 + p.x) + 0.08 * Math.sin(this.t / 31);
+      // the firelight breathes slowly; a quick flicker made the fire look busy (Jakub, 2026-10-12)
+      const flick = 0.78 + 0.1 * Math.sin(this.t / 330 + p.x) + 0.05 * Math.sin(this.t / 190);
       ctx.globalAlpha = flick * 0.55;
       ctx.drawImage(this.light, p.x - this.light.width / 2, p.y + k.fire.dy - this.light.height / 2);
     }
@@ -345,6 +425,35 @@ function makeGlow(rx: number, ry: number, rgb: [number, number, number]): HTMLCa
       img.data[i + 1] = rgb[1];
       img.data[i + 2] = rgb[2];
       img.data[i + 3] = Math.round(k * k * 120);
+    }
+  }
+  g.putImageData(img, 0, 0);
+  return c;
+}
+
+/**
+ * Where the sky's flash shows and how strongly: everything above the horizon,
+ * brightest round `at` and fading outward and down to the land, in six
+ * dithered bands so it reads as pixel art. White; tinted per flash.
+ */
+function makeFlashMask(at: [number, number], horizon: number): HTMLCanvasElement {
+  const h = horizon + 12;
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = h;
+  const g = c.getContext('2d')!;
+  const img = g.createImageData(W, h);
+  const bayer = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  for (let y = 0; y < h; y++) {
+    const down = Math.min(1, Math.max(0, (horizon + 10 - y) / 46));
+    for (let x = 0; x < W; x++) {
+      const d = Math.hypot((x - at[0]) / 1.15, (y - at[1]) * 1.6) / 560;
+      const k = Math.pow(Math.max(0, 1 - d), 1.3) * (0.35 + 0.65 * down) * down;
+      const step = Math.floor(k * 6 + bayer[(y & 3) * 4 + (x & 3)] / 16) / 6;
+      if (step <= 0) continue;
+      const i = (y * W + x) * 4;
+      img.data[i] = img.data[i + 1] = img.data[i + 2] = 255;
+      img.data[i + 3] = Math.round(step * 175);
     }
   }
   g.putImageData(img, 0, 0);

@@ -39,7 +39,7 @@ export type Rect4 = [number, number, number, number];
 export interface PropKind {
   /** anchor inside the sprite as a fraction (0.5,1 = bottom center) */
   anchor: [number, number];
-  /** static: frame 0 | loop: cycle frames every `ms` | pulse: frame 1 breathes over frame 0 */
+  /** static: frame 0 | loop: cycle frames every `ms` | pulse: frame 1 breathes over frame 0, one breath every `ms` (default 4400) */
   mode: 'static' | 'loop' | 'pulse';
   ms?: number;
   /**
@@ -69,6 +69,8 @@ export interface SparkEmitter {
   every: number;
   /** drift speed in px per second */
   speed: number;
+  /** how long a spark lives, ms (default 500-1600) */
+  life?: [number, number];
 }
 
 export interface ZoneArt {

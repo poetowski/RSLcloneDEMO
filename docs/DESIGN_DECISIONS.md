@@ -39,6 +39,7 @@ Section 7 lists what is not decided.
 | 2026-10-12 | A passive that gives a permanent stat boost is extra to the stat budget and works in combat only | 10, 15 |
 | 2026-10-12 | The Enforcer's helmet made less prominent: he should look weaker | 15 |
 | 2026-10-12 | The Bloodhound, a Common of the Sanguine Dominion and the first champion on four legs | 16 |
+| 2026-10-12 | Zone 1's battle background changed: a broken windmill, a calmer fire, a slower rift, a rare flash across the sky, more details | 5.3a |
 
 ---
 
@@ -428,6 +429,28 @@ in the ground to a farm burnt in the night. In the sky, the dawn sun between
 lilac peaks, bulky floating islands that slowly bob, and the rift: a tear of
 deep space with white-hot lips that pulses and sheds sparks, three veils of
 star-threaded cosmic fabric waving out of it. Leaves tumble across the arena.
+
+**Changed on his brief of 2026-10-12**, verbatim:
+
+```
+in zone 1 , i want following changes:
+put a broken windmill in the middle field behind the combat area. the flame from cart should be maybe slower or flames on different speed, this looks very busy and weird. also, the cosmic rift on the background sky i think its flare are too fast, since the rift is gigantic, its flares and particles should move slower. maybe from time to time, very unfrequently you can light up the sky in weird colors for a moment. put more details.
+```
+
+As built: a broken windmill stands in the middle field beside the burnt farm,
+behind the arena: a stone tower blackened toward the top, its cap charred and
+holed; one sail keeps its torn canvas, one is a bare lattice, one a stump,
+and one broke halfway and hangs, swinging a little. The scene's only fire is
+the burning haystack on the left (read as "the flame from cart"): its tongues
+now rise and sway each at a pace of its own, more slowly, and its light and
+embers are calmer. The rift moves as something gigantic: its veils wave about
+three times slower, its pulse takes nine seconds, and its sparks are fewer,
+drift about three times slower and linger. Every 24 to 52 seconds the sky
+lights up for under two seconds in a strange colour (teal, magenta, violet,
+amber or cyan, turning from one to another), spreading from the rift behind
+the islands. More details: three crows wheel over the farm and the windmill
+and two sit on the wall; stooks stand in the middle field, fence posts run
+along the road and puddles lie in its ruts.
 
 ### 5.4 Zone 2 — working sketch
 

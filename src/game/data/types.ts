@@ -217,10 +217,19 @@ export interface ZoneDef {
   tint?: { color: string; alpha: number; op: GlobalCompositeOperation };
   /** vultures or other birds circling in the sky */
   birds?: number;
+  /** where the birds circle, in screen pixels (high on the right when not given) */
+  birdsAt?: [number, number];
   /** heat shimmer on the horizon rows of the backdrop */
   haze?: boolean;
   /** brazier embers: first color, then the colors they fade through (default: firelight) */
   embers?: string[];
+  /**
+   * now and then the sky lights up for a moment in a strange colour, spreading
+   * from `at` (screen pixels): every `every[0]`-`every[1]` ms, for `ms` ms, its
+   * colour turning from one of `colors` to another (Jakub, 2026-10-12: "very
+   * unfrequently ... light up the sky in weird colors for a moment")
+   */
+  flash?: { at: [number, number]; every: [number, number]; ms: number; colors: string[] };
 }
 
 export interface EnemySlot {

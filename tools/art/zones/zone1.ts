@@ -10,6 +10,12 @@
 // bulky floating islands drifting, and on the right a great rift torn in the
 // cosmos, lit blue and white, shedding sparks, with veils of cosmic fabric
 // waving out of it. Leaves blow across the field (ZoneDef.ambient 'leaves').
+// On his brief of 2026-10-12: a broken windmill in the middle field beside the
+// burnt farm; the fire calmer, its tongues each on a rhythm of their own; the
+// rift, being gigantic, slower in its veils, its pulse and its sparks; now and
+// then a flash of strange light across the sky (ZoneDef.flash); more details:
+// crows wheeling over the farm and two on the wall, stooks in the middle field,
+// fence posts along the road, puddles in its ruts.
 import { flame } from '../fx/kit.ts';
 import { dith, disc, ellipseFill, line, outline, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, hash2, hex, rng, toHex, withAlpha } from '../raster.ts';
@@ -52,6 +58,9 @@ const ROCKC = H(['#1a2a4c', '#26406a', '#3a5e8c', '#5c88b4']);
 const TOPG = H(['#22220f', '#323014', '#45401a', '#5a5222', '#6e632a', '#867636']);
 const FALL = H(['#3a5a8a', '#6a8ab8', '#a8c4e4', '#e0f0ff']);
 const BONE = hex('#efe6d2');
+/** weathered sailcloth, and the flour spilled at the windmill's door */
+const SAIL = H(['#2c2622', '#4a4038', '#6a5e50', '#8c7e6a', '#b0a286', '#d2c6a8']);
+const FLOUR = H(['#8a8478', '#b4ad9e', '#dad4c4', '#f2eee2']);
 // --- the rift and its veils
 const VOID = H(['#03020a', '#08061a', '#0e0c2c', '#16143e']);
 const NEB = H(['#1c2e78', '#2848a8', '#3a6cd0', '#5a9cec', '#8ccaf8']);
@@ -154,9 +163,10 @@ const riftRoot = (t: number): [number, number] => {
  * rift is drawn over the root) out across the sky. Paths in screen pixels.
  */
 const VEILS = [
-  { kind: 'veil_a', path: [riftRoot(0.45), [508, 64], [466, 58], [420, 50], [374, 44], [334, 40], [302, 34]] as [number, number][], width: 16, amp: 7, waves: 1.4, twists: 1.2, ms: 130, seed: 211 },
-  { kind: 'veil_b', path: [riftRoot(0.78), [470, 108], [444, 114], [416, 118], [392, 122], [368, 122]] as [number, number][], width: 12, amp: 5, waves: 1.2, twists: 1, ms: 120, seed: 212 },
-  { kind: 'veil_c', path: [riftRoot(0.16), [576, 38], [556, 26], [532, 18], [506, 14]] as [number, number][], width: 10, amp: 5, waves: 1, twists: 0.8, ms: 140, seed: 213 },
+  // the rift is gigantic, so its veils wave slowly: a wave takes 4-5 s (Jakub, 2026-10-12)
+  { kind: 'veil_a', path: [riftRoot(0.45), [508, 64], [466, 58], [420, 50], [374, 44], [334, 40], [302, 34]] as [number, number][], width: 16, amp: 7, waves: 1.4, twists: 1.2, ms: 280, seed: 211 },
+  { kind: 'veil_b', path: [riftRoot(0.78), [470, 108], [444, 114], [416, 118], [392, 122], [368, 122]] as [number, number][], width: 12, amp: 5, waves: 1.2, twists: 1, ms: 260, seed: 212 },
+  { kind: 'veil_c', path: [riftRoot(0.16), [576, 38], [556, 26], [532, 18], [506, 14]] as [number, number][], width: 10, amp: 5, waves: 1, twists: 0.8, ms: 300, seed: 213 },
 ];
 
 /** A veil's bitmap box: its path's bounds with room for its width and its wave. */
@@ -572,7 +582,45 @@ function land(b: Bitmap, W: number, HH: number) {
   }
   // the burnt farm in the middle distance, smoke still rising
   farm(b, 284, HZ + 22);
+  fieldDetails(b, HH, roadX, roadHalf);
   stubbleField(b, HH);
+}
+
+/**
+ * The middle field's small things: the harvest standing in stooks left of the
+ * farm, fence posts along the road (a few leaning, one down), and puddles in
+ * the road's ruts holding the dawn and the rift's cold light.
+ */
+function fieldDetails(b: Bitmap, HH: number, roadX: (y: number) => number, roadHalf: (y: number) => number) {
+  const r = rng(311);
+  for (const [y, x0, x1, h] of [[HZ + 15, 204, 252, 2.2], [HZ + 24, 196, 262, 3.0]] as const) {
+    for (let x = x0; x <= x1; x += 7 + Math.floor(r() * 3)) sheaf(b, x + r() * 2, y + r(), h);
+  }
+  for (let y = HZ + 24; y < HH - 8; y += 6 + Math.floor((y - HZ) / 14)) {
+    const depth = (y - HZ) / (HH - HZ);
+    const x = Math.round(roadX(y) + roadHalf(y) + 3 + depth * 4);
+    const h = Math.round(2 + depth * 5);
+    const fallen = r() < 0.14;
+    const lean = fallen ? 0 : r() < 0.3 ? (r() < 0.5 ? -1 : 1) : 0;
+    if (fallen) {
+      for (let k = 0; k < h; k++) b.set(x + k, y, WOOD[2]);
+      continue;
+    }
+    for (let k = 0; k < h; k++) {
+      const px = x + Math.round((lean * k) / h);
+      b.set(px, y - k, k === h - 1 ? WOOD[4] : WOOD[2]);
+      if (depth > 0.5) b.set(px + 1, y - k, WOOD[1]);
+    }
+  }
+  for (const [y, side, rx] of [[HH - 24, -1, 3], [HH - 15, 1, 4], [HH - 7, -1, 5]] as const) {
+    const cx = roadX(y) + side * roadHalf(y) * 0.45;
+    ellipseFill(b, cx, y, rx, 0.9 + rx * 0.08, (x, yy, d) => {
+      if (d > 0.8) return EARTH[1];
+      // the puddle holds a dull piece of the sky, the rift's cold light catching its far edge
+      if (yy < y && x > cx + rx * 0.3) return SKYC[6];
+      return dith(x, yy, 0.5) ? SKY[9] : SKYC[4];
+    });
+  }
 }
 
 /** The far land's top edge at a column, never above the horizon line. */
@@ -734,7 +782,7 @@ function catmull(pts: [number, number][], t: number): [number, number] {
  * night-blue cloth threaded with stars, waving along its length and twisting
  * to show its darker back. Frames loop over one wave.
  */
-function veil(v: (typeof VEILS)[number], n = 10): Bitmap[] {
+function veil(v: (typeof VEILS)[number], n = 16): Bitmap[] {
   const box = veilBox(v);
   const path = v.path.map(([x, y]) => [x - box.x, y - box.y] as [number, number]);
   const out: Bitmap[] = [];
@@ -940,7 +988,7 @@ function autumnTree(n = 4): Bitmap[] {
 // ---------------------------------------------------------------------------
 
 /** The haystack burning on the left: a round stack, its top charred and glowing, flames licking up. */
-function haystack(n = 8): Bitmap[] {
+function haystack(n = 16): Bitmap[] {
   const W = 76, HH = 112, cx = 38, base = HH - 1;
   const out: Bitmap[] = [];
   for (let i = 0; i < n; i++) {
@@ -956,7 +1004,7 @@ function haystack(n = 8): Bitmap[] {
         const v = 4.2 - u * 1.6 - (1 - k) * 0.6 + streak + (hash2(x, y, 172) - 0.5) * 0.7;
         if (base - y > hgt * 0.62) {
           // burnt crown: black with embers in the cracks
-          const glow = hash2(x, y, 173 + (i % 2));
+          const glow = hash2(x, y, 173 + (Math.floor(i / 4) % 2));
           b.set(x, y, glow > 0.86 ? FIRE[2 + (glow > 0.95 ? 1 : 0)] : ASH[1 + Math.floor(hash2(x >> 1, y, 174) * 2)]);
           continue;
         }
@@ -964,13 +1012,15 @@ function haystack(n = 8): Bitmap[] {
       }
     }
     const solid = outline(b, HAY[0]);
-    // the fire: tongues of flame along the burnt crown
-    const tongues: [number, number, number][] = [[-20, 26, 6], [-9, 44, 8], [2, 58, 9], [13, 46, 8], [22, 30, 6], [-2, 34, 6]];
-    tongues.forEach(([dx, h, w], k) => {
-      const hh = h * (0.82 + 0.18 * Math.sin(ph * 2 + k * 1.7));
-      const x = cx + dx + Math.sin(ph + k) * 1.5;
+    // the fire: tongues of flame along the burnt crown, each rising and swaying at its own
+    // pace (cycles per loop) so they never pulse together (Jakub, 2026-10-12: "flames on different speed")
+    const tongues: [number, number, number, number][] = [[-20, 26, 6, 1], [-9, 44, 8, 2], [2, 58, 9, 1], [13, 46, 8, 3], [22, 30, 6, 2], [-2, 34, 6, 1]];
+    tongues.forEach(([dx, h, w, sp], k) => {
+      const a = ph * sp + k * 1.9;
+      const hh = h * (0.86 + 0.14 * Math.sin(a));
+      const x = cx + dx + Math.sin(a + k) * 1.2;
       const top = base - 34 * Math.sqrt(Math.max(0, 1 - (dx / 30) ** 2)) + 6;
-      flame(solid, x, top, hh, w, ph + k * 1.3, FIRE, 1.05);
+      flame(solid, x, top, hh, w, a * 0.5 + k * 1.3, FIRE, 1.05);
     });
     out.push(solid);
   }
@@ -1304,6 +1354,152 @@ function longGrass(seed: number): Bitmap {
   return outline(b, STUB[0]);
 }
 
+/**
+ * The windmill in the middle field, burnt and broken in the night's raid
+ * (Jakub, 2026-10-12): a tower of field stone blackened toward the top, its
+ * wooden cap charred and holed; of its four sails one keeps its torn canvas,
+ * one is a bare lattice, one snapped off at the hub and one broke halfway, its
+ * end hanging by a strand and swinging a little in the wind (the frames).
+ * Sacks lie at the door, one split and spilling flour. Lit by the dawn on the
+ * left; the rift's cold light along its right flank.
+ */
+function windmill(n = 4): Bitmap[] {
+  const W = 78, HH = 98, cx = 36, base = HH - 2;
+  const tTop = base - 37, cTop = tTop - 11;
+  const hub = { x: cx + 0.5, y: tTop - 5.5 };
+  const out: Bitmap[] = [];
+  for (let i = 0; i < n; i++) {
+    const b = new Bitmap(W, HH);
+    // the tower: field stone in courses, tapering, lit from the left, soot-black toward the top
+    for (let y = tTop; y <= base; y++) {
+      const k = (y - tTop) / (base - tTop);
+      const half = 6.2 + k * 3.6;
+      for (let x = Math.floor(cx - half - 1); x <= Math.ceil(cx + half + 1); x++) {
+        const u = (x + 0.5 - cx) / half;
+        if (Math.abs(u) > 1) continue;
+        const course = (y - tTop) % 4 === 3;
+        const joint = !course && (x + Math.floor((y - tTop) / 4) * 3) % 5 === 0;
+        const soot = (1 - k) * 1.7 * (0.5 + 0.5 * vnoise(x, y, 3, 301));
+        const v = 5.2 - u * 2.3 - soot + (hash2(x, y, 302) - 0.5) * 0.6 - (course || joint ? 0.9 : 0);
+        b.set(x, y, rampDither(ST, v, x, y));
+      }
+    }
+    // the door, a dark arch at the foot, and a slit of a window above it
+    for (let y = base - 6; y <= base; y++) for (let x = cx - 3; x <= cx - 1; x++) if (y > base - 6 || x === cx - 2) b.set(x, y, ST[0]);
+    for (const y of [base - 18, base - 17, base - 16]) b.set(cx - 1, y, ST[0]);
+    // the cap: a dome of boards wider than the tower, charred, the right side burnt through
+    for (let y = cTop; y <= tTop; y++) {
+      const k = (y - cTop) / (tTop - cTop);
+      const half = 2.4 + Math.sqrt(k) * 7.8;
+      for (let x = Math.floor(cx - half); x <= Math.ceil(cx + half); x++) {
+        const u = (x + 0.5 - cx) / half;
+        if (Math.abs(u) > 1) continue;
+        if (u > 0.25 && k < 0.8 && vnoise(x * 1.7, y * 1.7, 2, 303) > 0.45) continue;
+        const char = hash2(x, y, 304) > 0.6 ? 1.4 : 0;
+        b.set(x, y, rampDither(WOOD, 5 - u * 1.9 - k * 0.6 - char, x, y));
+      }
+    }
+    // the rift's cold light along the right flank of the stone and the boards
+    for (let y = cTop; y <= base; y++) {
+      for (let x = W - 1; x > cx + 2; x--) {
+        if (b.get(x, y) === 0) continue;
+        b.set(x, y, ROCKC[y % 3 === 0 ? 3 : 2]);
+        break;
+      }
+    }
+    // a point along an arm: d out from `from` at `deg` (up = 90), `side` across it (screen y down)
+    const P = (deg: number, d: number, side: number, from = hub) => {
+      const a = (deg * Math.PI) / 180;
+      return { x: from.x + Math.cos(a) * d - Math.sin(a) * side, y: from.y - Math.sin(a) * d - Math.cos(a) * side };
+    };
+    const dot = (q: { x: number; y: number }, c: number) => b.set(Math.round(q.x), Math.round(q.y), c);
+    /**
+     * One sail in front of the cap: its stock, the lattice on its trailing
+     * side in weathered grey, canvas where `cloth` says, a rail broken at `gap`.
+     */
+    const sail = (deg: number, len: number, cloth: (d: number, s: number) => boolean, o: { from?: { x: number; y: number }; d0?: number; gap?: number } = {}) => {
+      const from = o.from ?? hub, d0 = o.d0 ?? 0;
+      const s0 = 1.4, s1 = 6.8;
+      for (let d = d0 + 3; d <= len; d += 0.3) {
+        for (let sd = s0; sd <= s1; sd += 0.3) {
+          if (!cloth(d, sd)) continue;
+          const q = P(deg, d, sd, from), x = Math.round(q.x), y = Math.round(q.y);
+          b.set(x, y, rampDither(SAIL, 4.7 - (sd - s0) * 0.25 - d * 0.02 + (hash2(x, y, 321) - 0.5) * 0.7, x, y));
+        }
+      }
+      for (let d = d0; d <= len; d += 0.35) dot(P(deg, d, 0, from), WOOD[5]);
+      for (let d = d0 + 3; d <= len; d += 0.35) {
+        if (o.gap !== undefined && d > o.gap && d < o.gap + 3) continue;
+        dot(P(deg, d, s1, from), SAIL[3]);
+      }
+      for (let d = d0 + 3; d <= len + 0.1; d += 3.1) for (let sd = 0.6; sd <= s1; sd += 0.35) dot(P(deg, d, sd, from), SAIL[2]);
+    };
+    // the bare lattice, down to the left: its canvas burnt away, a rail broken
+    sail(236, 29, () => false, { gap: 16 });
+    // the one that keeps its canvas, up to the right, torn and holed
+    sail(60, 30, (d, sd) => d < 27 && vnoise(d * 1.2, sd * 1.9, 2, 305) < 0.78 - (d > 22 ? 0.35 : 0) && !(d > 11 && d < 14 && sd > 4.2));
+    // the stump, up to the left, splintered
+    for (let d = 0; d <= 9; d += 0.35) dot(P(150, d, 0), WOOD[5]);
+    for (const [dd, sd] of [[9.6, -0.6], [10.2, 0.4], [9.2, 0.9]]) dot(P(150, dd, sd), WOOD[4]);
+    // the one broken halfway, down to the right: its stock to the break, the rest hanging by a strand and swinging
+    for (let d = 0; d <= 12; d += 0.35) dot(P(330, d, 0), WOOD[5]);
+    const brk = P(330, 12.4, 0);
+    const swing = [-5, 0, 5, 0][i % 4];
+    const end = P(-80 + swing, 2.8, 0, brk);
+    for (let d = 0; d <= 2.8; d += 0.4) dot(P(-80 + swing, d, 0, brk), SAIL[1]);
+    sail(-92 + swing, 16, (d, sd) => d > 3 && d < 11 && sd < 5 && vnoise(d * 1.7, sd * 1.7, 2, 306) < 0.7, { from: end, d0: -1 });
+    // the hub
+    dot(hub, IRON[4]);
+    b.set(Math.round(hub.x) + 1, Math.round(hub.y), IRON[2]);
+    // sacks at the door, one split
+    ellipseFill(b, cx - 11, base - 1.5, 3, 2.5, (x, y) => rampDither(SAIL, 4.4 - (x - cx + 11) * 0.5 - (y - base) * 0.4, x, y));
+    ellipseFill(b, cx - 7, base - 1, 2.6, 2, (x, y) => rampDither(SAIL, 3.8 - (x - cx + 7) * 0.5, x, y));
+    const solid = outline(b, MTN[0]);
+    // flour spilled from the split sack, pale on the earth (painted after the outline)
+    for (let x = cx - 4; x < cx + 3; x++) {
+      for (let y = base; y <= base + 1; y++) {
+        const k = 1 - Math.abs(x - cx + 1) / 4;
+        if (y < HH && dith(x, y, k * (y === base ? 0.8 : 0.35))) solid.set(x, y, FLOUR[y === base ? 2 : 1]);
+      }
+    }
+    out.push(solid);
+  }
+  return out;
+}
+
+/** Crows wheeling over the farm: wings up, level, down (the runtime circles them, ZoneDef.birds). */
+function crows(): Bitmap[] {
+  const C = SABLE;
+  const frames = [
+    ['#.....#', '.#...#.', '..###..'],
+    ['.......', '###.###', '..###..'],
+    ['..###..', '.##.##.', '#.....#'],
+  ];
+  return frames.map((rows) => {
+    const b = new Bitmap(7, 3);
+    rows.forEach((row, y) => [...row].forEach((ch, x) => ch === '#' && b.set(x, y, x === 3 ? C[1] : C[2])));
+    return b;
+  });
+}
+
+/** Two crows on the wall's coping, one watching the field, one pecking. */
+function perchedCrows(): Bitmap {
+  const b = new Bitmap(22, 8);
+  const C = SABLE;
+  const crow = (ox: number, rows: string[]) =>
+    rows.forEach((row, y) =>
+      [...row].forEach((ch, x) => {
+        if (ch === '.') return;
+        b.set(ox + x, y, ch === 'b' ? IRON[3] : ch === 'h' ? C[5] : ch === 'l' ? IRON[1] : C[ch === 'd' ? 0 : 2]);
+      }),
+    );
+  // watching, head to the left
+  crow(1, ['..dd...', 'bdhd...', '.ddddd.', '..dddddd', '..dddd..', '...l.l..']);
+  // pecking, head down to the right
+  crow(12, ['........', '.dd.....', 'dddddd..', '.ddddhdd', '..dddddb', '...l.l..']);
+  return b;
+}
+
 // ---------------------------------------------------------------------------
 // Layout + export
 // ---------------------------------------------------------------------------
@@ -1344,12 +1540,15 @@ function layout(id: (n: string) => number): { ground: number[]; wall: number[]; 
     { kind: 'isle_big', x: 236, y: 124, layer: 'far' },
     { kind: 'debris', x: 322, y: 104, layer: 'far' },
     { kind: 'isle_mid', x: 392, y: 106, layer: 'far' },
+    // the windmill in the middle field, beside the burnt farm, behind the arena
+    { kind: 'windmill', x: 336, y: 164, layer: 'far' },
     { kind: 'tree', x: 604, y: 196, layer: 'far' },
     // back: the smoke, the field's fence and the burning haystack on the left; the cart on the right
     { kind: 'smoke', x: 52, y: 178, layer: 'back' },
     { kind: 'fence', x: 0, y: 202, layer: 'back' },
     { kind: 'haystack', x: 64, y: 208, layer: 'back' },
     { kind: 'cart', x: 640, y: 218, layer: 'back' },
+    { kind: 'perched', x: 434, y: 148, layer: 'back' },
     // floor: the trampled road, the burnt ground, the spilled load, leaves, arrows
     { kind: 'dawn', x: 0, y: 192, layer: 'floor' },
     { kind: 'worn', x: 380, y: 192, layer: 'floor' },
@@ -1369,7 +1568,8 @@ function layout(id: (n: string) => number): { ground: number[]; wall: number[]; 
 /** The rift's sparks: born along both lips, drifting off and twinkling out. */
 function sparks(): SparkEmitter[] {
   const colors = [RIM[2], RIM[1], RIM[0], NEB[4], NEB[3], NEB[2]].map(toHex);
-  return riftLips().map((path) => ({ path, colors, every: 70, speed: 9 }));
+  // the rift is gigantic: its sparks drift off slowly and linger (Jakub, 2026-10-12)
+  return riftLips().map((path) => ({ path, colors, every: 170, speed: 3.2, life: [1800, 3800] as [number, number] }));
 }
 
 export const zone1: ZoneArt = {
@@ -1384,6 +1584,9 @@ export const zone1: ZoneArt = {
     isle_mid: [island(64, 36, { seed: 222, cool: true, trees: 2 })],
     isle_far: [island(38, 20, { seed: 223, trees: 1, haze: 1.2 })],
     debris: [debris()],
+    windmill: windmill(),
+    bird: crows(),
+    perched: [perchedCrows()],
     tree: autumnTree(),
     smoke: smokePlume(),
     fence: [fence()],
@@ -1401,15 +1604,19 @@ export const zone1: ZoneArt = {
   }),
   kinds: {
     ...Object.fromEntries(VEILS.map((v) => [v.kind, { anchor: [0, 0] as [number, number], mode: 'loop' as const, ms: v.ms }])),
-    rift: { anchor: [0, 0], mode: 'pulse' },
+    // the rift breathes slowly: one pulse every 9 s
+    rift: { anchor: [0, 0], mode: 'pulse', ms: 9000 },
     isle_big: { anchor: [0.5, 1], mode: 'static', bob: { amp: 1, ms: 5200 } },
     isle_mid: { anchor: [0.5, 1], mode: 'static', bob: { amp: 1, ms: 4300 } },
     isle_far: { anchor: [0.5, 1], mode: 'static', bob: { amp: 1, ms: 6100 } },
     debris: { anchor: [0.5, 1], mode: 'static', bob: { amp: 1, ms: 3700 } },
+    windmill: { anchor: [0.5, 1], mode: 'loop', ms: 640 },
+    bird: { anchor: [0.5, 0.5], mode: 'loop', ms: 240 },
+    perched: { anchor: [0.5, 1], mode: 'static' },
     tree: { anchor: [0.5, 1], mode: 'loop', ms: 420 },
-    smoke: { anchor: [0, 1], mode: 'loop', ms: 200 },
+    smoke: { anchor: [0, 1], mode: 'loop', ms: 300 },
     fence: { anchor: [0, 1], mode: 'static' },
-    haystack: { anchor: [0.5, 1], mode: 'loop', ms: 85, fire: { dy: -58, flame: false } },
+    haystack: { anchor: [0.5, 1], mode: 'loop', ms: 120, fire: { dy: -58, flame: false } },
     cart: { anchor: [1, 1], mode: 'static' },
     dawn: { anchor: [0, 0], mode: 'static' },
     worn: { anchor: [0.5, 0], mode: 'static' },

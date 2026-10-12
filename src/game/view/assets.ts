@@ -40,6 +40,8 @@ export interface SparkEmitter {
   colors: string[];
   every: number;
   speed: number;
+  /** how long a spark lives, ms (default 500-1600) */
+  life?: [number, number];
 }
 
 export interface ZoneJson {
