@@ -40,6 +40,7 @@ Section 7 lists what is not decided.
 | 2026-10-12 | The Enforcer's helmet made less prominent: he should look weaker | 15 |
 | 2026-10-12 | The Bloodhound, a Common of the Sanguine Dominion and the first champion on four legs | 16 |
 | 2026-10-12 | Zone 1's battle background changed: a broken windmill, a calmer fire, a slower rift, a rare flash across the sky, more details | 5.3a |
+| 2026-10-12 | Zone 1: the flash every 10-25 s, things round the mill, distant rocks in the left sky, tools in the fields, more ravens on the left; the haystack's flames loop properly | 5.3a |
 
 ---
 
@@ -451,6 +452,28 @@ amber or cyan, turning from one to another), spreading from the rift behind
 the islands. More details: three crows wheel over the farm and the windmill
 and two sit on the wall; stooks stand in the middle field, fence posts run
 along the road and puddles lie in its ruts.
+
+**And, the same day:**
+
+```
+i want sky flash to occur more frequent, instead of 24-52s maybe rather go for 10-25s. put some details around the mill and maybe a bit more distant rocks floating in the left sky. put some details and tools on the left side of fields and near central part. add more ravens on the left side
+```
+
+```
+and fix flames on the hay because now they do not act in loop properly
+```
+
+As built: the flash comes every 10 to 25 seconds. Round the mill: a
+millstone leaning on the tower, more sacks, a barrel, the cap's charred
+boards in the grass and a barrow on its side. Three small rocks drift far off
+in the left sky, lilac like the far peaks. In the fields on the left a scythe
+leans on the fence, a pitchfork stands in the stubble, a rake lies dropped in
+the grass and a plough waits behind the fence; toward the centre stand the
+farm's well, two barrels at the road's end, a handcart tipped over at the
+roadside and a spade in the earth, and a hoe lies in the arena. Four more
+ravens wheel over the burning field, one sits on the fallen Azure standard and
+one pecks by the fence. The haystack's flames close their loop without a jump
+now, and so do the rift's veils, which had the same fault.
 
 ### 5.4 Zone 2 — working sketch
 

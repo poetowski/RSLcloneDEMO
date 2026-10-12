@@ -13,12 +13,13 @@ export const ZONES: ZoneDef[] = [
     glow: [255, 150, 70],
     shadow: { dx: 4, stretch: 1.25 },
     tint: { color: '#ff9a60', alpha: 0.05, op: 'soft-light' },
-    // crows wheeling over the burnt farm and the windmill (2026-10-12)
-    birds: 3,
-    birdsAt: [316, 80],
+    // ravens wheeling over the burnt farm and the windmill, and more over the burning field on the left (2026-10-12)
+    birds: 7,
+    birdsAt: [[316, 80], [100, 50], [150, 68]],
     // Jakub, 2026-10-12: "maybe from time to time, very unfrequently you can light up the sky in weird colors for a moment";
     // it spreads from the rift (tools/art/zones/zone1.ts RIFT_TOP / RIFT_BOT)
-    flash: { at: [536, 78], every: [24000, 52000], ms: 1700, colors: ['#4affc0', '#ff4ad8', '#9a6aff', '#ffb04a', '#4ad8ff'] },
+    // Jakub, the same day: "more frequent, instead of 24-52s maybe rather go for 10-25s"
+    flash: { at: [536, 78], every: [10000, 25000], ms: 1700, colors: ['#4affc0', '#ff4ad8', '#9a6aff', '#ffb04a', '#4ad8ff'] },
   },
 ];
 

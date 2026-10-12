@@ -217,8 +217,8 @@ export interface ZoneDef {
   tint?: { color: string; alpha: number; op: GlobalCompositeOperation };
   /** vultures or other birds circling in the sky */
   birds?: number;
-  /** where the birds circle, in screen pixels (high on the right when not given) */
-  birdsAt?: [number, number];
+  /** where the birds circle, in screen pixels, the birds shared out among the spots in turn (high on the right when not given) */
+  birdsAt?: [number, number][];
   /** heat shimmer on the horizon rows of the backdrop */
   haze?: boolean;
   /** brazier embers: first color, then the colors they fade through (default: firelight) */

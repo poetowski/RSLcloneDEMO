@@ -61,7 +61,7 @@ export class ZoneView {
     for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
     this.sparkT = (this.json.sparks ?? []).map(() => 0);
     for (let i = 0; i < (def.birds ?? 0); i++) {
-      const at = def.birdsAt;
+      const at = def.birdsAt?.[i % def.birdsAt.length];
       this.birds.push(
         at
           ? // a few birds wheeling slowly over one spot

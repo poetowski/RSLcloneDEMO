@@ -15,7 +15,13 @@
 // rift, being gigantic, slower in its veils, its pulse and its sparks; now and
 // then a flash of strange light across the sky (ZoneDef.flash); more details:
 // crows wheeling over the farm and two on the wall, stooks in the middle field,
-// fence posts along the road, puddles in its ruts.
+// fence posts along the road, puddles in its ruts. And, his next message the
+// same day: the flash more often, things lying round the mill (a millstone,
+// charred boards, a barrel, a barrow), distant rocks drifting in the left sky,
+// farm tools left in the fields (a scythe on the fence, a pitchfork, a rake, a
+// plough; a well, barrels, a handcart, a spade and a hoe toward the centre),
+// and more ravens on the left: wheeling over the burning field, one on the
+// fallen standard, one pecking by the fence.
 import { flame } from '../fx/kit.ts';
 import { dith, disc, ellipseFill, line, outline, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, hash2, hex, rng, toHex, withAlpha } from '../raster.ts';
@@ -61,6 +67,8 @@ const BONE = hex('#efe6d2');
 /** weathered sailcloth, and the flour spilled at the windmill's door */
 const SAIL = H(['#2c2622', '#4a4038', '#6a5e50', '#8c7e6a', '#b0a286', '#d2c6a8']);
 const FLOUR = H(['#8a8478', '#b4ad9e', '#dad4c4', '#f2eee2']);
+/** the scythe's blade, its edge catching the dawn */
+const BLADE = H(['#3a3e4c', '#6a7086', '#9aa2b8', '#d4dae6']);
 // --- the rift and its veils
 const VOID = H(['#03020a', '#08061a', '#0e0c2c', '#16143e']);
 const NEB = H(['#1c2e78', '#2848a8', '#3a6cd0', '#5a9cec', '#8ccaf8']);
@@ -583,7 +591,48 @@ function land(b: Bitmap, W: number, HH: number) {
   // the burnt farm in the middle distance, smoke still rising
   farm(b, 284, HZ + 22);
   fieldDetails(b, HH, roadX, roadHalf);
+  farmyard(b);
   stubbleField(b, HH);
+}
+
+/**
+ * What the farm folk left in the middle field: the well by the farm with its
+ * bucket on the rim, two barrels by the road's end, a handcart tipped over at
+ * the roadside, a spade stuck in the earth; and in the stubble field on the
+ * left, behind the fence, a plough left in its furrow.
+ */
+function farmyard(b: Bitmap) {
+  // the well: a ring of stone, two posts and a little roof
+  const wx = 256, wy = 156;
+  ellipseFill(b, wx, wy - 2, 4, 1.6, (x, y, d) => (d < 0.55 ? ST[0] : rampDither(ST, 4.6 - (x - wx + 4) * 0.4, x, y)));
+  for (let y = wy - 2; y <= wy; y++) for (let x = wx - 4; x <= wx + 4; x++) b.set(x, y, rampDither(ST, 4.2 - (x - wx + 4) * 0.35 - (y - wy + 2) * 0.3, x, y));
+  for (const px of [wx - 4, wx + 4]) for (let y = wy - 9; y <= wy - 2; y++) b.set(px, y, WOOD[px < wx ? 4 : 2]);
+  polyFill(b, [[wx - 6, wy - 8], [wx, wy - 12], [wx + 6, wy - 8]], (x, y) => rampDither(WOOD, 4.6 - (x - wx + 6) * 0.3, x, y));
+  for (let x = wx - 1; x <= wx + 1; x++) b.set(x, wy - 7, IRON[1]);
+  b.set(wx + 2, wy - 3, WOOD[4]);
+  b.set(wx + 3, wy - 3, WOOD[3]);
+  // two barrels by the road's end
+  for (const [bx, by] of [[302, 152], [307, 153]] as const) {
+    for (let y = by - 4; y <= by; y++) for (let x = bx - 1; x <= bx + 1; x++) b.set(x, y, y === by - 3 || y === by - 1 ? IRON[2] : rampDither(WOOD, 4.8 - (x - bx + 1) * 0.8, x, y));
+  }
+  // a handcart tipped over at the roadside, a wheel in the air, a shaft in the grass
+  const hx = 296, hy = 182;
+  for (let y = hy - 4; y <= hy; y++) for (let x = hx - 5; x <= hx + 3; x++) b.set(x, y, rampDither(WOOD, 4.6 - (x - hx + 5) * 0.25 - (y - hy + 4) * 0.35, x, y));
+  ellipseFill(b, hx - 2, hy - 6.5, 2.6, 2.6, (x, y, d) => (d > 0.62 ? WOOD[1] : d < 0.25 ? IRON[3] : 0));
+  line(b, hx + 3, hy, hx + 10, hy + 2, WOOD[3]);
+  line(b, hx + 3, hy - 1, hx + 10, hy + 1, WOOD[4]);
+  // a spade stuck in the earth
+  for (let y = 168; y <= 176; y++) b.set(366, y, WOOD[y < 170 ? 5 : 3]);
+  b.set(365, 168, WOOD[4]);
+  b.set(367, 168, WOOD[4]);
+  for (let y = 177; y <= 179; y++) for (let x = 365; x <= 367; x++) b.set(x, y, IRON[x === 365 ? 4 : 2]);
+  // the plough in the stubble behind the fence
+  const px = 118, py = 166;
+  line(b, px - 6, py, px + 4, py - 1, WOOD[3]);
+  line(b, px - 6, py - 1, px + 4, py - 2, WOOD[5]);
+  line(b, px - 6, py - 1, px - 10, py - 6, WOOD[4]);
+  line(b, px - 5, py - 1, px - 8, py - 6, WOOD[2]);
+  for (const [x, y] of [[px + 4, py], [px + 5, py], [px + 5, py + 1]] as const) b.set(x, y, IRON[3]);
 }
 
 /**
@@ -800,7 +849,8 @@ function veil(v: (typeof VEILS)[number], n = 16): Bitmap[] {
       const nx = -(qy - py) / tl, ny = (qx - px) / tl;
       // the wave travels from the root to the free end; the free end swings widest
       const off = v.amp * Math.pow(s, 1.1) * Math.sin(Math.PI * 2 * v.waves * s - ph);
-      const tw = Math.cos(Math.PI * 2 * v.twists * s - ph * 0.5);
+      // the twist runs one whole cycle per loop, so the loop closes without a jump
+      const tw = Math.cos(Math.PI * 2 * v.twists * s - ph);
       const wid = v.width * (0.45 + 0.55 * Math.pow(Math.sin(Math.PI * Math.min(1, s * 1.15)), 0.6)) * (1 - 0.85 * Math.pow(s, 3)) * (0.3 + 0.7 * Math.abs(tw));
       const front = tw >= 0;
       const cx = px + nx * off, cy = py + ny * off;
@@ -1014,13 +1064,14 @@ function haystack(n = 16): Bitmap[] {
     const solid = outline(b, HAY[0]);
     // the fire: tongues of flame along the burnt crown, each rising and swaying at its own
     // pace (cycles per loop) so they never pulse together (Jakub, 2026-10-12: "flames on different speed")
-    const tongues: [number, number, number, number][] = [[-20, 26, 6, 1], [-9, 44, 8, 2], [2, 58, 9, 1], [13, 46, 8, 3], [22, 30, 6, 2], [-2, 34, 6, 1]];
-    tongues.forEach(([dx, h, w, sp], k) => {
-      const a = ph * sp + k * 1.9;
+    // Every pace is a whole number of cycles per loop, so the last frame runs on into the first.
+    const tongues: [number, number, number, number, number][] = [[-20, 26, 6, 1, 1], [-9, 44, 8, 2, 1], [2, 58, 9, 1, 2], [13, 46, 8, 3, 2], [22, 30, 6, 2, 1], [-2, 34, 6, 1, 1]];
+    tongues.forEach(([dx, h, w, rise, sway], k) => {
+      const a = ph * rise + k * 1.9;
       const hh = h * (0.86 + 0.14 * Math.sin(a));
-      const x = cx + dx + Math.sin(a + k) * 1.2;
+      const x = cx + dx + Math.sin(ph * sway + k) * 1.2;
       const top = base - 34 * Math.sqrt(Math.max(0, 1 - (dx / 30) ** 2)) + 6;
-      flame(solid, x, top, hh, w, a * 0.5 + k * 1.3, FIRE, 1.05);
+      flame(solid, x, top, hh, w, ph * sway + k * 1.3, FIRE, 1.05);
     });
     out.push(solid);
   }
@@ -1364,7 +1415,7 @@ function longGrass(seed: number): Bitmap {
  * left; the rift's cold light along its right flank.
  */
 function windmill(n = 4): Bitmap[] {
-  const W = 78, HH = 98, cx = 36, base = HH - 2;
+  const W = 78, HH = 106, cx = 36, base = HH - 8;
   const tTop = base - 37, cTop = tTop - 11;
   const hub = { x: cx + 0.5, y: tTop - 5.5 };
   const out: Bitmap[] = [];
@@ -1451,9 +1502,25 @@ function windmill(n = 4): Bitmap[] {
     // the hub
     dot(hub, IRON[4]);
     b.set(Math.round(hub.x) + 1, Math.round(hub.y), IRON[2]);
-    // sacks at the door, one split
-    ellipseFill(b, cx - 11, base - 1.5, 3, 2.5, (x, y) => rampDither(SAIL, 4.4 - (x - cx + 11) * 0.5 - (y - base) * 0.4, x, y));
-    ellipseFill(b, cx - 7, base - 1, 2.6, 2, (x, y) => rampDither(SAIL, 3.8 - (x - cx + 7) * 0.5, x, y));
+    // round the foot: a millstone leaning on the tower, sacks at the door (one split), a barrel,
+    // the cap's charred boards fallen in the grass, a barrow left on its side
+    ellipseFill(b, cx - 9.5, base - 4.5, 3.4, 4.4, (x, y, d) => (d < 0.22 ? ST[0] : rampDither(ST, 5.2 - (x - cx + 9.5) * 0.6 - (y - base + 4.5) * 0.35 - (d > 0.8 ? 0.8 : 0), x, y)));
+    ellipseFill(b, cx - 15, base - 1.5, 3, 2.5, (x, y) => rampDither(SAIL, 4.4 - (x - cx + 15) * 0.5 - (y - base) * 0.4, x, y));
+    ellipseFill(b, cx - 12, base + 1, 2.6, 2, (x, y) => rampDither(SAIL, 3.8 - (x - cx + 12) * 0.5, x, y));
+    for (let y = base - 4; y <= base + 2; y++) {
+      for (let x = cx - 24; x <= cx - 20; x++) {
+        const hoop = y === base - 3 || y === base + 1;
+        b.set(x, y, hoop ? IRON[2] : rampDither(WOOD, 5.2 - (x - cx + 24) * 0.7 + (y === base - 4 ? 0.6 : 0), x, y));
+      }
+    }
+    for (const [x0, y0, x1, y1] of [[cx + 8, base + 2, cx + 16, base], [cx + 11, base + 4, cx + 20, base + 5], [cx + 17, base + 1, cx + 22, base + 3]] as const) {
+      line(b, x0, y0, x1, y1, WOOD[1]);
+      line(b, x0, y0 - 1, x1, y1 - 1, WOOD[3]);
+    }
+    // the barrow: a box on its side, its wheel up, a handle in the grass
+    for (let y = base - 1; y <= base + 3; y++) for (let x = cx + 23; x <= cx + 29; x++) b.set(x, y, rampDither(WOOD, 4.6 - (x - cx - 23) * 0.3 - (y - base + 1) * 0.4, x, y));
+    ellipseFill(b, cx + 24, base - 3, 2.2, 2.2, (x, y, d) => (d > 0.6 ? WOOD[1] : d < 0.25 ? IRON[3] : 0));
+    line(b, cx + 29, base + 3, cx + 34, base + 5, WOOD[3]);
     const solid = outline(b, MTN[0]);
     // flour spilled from the split sack, pale on the earth (painted after the outline)
     for (let x = cx - 4; x < cx + 3; x++) {
@@ -1465,6 +1532,88 @@ function windmill(n = 4): Bitmap[] {
     out.push(solid);
   }
   return out;
+}
+
+/**
+ * Rocks drifting far off in the left sky, small and lilac with the distance
+ * like the far peaks, a root or two hanging from them.
+ */
+function farRocks(shapes: [number, number, number, number][], roots: [number, number, number][] = []): Bitmap {
+  const W = 26, HH = 18;
+  const b = new Bitmap(W, HH);
+  for (const [x, y, rx, ry] of shapes) {
+    ellipseFill(b, x, y, rx, ry, (px, py) => rampDither(MTN, 4.2 - ((px - x) / rx) * 1.1 - ((py - y) / ry) * 1.2 - (py > y + ry * 0.3 ? 0.7 : 0), px, py));
+  }
+  for (const [x, y, len] of roots) for (let k = 0; k < len; k++) b.set(x + (k > len / 2 ? 1 : 0), y + k, MTN[1]);
+  return outline(b, MTN[1]);
+}
+
+/** A scythe leaning on the fence: a long snath with its two grips, the blade hanging from the top. */
+function scythe(): Bitmap {
+  const b = new Bitmap(26, 32);
+  line(b, 6, 31, 20, 4, WOOD[4]);
+  line(b, 7, 31, 21, 4, WOOD[2]);
+  for (const [x, y] of [[11, 22], [12, 22], [16, 13], [17, 13]] as const) b.set(x, y, WOOD[5]);
+  // the blade: a long curve from the top of the snath, its edge catching the dawn
+  for (let k = 0; k <= 16; k++) {
+    const x = 20 - k * 1.05, y = 4 + Math.sin((k / 16) * Math.PI) * 2.6 + k * 0.12;
+    b.set(Math.round(x), Math.round(y), k < 3 ? BLADE[1] : k < 11 ? BLADE[3] : BLADE[2]);
+    b.set(Math.round(x), Math.round(y) + 1, k > 13 ? 0 : BLADE[1]);
+  }
+  return outline(b, WOOD[0]);
+}
+
+/** A pitchfork stuck in the stubble, its three tines up. */
+function pitchfork(): Bitmap {
+  const b = new Bitmap(8, 22);
+  line(b, 4, 21, 3, 6, WOOD[4]);
+  line(b, 5, 21, 4, 6, WOOD[2]);
+  for (let x = 1; x <= 6; x++) b.set(x, 6, IRON[2]);
+  for (const x of [1, 3, 6]) for (let y = 1; y <= 5; y++) b.set(x, y, y === 1 ? IRON[4] : IRON[3]);
+  return outline(b, WOOD[0]);
+}
+
+/** A rake dropped in the grass, its teeth down. */
+function rake(): Bitmap {
+  const b = new Bitmap(28, 7);
+  line(b, 1, 5, 21, 2, WOOD[4]);
+  line(b, 1, 6, 21, 3, WOOD[2]);
+  line(b, 20, 1, 26, 1, WOOD[3]);
+  for (let x = 20; x <= 26; x += 2) b.set(x, 2, WOOD[2]);
+  return b;
+}
+
+/** A hoe left lying near the middle of the field. */
+function hoe(): Bitmap {
+  const b = new Bitmap(24, 6);
+  line(b, 1, 4, 19, 1, WOOD[3]);
+  line(b, 1, 5, 19, 2, WOOD[2]);
+  for (const [x, y] of [[20, 1], [21, 1], [21, 2], [22, 2], [22, 3]] as const) b.set(x, y, IRON[3]);
+  return b;
+}
+
+const RAVEN_PERCHED = [
+  '........ddd...',
+  '.......ddddd..',
+  '......ddhddbbb',
+  '....ddddddddb.',
+  '..dddddddddd..',
+  '.ddddssssddd..',
+  'dddddsssddd...',
+  'ddddddddd.....',
+  'd..ddddd......',
+  '.....l..l.....',
+];
+const RAVEN_PECKING = ['.....ddd....', '...ddddddd..', 'bbddhdddddd.', '.ddddddsddd.', '...ddddddd..', '....l..l....'];
+
+/** A raven drawn from rows: d body, s the sheen of its feathers, h its eye, b beak, l legs. */
+function raven(rows: string[]): Bitmap {
+  const b = new Bitmap(rows[0].length, rows.length);
+  rows.forEach((row, y) => [...row].forEach((ch, x) => {
+    if (ch === '.') return;
+    b.set(x, y, ch === 'b' ? IRON[3] : ch === 'h' ? IRON[4] : ch === 's' ? SABLE[4] : ch === 'l' ? IRON[1] : SABLE[1]);
+  }));
+  return b;
 }
 
 /** Crows wheeling over the farm: wings up, level, down (the runtime circles them, ZoneDef.birds). */
@@ -1537,15 +1686,22 @@ function layout(id: (n: string) => number): { ground: number[]; wall: number[]; 
     ...VEILS.map((v) => ({ kind: v.kind, x: veilBox(v).x, y: veilBox(v).y, layer: 'far' as const })),
     { kind: 'rift', x: RIFT_BOX.x, y: RIFT_BOX.y, layer: 'far' },
     { kind: 'isle_far', x: 30, y: 82, layer: 'far' },
+    // distant rocks drifting in the left sky
+    { kind: 'rocks_a', x: 80, y: 46, layer: 'far' },
+    { kind: 'rocks_b', x: 16, y: 112, layer: 'far' },
+    { kind: 'rocks_c', x: 152, y: 114, layer: 'far' },
     { kind: 'isle_big', x: 236, y: 124, layer: 'far' },
     { kind: 'debris', x: 322, y: 104, layer: 'far' },
     { kind: 'isle_mid', x: 392, y: 106, layer: 'far' },
     // the windmill in the middle field, beside the burnt farm, behind the arena
-    { kind: 'windmill', x: 336, y: 164, layer: 'far' },
+    { kind: 'windmill', x: 336, y: 170, layer: 'far' },
     { kind: 'tree', x: 604, y: 196, layer: 'far' },
     // back: the smoke, the field's fence and the burning haystack on the left; the cart on the right
     { kind: 'smoke', x: 52, y: 178, layer: 'back' },
+    // the pitchfork stands in the stubble behind the fence; the scythe leans on its post
+    { kind: 'pitchfork', x: 182, y: 184, layer: 'back' },
     { kind: 'fence', x: 0, y: 202, layer: 'back' },
+    { kind: 'scythe', x: 114, y: 202, layer: 'back' },
     { kind: 'haystack', x: 64, y: 208, layer: 'back' },
     { kind: 'cart', x: 640, y: 218, layer: 'back' },
     { kind: 'perched', x: 434, y: 148, layer: 'back' },
@@ -1557,8 +1713,13 @@ function layout(id: (n: string) => number): { ground: number[]; wall: number[]; 
     { kind: 'leaves', x: 432, y: 206, layer: 'floor' },
     { kind: 'arrows', x: 326, y: 222, layer: 'floor' },
     { kind: 'arrows', x: 284, y: 336, layer: 'floor' },
+    { kind: 'rake', x: 112, y: 216, layer: 'floor' },
+    { kind: 'raven_pecking', x: 128, y: 212, layer: 'floor' },
+    { kind: 'hoe', x: 304, y: 300, layer: 'floor' },
     // fg: the torn standard at the left edge, dry grass in both corners
     { kind: 'azure', x: -8, y: 364, layer: 'fg' },
+    // a raven on the fallen standard's crossbar
+    { kind: 'raven_perched', x: 22, y: 182, layer: 'fg' },
     { kind: 'grass_fg', x: 46, y: 362, layer: 'fg' },
     { kind: 'grass_fg2', x: 604, y: 362, layer: 'fg' },
   ];
@@ -1585,6 +1746,15 @@ export const zone1: ZoneArt = {
     isle_far: [island(38, 20, { seed: 223, trees: 1, haze: 1.2 })],
     debris: [debris()],
     windmill: windmill(),
+    rocks_a: [farRocks([[8, 7, 4.5, 3.2], [17, 11, 3, 2.2]], [[8, 10, 3], [17, 13, 2]])],
+    rocks_b: [farRocks([[10, 8, 3.6, 2.6]], [[10, 10, 3]])],
+    rocks_c: [farRocks([[9, 8, 3.2, 2.3], [15, 6, 1.6, 1.2]], [[9, 10, 2]])],
+    scythe: [scythe()],
+    pitchfork: [pitchfork()],
+    rake: [rake()],
+    hoe: [hoe()],
+    raven_perched: [raven(RAVEN_PERCHED)],
+    raven_pecking: [raven(RAVEN_PECKING)],
     bird: crows(),
     perched: [perchedCrows()],
     tree: autumnTree(),
@@ -1611,6 +1781,15 @@ export const zone1: ZoneArt = {
     isle_far: { anchor: [0.5, 1], mode: 'static', bob: { amp: 1, ms: 6100 } },
     debris: { anchor: [0.5, 1], mode: 'static', bob: { amp: 1, ms: 3700 } },
     windmill: { anchor: [0.5, 1], mode: 'loop', ms: 640 },
+    rocks_a: { anchor: [0.5, 1], mode: 'static', bob: { amp: 1, ms: 6800 } },
+    rocks_b: { anchor: [0.5, 1], mode: 'static', bob: { amp: 1, ms: 5900 } },
+    rocks_c: { anchor: [0.5, 1], mode: 'static', bob: { amp: 1, ms: 7600 } },
+    scythe: { anchor: [0.5, 1], mode: 'static' },
+    pitchfork: { anchor: [0.5, 1], mode: 'static' },
+    rake: { anchor: [0.5, 1], mode: 'static' },
+    hoe: { anchor: [0.5, 1], mode: 'static' },
+    raven_perched: { anchor: [0.5, 1], mode: 'static' },
+    raven_pecking: { anchor: [0.5, 1], mode: 'static' },
     bird: { anchor: [0.5, 0.5], mode: 'loop', ms: 240 },
     perched: { anchor: [0.5, 1], mode: 'static' },
     tree: { anchor: [0.5, 1], mode: 'loop', ms: 420 },
