@@ -129,6 +129,7 @@ Material kinds decide how light quantizes into the ramp (`BANDS` in `palette.ts`
 - **1px outline around the silhouette**, colored with the outline entry of the material it touches (colored, never black).
 - **Separation lines** where one form overlaps another: the pixels of the form behind get the outline color (`strong`) or two ramp steps darker (`soft`, for plate layers and folds).
 - Joined parts of the same limb are one group and never get a line between them.
+- Separate objects that cross (two swords, a weapon over a shield) each take a group of their own, or they melt together where they overlap; the crossed swords of `mi_campaign` are `sword1` and `sword2`, like the Skirmisher's.
 - Glowing parts (crystals, runes, eyes, gems) get a halo in their own deep color instead of a dark outline.
 
 ## 7. Animation

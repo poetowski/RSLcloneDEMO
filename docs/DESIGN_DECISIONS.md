@@ -43,6 +43,7 @@ Section 7 lists what is not decided.
 | 2026-10-12 | Zone 1: the flash every 10-25 s, things round the mill, distant rocks in the left sky, tools in the fields, more ravens on the left; the haystack's flames loop properly | 5.3a |
 | 2026-10-12 | The Dominion Medic, a Common of the Sanguine Dominion | 17 |
 | 2026-10-12 | The Champions screen: class filters beside the affinity ones, groups by faction, one rarity per row | 10 |
+| 2026-10-12 | The main menu's Campaign glyph: proper crossed swords with longer blades | 10 |
 
 ---
 
@@ -889,6 +890,10 @@ them.
   and a class combining; the cards in groups by faction in the factions'
   order (the Azure Crown first), each under its emblem and name; in a group
   the rarest first, every rarity on rows of its own.
+- **The Campaign glyph** (2026-10-12), Jakub's words: "on main screen, logo next to Campaign title button is not a proper crossed swords, their blades should be longer. fix this" Built: two swords
+  crossed corner to corner, the blades 13 px instead of 8 with their tips in
+  the top corners, slim gold hilts in the bottom corners, and a line parting
+  the blades where they cross (they had melted into one silver blob).
 - **Stat passives** (2026-10-12), Jakub's words: "none passive giving permanent stat voost should get this boost from stat budget pool. this is just extra" and "and this passive is during combat, so when player is looking at enforcer stats in his collection, this crit chance bonus is not shown there, only as a passive description under skills. passive is applied during combat."
   A passive that raises a stat comes on top of the rarity's stat budget, and
   the champion's stats outside battle (the collection, the champion page)

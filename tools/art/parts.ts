@@ -266,14 +266,17 @@ export interface SwordCfg {
   group?: string;
   /** Glowing groove down the blade. */
   rune?: Material;
+  /** Thickness of the hilt (grip, pommel, guard bar), 1 by default; a 16px glyph takes a slimmer one. */
+  hilt?: number;
 }
 
 export function sword(d: Draw, hand: V, ang: number, c: SwordCfg) {
   const f = d.frame(hand, ang);
   const g = c.group ?? 'weapon';
   const W = c.width / 2;
-  d.capsule({ mat: c.grip, z: c.z, group: g }, f(-c.gripLen, 0), f(2.2, 0), 1.25, 1.25);
-  d.circle({ mat: c.pommel, z: c.z + 0.05, group: g }, f(-c.gripLen - 1, 0), 1.8);
+  const k = c.hilt ?? 1;
+  d.capsule({ mat: c.grip, z: c.z, group: g }, f(-c.gripLen, 0), f(2.2, 0), 1.25 * k, 1.25 * k);
+  d.circle({ mat: c.pommel, z: c.z + 0.05, group: g }, f(-c.gripLen - 1, 0), 1.8 * k);
   d.poly(
     { mat: c.blade, z: c.z + 0.1, group: g },
     [f(3, -W), f(c.len - 5, -W * 0.85), f(c.len, 0), f(c.len - 5, W * 0.85), f(3, W)],
@@ -282,7 +285,7 @@ export function sword(d: Draw, hand: V, ang: number, c: SwordCfg) {
   if (c.rune) {
     d.capsule({ mat: c.rune, z: c.z + 0.12, group: g, line: 'none' }, f(6, 0), f(c.len - 9, 0), 0.6, 0.45);
   }
-  d.capsule({ mat: c.guard, z: c.z + 0.2, group: g }, f(2.8, -c.guardW), f(2.8, c.guardW), 1.3, 1.3);
+  d.capsule({ mat: c.guard, z: c.z + 0.2, group: g }, f(2.8, -c.guardW), f(2.8, c.guardW), 1.3 * k, 1.3 * k);
 }
 
 /**

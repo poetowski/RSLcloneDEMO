@@ -471,10 +471,13 @@ function glyph16(fn: (d: Draw) => void): Bitmap {
 }
 
 export const MENU_ICONS: Record<string, () => Bitmap> = {
+  // crossed swords: hilts in the bottom corners, blades corner to corner; a group
+  // each, so a line parts the blades where they cross
   campaign: () =>
     glyph16((d) => {
-      sword(d, v(2.5, 2.5), 45, { blade: MAT.silver, guard: MAT.gold, grip: MAT.leather, pommel: MAT.gold, len: 11, width: 1.8, guardW: 3, gripLen: 2.4, z: 1 });
-      sword(d, v(13.5, 2.5), 135, { blade: MAT.silver, guard: MAT.gold, grip: MAT.leather, pommel: MAT.gold, len: 11, width: 1.8, guardW: 3, gripLen: 2.4, z: 2 });
+      const s = { blade: MAT.silver, guard: MAT.gold, grip: MAT.leather, pommel: MAT.gold, len: 16, width: 1.8, guardW: 1.6, gripLen: 1, hilt: 0.6 };
+      sword(d, v(2.5, 2.5), 45, { ...s, z: 1, group: 'sword1' });
+      sword(d, v(13.5, 2.5), 135, { ...s, z: 2, group: 'sword2' });
     }),
   champions: () =>
     glyph16((d) => {
