@@ -114,10 +114,12 @@ export const LOCATIONS: LocationDef[] = [
     ],
   },
   {
-    // Zone 2 of the notes (DESIGN_DECISIONS.md 5.4): a node on the map, its stages and its art not designed yet
+    // Zone 2 of the notes (DESIGN_DECISIONS.md 5.4): a node on the map, its stages not designed yet; its
+    // background painted on Jakub's brief (2026-10-12)
     id: 'zone2',
     chapter: 'II',
     name: 'Verdant Grove',
+    zone: 'zone2',
     blurb: 'A grove deep in the forest, inside Court of Root territory.',
     requires: '1-10',
     map: { x: 722, y: 206 },

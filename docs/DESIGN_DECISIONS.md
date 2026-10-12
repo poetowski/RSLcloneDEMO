@@ -45,6 +45,7 @@ Section 7 lists what is not decided.
 | 2026-10-12 | The Champions screen: class filters beside the affinity ones, groups by faction, one rarity per row | 10 |
 | 2026-10-12 | The main menu's Campaign glyph: proper crossed swords with longer blades | 10 |
 | 2026-10-12 | Regen heals 15% max HP; Weaken removed | 10 |
+| 2026-10-12 | Zone 2's battle background, the Verdant Grove, painted on his brief | 5.4, 5.4b |
 
 ---
 
@@ -482,8 +483,8 @@ now, and so do the rift's veils, which had the same fault.
 ### 5.4 Zone 2 — working sketch
 
 *(2026-10-11: the area is the **Verdant Grove**. It is not about an arena:
-its battles only take place in something that looks like one. Its art waits
-for Jakub.)*
+its battles only take place in something that looks like one. 2026-10-12:
+its battle background painted on his brief, 5.4b.)*
 
 **Setting:** a **mystic arena in a deep forest**, inside Court of Root
 territory.
@@ -550,6 +551,51 @@ burnt in the night, a haystack burning) in its fields, the standards of the
 two worlds by the road. Then the river under a stone bridge and the forest,
 autumn turning green, around the Verdant Grove's glade. The map is 960 pixels
 wide and grows east area by area.
+
+### 5.4b Zone 2's battle background (2026-10-12)
+
+Jakub's brief, verbatim:
+
+```
+i want to design area 2. this is overgrown area full of statues and columns and old exotic temples in background on the background jungle mountain. many trees in foreground. sungliht day, maybe few butterflies. put details to designing this area. on the sky we can have some details as well, maybe birds and cloud. overgrown architecture looks like maya, but just similarities. put ornaments of snakes on a wall on right side in front of stairs to the mountain table on background. animate scene lightly.
+```
+
+"Mountain table" was read as a table mountain: a mountain with a flat top
+and sheer cliffs.
+
+**As built**, waiting for his look in game: a jungle ruin at midday. The sun
+stands high in the upper left and its light comes through the canopy in slow
+beams. Far off stands the table mountain, blue with distance, its cliffs a
+row of rock columns, a waterfall spilling from its brow into mist; on its
+brow a stepped temple pyramid with a pierced roof comb at the head of the
+great stair, a smaller temple along the rim and a roofless shrine; a pillar
+of rock stands apart from its western end and a tower of cloud rises behind
+it. To the left, a temple pyramid is half swallowed by the jungle under the
+sun. In the middle ground a colonnade stands on a terrace of two tiers:
+square columns carved with figures (standing, broken, one fallen in drums, a
+lintel still resting on two), two stelae, a reclining figure with a bowl, a
+seated idol, and a strangler fig rooted on the terrace's end. On the right,
+the terrace wall at the foot of the great stair: stepped merlons along its
+top and, along its panel, a feathered serpent undulating round carved discs,
+traces of old red paint behind it. At the wall's west end the serpent's
+great head rests on the ground, its jaws open toward the court, coming out
+of a collar of feathers. The great stair climbs from behind the wall through
+the jungle and up the cliff to the temple. In front of the wall's east end a
+stone jaguar lies on its plinth beside a broken column. On the left a
+colossal stone head sinks into the earth beside a broken column wrapped in
+roots, under a giant tree. The arena is an old paved court (the "something
+that looks like" an arena of 5.4), its flagstones lifted by roots and taken
+by moss and grass. Two great trees frame the edges, with leaves hanging into
+the top corners and lianas hanging from them.
+
+Animated lightly: clouds drift across the sky, the waterfall falls and its
+mist breathes, the sunbeams and the flecks of sun on the court fade in and
+out, the leaves, the lianas and the tree behind the wall stir, macaws wheel
+in the sky, a few butterflies flutter about and pollen drifts in the light.
+
+Everything the brief did not name is a first take: the waterfall, the
+colossal head, the jaguar, the colonnade's terrace and its small statues, the
+pyramid in the jungle, the macaws, the sunbeams and the pollen.
 
 ### 5.5 Visual throughline
 

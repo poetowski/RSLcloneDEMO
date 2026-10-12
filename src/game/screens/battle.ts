@@ -23,7 +23,8 @@ export class BattleScreen implements Screen {
         player: o.team.map(champion),
         playerStats: o.team.map((id) => battleStats(p, id)),
         enemy: st.enemies,
-        zone: zone(zoneOf(st.id)),
+        // ?zone=<id> fights the stage on another background (previews of an area whose stages wait)
+        zone: zone(new URLSearchParams(location.search).get('zone') ?? zoneOf(st.id)),
         stage: st,
         seed: Math.floor(Math.random() * 1e9),
         auto: p.settings.auto,

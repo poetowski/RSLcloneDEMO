@@ -66,9 +66,9 @@ Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8):
 | Location | Zone | Stages |
 | --- | --- | --- |
 | I. Fracture Reach | `zone1` | 1-1 to 1-10 (1-1 brings the Rime Scholar, 1-5 the Skirmisher, 1-6 the Dominion Medic, 1-7 the Lineholder, 1-8 the Bloodhound, 1-9 the Quartermaster; 1-10 is the boss and brings the Enforcer) |
-| II. Verdant Grove (after 1-10) | none yet | not designed |
+| II. Verdant Grove (after 1-10) | `zone2` | not designed |
 
-Zone 1 follows Jakub's working notes (DESIGN_DECISIONS.md 5.3), which are not locked: the stage texts quote them (contact, the settlement, escalation, the turning point, leaving). Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed. Zone 2 (the mystic arena in a Court of Root forest) has its node in the jungle and no stages yet. The world map follows his brief (DESIGN_DECISIONS.md 5.4a): the edge of a continent, a rift in the west, jungle toward the east, nothing beyond its north and south edges.
+Zone 1 follows Jakub's working notes (DESIGN_DECISIONS.md 5.3), which are not locked: the stage texts quote them (contact, the settlement, escalation, the turning point, leaving). Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed. Zone 2 (a jungle ruin in Court of Root territory, its battle background painted on Jakub's brief: DESIGN_DECISIONS.md 5.4b) has its node in the jungle and its background, and no stages yet: `?screen=battle&stage=1-1&zone=zone2` fights any stage on it. The world map follows his brief (DESIGN_DECISIONS.md 5.4a): the edge of a continent, a rift in the west, jungle toward the east, nothing beyond its north and south edges.
 
 ## 4. The save: the Master Archivist and the Reliquary
 

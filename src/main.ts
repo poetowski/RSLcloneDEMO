@@ -83,6 +83,7 @@ async function boot() {
 
   // deep links: ?screen=campaign|team|battle|collection|champion|academy|options|recruit
   //   &stage=1-2 &team=captain_gareth,rime_scholar &champion=captain_gareth &chapter=buffs   ?demo=<skill id>
+  //   &zone=zone2 (battle, team: the stage on another background)
   const r = app.router;
   const demo = params.get('demo');
   const stageId = params.get('stage') ?? '1-1';

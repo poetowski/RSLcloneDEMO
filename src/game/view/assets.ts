@@ -31,6 +31,8 @@ export interface PropKind {
   fire?: { dy: number; flame?: boolean };
   /** drifts up and down by `amp` px, once every `ms` */
   bob?: { amp: number; ms: number };
+  /** drifts sideways across the screen at `speed` px a second, coming round again from the other side (clouds) */
+  drift?: { speed: number };
   frames: number;
 }
 

@@ -1,8 +1,9 @@
 // Renders a combat background: backdrop, the far layer (sky pieces and distant
-// scenery behind the tiles, some of them bobbing), spark emitters, pre-baked
-// tile layers, props driven by their kind (static, looping, pulsing, burning),
-// the ambience of the zone (falling snow, blowing sand, drifting star-dust with
-// shooting stars, or autumn leaves tumbling in the wind; circling birds, heat
+// scenery behind the tiles, some of them bobbing, clouds drifting across),
+// spark emitters, pre-baked tile layers, props driven by their kind (static,
+// looping, pulsing, burning), the ambience of the zone (falling snow, blowing
+// sand, drifting star-dust with shooting stars, autumn leaves tumbling in the
+// wind, or pollen drifting in the sunlight; circling birds, butterflies, heat
 // haze, now and then a flash of strange light across the sky), light pools, a
 // mood tint and the vignette. Everything zone-specific
 // comes from the zone's JSON (art) and ZoneDef (behaviour), so a new zone
@@ -21,6 +22,38 @@ interface Bird {
   speed: number;
 }
 
+/** A butterfly wandering about its spot: slow loops, wings beating, now and then a glide. */
+interface Butterfly {
+  hx: number;
+  hy: number;
+  ax: number;
+  ay: number;
+  f: [number, number, number];
+  p: [number, number, number];
+  /** wingbeats a second */
+  rate: number;
+  wing: string;
+  edge: string;
+  x: number;
+  y: number;
+  frame: number;
+}
+
+/** Wing colours and their dark edges: a blue morpho, an orange, a yellow and a white. */
+const BUTTERFLY_TONES: [string, string][] = [
+  ['#46a6ff', '#163c8c'],
+  ['#ff9a30', '#6e2e0e'],
+  ['#ffdc4a', '#7a5a10'],
+  ['#f6f2e6', '#7c786c'],
+];
+
+/** Wings open, half raised, closed: W wing, E its dark tips, B the body. */
+const BUTTERFLY_FRAMES = [
+  ['EWW.WWE', 'WWWBWWW', '.WWBWW.', '..W.W..'],
+  ['..W.W..', '.WWBWW.', '..WBW..', '...B...'],
+  ['...W...', '...W...', '...W...', '...B...'],
+];
+
 export class ZoneView {
   private tilesLayer: HTMLCanvasElement;
   private light: HTMLCanvasElement;
@@ -37,6 +70,7 @@ export class ZoneView {
   readonly json: ZoneJson;
   private art: ZoneArt;
   private birds: Bird[] = [];
+  private butterflies: Butterfly[] = [];
   private gust = 0;
   private gustT = 4000;
   /** the sky's rare flash: its mask, one tinted copy per colour, the time to the next one, how far into one we are (-1: none) */
@@ -57,7 +91,7 @@ export class ZoneView {
     this.tilesLayer = this.bakeTiles();
     this.light = makeGlow(64, 40, def.glow);
     this.vignette = makeVignette();
-    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : 70;
+    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : 70;
     for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
     this.sparkT = (this.json.sparks ?? []).map(() => 0);
     for (let i = 0; i < (def.birds ?? 0); i++) {
@@ -69,6 +103,16 @@ export class ZoneView {
           : { cx: 380 + Math.random() * 200, cy: 22 + Math.random() * 26, r: 30 + Math.random() * 40, ry: 6 + Math.random() * 6, a: Math.random() * Math.PI * 2, speed: (0.00025 + Math.random() * 0.0002) * (i % 2 ? 1 : -1) },
       );
     }
+    (def.butterflies ?? []).forEach(([hx, hy], i) => {
+      const [wing, edge] = BUTTERFLY_TONES[i % BUTTERFLY_TONES.length];
+      const rnd = () => Math.random();
+      this.butterflies.push({
+        hx, hy, ax: 30 + rnd() * 18, ay: 9 + rnd() * 8,
+        f: [0.3 + rnd() * 0.25, 0.4 + rnd() * 0.3, 0.9 + rnd() * 0.5],
+        p: [rnd() * 6.3, rnd() * 6.3, rnd() * 6.3],
+        rate: 3 + rnd() * 1.4, wing, edge, x: hx, y: hy, frame: 0,
+      });
+    });
     if (def.flash) {
       this.flashMask = makeFlashMask(def.flash.at, this.json.horizon);
       this.flashT = this.nextFlash() * (this.flashPreview ? 0.4 : 1);
@@ -119,6 +163,21 @@ export class ZoneView {
   }
 
   private spawnAmbient(x = -4, y = -4) {
+    if (this.def.ambient === 'pollen') {
+      // pollen and seed down drifting slowly through the sunlight
+      const respawn = x < 0;
+      this.ambient.add({
+        x: respawn ? -2 : x,
+        y: respawn ? 30 + Math.random() * 290 : y,
+        vx: 2 + Math.random() * 4,
+        vy: (Math.random() - 0.6) * 2,
+        life: Infinity,
+        size: 1,
+        color: Math.random() < 0.35 ? '#fff6cc' : '#e4dca8',
+        sway: 3 + Math.random() * 5,
+      });
+      return;
+    }
     if (this.def.ambient === 'leaves') {
       // autumn leaves tumbling across in the wind from the left, a few close to the camera
       const respawn = x < 0;
@@ -201,7 +260,7 @@ export class ZoneView {
     const speedUp = this.def.ambient === 'sand' && this.gust > 0 ? 2.2 : 1;
     amb.update(dt * speedUp);
     for (const p of amb.list) if (p.y > H + 4 || p.y < -6 || p.x > W + 8 || p.x < -60) p.life = 0;
-    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.gust > 0 ? 150 : 70;
+    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.gust > 0 ? 150 : 70;
     while (amb.list.length < target) this.spawnAmbient();
     if (this.def.ambient === 'sand') {
       // every few seconds a gust sweeps a veil of sand across the arena
@@ -264,6 +323,15 @@ export class ZoneView {
       }
     }
     for (const b of this.birds) b.a += b.speed * dt;
+    // butterflies loop slowly about their spots, their wings beating, now and then gliding
+    const s = this.t / 1000;
+    for (const f of this.butterflies) {
+      f.x = f.hx + Math.sin(s * f.f[0] + f.p[0]) * f.ax + Math.sin(s * f.f[2] + f.p[2]) * f.ax * 0.3;
+      f.y = f.hy + Math.sin(s * f.f[1] + f.p[1]) * f.ay + Math.sin(s * f.rate * Math.PI * 2) * 0.7;
+      const glide = Math.sin(s * 0.8 + f.p[1]) > 0.8;
+      const beat = Math.sin(s * f.rate * Math.PI * 2 + f.p[0]);
+      f.frame = glide || beat > 0.35 ? 0 : beat > -0.35 ? 1 : 2;
+    }
     const f = this.def.flash;
     if (f) {
       if (this.flashAge >= 0) {
@@ -305,7 +373,15 @@ export class ZoneView {
     const img = this.art.props;
     // a bobbing prop drifts a pixel or two up and down, each on its own phase
     const bob = k.bob ? Math.round(Math.sin((this.t / k.bob.ms) * Math.PI * 2 + p.x * 0.05) * k.bob.amp) : 0;
-    const place = (r: Rect4) => [p.x - r[2] * k.anchor[0], p.y + bob - r[3] * k.anchor[1]] as const;
+    let px = p.x;
+    if (k.drift) {
+      // drifting across the sky, coming round again from the other side
+      const w = this.frame(p.kind, 0)[2];
+      const span = W + w;
+      const left = p.x - w * k.anchor[0];
+      px = ((((left + w + (this.t / 1000) * k.drift.speed) % span) + span) % span) - w + w * k.anchor[0];
+    }
+    const place = (r: Rect4) => [px - r[2] * k.anchor[0], p.y + bob - r[3] * k.anchor[1]] as const;
     if (k.mode === 'loop') {
       // each placement runs on its own phase (props left of the screen edge included)
       const f = ((Math.floor(this.t / (k.ms ?? 150) + p.x * 0.01) % k.frames) + k.frames) % k.frames;
@@ -373,6 +449,15 @@ export class ZoneView {
   drawFront(ctx: CanvasRenderingContext2D) {
     for (const p of this.json.props) if (p.layer === 'fg') this.drawProp(ctx, p);
     this.ambient.draw(ctx);
+    for (const f of this.butterflies) {
+      const rows = BUTTERFLY_FRAMES[f.frame];
+      const x0 = Math.round(f.x) - 3, y0 = Math.round(f.y) - 2;
+      rows.forEach((row, y) => [...row].forEach((ch, x) => {
+        if (ch === '.') return;
+        ctx.fillStyle = ch === 'W' ? f.wing : ch === 'E' ? f.edge : '#1a1612';
+        ctx.fillRect(x0 + x, y0 + y, 1, 1);
+      }));
+    }
     if (this.def.ambient === 'sand' && this.gust > 0) {
       // the gust itself: a low dithered veil that sweeps across and fades
       const k = Math.sin((this.gust / 1400) * Math.PI);

@@ -21,18 +21,35 @@ export const ZONES: ZoneDef[] = [
     // Jakub, the same day: "more frequent, instead of 24-52s maybe rather go for 10-25s"
     flash: { at: [536, 78], every: [10000, 25000], ms: 1700, colors: ['#4affc0', '#ff4ad8', '#9a6aff', '#ffb04a', '#4ad8ff'] },
   },
+  {
+    // Zone 2 from Jakub's working notes, painted on his brief (2026-10-12): an overgrown place of statues and
+    // columns in the jungle on a sunlit day, old temples on a table mountain, serpents carved on the wall in
+    // front of its stair, many trees in the foreground; pollen drifting in the light
+    id: 'zone2',
+    name: 'Verdant Grove',
+    ambient: 'pollen',
+    glow: [255, 226, 160],
+    // the sun stands high: short shadows
+    shadow: { dx: 2, stretch: 1.1 },
+    tint: { color: '#ffe8a8', alpha: 0.05, op: 'soft-light' },
+    // Jakub: "on the sky we can have some details as well, maybe birds and cloud": macaws wheeling over the jungle
+    birds: 4,
+    birdsAt: [[226, 48], [372, 24]],
+    // Jakub: "maybe few butterflies"
+    butterflies: [[84, 232], [290, 176], [588, 214], [196, 108], [470, 96]],
+  },
 ];
 
 const byId = new Map(ZONES.map((z) => [z.id, z]));
 
 /**
  * The zone a faction calls home: where its champions stand in the Academy
- * demos and on their detail page. No faction has a home yet, so every one
+ * demos and on their detail page. The Court of Root's is the Verdant Grove,
+ * inside its territory (docs/DESIGN_DECISIONS.md 5.4); every other faction
  * stands in the first zone.
  */
 export function homeZone(faction: FactionId): ZoneDef {
-  void faction;
-  return ZONES[0];
+  return faction === 'court_of_root' ? zone('zone2') : ZONES[0];
 }
 
 export function zone(id: string): ZoneDef {

@@ -24,7 +24,7 @@ export class TeamScreen extends BaseScreen {
   constructor(app: App, stageId: string) {
     super(app);
     this.s = stage(stageId);
-    this.diorama = new Diorama(app, zoneOf(stageId));
+    this.diorama = new Diorama(app, new URLSearchParams(location.search).get('zone') ?? zoneOf(stageId));
     const own = roster(this.archivist);
     this.team = this.archivist.team.filter((id) => own.includes(id)).slice(0, 3);
     if (!this.team.length) this.team = own.slice(0, 3);

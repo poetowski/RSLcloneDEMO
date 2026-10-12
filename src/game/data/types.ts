@@ -206,8 +206,8 @@ export interface RoleDef {
 export interface ZoneDef {
   id: string;
   name: string;
-  /** snow, blowing sand, star-dust with shooting stars, or autumn leaves tumbling in the wind */
-  ambient: 'snow' | 'sand' | 'motes' | 'leaves';
+  /** snow, blowing sand, star-dust with shooting stars, autumn leaves tumbling in the wind, or pollen drifting in the sunlight */
+  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen';
   /** color of brazier light pools */
   glow: [number, number, number];
   /** unit shadows: offset away from the key light and horizontal stretch */
@@ -220,6 +220,8 @@ export interface ZoneDef {
   birdsAt?: [number, number][];
   /** heat shimmer on the horizon rows of the backdrop */
   haze?: boolean;
+  /** butterflies fluttering about these spots, in screen pixels, one butterfly each */
+  butterflies?: [number, number][];
   /** brazier embers: first color, then the colors they fade through (default: firelight) */
   embers?: string[];
   /**
