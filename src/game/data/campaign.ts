@@ -104,6 +104,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: 'Leaving the reach, on to the next area.',
         enemies: [{ champion: 'captain_gareth', boss: true }, { champion: 'rime_scholar' }, { champion: 'rime_scholar' }],
         power: 0.76,
+        // a stand-in: the stage that brings the Enforcer is not Jakub's
+        recruit: 'enforcer',
       },
     ],
   },

@@ -116,12 +116,17 @@ export interface PassiveDef {
    * overdrive: the first time HP drops below `value` x max HP, `statuses` are granted
    * rebuke:    while below `value` x max HP, an enemy whose critical hit lands on the
    *            champion receives `statuses`; then the passive rests for `cooldown` turns
+   * stat:      always on in battle: adds `value` to the champion's `stat` (0.1 C.RATE =
+   *            +10%). Extra, outside the stat budget, and never shown with the
+   *            champion's stats outside battle (Jakub, 2026-10-12)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
   /** rebuke: the champion's own turns before it can answer again */
   cooldown?: number;
+  /** stat: the stat it raises */
+  stat?: StatId;
 }
 
 export interface Stats {

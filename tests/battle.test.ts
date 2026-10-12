@@ -6,7 +6,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { brute, cleaver, drummer, fixture, freezer, guard, inAffinity, mender, overdrive, provisioner, rebuker, stalker, striker, twin, undying, warden } from './fixtures';
+import { brute, cleaver, drummer, fixture, freezer, guard, inAffinity, keen, mender, overdrive, provisioner, rebuker, stalker, striker, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -50,6 +50,17 @@ describe('damage rules', () => {
     expect(b.get('p0').maxHp).toBe(2000);
     expect(b.attack(b.get('p0'))).toBe(150);
     expect(new Battle(combatants([striker]), combatants([twin])).get('p0').maxHp).toBe(striker.stats.hp);
+  });
+
+  it('adds a stat passive in battle only, on top of the stats a combatant brings', () => {
+    const b = new Battle(combatants([keen]), combatants([twin]), { seed: 5 });
+    expect(b.get('p0').stats.crit).toBe(1);
+    // the champion's own stats, the ones the collection shows, stay as they are
+    expect(keen.stats.crit).toBe(0.05);
+    const r = b.useSkill(b.get('p0'), keen.skills[0], 'e0');
+    expect(r.events.find((e) => e.kind === 'damage')).toMatchObject({ crit: true });
+    const woven = new Battle([{ def: keen, stats: { ...keen.stats, crit: 0.15, atk: 150 } }], combatants([twin]));
+    expect([woven.get('p0').stats.crit, woven.get('p0').stats.atk]).toEqual([1.1, 150]);
   });
 });
 

@@ -234,7 +234,7 @@ Every skill is data (`SkillDef` in `types.ts`); these are the levers a kit can p
 
 ### ME3 The roster
 
-Jakub's champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4 and 8, Starter Heroes; 12, the Skirmisher; 13, the Lineholder; 14, the Quartermaster): names, looks, kits and what each teaches are his; stats and the numbers in the skills are stand-ins.
+Jakub's champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4 and 8, Starter Heroes; 12, the Skirmisher; 13, the Lineholder; 14, the Quartermaster; 15, the Enforcer): names, looks, kits and what each teaches are his; stats and the numbers in the skills are stand-ins.
 
 | Champion (`id`) | Role, rarity, affinity, faction | SPD | Signature idea | Met / joins |
 | --- | --- | --- | --- | --- |
@@ -243,8 +243,9 @@ Jakub's champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4 and 8, Starter H
 | Skirmisher (`skirmisher`) | Damage, common, Bloom, Azure Crown | 110 | one skill: two quick cuts, one with each short sword, every turn; the roster's first Common and first Bloom, and the fastest. Fragile (HP 960): the Ember copies hit him strong | after 1-5 (a stand-in), not fought there |
 | Lineholder (`lineholder`) | Tank, common, Tide, Azure Crown | 92 | Guard Cut, one mace blow from behind the shield; Brace, DEF Up on himself for 2 turns: the roster's first Tank and first skill aimed only at its user. The sturdiest (HP 1320, DEF 72), the slowest and the weakest hitter (ATK 78); with no Taunt, the AI ignores him until the others are low (T20) | after 1-7 (a stand-in), not fought there |
 | Quartermaster (`quartermaster`) | Support, common, Bloom, Azure Crown | 104 | a plain rap of his walking stick; Field Rations heals every ally by 15% of his own max HP, then lends 15% Turn Meter to the ally lowest on HP: the roster's first heal and its first turn meter boost | after 1-9 (a stand-in), not fought there |
+| Enforcer (`enforcer`) | Damage, common, Ember, Sanguine Dominion | 98 | Heavy Cut, one plain two-handed cut (1.0); Keen Edge, +10% C.RATE in every battle (12.5%): the roster's first stat passive, extra to the budget and only its text outside battle, and the first champion who crits often | after 1-10 (a stand-in), not fought there |
 
-Spread: roles Damage 2, Support 2, Tank 1; affinities Ember 1, Tide 2, Bloom 2; rarities Elite 2, Common 3 (Heroic and Mythic have budgets but no champions, T8); factions Azure Crown 4, Sanguine Dominion 1, the Court of Root and the Ashveil Reign none.
+Spread: roles Damage 3, Support 2, Tank 1; affinities Ember 2, Tide 2, Bloom 2; rarities Elite 2, Common 4 (Heroic and Mythic have budgets but no champions, T8); factions Azure Crown 4, Sanguine Dominion 2, the Court of Root and the Ashveil Reign none.
 
 ### ME4 The campaign
 
@@ -261,7 +262,7 @@ Zone 1, the *Fracture Reach*, from Jakub's working notes (DESIGN_DECISIONS.md 5.
 | 1-7 | 2 Gareths, Rime Scholar | 0.82 | normal | Ember -1, Tide +2 | brings the Lineholder |
 | 1-8 | 3 Gareths | 0.71 | normal | Tide +3 | three Wide Sweeps; four champions to choose three from |
 | 1-9 | 2 Gareths, Rime Scholar | 0.74 | normal | Ember -1, Tide +2 | brings the Quartermaster |
-| 1-10 | Gareth (boss), 2 Rime Scholars | 0.76 | boss | Ember -2, Tide +1 | boss HP and crown; five champions to choose three from |
+| 1-10 | Gareth (boss), 2 Rime Scholars | 0.76 | boss | Ember -2, Tide +1 | boss HP and crown; five champions to choose three from; brings the Enforcer |
 
 ### ME5 Feel: the presentation mechanics
 
@@ -369,7 +370,7 @@ These complete the balance report. Until they are automated ([DDD.md](DDD.md) R-
 
 ### 6.0 Zone 1 (2026-10-10)
 
-Jakub's content: Captain Gareth and the Rime Scholar (the Starter Heroes record, kits with stand-in numbers), the Skirmisher from 1-6 and the Lineholder from 1-8 (both re-measured 2026-10-11) and Zone 1 with stand-in enemies (copies of the first two). `npm test`, `npm run typecheck`, `npm run audit` and `npm run balance` all pass; impact is skipped (it needs six champions). Every team the player can own at that point (the champions owned by then, three at most: one team up to 1-7, four at 1-8 and 1-9, ten at 1-10) is auto-battled 300 times (seeds 1000-1299) with the 6.5 loop; a row averages its teams:
+Jakub's content: Captain Gareth and the Rime Scholar (the Starter Heroes record, kits with stand-in numbers), the Skirmisher from 1-6 and the Lineholder from 1-8 (both re-measured 2026-10-11) and Zone 1 with stand-in enemies (copies of the first two). `npm test`, `npm run typecheck`, `npm run audit` and `npm run balance` passed with impact skipped (it needs six champions) until the Enforcer made six (2026-10-12; see the end of this section). Every team the player can own at that point (the champions owned by then, three at most: one team up to 1-7, four at 1-8 and 1-9, ten at 1-10) is auto-battled 300 times (seeds 1000-1299) with the 6.5 loop; a row averages its teams:
 
 | Stage | Power | Team size | Auto win | Actions | 3-star share of wins | Player opens | Strong / weak hits | Skipped turns | Cold Rebukes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -385,6 +386,8 @@ Jakub's content: Captain Gareth and the Rime Scholar (the Starter Heroes record,
 | 1-10 | 0.76 | 3 (10 teams) | 49% | 22.5 | 9% | 51% | 27% / 36% | 0.05 | 0.07 |
 
 (Skipped turns and Cold Rebukes are per battle.) From 1-6 the Skirmisher fights too: the player opens most battles (his SPD 110), weak hits outnumber strong ones (his Bloom cuts the Gareth copies weak, and their Ember cuts him strong), and flawless wins all but vanish at 1-6 and 1-7 (12-18% of wins): with HP 960 he is the one who falls, and three stars need all three standing. From 1-8 the Lineholder joins and the four teams split wide: Gareth and the Rime Scholar with either Common win 77-100% (flawless in 8-69% of wins), the Rime Scholar with both Commons 47-63%, Gareth with both Commons 9-22%. The rows average them, so 1-8 to 1-10 run at lower powers (T20), and flawless wins come back (9-42%). At 1-10 the Quartermaster joins too and ten teams are averaged: Gareth and the Rime Scholar with him win 96%, with the Skirmisher 95%, and the three Commons together 2%. The curve falls from 93% to 49%; on these seeds 1-4 and 1-5 sit a few points above 1-3, inside the noise of 300 battles (on seeds 1-300 the curve is monotonic but for 1-8, see MECHANICS_GUIDE 10). Battles run 6.8 to 22.5 actions. The Rime Scholar hits Gareth's copies strong, so strong hits now outnumber weak ones, and stages of Gareths need more power; their Wide Sweeps make flawless wins rare there (18-20% of wins). Cold Rebuke fires once in 8 to 25 battles: both kits crit at 2.5%, as Jakub keeps crit out of Gareth's kit, so it rarely meets a critical hit in Zone 1; it is the roster's only control (T19).
+
+Impact (2026-10-12, `npm run balance` section 3, 960 battles per champion, band 40-60%): Gareth 83%, the Rime Scholar 71%, the Enforcer 44%, the Skirmisher 44%, the Quartermaster 37%, the Lineholder 23%. Random teams pit the two Elites against Commons, so whoever has them wins, and the Lineholder draws no fire (T20). The Enforcer joins after 1-10, so the curve above is unchanged. The four lines out of band wait for Jakub's balance (decision log, 2026-10-12).
 
 The sections below are the proof of concept's baseline (commit `8dd9a26`, 2026-10-06, 39 tests): thirteen champions and ten stages that no longer exist, kept as the reference for a full roster.
 
@@ -510,11 +513,11 @@ Paste it into the pull request description.
 | T12 | Acquisition: one recruit per first clear ties the size of the roster to the size of the campaign. | keep it; shards, summoning, fixed rewards or events |
 | T13 | Team size is 3 (RSL 4-5, SWGOH 5). Formation slots, zone spawns, the HUD and every balance number depend on it. | decide early; 3, 4 or 5 |
 | T14 | Team-building levers are few: no leader skills or auras, and formation is visual only (the front row does not protect the back). | leader skills or auras; positional rules |
-| T16 | Status variety: no immunities, no revives, ally-target skills unused (T8), three passive kinds. | grow the vocabulary with the roster; every new protection needs an answer (DY6) |
+| T16 | Status variety: no immunities, no revives, ally-target skills unused (T8), four passive kinds (the stat passive since 2026-10-12). | grow the vocabulary with the roster; every new protection needs an answer (DY6) |
 | T17 | Modes: the campaign is the only mode; no dungeons, boss modes or events; PvP is excluded. | decide which modes the game has |
 | T18 | Platform: a 640x360 web canvas with mouse and keyboard; RSL and SWGOH are phone games (touch, short sessions). | web only; or phones too (touch-first input, layout) |
 | T20 | A Tank draws no fire: the AI hits the lowest HP share 70% of the time and nothing protects allies (the Lineholder has no Taunt, formation is visual only, T14), so his HP and DEF count only once the others are low. Teams that pair the two Commons lose most late battles in Zone 1 (9-63%), and as the curve averages every team the player can own, 1-8 to 1-10 are tuned so the best teams win 95-100%. | Jakub decides what roles do (DESIGN_DECISIONS.md 7): a Taunt or a protect rule for Tanks, AI targeting by threat; or measure the curve on the teams a player would pick |
-| T19 | Crit is load-bearing for Cold Rebuke, but crit is kept out of Gareth's kit (2.5%, the floor of the norms) and Zone 1's enemies are copies of the two, so the passive fires once in 8 to 25 battles there. Jakub: crit must be taught at or before the point Cold Rebuke first fires meaningfully. | Jakub decides: enemies that crit (Zone 1's real enemies, or Zone 2), a crit teacher among the champions, or the Academy alone |
+| T19 | Crit is load-bearing for Cold Rebuke, but crit is kept out of Gareth's kit (2.5%, the floor of the norms) and Zone 1's enemies are copies of the two, so the passive fires once in 8 to 25 battles there. The Enforcer crits at 12.5% in battle (Keen Edge, 2026-10-12), but he joins after 1-10 (a stand-in) and is not among Zone 1's enemies. Jakub: crit must be taught at or before the point Cold Rebuke first fires meaningfully. | Jakub decides: enemies that crit (Zone 1's real enemies, or Zone 2), a crit teacher among the champions, or the Academy alone |
 
 ## 9. Decision log
 
@@ -541,6 +544,7 @@ Record every change that moves a dynamic out of its band, changes a band, or cha
 | 2026-10-12 | Jakub: the interface's affinity marks stay; Gareth's ember cuts and the Skirmisher's leaf-green ones made plain (effects renamed `sword_cut`, `heavy_blow`, `sword_sweep`, `blade_cut`, `blade_cut_rise`); balance, recruiting stages and stage enemies are his to dictate later | AE2, AE5 | none in play | ember and leaf-green -> white streaks, light, dust and chips | set by Jakub |
 | 2026-10-12 | The Quartermaster (Jakub's brief, DESIGN_DECISIONS.md 14): Common, Support, Tide, Azure Crown; a plain A1 (0.9); Field Rations heals every ally by 15% of his max HP, then 15% Turn Meter to the ally lowest on HP. Rules: `healOf: 'caster'`, `tmLowestAlly`; demos wound the healer's team first. Joins on the first clear of 1-9 (a stand-in), so 1-10 averages ten teams | AE3, AE4 | auto win 1-10 57% -> 52% (all ten teams; the best 97%), still in the boss band; no power changed | 6.0 re-measured | set by Jakub; names, texts, numbers and the recruiting stage are stand-ins |
 | 2026-10-12 | The Quartermaster's affinity set to Bloom (Jakub: "quartermaster affinity should be bloom. change it"; Tide before) | AE3 | auto win 1-10 52% -> 49% (all ten teams; the best 96%), still in the boss band; nothing in his art changes, as an affinity sets nothing there | 6.0 re-measured | set by Jakub |
+| 2026-10-12 | The Enforcer (Jakub's brief, DESIGN_DECISIONS.md 15): Common, Damage, Ember, Sanguine Dominion; Heavy Cut (1.0) and Keen Edge, +10% C.RATE always on. Rules: a passive kind `stat`, extra to the stat budget and applied in battle only (Jakub: "this is just extra", "passive is applied during combat"); his helmet made lighter so he looks weaker. Joins on the first clear of 1-10 (a stand-in) | AE3 | the curve unchanged (he joins after the last stage); the roster reaches six, so impact runs for the first time: Gareth 83%, the Rime Scholar 71%, the Enforcer 44%, the Skirmisher 44%, the Quartermaster 37%, the Lineholder 23%, four outside 40-60% (the Elites against Commons; T20) | impact skipped -> measured | set by Jakub; names, texts, numbers and the recruiting stage are stand-ins; the four impact lines wait for his balance, no champion retuned |
 
 ## 10. Keeping this document true
 

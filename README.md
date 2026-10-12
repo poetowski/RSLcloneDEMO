@@ -6,13 +6,13 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 
 ![Battle](docs/images/battle.gif)
 
-- **5 champions**: Captain Gareth, the Skirmisher, the Lineholder and the Quartermaster of the Azure Crown and the Rime Scholar of the Sanguine Dominion, each with idle, run, every skill, hurt, death and a victory pose, rendered for both facings. Four factions: the Azure Crown, the Sanguine Dominion, the Court of Root and the Ashveil Reign.
+- **6 champions**: Captain Gareth, the Skirmisher, the Lineholder and the Quartermaster of the Azure Crown and the Rime Scholar and the Enforcer of the Sanguine Dominion, each with idle, run, every skill, hurt, death and a victory pose, rendered for both facings. Four factions: the Azure Crown, the Sanguine Dominion, the Court of Root and the Ashveil Reign.
 - **A combat background** for Zone 1, the *Fracture Reach*: dawn in autumn after a raid, a haystack burning by a stubble field, a hay cart overturned with a wheel off, bulky floating islands, and a rift torn in the cosmos waving veils of cosmic fabric, with leaves blowing across.
 - **A campaign** on a painted world map a screen and a half wide that grows east area by area: a rift torn diagonally through the land in the west, the Fracture Reach's village in its autumn fields, the river, and the forest around the Verdant Grove; one node per area, each opening its list of stages (drag the map, step between areas with the arrows, or press `M` for the whole world). Zone 1 holds 10 stages; Zone 2's node waits for its stages. The second champion joins after the first battle.
 - **A Weaver Matrix** for every champion: six named slots in two triangles holding Thread Spools, each with a main stat and strands, and eight Weave Patterns that two spools of a kind weave, on the champion page's MATRIX tab (spools have no sources yet; `?spools=1` adds a sample).
 - **A collection** of champions with locked silhouettes, rarities, affinities, factions and roles, and a detail page with every animation and skill.
 - **The Academy**: an in-game codex that teaches combat, the turn meter, damage, affinities, all buffs, debuffs and special mechanics, with live demonstrations.
-- **Real mechanics**: turn meter, A1/A2/A3 cooldowns, 16 statuses, the affinity cycle (Ember beats Bloom, Bloom beats Tide, Tide beats Ember), counterattacks, dispels, lifesteal, execute, turn meter boosts, passives (Undying, Overdrive, and Rebuke, which answers a critical hit), bosses, stars, auto battle and speed controls.
+- **Real mechanics**: turn meter, A1/A2/A3 cooldowns, 16 statuses, the affinity cycle (Ember beats Bloom, Bloom beats Tide, Tide beats Ember), counterattacks, dispels, lifesteal, execute, turn meter boosts, passives (Undying, Overdrive, Rebuke, which answers a critical hit, and stat passives that raise a stat in every battle), bosses, stars, auto battle and speed controls.
 - **Guardrails** that keep new content consistent: balance norms and a balance simulator, content tests, an art audit, and two project skills for adding champions and backgrounds.
 
 | | |
@@ -43,7 +43,7 @@ Deep links: `?screen=campaign|team|battle|collection|champion|academy|options|re
 
 ## The champions
 
-All five are Jakub's ([docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md) 8, Starter Heroes, 12, the Skirmisher, 13, the Lineholder, and 14, the Quartermaster): names, looks, kits and what each one teaches. Their stats and the numbers in their skills are stand-ins until he sets them ([docs/MECHANICS_GUIDE.md](docs/MECHANICS_GUIDE.md) 9).
+All six are Jakub's ([docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md) 8, Starter Heroes, 12, the Skirmisher, 13, the Lineholder, 14, the Quartermaster, and 15, the Enforcer): names, looks, kits and what each one teaches. Their stats and the numbers in their skills are stand-ins until he sets them ([docs/MECHANICS_GUIDE.md](docs/MECHANICS_GUIDE.md) 9).
 
 | | Champion | Kit |
 | --- | --- | --- |
@@ -52,6 +52,7 @@ All five are Jakub's ([docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md) 8, St
 | ![](docs/images/reel_skirmisher.gif) | **Skirmisher**. Common Bloom Damage, Azure Crown. A slight, light-armoured man in blue leather with the Azure Crown's insignia, a leather helmet and two short swords; weaker-looking than the starters. Joins after 1-5. | **Twin Cut** (A1): two quick cuts at one enemy, one with each sword; it always hits twice. No A2. |
 | ![](docs/images/reel_lineholder.gif) | **Lineholder**. Common Tide Tank, Azure Crown. A big man behind a big dark-blue shield with two small gold crowns, a mace of dark iron on a wooden handle resting on his shoulder, a blue leather helmet like the Skirmisher's, a dark quilted coat with blue stripes. Joins after 1-7. | **Guard Cut** (A1): keeps the shield up and strikes one enemy with the mace over its rim. **Brace** (A2): sets his feet behind the shield; DEF Up on himself for 2 turns. |
 | ![](docs/images/reel_quartermaster.gif) | **Quartermaster**. Common Bloom Support, Azure Crown. A grey-haired man of the road in a long brown leather coat, a big pack on his back, the Crown's blue badge on his chest and a tall walking stick. Joins after 1-9. | **Stick Rap** (A1): a plain rap of the walking stick. **Field Rations** (A2): every ally heals by 15% of his max HP, then the ally lowest on HP (not himself) gains 15% Turn Meter. |
+| ![](docs/images/reel_enforcer.gif) | **Enforcer**. Common Ember Damage, Sanguine Dominion. A soldier in crimson half armour with the black hexagon on his chest, a plain cap of dark iron and a long bastard sword held in both hands. Joins after 1-10. | **Heavy Cut** (A1): a two-handed cut of the long sword at one enemy. **Keen Edge** (passive): +10% C.RATE in every battle. No A2. |
 
 ### Skill icons (one row per champion: A1, A2, A3 or the passive)
 

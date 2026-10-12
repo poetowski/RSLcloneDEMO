@@ -93,5 +93,7 @@ export function auditChampion(c: ChampionDef): string[] {
     if (!hard && st.turns > STATUS_NORMS.maxTurns) out.push(`${p!.id}: ${st.status} for ${st.turns} turns`);
   }
   if (p?.kind === 'rebuke' && !(p.cooldown && p.cooldown >= 1)) out.push(`${p.id}: a rebuke needs a cooldown`);
+  // a stat passive is extra, outside the budget (Jakub, 2026-10-12): it only has to name its stat
+  if (p?.kind === 'stat' && !p.stat) out.push(`${p.id}: a stat passive needs a stat`);
   return out;
 }

@@ -35,6 +35,9 @@ Section 7 lists what is not decided.
 | 2026-10-12 | Balance, the stage that brings each champion and every stage's enemies: Jakub dictates them later | 7 |
 | 2026-10-12 | The Quartermaster, a Common of the Azure Crown | 14 |
 | 2026-10-12 | The Quartermaster's affinity: Bloom (Tide before, the same day) | 14 |
+| 2026-10-12 | The Enforcer, a Common of the Sanguine Dominion | 15 |
+| 2026-10-12 | A passive that gives a permanent stat boost is extra to the stat budget and works in combat only | 10, 15 |
+| 2026-10-12 | The Enforcer's helmet made less prominent: he should look weaker | 15 |
 
 ---
 
@@ -539,7 +542,8 @@ open questions.
   decided 2026-10-11: no subtitle, eight stats; section 10)*
 - Kit / skill design *(the starter pair's kits decided 2026-10-10, section 8,
   the Skirmisher's and the Lineholder's 2026-10-11, sections 12 and 13, and
-  the Quartermaster's 2026-10-12, section 14; their numbers are not)*
+  the Quartermaster's and the Enforcer's 2026-10-12, sections 14 and 15;
+  their numbers are not)*
 - Art pipeline specification
 - Save and progression *(gear decided: the Weaver Matrix, section 9; levels,
   ranks, ascension and skill upgrades are not)*
@@ -831,6 +835,10 @@ them.
   stand-in ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 7).
 - **No subtitles** (2026-10-11): champions carry no title anywhere in the
   game. Jakub: "i actually dont like these subtitles at all".
+- **Stat passives** (2026-10-12), Jakub's words: "none passive giving permanent stat voost should get this boost from stat budget pool. this is just extra" and "and this passive is during combat, so when player is looking at enforcer stats in his collection, this crit chance bonus is not shown there, only as a passive description under skills. passive is applied during combat."
+  A passive that raises a stat comes on top of the rarity's stat budget, and
+  the champion's stats outside battle (the collection, the champion page)
+  never include it: there it is the passive's text under the skills.
 
 ---
 
@@ -959,3 +967,54 @@ by the game: "lowest HP" is the lowest share of max HP; the Turn Meter goes
 to an ally other than himself (his own meter resets as his turn ends); the
 heal includes him; the insignia is on his chest.
 
+## 15. The Enforcer (received 2026-10-12)
+
+Jakub's brief, verbatim:
+
+```
+i want to create new champion.
+name = Enforcer.
+affinity = ember
+class = damage
+alligience = sanguine dominion
+rarity common
+design: crimson medium armor with dark helmet. holding long bastard sword.
+black hexagon on torso.
+kit = A1 attack
+passive +10% crit chance every time
+```
+
+Asked whether "every time" meant a flat bonus or one that grows with each
+attack, he chose the flat bonus that is always on: every attack has +10%
+crit chance on top of his own. While he was being built Jakub added the rule
+for such passives (section 10):
+
+```
+none passive giving permanent stat voost should get this boost from stat budget pool. this is just extra
+```
+
+```
+and this passive is during combat, so when player is looking at enforcer stats in his collection, this crit chance bonus is not shown there, only as a passive description under skills. passive is applied during combat.
+```
+
+and, on the first look at him:
+
+```
+make helmet of enforcer less prominent, now it looks very heavy and advanced. he should look weaker
+```
+
+| | |
+|---|---|
+| Rarity | Common |
+| Role | Damage |
+| Faction | Sanguine Dominion |
+| Affinity | Ember |
+| Kit | A1 an attack; a passive of +10% crit chance, always on: extra to his stat budget, applied in combat only (the brief names no A2 and no A3) |
+| Look | crimson medium armour; a dark helmet, less prominent so that he looks weaker; a long bastard sword held in his hands; a black hexagon on the torso |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the skill's name
+(Heavy Cut) and text, its multiplier (1.0, a plain attack), the passive's
+name (Keen Edge) and text, the stats, the lore line, the stage that brings
+him (the first clear of 1-10), and the details of his art and effect. Read by
+the game: "class" is his role, "alligience" his faction; the hexagon is on
+his chest.

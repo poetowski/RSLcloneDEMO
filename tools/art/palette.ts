@@ -76,6 +76,9 @@ export const MAT = {
   faded: m('faded', 'cloth', ['#1a1411', '#3a2e27', '#5c4a3c', '#7f6852', '#a2876a', '#c4a888']),
   /** dark green: the Rime Scholar's dress */
   pine: m('pine', 'cloth', ['#050e0c', '#0b1c17', '#123020', '#1b452c', '#2a5f3b', '#41804e']),
+  /** crimson: the Enforcer's armour, the cloth over its plates (`crimsonPlate` is the same red on steel) */
+  crimson: m('crimson', 'cloth', ['#1a0510', '#3a0a1e', '#64102c', '#9a1a38', '#c62c48', '#ee6660']),
+  crimsonPlate: m('crimsonPlate', 'metal', ['#1a0510', '#3a0a1e', '#64102c', '#9a1a38', '#c62c48', '#ee6660']),
 
   // --- furs ----------------------------------------------------------------
   furWhite: m('furWhite', 'fur', ['#262838', '#4b5068', '#7a849c', '#b0bccc', '#dbe4ee', '#fbfdff']),

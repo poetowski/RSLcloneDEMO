@@ -120,5 +120,8 @@ export const rebuker = (() => {
   return { ...c, skills: [c.skills[0], c.skills[1]] as ChampionDef['skills'] };
 })();
 
+/** A stat passive: +95% C.RATE in battle, so with its own 5% every hit is critical. */
+export const keen = fixture('keen', { passive: { id: 'keen', name: 'Keen', desc: '', kind: 'stat', stat: 'crit', value: 0.95 } });
+
 /** The same striker in each affinity (strong and weak hits). */
 export const inAffinity = (affinity: Affinity) => fixture(`striker_${affinity}`, { affinity });

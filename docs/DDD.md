@@ -59,7 +59,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Turn meter boost / drain | adds to the other allies' meters or to the one lowest on HP after the heals, or takes from the targets' | `tmAllies`, `tmLowestAlly`, `tmTargets`, `tm` event |
 | Kept meter | the actor ends its turn with this meter instead of 0 | `selfTm`, `Unit.pendingTm` |
 | Counterattack | the `counter` status, and the A1 it answers with | `counter`, `SkillResult.counter` |
-| Passive | a rule that wakes by itself: Undying, Overdrive, Rebuke (answers a critical hit below a threshold, then rests) | `PassiveDef.kind`, `PassiveDef.cooldown`, `Unit.revived`, `Unit.overdriven`, `Unit.cooldowns[passive id]` |
+| Passive | a rule that wakes by itself: Undying, Overdrive, Rebuke (answers a critical hit below a threshold, then rests); or a stat passive, a stat raised in every battle (Keen Edge, C.RATE +10%: extra to the budget, outside battle only its text) | `PassiveDef.kind`, `PassiveDef.cooldown`, `PassiveDef.stat`, `battleStats`, `Unit.revived`, `Unit.overdriven`, `Unit.cooldowns[passive id]` |
 | Boss | an enemy slot with x1.6 HP, a crown and an intro | `EnemySlot.boss`, `BOSS_HP` |
 | Power | a stage's multiplier on enemy HP and ATK | `StageDef.power`, `BattleOptions.enemyPower` |
 | Battle event | one fact the rules produced, for the view to present | `BattleEvent` |
@@ -78,7 +78,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Role | Tank, Damage, Support: how the budget is spent (no fourth role; Control, Bruiser and the like are descriptive tags) | `Role`, `ROLES` |
 | Faction | one of four powers: the Azure Crown, the Sanguine Dominion, the Court of Root, the Ashveil Reign; story and standard, no mechanics | `FactionId`, `FACTIONS`, `FactionDef.standard` |
 | Standard | a faction's heraldry: the Azure Crown a gold crown on blue, the Sanguine Dominion a red hexagon on black, the Court of Root a brown claw on green, the Ashveil Reign a white bone across a dark grey | `FactionDef.standard`, `emblem_<faction>` |
-| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal, the Quartermaster's brown leather), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
+| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal, the Quartermaster's brown leather, the Enforcer's crimson), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
 | Muzzle | where projectiles leave a ranged champion's sprite | `ChampionDef.muzzle` |
 | Approach | how the actor travels before the attack | `Approach` |
 | Stat score, budget | weighted stat sum, and its target per rarity (±5%) | `statScore`, `budgetDelta`, `BUDGET_TOLERANCE` |
@@ -382,16 +382,16 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | --- | --- | --- |
 | INV-K1 | Champion ids are unique; rarity, affinity, faction and role exist | test |
 | INV-K2 | Stats within ±5% of the rarity budget and inside the limits | test, balance 1 |
-| INV-K3 | Slots in order A1-A2(-A3); cooldowns, multipliers, durations and the guaranteed-control slot within the norms; a passive's control lasts one turn and a Rebuke has a cooldown | type (tuple of two or three), test, balance 2 |
+| INV-K3 | Slots in order A1-A2(-A3); cooldowns, multipliers, durations and the guaranteed-control slot within the norms; a passive's control lasts one turn, a Rebuke has a cooldown and a stat passive names its stat | type (tuple of two or three), test, balance 2 |
 | INV-K4 | `hits.length` equals the hit frames of the animation; leap needs `jump`, `actorFx` needs `cast`; Undying needs `rise` | test |
 | INV-K5 | Every effect a skill names exists; a champion with a projectile has a `muzzle` | test |
 | INV-K6 | Every champion has an atlas, a portrait and one icon per skill | test |
 | INV-K7 | Every status has an icon and is taught in the Academy; Academy demos and icons exist | test |
 | INV-K8 | Every faction, affinity, role and rarity has its UI part (`emblem_`, `gem_`, `role_`, `card_`) | convention: screens throw on a missing part (R-6) |
 | INV-K9 | Every A1 targets a single enemy, because counterattacks answer with A1 | convention, true today (R-6) |
-| INV-K10 | Effect names are unique across effect modules (a later module would silently override an earlier one) | convention, true today: 72 names (R-6) |
+| INV-K10 | Effect names are unique across effect modules (a later module would silently override an earlier one) | convention, true today: 79 names (R-6) |
 | INV-K11 | Every faction has a deliberate home zone | convention: `homeZone()` returns the first zone for every faction until zones belong to factions (DR-12) |
-| INV-K12 | Numbers in skill descriptions equal the data | convention, true today for all 5 skills and the passive (R-1) |
+| INV-K12 | Numbers in skill descriptions equal the data | convention, true today for all 11 skills and both passives (R-1) |
 | INV-K13 | Numbers in the Academy, its figures and the stat tips equal the rules | test for the turn-meter numbers it quotes; the rest by convention (DR-5, R-1) |
 | INV-K14 | Definitions do not change at runtime | convention: objects are not frozen |
 | INV-K15 | The interface ramps repeat the category colours: `UIR.rarity` and `UIR.affinity` base entries (`palette.ts`) equal the colours in `meta.ts`; faction medallions follow the standards instead (the Azure Crown's crown is gold on its blue field) | convention, true today for all 7 (R-6) |

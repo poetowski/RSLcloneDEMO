@@ -27,7 +27,7 @@ export interface Combatant {
 export interface Unit {
   uid: string;
   champion: ChampionDef;
-  /** stats in this battle: the champion's, or with its Weaver Matrix (stage power is applied separately) */
+  /** stats in this battle: the champion's, or with its Weaver Matrix, plus a stat passive (stage power is applied separately) */
   stats: Stats;
   team: TeamId;
   /** 0 = front, 1 = back-top, 2 = back-bottom */
@@ -100,6 +100,17 @@ export function landShare(acc: number, res: number): number {
   return res > acc ? RES_SCALE / (RES_SCALE + res - acc) : 1;
 }
 
+/**
+ * The stats a champion fights with: a stat passive adds to them here, in
+ * battle only (Jakub, 2026-10-12: the collection shows the champion's stats
+ * without it, and it is extra, outside the stat budget).
+ */
+export function battleStats(def: ChampionDef, stats: Stats): Stats {
+  const p = def.passive;
+  if (p?.kind !== 'stat' || !p.stat) return stats;
+  return { ...stats, [p.stat]: Math.round((stats[p.stat] + p.value) * 1000) / 1000 };
+}
+
 export interface BattleOptions {
   seed?: number;
   /** enemy stat multiplier (HP and ATK) for campaign stages */
@@ -121,7 +132,7 @@ export class Battle {
     const bossHp = opts.bossHp ?? 1.6;
     const mk = (c: Combatant, team: TeamId, slot: number): Unit => {
       const k = team === 'enemy' ? power : 1;
-      const stats = c.stats ?? c.def.stats;
+      const stats = battleStats(c.def, c.stats ?? c.def.stats);
       const hp = Math.round(stats.hp * k * (c.boss ? bossHp : 1));
       return {
         uid: `${team === 'player' ? 'p' : 'e'}${slot}`,

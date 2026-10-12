@@ -1,12 +1,17 @@
-// The Rime Scholar's effects (Sanguine Dominion): pale cold, rime and ice.
-// Solid ice is drawn normally; only the cold flare is light (additive in
-// src/game/view/scene.ts).
+// The Sanguine Dominion's effects. The Rime Scholar's: pale cold, rime and
+// ice; solid ice is drawn normally, only the cold flare is light. The
+// Enforcer's Heavy Cut: a plain line of light and chips, the light of the
+// steel, never his affinity (affinities are abstract, Jakub, 2026-10-11).
+// Light effects are additive in src/game/view/scene.ts.
 import { ACCENT } from '../palette.ts';
 import { disc, dith, ellipseFill, ellipseRing, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng, withAlpha } from '../raster.ts';
-import { burst, FxDef, ramps, ring, shard, sparks, W } from './kit.ts';
+import { burst, cut, FxDef, ramps, ring, shard, sparks, W } from './kit.ts';
 
 const I = ramps.ice;
+const DU = ramps.dust;
+/** A dull flash: grey to white, no hue of its own. */
+const DULL: RGBA[] = [DU[0], DU[2], DU[3], DU[4], W];
 
 /** A small six-armed snowflake: a white core and pale arms. */
 function flake(b: Bitmap, x: number, y: number, r: number, core: RGBA = W, arm: RGBA = I[3]) {
@@ -118,6 +123,18 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
       if (i <= 4) ellipseFill(b, cx, gy, 30, 7, (x, y, d) => (dith(x, y, (1 - d) * 0.5 * (1 - t)) ? I[1] : 0));
       if (i >= 6) sparks(b, cx, gy - 18, 22, 34, (i - 5) / 3, I, 59, 6);
       if (i >= 2 && i <= 5) flake(b, cx + 18, gy - 30 + i * 2, 2);
+    },
+  },
+  /** Heavy Cut: one long two-handed cut from high behind to low in front, a white line that thins away, a flash where it bites, chips of light flying. */
+  long_cut: {
+    w: 84, h: 84, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
+    draw: (b, t, i) => {
+      const reach = [0.5, 0.9, 1, 1, 1, 1, 1][i];
+      const heat = [1.45, 1.35, 1.1, 0.85, 0.62, 0.45, 0.3][i];
+      const th = [3.6, 4.8, 3.9, 3.0, 2.2, 1.5, 1.1][i];
+      if (i < 6) cut(b, 10, 8, 74, 72, -3, th, DULL, heat, reach);
+      if (i === 1 || i === 2) burst(b, 44, 42, 8, 2, [15, 10][i - 1], 1.5, DULL, 0.35);
+      if (i >= 1) sparks(b, 44, 42, 16, 34, (i - 1) / 5, DULL, 101, 22);
     },
   },
   /** The cold flaring in her, the moment Cold Rebuke answers (additive light). */

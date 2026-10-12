@@ -137,6 +137,8 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'p', text: 'A passive: the first time its holder\'s HP drops below a threshold, it overloads and gains buffs for a few turns. Take it from above the threshold to low in one burst, or Dispel the buffs the moment they appear.' },
       { kind: 'h', text: 'Rebuke' },
       { kind: 'p', text: 'A passive that answers a blow. The Rime Scholar\'s Cold Rebuke: while she is below 35% HP, an enemy whose critical hit lands on her is Frozen for 1 turn, and the passive then rests for a few turns. Statuses can happen in response to being hurt.' },
+      { kind: 'h', text: 'Stat passives' },
+      { kind: 'p', text: "A passive can raise a stat in every battle, on top of the champion's own stats and its Weaver Matrix. The champion's page shows the stats without it. The Enforcer's Keen Edge adds 10% C.RATE." },
     ],
   },
   {

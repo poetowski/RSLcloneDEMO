@@ -23,7 +23,7 @@ Fill this in before writing code, and show it to the user when they are around: 
 | Materials | | from `MAT` in `tools/art/palette.ts`; a new ramp only if nothing fits (6 steps, hue-shifted) |
 | Weapon / focus | | a function in the art module, reused by the icons |
 | Height | | 66-80 px body, audit range 64-96 |
-| Closest existing champion | | the art module to start from: armoured swordsman with a cloak `captain_gareth`, robed caster with a hanging focus `rime_scholar`, light infantry with two short swords `skirmisher`, a big shield and a one-handed mace `lineholder`, a walking stick and a backpack `quartermaster`; the proof of concept's modules (and the stand-ins `azure_warrior`, `sanguine_support`, until 2026-10-10) are in git history at tag `poc-v1` (`tools/art/champions/`: sword `knight`, two-hander `dreadknight`, polearm `jackal` or `sunspear`, dual blades `stalker`, bow `archer`, staff casters `frostmage` and `starsinger`, unarmed `monk` and `colossus`, a mummy king `tomblord`) |
+| Closest existing champion | | the art module to start from: armoured swordsman with a cloak `captain_gareth`, robed caster with a hanging focus `rime_scholar`, light infantry with two short swords `skirmisher`, a big shield and a one-handed mace `lineholder`, a walking stick and a backpack `quartermaster`, a two-handed long sword in half armour `enforcer`; the proof of concept's modules (and the stand-ins `azure_warrior`, `sanguine_support`, until 2026-10-10) are in git history at tag `poc-v1` (`tools/art/champions/`: sword `knight`, two-hander `dreadknight`, polearm `jackal` or `sunspear`, dual blades `stalker`, bow `archer`, staff casters `frostmage` and `starsinger`, unarmed `monk` and `colossus`, a mummy king `tomblord`) |
 
 ## Kit
 
@@ -32,7 +32,7 @@ Fill this in before writing code, and show it to the user when they are around: 
 | A1 (CD 0) | | | total 0.9-1.25 (AoE 0.5-0.8) | chance-based debuff at most | `attack1` | |
 | A2 (CD 3) | | | total 1.1-1.6 (AoE 0.5-1.1) | | | |
 | A3 (CD 4-5) | | | total 1.3-2.6 (AoE 0.7-1.2) | the only slot that may guarantee a 1-turn Stun/Freeze | | |
-| Passive | | | | `undying`, `overdrive` and `rebuke` exist; a new kind needs rules, tests and an Academy entry | | |
+| Passive | | | | `undying`, `overdrive`, `rebuke` and `stat` exist (a stat passive is extra to the budget and works in combat only); a new kind needs rules, tests and an Academy entry | | |
 
 Stats (HP / ATK / DEF / SPD / CRIT): ______ ; statScore = HP/12 + ATK x 1.1 + (DEF - 40) x 2.25 + SPD x 1.3 + CRIT x 300 = ______ (within 5% of the budget).
 
