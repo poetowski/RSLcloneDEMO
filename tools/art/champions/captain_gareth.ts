@@ -4,10 +4,11 @@
 // greaves) in dull steel and worn leather over a deep amber-brown coat; a
 // short, faded cloak; a small, worn captain's insignia. Steel, leather,
 // amber-brown and a little darkened gold: warm, weathered, functional. No
-// Azure Crown blue: champions in the field are not walking banners. His Ember
-// shows in what he does with the sword (the ember smear of a cut, the effects
-// in fx/azure_crown.ts), never in the sword itself. Head, hair and beard are a
-// first take: the record does not describe them.
+// Azure Crown blue: champions in the field are not walking banners. His cuts
+// are plain (Jakub, 2026-10-12: affinities are abstract and set nothing in the
+// art): a white streak, and in fx/azure_crown.ts light, dust and chips, never
+// fire. Head, hair and beard are a first take: the record does not describe
+// them.
 import { BuildInfo, ChampionArt, CharDef, cycle, keys, tween } from '../char.ts';
 import { compose, glyph, impactStar } from '../icons.ts';
 import { ACCENT, MAT } from '../palette.ts';
@@ -35,8 +36,8 @@ const D: Dims = {
 
 const SK = MAT.skinTan, AM = MAT.amber, FD = MAT.faded, IR = MAT.iron, ST = MAT.steel, LE = MAT.leather, DL = MAT.darkleather, OG = MAT.oldGold, HR = MAT.hairBrown;
 
-/** Ember smear: his affinity shows in the cut, never in the blade. */
-const EMBER = { core: ACCENT.emberCore, edge: ACCENT.smearEmber };
+/** The streak of the cut: plain white with the light of the steel, the colour of motion, not of an affinity. */
+const SWING = { core: ACCENT.white, edge: MAT.steel.ramp[4] };
 
 /** Blade length from the hand, for smears and the sweep. */
 const BLADE = 25;
@@ -107,7 +108,7 @@ function build(d: Draw, s: Skel, info: BuildInfo) {
   // the sword, its ember smear, then the near arm over the grip
   if (info.def.smear && info.prev && P.smearOff === undefined) {
     const from = info.prev.pose.p.swordAng ?? P.swordAng;
-    smear(d, s.hN, from, P.swordAng, BLADE + 3, 11, EMBER, 3);
+    smear(d, s.hN, from, P.swordAng, BLADE + 3, 11, SWING, 3);
   }
   sword(d, s.hN, P.swordAng ?? 20, 58, 0);
   arm(d, s, 'N', armCfg(60, 0));
@@ -189,7 +190,7 @@ function sword(d: Draw, hand: V, ang: number, z: number, shade: number) {
   d.capsule({ mat: IR, z: z + 0.2, group: g, shade }, f(3.2, -3.9), f(3.2, 3.9), 1.05, 1.05);
 }
 
-/** The flat ember arc of Wide Sweep around the body: a back half and a front half. */
+/** The flat arc of light of Wide Sweep around the body: a back half and a front half. */
 function sweepArc(d: Draw, s: Skel, phase: number, front: boolean) {
   const c = s.T(11, 2);
   const o = { mat: MAT.steel, group: 'sweep', outline: false, line: 'none' as const, noClean: true };
@@ -199,8 +200,8 @@ function sweepArc(d: Draw, s: Skel, phase: number, front: boolean) {
   const lo = front ? Math.max(a0, 270) : a0, hi = front ? a1 : Math.min(a1, 270);
   if (hi - lo < 4) return;
   const fade = phase >= 3 ? 1 : 0;
-  d.arc({ ...o, z: front ? 70 : 3, color: ACCENT.smearEmber }, c, 26 - fade * 3, 34, lo, hi, 0.9, 0.3);
-  d.arc({ ...o, z: front ? 70.1 : 3.1, color: fade ? ACCENT.smearPeach : ACCENT.emberCore }, c, 31, 34, lo, hi, 0.7, 0.3);
+  d.arc({ ...o, z: front ? 70 : 3, color: MAT.steel.ramp[4] }, c, 26 - fade * 3, 34, lo, hi, 0.9, 0.3);
+  d.arc({ ...o, z: front ? 70.1 : 3.1, color: fade ? MAT.steel.ramp[3] : ACCENT.white }, c, 31, 34, lo, hi, 0.7, 0.3);
 }
 
 function head(d: Draw, s: Skel, P: Record<string, number>) {
@@ -464,31 +465,31 @@ export const captainGareth: ChampionArt = {
       compose(AM, glyph((d) => {
         iconSword(d, v(9, 9), 45, 10, 29);
       }), (b) => {
-        // the cut: one clean line of heat across the field, white at its heart
+        // the cut: one clean line of light across the field, white at its heart
         for (let i = 0; i < 32; i++) {
           const x = 4 + i, y = 6 + Math.round(i * 0.84);
           const k = Math.sin((i / 31) * Math.PI);
-          b.set(x, y, k > 0.55 ? E.white : k > 0.25 ? E.emberCore : E.smearEmber);
-          if (k > 0.2) b.set(x + 1, y, k > 0.6 ? E.emberCore : E.smearEmber);
+          b.set(x, y, k > 0.55 ? E.white : k > 0.25 ? ST.ramp[5] : ST.ramp[4]);
+          if (k > 0.2) b.set(x + 1, y, k > 0.6 ? ST.ramp[5] : ST.ramp[4]);
           if (k > 0.5) {
-            b.set(x - 1, y, E.smearEmber);
-            b.set(x + 2, y, E.smearEmber);
+            b.set(x - 1, y, ST.ramp[4]);
+            b.set(x + 2, y, ST.ramp[4]);
           }
         }
-        for (const [x, y] of [[9, 20], [30, 18], [25, 33], [14, 6], [33, 28]]) b.set(x, y, E.emberCore);
+        for (const [x, y] of [[9, 20], [30, 18], [25, 33], [14, 6], [33, 28]]) b.set(x, y, ST.ramp[5]);
       }),
     iron_blow: () =>
       compose(AM, glyph((d) => {
         iconSword(d, v(20, 36), -90, 10, 27);
       }), (b) => {
-        impactStar(b, 20, 31, 3, 10, 12, E.smearEmber, E.emberCore);
+        impactStar(b, 20, 31, 3, 10, 12, ST.ramp[4], E.white);
         // the buff it leaves: a gold chevron rising beside the blow
         for (const [dx, dy] of [[0, 0], [1, -1], [2, -2], [3, -1], [4, 0], [1, 0], [3, 0]]) b.set(29 + dx, 9 + dy, E.goldHot);
         for (const [dx, dy] of [[0, 4], [1, 3], [2, 2], [3, 3], [4, 4]]) b.set(29 + dx, 9 + dy, E.chiGold);
       }),
     wide_sweep: () =>
       compose(AM, glyph((d) => {
-        smear(d, v(20, 17), 200, -20, 16, 6, EMBER, 1);
+        smear(d, v(20, 17), 200, -20, 16, 6, SWING, 1);
         iconSword(d, v(10, 16), 4, 10, 27);
       })),
   },

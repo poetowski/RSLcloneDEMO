@@ -55,7 +55,8 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Dispel | removes every buff from the targets before the first hit | `stripBuffs`, `dispel` event |
 | Cleanse | removes one debuff from each ally on the last hit | `cleanse` |
 | Lifesteal | heals the actor by a fraction of the HP damage dealt | `lifesteal` |
-| Turn meter boost / drain | adds to the other allies' meters, or takes from the targets' | `tmAllies`, `tmTargets`, `tm` event |
+| Heal | restores HP, never past the maximum: a share of each ally's own max HP, or of the healer's | `healAllies`, `healOf`, `heal` event |
+| Turn meter boost / drain | adds to the other allies' meters or to the one lowest on HP after the heals, or takes from the targets' | `tmAllies`, `tmLowestAlly`, `tmTargets`, `tm` event |
 | Kept meter | the actor ends its turn with this meter instead of 0 | `selfTm`, `Unit.pendingTm` |
 | Counterattack | the `counter` status, and the A1 it answers with | `counter`, `SkillResult.counter` |
 | Passive | a rule that wakes by itself: Undying, Overdrive, Rebuke (answers a critical hit below a threshold, then rests) | `PassiveDef.kind`, `PassiveDef.cooldown`, `Unit.revived`, `Unit.overdriven`, `Unit.cooldowns[passive id]` |
@@ -77,7 +78,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Role | Tank, Damage, Support: how the budget is spent (no fourth role; Control, Bruiser and the like are descriptive tags) | `Role`, `ROLES` |
 | Faction | one of four powers: the Azure Crown, the Sanguine Dominion, the Court of Root, the Ashveil Reign; story and standard, no mechanics | `FactionId`, `FACTIONS`, `FactionDef.standard` |
 | Standard | a faction's heraldry: the Azure Crown a gold crown on blue, the Sanguine Dominion a red hexagon on black, the Court of Root a brown claw on green, the Ashveil Reign a white bone across a dark grey | `FactionDef.standard`, `emblem_<faction>` |
-| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
+| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal, the Quartermaster's brown leather), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
 | Muzzle | where projectiles leave a ranged champion's sprite | `ChampionDef.muzzle` |
 | Approach | how the actor travels before the attack | `Approach` |
 | Stat score, budget | weighted stat sum, and its target per rarity (±5%) | `statScore`, `budgetDelta`, `BUDGET_TOLERANCE` |
@@ -274,7 +275,7 @@ winner()           checked before choosing and after every action
 2. Cooldown: set to `cooldown + 1`, because `endTurn` of this same turn ticks it once.
 3. Dispel: every buff removed from the targets (events at hit 0).
 4. For each hit `k`, for each living target: roll damage, then apply it (the shield absorbs first and expires at 0; then death, Undying or Overdrive), then, on a critical hit, the target's Rebuke (its statuses land on the actor), then the lifesteal heal, then the per-hit status rolls.
-5. On the last hit: ally heals, cleanse, status applications in the order written in the skill (recipients by `to`), target meter change, ally meter change.
+5. On the last hit: ally heals, cleanse, status applications in the order written in the skill (recipients by `to`), target meter change, ally meter change, the meter of the ally lowest on HP.
 6. The kept meter (`selfTm`) waits for `endTurn`.
 7. Counterattacks: each damaged, living enemy defender that holds Counter and is neither stunned nor frozen answers once with its A1 at the actor. Counters set no cooldown, keep no meter and are never countered.
 
@@ -343,7 +344,7 @@ winner()           checked before choosing and after every action
 | `expire` | `endTurn`; a shield used up in `applyDamage` | 0, or the hit | `status` | the icon disappears; ice shatters | Buffs, Debuffs |
 | `cleanse` | `useSkill` | last | `status` | `CLEANSED` | Special Mechanics |
 | `dispel` | `useSkill`, before the hits | 0 | `status` | `-NAME` and a dispel burst | Buffs, Special Mechanics |
-| `tm` | `useSkill` (`tmTargets`, `tmAllies`) | last | `delta` | `+n% TURN` / `-n% TURN` | Turn Meter & Speed, Special Mechanics |
+| `tm` | `useSkill` (`tmTargets`, `tmAllies`, `tmLowestAlly`) | last | `delta` | `+n% TURN` / `-n% TURN` | Turn Meter & Speed, Special Mechanics |
 | `revive` | `applyDamage` (Undying) | hit | `hp` | fall, tomb-light helix, `UNDYING!`, rise | Special Mechanics |
 | `passive` | `applyDamage` (Overdrive) | hit | `name` | banner with the name, burst, `OVERDRIVE!` (fixed text, DR-14) | Special Mechanics |
 | `death` | `applyDamage` | hit | - | death animation, fade | The Basics |

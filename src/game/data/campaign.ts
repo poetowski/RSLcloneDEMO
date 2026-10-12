@@ -96,6 +96,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: 'The turning point.',
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'captain_gareth' }],
         power: 0.74,
+        // a stand-in: the stage that brings the Quartermaster is not Jakub's
+        recruit: 'quartermaster',
       },
       {
         id: '1-10',

@@ -227,13 +227,14 @@ Every skill is data (`SkillDef` in `types.ts`); these are the levers a kit can p
 | `healAllies`, `cleanse`, `lifesteal` | sustain (DY6) | 3, 2, 1 |
 | `stripBuffs` | dispel (DY6, DY7) | 1 (Weighing of Hearts) |
 | `tmTargets`, `tmAllies`, `selfTm` | tempo (DY1) | 2, 1, 1 |
+| `healOf: 'caster'`, `tmLowestAlly` (2026-10-12) | sustain and tempo (DY6, DY1) | the Quartermaster's Field Rations |
 | `execute` | timing (DY2, DY3) | 2 (Skullsplitter, Mirage Assault) |
 | `ai.priority`, `ai.when` | the reference player (DY2, T2) | every skill; `allyHurt` on Serenity only |
 | `approach`, `projectile`, `castFx`, `actorFx`, `shake` | spectacle and pacing (AE2, DY10) | ranged 14, melee 11, none 7, center 3, leap 2, blink 2; projectile 7, castFx 13, actorFx 2, shake 13 |
 
 ### ME3 The roster
 
-Jakub's champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4 and 8, Starter Heroes; 12, the Skirmisher; 13, the Lineholder): names, looks, kits and what each teaches are his; stats and the numbers in the skills are stand-ins.
+Jakub's champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4 and 8, Starter Heroes; 12, the Skirmisher; 13, the Lineholder; 14, the Quartermaster): names, looks, kits and what each teaches are his; stats and the numbers in the skills are stand-ins.
 
 | Champion (`id`) | Role, rarity, affinity, faction | SPD | Signature idea | Met / joins |
 | --- | --- | --- | --- | --- |
@@ -241,8 +242,9 @@ Jakub's champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4 and 8, Starter H
 | Rime Scholar (`rime_scholar`) | Support, elite, Tide, Sanguine Dominion | 106 | a plain attack; Slow on every enemy; no A3; Cold Rebuke freezes whoever crits her below 35% HP. Teaches that statuses exist, that a Support can deny, and that statuses can answer being hurt | after the first battle (1-1), not fought there |
 | Skirmisher (`skirmisher`) | Damage, common, Bloom, Azure Crown | 110 | one skill: two quick cuts, one with each short sword, every turn; the roster's first Common and first Bloom, and the fastest. Fragile (HP 960): the Ember copies hit him strong | after 1-5 (a stand-in), not fought there |
 | Lineholder (`lineholder`) | Tank, common, Tide, Azure Crown | 92 | Guard Cut, one mace blow from behind the shield; Brace, DEF Up on himself for 2 turns: the roster's first Tank and first skill aimed only at its user. The sturdiest (HP 1320, DEF 72), the slowest and the weakest hitter (ATK 78); with no Taunt, the AI ignores him until the others are low (T20) | after 1-7 (a stand-in), not fought there |
+| Quartermaster (`quartermaster`) | Support, common, Tide, Azure Crown | 104 | a plain rap of his walking stick; Field Rations heals every ally by 15% of his own max HP, then lends 15% Turn Meter to the ally lowest on HP: the roster's first heal and its first turn meter boost | after 1-9 (a stand-in), not fought there |
 
-Spread: roles Damage 2, Support 1, Tank 1; affinities Ember 1, Tide 2, Bloom 1; rarities Elite 2, Common 2 (Heroic and Mythic have budgets but no champions, T8); factions Azure Crown 3, Sanguine Dominion 1, the Court of Root and the Ashveil Reign none.
+Spread: roles Damage 2, Support 2, Tank 1; affinities Ember 1, Tide 3, Bloom 1; rarities Elite 2, Common 3 (Heroic and Mythic have budgets but no champions, T8); factions Azure Crown 4, Sanguine Dominion 1, the Court of Root and the Ashveil Reign none.
 
 ### ME4 The campaign
 
@@ -258,8 +260,8 @@ Zone 1, the *Fracture Reach*, from Jakub's working notes (DESIGN_DECISIONS.md 5.
 | 1-6 | Gareth, 2 Rime Scholars | 0.90 | normal | Ember -2, Tide +1 | a full team of three; two Rimebinds: the team slowed for long stretches |
 | 1-7 | 2 Gareths, Rime Scholar | 0.82 | normal | Ember -1, Tide +2 | brings the Lineholder |
 | 1-8 | 3 Gareths | 0.71 | normal | Tide +3 | three Wide Sweeps; four champions to choose three from |
-| 1-9 | 2 Gareths, Rime Scholar | 0.74 | normal | Ember -1, Tide +2 | |
-| 1-10 | Gareth (boss), 2 Rime Scholars | 0.76 | boss | Ember -2, Tide +1 | boss HP and crown |
+| 1-9 | 2 Gareths, Rime Scholar | 0.74 | normal | Ember -1, Tide +2 | brings the Quartermaster |
+| 1-10 | Gareth (boss), 2 Rime Scholars | 0.76 | boss | Ember -2, Tide +1 | boss HP and crown; five champions to choose three from |
 
 ### ME5 Feel: the presentation mechanics
 
@@ -367,7 +369,7 @@ These complete the balance report. Until they are automated ([DDD.md](DDD.md) R-
 
 ### 6.0 Zone 1 (2026-10-10)
 
-Jakub's content: Captain Gareth and the Rime Scholar (the Starter Heroes record, kits with stand-in numbers), the Skirmisher from 1-6 and the Lineholder from 1-8 (both re-measured 2026-10-11) and Zone 1 with stand-in enemies (copies of the first two). `npm test`, `npm run typecheck`, `npm run audit` and `npm run balance` all pass; impact is skipped (it needs six champions). Every team the player can own at that point (the champions owned by then, three at most: one team up to 1-7, four from 1-8) is auto-battled 300 times (seeds 1000-1299) with the 6.5 loop; a row averages its teams:
+Jakub's content: Captain Gareth and the Rime Scholar (the Starter Heroes record, kits with stand-in numbers), the Skirmisher from 1-6 and the Lineholder from 1-8 (both re-measured 2026-10-11) and Zone 1 with stand-in enemies (copies of the first two). `npm test`, `npm run typecheck`, `npm run audit` and `npm run balance` all pass; impact is skipped (it needs six champions). Every team the player can own at that point (the champions owned by then, three at most: one team up to 1-7, four at 1-8 and 1-9, ten at 1-10) is auto-battled 300 times (seeds 1000-1299) with the 6.5 loop; a row averages its teams:
 
 | Stage | Power | Team size | Auto win | Actions | 3-star share of wins | Player opens | Strong / weak hits | Skipped turns | Cold Rebukes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -380,9 +382,9 @@ Jakub's content: Captain Gareth and the Rime Scholar (the Starter Heroes record,
 | 1-7 | 0.82 | 3 | 73% | 13.4 | 12% | 73% | 30% / 34% | 0.03 | 0.06 |
 | 1-8 | 0.71 | 3 (4 teams) | 71% | 11.9 | 42% | 68% | 34% / 41% | 0.00 | 0.00 |
 | 1-9 | 0.74 | 3 (4 teams) | 65% | 15.6 | 28% | 62% | 27% / 35% | 0.03 | 0.05 |
-| 1-10 | 0.76 | 3 (4 teams) | 57% | 20.8 | 10% | 57% | 24% / 31% | 0.06 | 0.08 |
+| 1-10 | 0.76 | 3 (10 teams) | 52% | 22.8 | 9% | 51% | 22% / 30% | 0.05 | 0.07 |
 
-(Skipped turns and Cold Rebukes are per battle.) From 1-6 the Skirmisher fights too: the player opens most battles (his SPD 110), weak hits outnumber strong ones (his Bloom cuts the Gareth copies weak, and their Ember cuts him strong), and flawless wins all but vanish at 1-6 and 1-7 (12-18% of wins): with HP 960 he is the one who falls, and three stars need all three standing. From 1-8 the Lineholder joins and the four teams split wide: Gareth and the Rime Scholar with either Common win 77-100% (flawless in 8-69% of wins), the Rime Scholar with both Commons 47-63%, Gareth with both Commons 9-22%. The rows average them, so 1-8 to 1-10 run at lower powers (T20), and flawless wins come back (10-42%). The curve falls from 93% to 57%; on these seeds 1-4 and 1-5 sit a few points above 1-3, inside the noise of 300 battles (on seeds 1-300 the curve is monotonic but for 1-8, see MECHANICS_GUIDE 10). Battles run 6.8 to 20.8 actions. The Rime Scholar hits Gareth's copies strong, so strong hits now outnumber weak ones, and stages of Gareths need more power; their Wide Sweeps make flawless wins rare there (18-20% of wins). Cold Rebuke fires once in 8 to 25 battles: both kits crit at 2.5%, as Jakub keeps crit out of Gareth's kit, so it rarely meets a critical hit in Zone 1; it is the roster's only control (T19).
+(Skipped turns and Cold Rebukes are per battle.) From 1-6 the Skirmisher fights too: the player opens most battles (his SPD 110), weak hits outnumber strong ones (his Bloom cuts the Gareth copies weak, and their Ember cuts him strong), and flawless wins all but vanish at 1-6 and 1-7 (12-18% of wins): with HP 960 he is the one who falls, and three stars need all three standing. From 1-8 the Lineholder joins and the four teams split wide: Gareth and the Rime Scholar with either Common win 77-100% (flawless in 8-69% of wins), the Rime Scholar with both Commons 47-63%, Gareth with both Commons 9-22%. The rows average them, so 1-8 to 1-10 run at lower powers (T20), and flawless wins come back (9-42%). At 1-10 the Quartermaster joins too and ten teams are averaged: Gareth and the Rime Scholar with him win 97%, with the Skirmisher 95%, and the three Commons together 3%. The curve falls from 93% to 52%; on these seeds 1-4 and 1-5 sit a few points above 1-3, inside the noise of 300 battles (on seeds 1-300 the curve is monotonic but for 1-8, see MECHANICS_GUIDE 10). Battles run 6.8 to 22.8 actions. The Rime Scholar hits Gareth's copies strong, so strong hits now outnumber weak ones, and stages of Gareths need more power; their Wide Sweeps make flawless wins rare there (18-20% of wins). Cold Rebuke fires once in 8 to 25 battles: both kits crit at 2.5%, as Jakub keeps crit out of Gareth's kit, so it rarely meets a critical hit in Zone 1; it is the roster's only control (T19).
 
 The sections below are the proof of concept's baseline (commit `8dd9a26`, 2026-10-06, 39 tests): thirteen champions and ten stages that no longer exist, kept as the reference for a full roster.
 
@@ -536,6 +538,8 @@ Record every change that moves a dynamic out of its band, changes a band, or cha
 | 2026-10-11 | The Skirmisher (Jakub's brief, DESIGN_DECISIONS.md 12): Common, Damage, Bloom, Azure Crown, one A1 that always hits twice; joins on the first clear of 1-5 (a stand-in), so 1-6 to 1-10 are played by three and their powers rise (0.68 / 0.70 / 0.775 / 0.71 / 0.59 -> 0.90 / 0.82 / 0.80 / 0.87 / 0.86). Rules: a kit may have one skill | AE3, AE4 | auto win 1-6 to 1-10 81 / 73 / 72 / 65 / 55% (was 81 / 75 / 76 / 73 / 65%); flawless wins there fall to 3-18% of wins; the player opens 68-80% of battles | 6.0 re-measured | set by Jakub; the numbers, the skill's name and the recruiting stage are stand-ins |
 | 2026-10-11 | Affinity is abstract (Jakub: "affinity should not dictate colors or elements or anything. these three affinity choices are very abstract"): no colour, element or effect follows from an affinity | AE5 | none in play | effects by affinity -> effects by what the skill does | set by Jakub; whether Gareth's ember cuts and the Skirmisher's leaf-green ones change waits for him |
 | 2026-10-11 | The Lineholder (Jakub's brief, DESIGN_DECISIONS.md 13): Common, Tank, Tide, Azure Crown; Guard Cut, and Brace, DEF Up on himself for 2 turns; joins on the first clear of 1-7 (a stand-in), so from 1-8 the curve averages four teams, two of which pair the Commons and lose most battles; 1-8 to 1-10 powers fall (0.80 / 0.87 / 0.86 -> 0.71 / 0.74 / 0.76) | AE3, AE4 | auto win 1-8 to 1-10 72 / 65 / 55% -> 71 / 65 / 57% (all teams), the best teams 95-100%; flawless wins there 3 / 7 / 4% -> 42 / 28 / 10% of wins; T20 | 6.0 re-measured | set by Jakub; the numbers, the texts and the recruiting stage are stand-ins |
+| 2026-10-12 | Jakub: the interface's affinity marks stay; Gareth's ember cuts and the Skirmisher's leaf-green ones made plain (effects renamed `sword_cut`, `heavy_blow`, `sword_sweep`, `blade_cut`, `blade_cut_rise`); balance, recruiting stages and stage enemies are his to dictate later | AE2, AE5 | none in play | ember and leaf-green -> white streaks, light, dust and chips | set by Jakub |
+| 2026-10-12 | The Quartermaster (Jakub's brief, DESIGN_DECISIONS.md 14): Common, Support, Tide, Azure Crown; a plain A1 (0.9); Field Rations heals every ally by 15% of his max HP, then 15% Turn Meter to the ally lowest on HP. Rules: `healOf: 'caster'`, `tmLowestAlly`; demos wound the healer's team first. Joins on the first clear of 1-9 (a stand-in), so 1-10 averages ten teams | AE3, AE4 | auto win 1-10 57% -> 52% (all ten teams; the best 97%), still in the boss band; no power changed | 6.0 re-measured | set by Jakub; names, texts, numbers and the recruiting stage are stand-ins |
 
 ## 10. Keeping this document true
 

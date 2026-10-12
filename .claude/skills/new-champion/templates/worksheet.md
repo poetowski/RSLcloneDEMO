@@ -23,7 +23,7 @@ Fill this in before writing code, and show it to the user when they are around: 
 | Materials | | from `MAT` in `tools/art/palette.ts`; a new ramp only if nothing fits (6 steps, hue-shifted) |
 | Weapon / focus | | a function in the art module, reused by the icons |
 | Height | | 66-80 px body, audit range 64-96 |
-| Closest existing champion | | the art module to start from: armoured swordsman with a cloak `captain_gareth`, robed caster with a hanging focus `rime_scholar`, light infantry with two short swords `skirmisher`, a big shield and a one-handed mace `lineholder`; the proof of concept's modules (and the stand-ins `azure_warrior`, `sanguine_support`, until 2026-10-10) are in git history at tag `poc-v1` (`tools/art/champions/`: sword `knight`, two-hander `dreadknight`, polearm `jackal` or `sunspear`, dual blades `stalker`, bow `archer`, staff casters `frostmage` and `starsinger`, unarmed `monk` and `colossus`, a mummy king `tomblord`) |
+| Closest existing champion | | the art module to start from: armoured swordsman with a cloak `captain_gareth`, robed caster with a hanging focus `rime_scholar`, light infantry with two short swords `skirmisher`, a big shield and a one-handed mace `lineholder`, a walking stick and a backpack `quartermaster`; the proof of concept's modules (and the stand-ins `azure_warrior`, `sanguine_support`, until 2026-10-10) are in git history at tag `poc-v1` (`tools/art/champions/`: sword `knight`, two-hander `dreadknight`, polearm `jackal` or `sunspear`, dual blades `stalker`, bow `archer`, staff casters `frostmage` and `starsinger`, unarmed `monk` and `colossus`, a mummy king `tomblord`) |
 
 ## Kit
 

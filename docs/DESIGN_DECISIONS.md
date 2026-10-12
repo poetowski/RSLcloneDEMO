@@ -31,6 +31,9 @@ Section 7 lists what is not decided.
 | 2026-10-11 | The Skirmisher, a Common of the Azure Crown | 12 |
 | 2026-10-11 | Affinity is abstract: it dictates no colours, elements or anything else | 2.1, 7 |
 | 2026-10-11 | The Lineholder, a Common of the Azure Crown | 13 |
+| 2026-10-12 | The interface's affinity marks stay; Gareth's and the Skirmisher's cuts made plain | 2.1, 7 |
+| 2026-10-12 | Balance, the stage that brings each champion and every stage's enemies: Jakub dictates them later | 7 |
+| 2026-10-12 | The Quartermaster, a Common of the Azure Crown | 14 |
 
 ---
 
@@ -84,8 +87,17 @@ An affinity sets no colour, element or anything else in a champion's look:
 Ember is not fire, Bloom is not plants, Tide is not water. A champion's
 colours, materials, smears and effects come from who the champion is and what
 the skill does. The fire and water glosses in sections 6 and 8 are how the
-affinities were first described; they set nothing in the art. Whether art
-made before the rule changes is open (section 7).
+affinities were first described; they set nothing in the art.
+
+On 2026-10-12, in Jakub's words:
+
+```
+affinity marks are ok. you can rework gareths ember cuts and skirmishers leaf green cuts to more plain.
+```
+
+The interface keeps its affinity marks (the gems, the tinted card
+backgrounds). The cuts of Gareth and the Skirmisher, made before the rule,
+are plain now.
 
 ### 2.2 Rarity
 
@@ -525,8 +537,8 @@ open questions.
 - Champion schema (what fields a champion has beyond the enums) *(partly
   decided 2026-10-11: no subtitle, eight stats; section 10)*
 - Kit / skill design *(the starter pair's kits decided 2026-10-10, section 8,
-  and the Skirmisher's and the Lineholder's 2026-10-11, sections 12 and 13;
-  their numbers are not)*
+  the Skirmisher's and the Lineholder's 2026-10-11, sections 12 and 13, and
+  the Quartermaster's 2026-10-12, section 14; their numbers are not)*
 - Art pipeline specification
 - Save and progression *(gear decided: the Weaver Matrix, section 9; levels,
   ranks, ascension and skill upgrades are not)*
@@ -534,11 +546,10 @@ open questions.
 - How far Resistance must exceed Accuracy to resist a debuff *(the game
   stands in a curve, section 10)*
 - Zone 1's enemies *(the game stands in copies of the two starters)*
-- Whether art made before the affinity rule (2.1) changes: Gareth's ember cuts
-  (section 8 asked for his Ember in what he does with the sword) and the
-  Skirmisher's leaf-green cuts (a stand-in); and whether the interface's
-  affinity marks (a red diamond, a green leaf and a blue drop, card
-  backgrounds tinted to match) become abstract too
+- Balance, the stage that brings each champion and every stage's enemies:
+  Jakub, 2026-10-12, "regarding balancing and where is what spawned and what
+  is composition of each stage, i will dictate these later" *(the game's
+  stage powers, recruiting stages and enemies are stand-ins)*
 - Where crit is taught, at or before the point Cold Rebuke first fires
   meaningfully (section 8, the Rime Scholar's notes)
 - Team size *(the game uses 3)* and how champions are acquired *(one recruit
@@ -552,7 +563,8 @@ open questions.
 Decided since the first export: the names of the starter pair, and that
 champions are fragments, the first one with the Archivist from the start
 (section 8); the zone names, the Fracture Reach and the Verdant Grove (5.3,
-5.4).
+5.4); that the interface keeps its affinity marks and the cuts made before
+the affinity rule are plain (2.1).
 
 ---
 
@@ -593,8 +605,8 @@ His job in the game is to **teach the player how damage works**.
 **Weapon.** A straight single-handed sword. Functional, worn at the grip, no
 ornament. No glow or fire effect on the weapon itself — his Ember affinity is
 expressed in what he does with the sword, not in the sword. *(2026-10-11:
-affinity is abstract and sets nothing in the art, 2.1; whether his cuts keep
-their ember look is open, section 7.)*
+affinity is abstract and sets nothing in the art, 2.1; 2026-10-12: his cuts
+made plain.)*
 
 **Wearing.** Mid-weight military armor: breastplate, pauldrons, greaves, in
 dull steel and worn leather. A tabard or coat underneath in deep amber-brown.
@@ -902,3 +914,41 @@ What the game fills in (stand-ins, listed in CLAUDE.md): Guard Cut's text and
 multiplier (one blow, damage only), Brace's text and cooldown, the stats, the
 lore line, the stage that brings him (the first clear of 1-7), and the
 details of his art and effects.
+
+## 14. The Quartermaster (received 2026-10-12)
+
+Jakub's brief, verbatim (the message also carried the decisions recorded in
+2.1 and 7):
+
+```
+for now i want new hero:
+name = Quartermaster
+this is support common champion of azure crown.
+he wield walking stick. he has leather brown cloth with backpack with blue insignia on front.
+his A1 is basic hit, not strong.
+his A2 heals all allies by 15% of this champion max hp. and grants 15% turn meter to ally with lowest HP after heal.
+```
+
+and, the same day:
+
+```
+quartermaster affinity should be tide.
+```
+
+| | |
+|---|---|
+| Rarity | Common |
+| Role | Support |
+| Faction | Azure Crown |
+| Affinity | Tide |
+| Kit | A1 a basic hit, not strong; A2 heals all allies by 15% of his max HP, then grants 15% Turn Meter to the ally with the lowest HP after the heal (the brief names no A3 and no passive) |
+| Look | a walking stick; brown leather clothes; a backpack; a blue insignia on the front |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): both skills' names
+(Stick Rap, Field Rations) and texts, A1's multiplier (0.9, the floor of
+the norms), A2's cooldown, the stats, the lore line, the stage that brings
+him (the first clear of 1-9), and the details of his art and effects. Read
+by the game: "lowest HP" is the lowest share of max HP; the Turn Meter goes
+to an ally other than himself (his own meter resets as his turn ends); the
+heal includes him; the insignia is on his chest.
+

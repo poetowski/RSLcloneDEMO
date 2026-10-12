@@ -21,7 +21,7 @@ export const skirmisher: ChampionDef = {
       id: 'twin_cut', name: 'Twin Cut', tag: 'Single enemy', slot: 1, cooldown: 0,
       desc: 'Two quick cuts at one enemy, one with each short sword. It always hits twice.',
       target: 'enemy', anim: 'attack1', approach: 'melee',
-      hits: [{ mult: 0.6, fx: 'leaf_cut' }, { mult: 0.6, fx: 'leaf_cut_rise' }],
+      hits: [{ mult: 0.6, fx: 'blade_cut' }, { mult: 0.6, fx: 'blade_cut_rise' }],
       ai: { priority: 1 },
     },
   ],

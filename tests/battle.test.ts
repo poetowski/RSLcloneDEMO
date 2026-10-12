@@ -6,7 +6,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { brute, cleaver, drummer, freezer, guard, inAffinity, mender, overdrive, rebuker, stalker, striker, twin, undying, warden } from './fixtures';
+import { brute, cleaver, drummer, fixture, freezer, guard, inAffinity, mender, overdrive, provisioner, rebuker, stalker, striker, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -277,6 +277,36 @@ describe('statuses', () => {
     b.get('p1').tm = 95;
     b.useSkill(k, skill(drummer, 'march'));
     expect(b.get('p1').tm).toBe(100);
+  });
+
+  it("heals every ally by a share of the healer's max HP with healOf 'caster'", () => {
+    const b = new Battle(combatants([provisioner, guard, twin]), combatants([striker]), { seed: 4 });
+    const [q, g, t] = ['p0', 'p1', 'p2'].map((id) => b.get(id));
+    q.hp = 300;
+    g.hp = g.maxHp - 100;
+    t.hp = 300;
+    const r = b.useSkill(q, skill(provisioner, 'rations'));
+    const healed = (uid: string) => r.events.reduce((n, e) => n + (e.kind === 'heal' && e.target === uid ? e.amount : 0), 0);
+    // 15% of the healer's 1500 max HP whatever the ally's own, never past full
+    expect([healed(q.uid), healed(g.uid), healed(t.uid)]).toEqual([225, 100, 225]);
+  });
+
+  it('lends turn meter to the ally lowest on HP once the heal has landed, never to the healer', () => {
+    const small = fixture('small', { stats: { hp: 800 } }), big = fixture('big', { stats: { hp: 2000 } });
+    const b = new Battle(combatants([provisioner, small, big]), combatants([striker]), { seed: 4 });
+    const [q, s, g] = ['p0', 'p1', 'p2'].map((id) => b.get(id));
+    for (const u of b.units) u.tm = 10;
+    q.hp = 150;
+    s.hp = 320; // 40% before the heal, 68% after
+    g.hp = 900; // 45% before the heal, 56% after: the lowest once healed
+    const r = b.useSkill(q, skill(provisioner, 'rations'));
+    expect([q.tm, s.tm, g.tm]).toEqual([10, 10, 25]);
+    expect(r.events.filter((e) => e.kind === 'tm')).toEqual([{ kind: 'tm', target: g.uid, delta: 15, hit: 0 }]);
+    // never past a full meter
+    g.tm = 95;
+    g.hp = 100;
+    b.useSkill(q, skill(provisioner, 'rations'));
+    expect(g.tm).toBe(100);
   });
 
   it('overloads once below the Overdrive threshold', () => {

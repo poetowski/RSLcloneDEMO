@@ -148,12 +148,6 @@ export const ACCENT = {
   lipRose: hex('#b0524a'),
   smearCyan: hex('#90f5e2'),
   smearMagenta: hex('#ff9ad8'),
-  /** Captain Gareth: his Ember shows in what he does with the sword, the smear of the cut */
-  smearEmber: hex('#ff8a3a'),
-  /** Bloom in a cut: the Skirmisher's smear */
-  smearLeaf: hex('#86d86a'),
-  leafCore: hex('#f0ffd8'),
-  emberCore: hex('#ffe6b0'),
   /** the Rime Scholar's ice flakes */
   flake: hex('#e8f8ff'),
 };

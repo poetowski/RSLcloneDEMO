@@ -78,6 +78,8 @@ export interface SkillDef {
   statuses?: StatusApp[];
   /** heal all allies by this fraction of each ally's max HP (on the last hit) */
   healAllies?: number;
+  /** whose max HP `healAllies` is a share of: each ally's own (the default) or the caster's */
+  healOf?: 'ally' | 'caster';
   /** removes one debuff from each ally */
   cleanse?: boolean;
   /** removes every buff from the targets before the first hit */
@@ -88,6 +90,8 @@ export interface SkillDef {
   tmTargets?: number;
   /** turn meter change for the actor's allies (not the actor), on the last hit */
   tmAllies?: number;
+  /** turn meter change for the ally (not the actor) with the lowest HP share once the skill's heals have landed, on the last hit */
+  tmLowestAlly?: number;
   /** the actor ends the turn with this much turn meter instead of 0 */
   selfTm?: number;
   /** bonus damage when the target is below a HP fraction */

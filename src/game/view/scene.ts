@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'ember_cut', 'ember_sweep', 'iron_impact', 'cold_flare', 'leaf_cut', 'leaf_cut_rise']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -258,6 +258,14 @@ export class BattleScene {
         v.stunned = false;
         v.setFrozen(false);
         if (v.anim !== 'idle') v.play('idle');
+      }
+      // a heal only shows on the wounded: the demo hurts the healer's team first, each ally a little less
+      if (skill.healAllies) {
+        this.battle.allies(actor).forEach((a, i) => {
+          a.hp = Math.round(a.maxHp * (0.45 + 0.15 * i));
+          const v = this.view(a.uid);
+          v.hp = v.lagHp = a.hp;
+        });
       }
       this.active = this.view(actor.uid);
       const valid = this.battle.validTargets(actor, skill);

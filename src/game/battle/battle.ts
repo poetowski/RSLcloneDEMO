@@ -309,7 +309,7 @@ export class Battle {
 
     // support effects land on the last hit
     if (skill.healAllies) {
-      for (const a of this.allies(actor)) this.heal(a, Math.round(a.maxHp * skill.healAllies), last, events);
+      for (const a of this.allies(actor)) this.heal(a, Math.round((skill.healOf === 'caster' ? actor.maxHp : a.maxHp) * skill.healAllies), last, events);
     }
     if (skill.cleanse) {
       for (const a of this.allies(actor)) {
@@ -342,6 +342,15 @@ export class Battle {
         const before = a.tm;
         a.tm = Math.max(0, Math.min(TURN_FULL, a.tm + skill.tmAllies));
         events.push({ kind: 'tm', target: a.uid, delta: a.tm - before, hit: last });
+      }
+    }
+    if (skill.tmLowestAlly) {
+      // after the heals; never the actor, whose own meter resets at its turn end
+      const low = this.allies(actor).filter((a) => a !== actor).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
+      if (low) {
+        const before = low.tm;
+        low.tm = Math.max(0, Math.min(TURN_FULL, low.tm + skill.tmLowestAlly));
+        events.push({ kind: 'tm', target: low.uid, delta: low.tm - before, hit: last });
       }
     }
     if (skill.selfTm && !asCounter) actor.pendingTm = skill.selfTm;

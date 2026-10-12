@@ -6,9 +6,9 @@
 // in his kit, his stance a little hunched. What the brief leaves open is a
 // first take: the cut of the jerkin, the leather strips over the hips and the
 // bracers, the helmet's cheek guards and seam, the insignia (the Crown's gold
-// crown on an azure badge), his face, the swords' shape. His Bloom shows in
-// his cuts (a leaf-green smear, the effects in fx/azure_crown.ts), never on
-// the blades.
+// crown on an azure badge), his face, the swords' shape. His cuts are plain
+// (Jakub, 2026-10-12: affinities are abstract and set nothing in the art): a
+// white streak, and in fx/azure_crown.ts a line of light shedding chips.
 import { BuildInfo, ChampionArt, CharDef, cycle, keys, tween } from '../char.ts';
 import { compose, glyph } from '../icons.ts';
 import { ACCENT, MAT } from '../palette.ts';
@@ -35,8 +35,8 @@ const D: Dims = {
 
 const SK = MAT.skinLight, BL = MAT.blueLeather, DL = MAT.darkleather, LE = MAT.leather, CH = MAT.charcoal, IR = MAT.iron, ST = MAT.steel, AZ = MAT.lapis, GD = MAT.gold, HR = MAT.hairDark;
 
-/** Bloom in the cut: green-gold, white at its heart. */
-const BLOOM = { core: ACCENT.leafCore, edge: ACCENT.smearLeaf };
+/** The streak of a cut: plain white with the light of the steel, the colour of motion, not of an affinity. */
+const SWING = { core: ACCENT.white, edge: MAT.steel.ramp[4] };
 
 /** Blade length from the hand: short swords. */
 const BLADE = 19;
@@ -105,7 +105,7 @@ function blade(d: Draw, hand: V, ang: number, z: number) {
 
 function smearOf(d: Draw, hand: V, from: number | undefined, to: number | undefined, z: number) {
   if (from === undefined || to === undefined) return;
-  smear(d, hand, from, to, BLADE + 3, 8, BLOOM, z);
+  smear(d, hand, from, to, BLADE + 3, 8, SWING, z);
 }
 
 /** A small rounded leather shoulder guard. */
@@ -369,12 +369,12 @@ export const skirmisher: ChampionArt = {
     twin_cut: () =>
       compose(BL, glyph((d) => {
         // two cuts, one from each sword: down, then back up
-        smear(d, v(15, 16), 150, -40, 17, 5, BLOOM, 1);
-        smear(d, v(25, 24), -150, 40, 17, 5, BLOOM, 2);
+        smear(d, v(15, 16), 150, -40, 17, 5, SWING, 1);
+        smear(d, v(25, 24), -150, 40, 17, 5, SWING, 2);
         iconBlade(d, v(7, 8), 42, 10, 22);
         iconBlade(d, v(33, 33), -138, 11, 22);
       }), (b) => {
-        for (const [x, y] of [[34, 7], [36, 10], [31, 5], [5, 31], [8, 34]]) b.set(x, y, E.leafCore);
+        for (const [x, y] of [[34, 7], [36, 10], [31, 5], [5, 31], [8, 34]]) b.set(x, y, E.white);
       }),
   },
 };

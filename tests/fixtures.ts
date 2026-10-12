@@ -49,6 +49,12 @@ export const twin = fixture('twin', {
   skills: [skill('twin_chop', 1, { hits: [{ mult: 0.6 }, { mult: 0.6 }] }), skill('twin_sweep', 2, { target: 'enemies', hits: [{ mult: 0.5 }, { mult: 0.5 }] })],
 });
 
+/** A2 heals the team by a share of its own max HP, then lends turn meter to the ally lowest on HP. */
+export const provisioner = fixture('provisioner', {
+  stats: { hp: 1500 },
+  skills: [undefined, skill('rations', 2, { target: 'allies', hits: [{ mult: 0 }], healAllies: 0.15, healOf: 'caster', tmLowestAlly: 15 })],
+});
+
 /** A2 on a three-turn cooldown; A3 makes itself the target (Taunt). */
 export const guard = fixture('guard', {
   stats: { hp: 1500, def: 78 },

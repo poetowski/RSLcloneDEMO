@@ -1,18 +1,17 @@
-// The Azure Crown's effects. Captain Gareth's Ember shows in what he does with
-// the sword, never in the sword: the cut glows white-hot and sheds embers, the
-// heavy blow bursts, the sweep leaves a flat arc of heat. The Skirmisher's
-// Bloom shows the same way: his two cuts glow green-gold and tear leaves loose.
-// The Lineholder's effects come from his gear and what he does with it, not
-// from his affinity (affinities are abstract, Jakub, 2026-10-11): the mace
-// lands in a dull white flash, dust and iron chips; when he braces, dust
-// kicks up round his feet.
+// The Azure Crown's effects. They show what each skill does with a weapon or a
+// tool, never the champion's affinity (affinities are abstract, Jakub,
+// 2026-10-11; on 2026-10-12 he had Gareth's ember cuts and the Skirmisher's
+// leaf-green ones made plain): a cut is a white line of light shedding chips,
+// a heavy blow a dull grey-white flash with dust rolling out, a sweep a flat
+// arc of light. The Lineholder's mace lands the same way and his Brace kicks
+// up dust; the Quartermaster's stick raps, and his Field Rations reach each
+// ally as warm light with small white crosses rising.
 import { dith, ellipseRing, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng } from '../raster.ts';
-import { burst, cut, FxDef, ramps, ring, sparks, W } from './kit.ts';
+import { burst, cut, FxDef, motes, ramps, ring, sparks, W } from './kit.ts';
 
-const F = ramps.fire;
-const G = ramps.green;
 const DU = ramps.dust;
+const GO = ramps.gold;
 /** A dull flash: grey to white, no hue of its own. */
 const DULL: RGBA[] = [DU[0], DU[2], DU[3], DU[4], W];
 
@@ -33,41 +32,6 @@ function dust(b: Bitmap, cx: number, cy: number, n: number, spread: number, t: n
         b.set(xx, yy, rampDither(DU, 3.2 - d * 1.4 - t, xx, yy));
       }
     }
-  }
-}
-
-/** Leaves torn loose by a cut: they flutter out, then drift down turning; t in [0,1]. */
-function leaves(b: Bitmap, cx: number, cy: number, n: number, spread: number, t: number, seed: number) {
-  const r = rng(seed);
-  for (let k = 0; k < n; k++) {
-    const a = (r() - 0.5) * Math.PI * 2;
-    const sp = (0.3 + r() * 0.7) * spread;
-    const ease = 1 - (1 - t) * (1 - t);
-    const x = Math.round(cx + Math.cos(a) * sp * ease + Math.sin(t * 9 + k) * 1.6);
-    const y = Math.round(cy + Math.sin(a) * sp * ease * 0.7 + 16 * t * t);
-    const life = 1 - t * (0.5 + r() * 0.5);
-    if (life <= 0) continue;
-    const c = G[Math.max(1, Math.min(4, Math.round(life * 4.2)))];
-    // a leaf is two pixels, lying a different way as it turns
-    const turn = (k + Math.floor(t * 6)) % 3;
-    b.set(x, y, c);
-    b.set(x + (turn === 1 ? 0 : 1), y + (turn === 0 ? 0 : 1), turn === 2 ? G[2] : c);
-  }
-}
-
-/** Embers shed by a cut: they fly out mostly upward, slow, sink and dim; t in [0,1]. */
-function embers(b: Bitmap, cx: number, cy: number, n: number, spread: number, t: number, seed: number, gravity = 30) {
-  const r = rng(seed);
-  for (let k = 0; k < n; k++) {
-    const a = -Math.PI / 2 + (r() - 0.5) * Math.PI * 1.7;
-    const sp = (0.35 + r() * 0.65) * spread;
-    const ease = 1 - (1 - t) * (1 - t);
-    const x = cx + Math.cos(a) * sp * ease, y = cy + Math.sin(a) * sp * ease * 0.8 + gravity * t * t;
-    const life = 1 - t * (0.55 + r() * 0.55);
-    if (life <= 0) continue;
-    const c = F[Math.max(1, Math.min(4, Math.round(life * 4.4)))];
-    b.set(Math.round(x), Math.round(y), c);
-    if (life > 0.65 && k % 2 === 0) b.set(Math.round(x), Math.round(y) + 1, F[1]);
   }
 }
 
@@ -103,56 +67,45 @@ function flatArc(b: Bitmap, cx: number, cy: number, rx: number, ry: number, thic
   }
 }
 
+/** A straight cut of light from (x0,y0) to (x1,y1) that thins away, a small flash where it crosses, chips flying. */
+function lightCut(b: Bitmap, i: number, x0: number, y0: number, x1: number, y1: number, bend: number, flash: [number, number, number], seed: number, thick = 1) {
+  const reach = [0.55, 1, 1, 1, 1, 1, 1][i];
+  const heat = [1.4, 1.3, 1.05, 0.8, 0.6, 0.45, 0.3][i];
+  const th = [3.2, 4.2, 3.4, 2.6, 1.9, 1.3, 1][i] * thick;
+  if (i < 6) cut(b, x0, y0, x1, y1, bend, th, DULL, heat, reach);
+  if (i === 1 || i === 2) burst(b, flash[0], flash[1], 6, 2, [12, 8][i - 1], 1.3, DULL, flash[2]);
+  if (i >= 1) sparks(b, flash[0], flash[1], 14, 30, (i - 1) / 5, DULL, seed, 20);
+}
+
 export const AZURE_CROWN_FX: Record<string, FxDef> = {
-  /** Line Cut: one straight cut from high behind to low in front, white-hot, cooling to embers. */
-  ember_cut: {
+  /** Line Cut: one straight cut from high behind to low in front, a white line shedding chips of light. */
+  sword_cut: {
     w: 72, h: 72, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
-    draw: (b, t, i) => {
-      const reach = [0.55, 1, 1, 1, 1, 1, 1][i];
-      const heat = [1.4, 1.3, 1.05, 0.8, 0.6, 0.45, 0.3][i];
-      const thick = [3.2, 4.4, 3.6, 2.8, 2.0, 1.4, 1][i];
-      if (i < 6) cut(b, 12, 10, 62, 60, -2, thick, F, heat, reach);
-      if (i === 1 || i === 2) burst(b, 38, 36, 6, 2, [13, 8][i - 1], 1.4, F, 0.4);
-      if (i >= 1) embers(b, 40, 38, 18, 34, (i - 1) / 5, 17, 26);
-    },
+    draw: (b, t, i) => lightCut(b, i, 12, 10, 62, 60, -2, [38, 36, 0.4], 17, 1.05),
   },
-  /** Twin Cut, first hit: the near sword cuts high to low in a green-gold line and tears leaves loose. */
-  leaf_cut: {
+  /** Twin Cut, first hit: the near sword cuts high to low. */
+  blade_cut: {
     w: 72, h: 72, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
-    draw: (b, t, i) => {
-      const reach = [0.55, 1, 1, 1, 1, 1, 1][i];
-      const heat = [1.4, 1.3, 1.05, 0.8, 0.6, 0.45, 0.3][i];
-      const thick = [2.8, 3.8, 3.2, 2.4, 1.8, 1.2, 1][i];
-      if (i < 6) cut(b, 14, 14, 60, 56, -2, thick, G, heat, reach);
-      if (i === 1 || i === 2) burst(b, 38, 36, 5, 2, [11, 7][i - 1], 1.2, G, 0.3);
-      if (i >= 1) leaves(b, 40, 38, 12, 30, (i - 1) / 5, 23);
-    },
+    draw: (b, t, i) => lightCut(b, i, 14, 14, 60, 56, -2, [38, 36, 0.3], 23, 0.88),
   },
   /** Twin Cut, second hit: the far sword cuts back low to high. */
-  leaf_cut_rise: {
+  blade_cut_rise: {
     w: 72, h: 72, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
-    draw: (b, t, i) => {
-      const reach = [0.55, 1, 1, 1, 1, 1, 1][i];
-      const heat = [1.4, 1.3, 1.05, 0.8, 0.6, 0.45, 0.3][i];
-      const thick = [2.8, 3.8, 3.2, 2.4, 1.8, 1.2, 1][i];
-      if (i < 6) cut(b, 14, 58, 60, 16, 2, thick, G, heat, reach);
-      if (i === 1 || i === 2) burst(b, 36, 37, 5, 2, [11, 7][i - 1], 1.2, G, 0.9);
-      if (i >= 1) leaves(b, 36, 36, 12, 30, (i - 1) / 5, 29);
-    },
+    draw: (b, t, i) => lightCut(b, i, 14, 58, 60, 16, 2, [36, 37, 0.9], 29, 0.88),
   },
-  /** Iron Blow: the blow comes straight down; a hot core bursts, a ring rolls out, embers fly. */
-  iron_impact: {
+  /** Iron Blow: the blow comes straight down: a dull grey-white burst, a ring of dust rolling out, chips flying. */
+  heavy_blow: {
     w: 92, h: 92, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 8, 12, 8],
     draw: (b, t, i) => {
       const cx = 46, cy = 54;
-      if (i < 3) cut(b, 42, 2, 47, cy, 2, [3, 4.6, 3][i], F, [1.4, 1.25, 0.8][i], [0.7, 1, 1][i]);
-      if (i >= 1 && i < 5) burst(b, cx, cy, 10, [3, 4, 3, 2][i - 1], [22, 32, 25, 15][i - 1], [2.6, 3.3, 2.4, 1.6][i - 1], F, i * 0.13);
+      if (i < 3) cut(b, 42, 2, 47, cy, 2, [3, 4.6, 3][i], DULL, [1.4, 1.25, 0.8][i], [0.7, 1, 1][i]);
+      if (i >= 1 && i < 5) burst(b, cx, cy, 10, [3, 4, 3, 2][i - 1], [22, 32, 25, 15][i - 1], [2.6, 3.3, 2.4, 1.6][i - 1], DULL, i * 0.13);
       if (i >= 2) {
         const r = 8 + (i - 2) * 7;
-        ring(b, cx, cy, r, r * 0.55, Math.max(0.8, 3.2 - (i - 2) * 0.5), F, 1.25 - (i - 2) * 0.16);
+        ring(b, cx, cy + 4, r, r * 0.5, Math.max(0.8, 3.0 - (i - 2) * 0.45), DU, 1.25 - (i - 2) * 0.15);
       }
-      if (i >= 1) embers(b, cx, cy, 24, 48, (i - 1) / 6, 29, 42);
-      if (i >= 2) sparks(b, cx, cy, 12, 38, (i - 2) / 5, F, 31, 14);
+      if (i >= 1) dust(b, cx, cy + 6, 10, 32, (i - 1) / 6, 29);
+      if (i >= 1) sparks(b, cx, cy, 18, 42, (i - 1) / 6, DULL, 31, 30);
     },
   },
   /** Guard Cut: the mace comes down over the shield's rim and lands: a dull white flash, iron chips, a ring of dust rolling out. */
@@ -182,16 +135,47 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
       if (i >= 1 && i < 6) sparks(b, cx + 12, gy - 4, 7, 16, (i - 1) / 5, DU, 79, 30);
     },
   },
-  /** Wide Sweep: a wide, flat arc of heat crosses the target, leading edge thick, then embers. */
-  ember_sweep: {
-    w: 96, h: 56, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 4, 8, 4],
+  /** Stick Rap: a small dull flash where the stick lands, a few chips, a puff of dust. */
+  stick_rap: {
+    w: 56, h: 56, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 4, 6, 4],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 30;
+      if (i < 2) cut(b, 33, 6, 28, cy, -1, [1.8, 2.4][i], DULL, [1.3, 1.1][i], [0.7, 1][i]);
+      if (i >= 1 && i < 4) burst(b, cx, cy, 8, [2, 3, 2][i - 1], [9, 13, 8][i - 1], [1.6, 2.0, 1.2][i - 1], DULL, 0.3 + i * 0.1);
+      if (i >= 1) dust(b, cx, cy + 4, 4, 14, (i - 1) / 4, 47, 4);
+      if (i >= 1) sparks(b, cx, cy, 8, 18, (i - 1) / 4, DULL, 53, 18);
+    },
+  },
+  /** Field Rations: warm light gathers at each ally's feet and small white crosses rise from it (additive). */
+  rations: {
+    w: 48, h: 72, n: 10, ms: 70, ax: 0.5, ay: 1, pad: [2, 4, 3, 4],
+    draw: (b, t, i) => {
+      const cx = 24, gy = 70;
+      const rr = [6, 12, 16, 18, 19, 19, 18, 16, 13, 9][i];
+      ellipseRing(b, cx, gy - 2, rr, rr * 0.28, 1.4, (x, y, a) => (dith(x, y, 1 - t * 0.7) ? rampDither(GO, 3 - t * 1.4 + Math.sin(a) * 0.6, x, y) : 0));
+      const r = rng(83);
+      for (let k = 0; k < 5; k++) {
+        const x0 = cx + (r() - 0.5) * 26, start = r() * 0.3, sp = 1.2 + r() * 0.5;
+        const tt = (t - start) * sp;
+        if (tt <= 0 || tt >= 1) continue;
+        const x = Math.round(x0 + Math.sin(tt * 6 + k) * 1.5), y = Math.round(gy - 8 - tt * 50);
+        const core = tt < 0.6 ? W : GO[4], arm = tt < 0.6 ? GO[3] : GO[2];
+        b.set(x, y, core);
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(x + dx, y + dy, arm);
+      }
+      motes(b, cx, gy - 6, 24, 40, 10, t, GO, 89);
+    },
+  },
+  /** Wide Sweep: a wide, flat arc of light crosses the target, leading edge thick, then chips. */
+  sword_sweep: {
+    w: 96, h: 56, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 4, 14, 4],
     draw: (b, t, i) => {
       const grow = [0.45, 0.85, 1, 1, 1, 1, 1][i];
       const heat = [1.35, 1.25, 1.05, 0.8, 0.6, 0.42, 0.28][i];
       // in screen space the front of the sweep is the lower half of the ellipse: left to right through the bottom
       const a0 = Math.PI * 0.98, a1 = a0 - Math.PI * 0.96 * grow;
-      if (i < 6) flatArc(b, 48, 20, 44, 17, 16 * (1 - t * 0.45), a0, a1, F, heat);
-      if (i >= 1) embers(b, 58, 34, 16, 30, (i - 1) / 5, 37, 24);
+      if (i < 6) flatArc(b, 48, 20, 44, 17, 16 * (1 - t * 0.45), a0, a1, DULL, heat);
+      if (i >= 1) sparks(b, 58, 30, 12, 24, (i - 1) / 5, DULL, 37, 12);
     },
   },
 };

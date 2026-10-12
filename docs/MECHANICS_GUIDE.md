@@ -62,11 +62,13 @@ interface SkillDef {
   hits: { mult: number; fx?: string }[];         // one entry per hit frame of the animation
   statuses?: { status; turns; chance?; to: 'targets' | 'self' | 'allies'; value?; perHit? }[];
   healAllies?: number;      // fraction of each ally's max HP
+  healOf?: 'ally' | 'caster'; // whose max HP healAllies is a share of (default: each ally's own)
   cleanse?: boolean;        // remove one debuff from each ally
   stripBuffs?: boolean;     // dispel: remove every buff from the targets before the first hit
   lifesteal?: number;       // fraction of damage dealt healed to the actor
   tmTargets?: number;       // turn meter change for targets, in %
   tmAllies?: number;        // turn meter change for every ally except the actor, in % (capped at 100)
+  tmLowestAlly?: number;    // turn meter change for the ally (not the actor) lowest on HP share once the heals have landed
   selfTm?: number;          // actor ends the turn with this TM instead of 0
   execute?: { below: number; mult: number };
   projectile?: string; castFx?: string; actorFx?: string; shake?: number;   // presentation
@@ -157,25 +159,27 @@ Three affinities in a cycle (Jakub's, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)
 | Cleanse | removes one debuff from each ally |
 | Lifesteal | heals the actor for a fraction of damage dealt (blocked by Heal Block) |
 | Execute | `mult` bonus against targets below `below` x max HP |
-| Turn Meter boost | `tmAllies` adds to every other ally's turn meter on the last hit; `tmTargets` drains enemies |
+| Heals | `healAllies` heals every ally on the last hit by a share of each ally's own max HP, or of the healer's with `healOf: 'caster'`; never past the maximum; Heal Block stops it |
+| Turn Meter boost | `tmAllies` adds to every other ally's turn meter on the last hit; `tmLowestAlly` adds to the other ally with the lowest HP share once the skill's heals have landed; `tmTargets` drains enemies |
 | Undying (passive) | the first lethal hit leaves the champion at `value` x max HP with every debuff removed |
 | Overdrive (passive) | the first time a hit leaves the champion alive below `value` x max HP, it gains the passive's `statuses`; a lethal hit never triggers it. Shows as a `passive` event: banner, core-flare, `OVERDRIVE!` |
 | Rebuke (passive) | while the champion is below `value` x max HP **after** a hit, an enemy whose **critical** hit landed on it receives the passive's `statuses` (Cold Rebuke: Freeze, 1 turn); then the passive rests for `cooldown` of the champion's own turns. A hit that kills never triggers it. Shows as a `passive` event with the attacker as `source`: the passive's banner, a burst of ice round the holder, `REBUKE!`, a shard flying to the attacker; the Freeze lands once the attacker is back in formation |
 
-No champion of today's roster uses turn meter boosts, Counterattack, Undying or Overdrive, and none places control with a skill; the rules stay in the engine and are proven by the rule tests on synthetic champions (`tests/fixtures.ts`). The roster's only control is the Rime Scholar's Cold Rebuke.
+No champion of today's roster uses Counterattack, Undying or Overdrive or places control with a skill, and only the Quartermaster boosts turn meter (one ally, with Field Rations); the rules stay in the engine and are proven by the rule tests on synthetic champions (`tests/fixtures.ts`). The roster's only control is the Rime Scholar's Cold Rebuke.
 
 ## 9. Champion kits
 
-The kits are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 8, Starter Heroes, 12, the Skirmisher, and 13, the Lineholder): which skills, their shapes and riders, and Cold Rebuke's 35% threshold and 1-turn Freeze. The numbers he has not set are stand-ins, in italics:
+The kits are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 8, Starter Heroes, 12, the Skirmisher, and 13, the Lineholder, and 14, the Quartermaster): which skills, their shapes and riders, and Cold Rebuke's 35% threshold and 1-turn Freeze. The numbers he has not set are stand-ins, in italics:
 
 | Champion | A1 | A2 | A3 | Passive |
 | --- | --- | --- | --- | --- |
 | **Captain Gareth**, Damage, Ember | Line Cut: one enemy, *1.0* | Iron Blow (CD *3*): one enemy, *1.5*; then ATK Up on himself for 2 turns, after the hit, never gated by a crit | Wide Sweep (CD *4*): all enemies, *0.95*, damage only | none |
 | **Rime Scholar**, Support, Tide | Pale Strike: one enemy, *1.0*, a pale shard thrown from her hand, nothing else | Rimebind (CD *3*): all enemies, *0.5*; Slow for *2* turns on every enemy | none | Cold Rebuke: below 35% HP, an enemy whose critical hit lands on her is Frozen for 1 turn; rests *3* turns |
 | **Skirmisher**, Damage, Bloom, Common | *Twin Cut*: one enemy, two hits of *0.6*, one with each short sword; always hits twice | none | none | none |
+| **Quartermaster**, Support, Tide, Common | *Stick Rap*: one enemy, *0.9*, a plain rap of the walking stick | *Field Rations* (CD *3*): heals every ally by 15% of his max HP, then 15% Turn Meter to the ally (not himself) lowest on HP after the heal | none | none |
 | **Lineholder**, Tank, Tide, Common | Guard Cut: one enemy, *1.0*, *a mace blow from behind the shield, damage only* | Brace (CD *3*): DEF Up on himself for 2 turns, no damage | none | none |
 
-Stats (stand-ins inside the Elite budget): Gareth HP 1150, ATK 122, DEF 62, SPD 104, CRIT 2.5% (score 422: his crit sits at the floor of the norms, as crit is deliberately not introduced on him); the Rime Scholar HP 1250, ATK 96, DEF 66, SPD 106, CRIT 2.5% (score 414, her passive paid for from the budget); the Skirmisher, on the Common budget, HP 960, ATK 108, DEF 57, SPD 110, CRIT 3.5% (score 391); the Lineholder, on the Common budget, HP 1320, ATK 78, DEF 72, SPD 92, CRIT 2.5% (score 395): the sturdiest and slowest of the four and the weakest hitter. Zone 1's enemies are copies of the two and crit as rarely, so Cold Rebuke seldom fires there; Jakub's note is that crit must be taught at or before the point Cold Rebuke first fires meaningfully.
+Stats (stand-ins inside the Elite budget): Gareth HP 1150, ATK 122, DEF 62, SPD 104, CRIT 2.5% (score 422: his crit sits at the floor of the norms, as crit is deliberately not introduced on him); the Rime Scholar HP 1250, ATK 96, DEF 66, SPD 106, CRIT 2.5% (score 414, her passive paid for from the budget); the Skirmisher, on the Common budget, HP 960, ATK 108, DEF 57, SPD 110, CRIT 3.5% (score 391); the Lineholder, on the Common budget, HP 1320, ATK 78, DEF 72, SPD 92, CRIT 2.5% (score 395): the sturdiest and slowest of the five and the weakest hitter; the Quartermaster, on the Common budget, HP 1140, ATK 88, DEF 64, SPD 104, CRIT 2.5% (score 389): his heal is 171 HP to every ally. Zone 1's enemies are copies of the two and crit as rarely, so Cold Rebuke seldom fires there; Jakub's note is that crit must be taught at or before the point Cold Rebuke first fires meaningfully.
 
 ## 10. Difficulty guardrails
 
@@ -188,10 +192,10 @@ Numbers are tuned against explicit norms, not by feel. `src/game/data/norms.ts` 
 | Skill multipliers (sum of hits) | A1 single 0.9-1.25 / AoE 0.5-0.8; A2 1.1-1.6 / 0.5-1.1; A3 1.3-2.6 / 0.7-1.2 |
 | Cooldowns | A1 0, A2 3, A3 4-5 |
 | Statuses | hard control lasts 1 turn and is guaranteed only on an A3; anything else at most 3 turns |
-| Impact | `npm run balance` section 3: random 3v3 teams that include the champion win **40-60%** against random teams (960 battles per champion). It needs six champions for two teams of three and is skipped below that (today's roster has four) |
+| Impact | `npm run balance` section 3: random 3v3 teams that include the champion win **40-60%** against random teams (960 battles per champion). It needs six champions for two teams of three and is skipped below that (today's roster has five) |
 | Campaign curve | section 4: every team the player can own at that point (three champions, or all of them while they own fewer), auto-battled 20 times: first stage 85-100%, normal 55-92%, boss 40-80% (humans win more than the AI) |
 
-Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take `BOSS_HP = 1.6` x HP. In Zone 1 the player owns one champion at 1-1, two from 1-2, three from 1-6 (the Skirmisher joins on the first clear of 1-5) and four from 1-8 (the Lineholder joins on the first clear of 1-7). Up to 1-7 every stage has one team; from 1-8 the curve averages the four teams of three. Powers were chosen against 300 battles per team for a smooth decline (retuned 2026-10-10 for the Starter Heroes kits, 2026-10-11 from 1-6 for a team of three and from 1-8 for four teams), and the report's 20-battle sample checks them. The Rime Scholar hits Gareth's copies strong and they hit her weak, so stages of Gareths take more power than stages with a Rime Scholar. From 1-8 the four teams split wide: Gareth and the Rime Scholar with either Common win 77-100%, the Rime Scholar with both Commons 47-63%, Gareth with both Commons 9-22%. To bring the average into the band, 1-8 to 1-10 run at lower powers, so the best teams win almost always there (MDA T20):
+Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take `BOSS_HP = 1.6` x HP. In Zone 1 the player owns one champion at 1-1, two from 1-2, three from 1-6 (the Skirmisher joins on the first clear of 1-5) four from 1-8 (the Lineholder joins on the first clear of 1-7) and five at 1-10 (the Quartermaster joins on the first clear of 1-9). Up to 1-7 every stage has one team; 1-8 and 1-9 average the four teams of three, 1-10 the ten. The powers, the stages that bring champions and the enemies are stand-ins: Jakub will dictate them (2026-10-12). Powers were chosen against 300 battles per team for a smooth decline (retuned 2026-10-10 for the Starter Heroes kits, 2026-10-11 from 1-6 for a team of three and from 1-8 for four teams), and the report's 20-battle sample checks them. The Rime Scholar hits Gareth's copies strong and they hit her weak, so stages of Gareths take more power than stages with a Rime Scholar. From 1-8 the four teams split wide: Gareth and the Rime Scholar with either Common win 77-100%, the Rime Scholar with both Commons 47-63%, Gareth with both Commons 9-22%. To bring the average into the band, 1-8 to 1-10 run at lower powers, so the best teams win almost always there (MDA T20):
 
 | Stage | Enemies | Power | Win (300) | Win (report) | Band |
 | --- | --- | --- | --- | --- | --- |
@@ -204,7 +208,7 @@ Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take
 | 1-7 | 2 Gareths, Rime Scholar | 0.82 | 74% | 85% | normal |
 | 1-8 | 3 Gareths | 0.71 | 71% | 73% | normal |
 | 1-9 | 2 Gareths, Rime Scholar | 0.74 | 65% | 66% | normal |
-| 1-10 | Gareth (boss), 2 Rime Scholars | 0.76 | 57% | 56% | boss |
+| 1-10 | Gareth (boss), 2 Rime Scholars | 0.76 | 52% | 52% | boss |
 
 ## 11. AI (`src/game/battle/ai.ts`)
 
