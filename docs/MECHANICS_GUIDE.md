@@ -166,15 +166,16 @@ No champion of today's roster uses turn meter boosts, Counterattack, Undying or 
 
 ## 9. Champion kits
 
-The kits are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 8, Starter Heroes, and 12, the Skirmisher): which skills, their shapes and riders, and Cold Rebuke's 35% threshold and 1-turn Freeze. The numbers he has not set are stand-ins, in italics:
+The kits are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 8, Starter Heroes, 12, the Skirmisher, and 13, the Lineholder): which skills, their shapes and riders, and Cold Rebuke's 35% threshold and 1-turn Freeze. The numbers he has not set are stand-ins, in italics:
 
 | Champion | A1 | A2 | A3 | Passive |
 | --- | --- | --- | --- | --- |
 | **Captain Gareth**, Damage, Ember | Line Cut: one enemy, *1.0* | Iron Blow (CD *3*): one enemy, *1.5*; then ATK Up on himself for 2 turns, after the hit, never gated by a crit | Wide Sweep (CD *4*): all enemies, *0.95*, damage only | none |
 | **Rime Scholar**, Support, Tide | Pale Strike: one enemy, *1.0*, a pale shard thrown from her hand, nothing else | Rimebind (CD *3*): all enemies, *0.5*; Slow for *2* turns on every enemy | none | Cold Rebuke: below 35% HP, an enemy whose critical hit lands on her is Frozen for 1 turn; rests *3* turns |
 | **Skirmisher**, Damage, Bloom, Common | *Twin Cut*: one enemy, two hits of *0.6*, one with each short sword; always hits twice | none | none | none |
+| **Lineholder**, Tank, Tide, Common | Guard Cut: one enemy, *1.0*, *a mace blow from behind the shield, damage only* | Brace (CD *3*): DEF Up on himself for 2 turns, no damage | none | none |
 
-Stats (stand-ins inside the Elite budget): Gareth HP 1150, ATK 122, DEF 62, SPD 104, CRIT 2.5% (score 422: his crit sits at the floor of the norms, as crit is deliberately not introduced on him); the Rime Scholar HP 1250, ATK 96, DEF 66, SPD 106, CRIT 2.5% (score 414, her passive paid for from the budget); the Skirmisher, on the Common budget, HP 960, ATK 108, DEF 57, SPD 110, CRIT 3.5% (score 391). Zone 1's enemies are copies of the two and crit as rarely, so Cold Rebuke seldom fires there; Jakub's note is that crit must be taught at or before the point Cold Rebuke first fires meaningfully.
+Stats (stand-ins inside the Elite budget): Gareth HP 1150, ATK 122, DEF 62, SPD 104, CRIT 2.5% (score 422: his crit sits at the floor of the norms, as crit is deliberately not introduced on him); the Rime Scholar HP 1250, ATK 96, DEF 66, SPD 106, CRIT 2.5% (score 414, her passive paid for from the budget); the Skirmisher, on the Common budget, HP 960, ATK 108, DEF 57, SPD 110, CRIT 3.5% (score 391); the Lineholder, on the Common budget, HP 1320, ATK 78, DEF 72, SPD 92, CRIT 2.5% (score 395): the sturdiest and slowest of the four and the weakest hitter. Zone 1's enemies are copies of the two and crit as rarely, so Cold Rebuke seldom fires there; Jakub's note is that crit must be taught at or before the point Cold Rebuke first fires meaningfully.
 
 ## 10. Difficulty guardrails
 
@@ -187,10 +188,10 @@ Numbers are tuned against explicit norms, not by feel. `src/game/data/norms.ts` 
 | Skill multipliers (sum of hits) | A1 single 0.9-1.25 / AoE 0.5-0.8; A2 1.1-1.6 / 0.5-1.1; A3 1.3-2.6 / 0.7-1.2 |
 | Cooldowns | A1 0, A2 3, A3 4-5 |
 | Statuses | hard control lasts 1 turn and is guaranteed only on an A3; anything else at most 3 turns |
-| Impact | `npm run balance` section 3: random 3v3 teams that include the champion win **40-60%** against random teams (960 battles per champion). It needs six champions for two teams of three and is skipped below that (today's roster has two) |
+| Impact | `npm run balance` section 3: random 3v3 teams that include the champion win **40-60%** against random teams (960 battles per champion). It needs six champions for two teams of three and is skipped below that (today's roster has four) |
 | Campaign curve | section 4: every team the player can own at that point (three champions, or all of them while they own fewer), auto-battled 20 times: first stage 85-100%, normal 55-92%, boss 40-80% (humans win more than the AI) |
 
-Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take `BOSS_HP = 1.6` x HP. In Zone 1 the player owns one champion at 1-1, two from 1-2 and three from 1-6 (the Skirmisher joins on the first clear of 1-5), so every stage has one team; its powers were chosen against 300 battles each for a smooth decline (retuned 2026-10-10 for the Starter Heroes kits, and 2026-10-11 from 1-6 for a team of three), and the report's 20-battle sample checks them. The Rime Scholar hits Gareth's copies strong and they hit her weak, so stages of Gareths take more power than stages with a Rime Scholar; three Gareths (1-8) fall off a cliff: with the team of three, between 0.78 (91% on 600 battles) and 0.82 (69%):
+Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take `BOSS_HP = 1.6` x HP. In Zone 1 the player owns one champion at 1-1, two from 1-2, three from 1-6 (the Skirmisher joins on the first clear of 1-5) and four from 1-8 (the Lineholder joins on the first clear of 1-7). Up to 1-7 every stage has one team; from 1-8 the curve averages the four teams of three. Powers were chosen against 300 battles per team for a smooth decline (retuned 2026-10-10 for the Starter Heroes kits, 2026-10-11 from 1-6 for a team of three and from 1-8 for four teams), and the report's 20-battle sample checks them. The Rime Scholar hits Gareth's copies strong and they hit her weak, so stages of Gareths take more power than stages with a Rime Scholar. From 1-8 the four teams split wide: Gareth and the Rime Scholar with either Common win 77-100%, the Rime Scholar with both Commons 47-63%, Gareth with both Commons 9-22%. To bring the average into the band, 1-8 to 1-10 run at lower powers, so the best teams win almost always there (MDA T20):
 
 | Stage | Enemies | Power | Win (300) | Win (report) | Band |
 | --- | --- | --- | --- | --- | --- |
@@ -201,9 +202,9 @@ Stage difficulty is set by `power` (enemy HP and ATK multiplier) and bosses take
 | 1-5 | 2 Gareths, Rime Scholar | 0.67 | 81% | 85% | normal |
 | 1-6 | Gareth, 2 Rime Scholars | 0.90 | 81% | 85% | normal |
 | 1-7 | 2 Gareths, Rime Scholar | 0.82 | 74% | 85% | normal |
-| 1-8 | 3 Gareths | 0.80 | 74% | 65% | normal |
-| 1-9 | 2 Gareths, Rime Scholar | 0.87 | 72% | 60% | normal |
-| 1-10 | Gareth (boss), 2 Rime Scholars | 0.86 | 58% | 60% | boss |
+| 1-8 | 3 Gareths | 0.71 | 71% | 73% | normal |
+| 1-9 | 2 Gareths, Rime Scholar | 0.74 | 65% | 66% | normal |
+| 1-10 | Gareth (boss), 2 Rime Scholars | 0.76 | 57% | 56% | boss |
 
 ## 11. AI (`src/game/battle/ai.ts`)
 

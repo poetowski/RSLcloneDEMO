@@ -29,6 +29,8 @@ Section 7 lists what is not decided.
 | 2026-10-11 | The world map redrawn: no edges, the rift reworked, the areas and the forest closer, growing east area by area | 5.4a |
 | 2026-10-11 | The redrawn world map approved as built ("i love it") | 5.4a |
 | 2026-10-11 | The Skirmisher, a Common of the Azure Crown | 12 |
+| 2026-10-11 | Affinity is abstract: it dictates no colours, elements or anything else | 2.1, 7 |
+| 2026-10-11 | The Lineholder, a Common of the Azure Crown | 13 |
 
 ---
 
@@ -71,6 +73,19 @@ Three values, rock-paper-scissors cycle. No Void.
 
 Void is reserved as a future neutral affinity and is not part of the current
 enum. Mechanism (damage, crit, landing, all three) is deferred.
+
+**Affinity is abstract** (2026-10-11), in Jakub's words:
+
+```
+remember in your drawing or designing skills that affinity should not dictate colors or elements or anything. these three affinity choices are very abstract
+```
+
+An affinity sets no colour, element or anything else in a champion's look:
+Ember is not fire, Bloom is not plants, Tide is not water. A champion's
+colours, materials, smears and effects come from who the champion is and what
+the skill does. The fire and water glosses in sections 6 and 8 are how the
+affinities were first described; they set nothing in the art. Whether art
+made before the rule changes is open (section 7).
 
 ### 2.2 Rarity
 
@@ -504,12 +519,14 @@ open questions.
   stands in ±20% damage)*
 - Rarity gating (stats, kits, ascension, recruit pools) *(the game stands in a
   stat budget per rarity)*
-- Role mechanics (whether roles change battle rules, AI, or nothing)
+- Role mechanics (whether roles change battle rules, AI, or nothing) *(a
+  Tank draws no fire today: enemies hit whoever is lowest on HP; MDA T20)*
 - Faction mechanics (synergies, team-building constraints, UI filtering)
 - Champion schema (what fields a champion has beyond the enums) *(partly
   decided 2026-10-11: no subtitle, eight stats; section 10)*
 - Kit / skill design *(the starter pair's kits decided 2026-10-10, section 8,
-  and the Skirmisher's 2026-10-11, section 12; their numbers are not)*
+  and the Skirmisher's and the Lineholder's 2026-10-11, sections 12 and 13;
+  their numbers are not)*
 - Art pipeline specification
 - Save and progression *(gear decided: the Weaver Matrix, section 9; levels,
   ranks, ascension and skill upgrades are not)*
@@ -517,6 +534,11 @@ open questions.
 - How far Resistance must exceed Accuracy to resist a debuff *(the game
   stands in a curve, section 10)*
 - Zone 1's enemies *(the game stands in copies of the two starters)*
+- Whether art made before the affinity rule (2.1) changes: Gareth's ember cuts
+  (section 8 asked for his Ember in what he does with the sword) and the
+  Skirmisher's leaf-green cuts (a stand-in); and whether the interface's
+  affinity marks (a red diamond, a green leaf and a blue drop, card
+  backgrounds tinted to match) become abstract too
 - Where crit is taught, at or before the point Cold Rebuke first fires
   meaningfully (section 8, the Rime Scholar's notes)
 - Team size *(the game uses 3)* and how champions are acquired *(one recruit
@@ -570,7 +592,9 @@ His job in the game is to **teach the player how damage works**.
 
 **Weapon.** A straight single-handed sword. Functional, worn at the grip, no
 ornament. No glow or fire effect on the weapon itself — his Ember affinity is
-expressed in what he does with the sword, not in the sword.
+expressed in what he does with the sword, not in the sword. *(2026-10-11:
+affinity is abstract and sets nothing in the art, 2.1; whether his cuts keep
+their ember look is open, section 7.)*
 
 **Wearing.** Mid-weight military armor: breastplate, pauldrons, greaves, in
 dull steel and worn leather. A tabard or coat underneath in deep amber-brown.
@@ -845,3 +869,36 @@ he must look weeker but he has no a2 only a1 with guaranteed double hit
 What the game fills in (stand-ins, listed in CLAUDE.md): the skill's name
 (Twin Cut), text and multipliers, the stats, the lore line, the stage that
 brings him (the first clear of 1-5), and the details of his art.
+
+## 13. The Lineholder (received 2026-10-11)
+
+Jakub's brief, verbatim:
+
+```
+i want new common hero for azure crown.
+rarity = common
+name= Lineholder
+affinity= tide
+tank
+A1 Guard Cut.
+A2 buffs himself defense up for 2 turns. name of ability = Brace
+design = big shield dark blue with two small crowns on it. he has mace dark iron with wooden handler.. helmet blue over his head maybe similar to skirmisher. dress dark with some blue strips.
+design properly graphics
+```
+
+| | |
+|---|---|
+| Rarity | Common |
+| Role | Tank |
+| Faction | Azure Crown |
+| Affinity | Tide |
+| Kit | A1 Guard Cut; A2 Brace: DEF Up on himself for 2 turns (the brief names no A3 and no passive) |
+| Look | a big dark-blue shield with two small crowns on it; a mace of dark iron with a wooden handle; a blue helmet over his head, maybe like the Skirmisher's; dark clothes with some blue stripes |
+
+While he was being drawn Jakub set the affinity rule (2.1): his Tide sets
+nothing in his look or his effects.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): Guard Cut's text and
+multiplier (one blow, damage only), Brace's text and cooldown, the stats, the
+lore line, the stage that brings him (the first clear of 1-7), and the
+details of his art and effects.

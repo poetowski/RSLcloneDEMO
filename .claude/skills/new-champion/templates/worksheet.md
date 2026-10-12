@@ -11,7 +11,7 @@ Fill this in before writing code, and show it to the user when they are around: 
 | Faction | | Azure Crown, Sanguine Dominion, Court of Root, Ashveil Reign (`meta.ts`; DESIGN_DECISIONS.md 3) |
 | Role | | Tank, Damage, Support; tags such as bruiser or control describe the kit |
 | Rarity | | Common, Elite, Heroic, Mythic; sets the stat budget: 390, 425, 440, 455 |
-| Affinity | | Ember > Bloom > Tide > Ember; independent of the faction; check the matchups of the stage that brings them |
+| Affinity | | Ember > Bloom > Tide > Ember; independent of the faction; abstract: it sets no colour, material, element or effect (Jakub, 2026-10-11); check the matchups of the stage that brings them |
 | Joins by | | starter, or the stage whose first clear brings them (fought there or not) |
 
 ## Look
@@ -23,7 +23,7 @@ Fill this in before writing code, and show it to the user when they are around: 
 | Materials | | from `MAT` in `tools/art/palette.ts`; a new ramp only if nothing fits (6 steps, hue-shifted) |
 | Weapon / focus | | a function in the art module, reused by the icons |
 | Height | | 66-80 px body, audit range 64-96 |
-| Closest existing champion | | the art module to start from: armoured swordsman with a cloak `captain_gareth`, robed caster with a hanging focus `rime_scholar`, light infantry with two short swords `skirmisher`; the proof of concept's modules (and the stand-ins `azure_warrior`, `sanguine_support`, until 2026-10-10) are in git history at tag `poc-v1` (`tools/art/champions/`: sword `knight`, two-hander `dreadknight`, polearm `jackal` or `sunspear`, dual blades `stalker`, bow `archer`, staff casters `frostmage` and `starsinger`, unarmed `monk` and `colossus`, a mummy king `tomblord`) |
+| Closest existing champion | | the art module to start from: armoured swordsman with a cloak `captain_gareth`, robed caster with a hanging focus `rime_scholar`, light infantry with two short swords `skirmisher`, a big shield and a one-handed mace `lineholder`; the proof of concept's modules (and the stand-ins `azure_warrior`, `sanguine_support`, until 2026-10-10) are in git history at tag `poc-v1` (`tools/art/champions/`: sword `knight`, two-hander `dreadknight`, polearm `jackal` or `sunspear`, dual blades `stalker`, bow `archer`, staff casters `frostmage` and `starsinger`, unarmed `monk` and `colossus`, a mummy king `tomblord`) |
 
 ## Kit
 

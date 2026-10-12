@@ -172,6 +172,16 @@ describe('design decisions', () => {
     expect(s?.passive).toBeUndefined();
   });
 
+  it('has the Lineholder of his brief: a Common of the Azure Crown, Tank, Tide; A1 Guard Cut, A2 Brace (DEF Up on himself for 2 turns)', () => {
+    const l = CHAMPIONS.find((c) => c.id === 'lineholder');
+    expect(l && [l.name, l.rarity, l.role, l.faction, l.affinity]).toEqual(['Lineholder', 'common', 'Tank', 'azure_crown', 'tide']);
+    expect(l?.skills.map((s) => [s.slot, s.name])).toEqual([[1, 'Guard Cut'], [2, 'Brace']]);
+    const brace = l?.skills[1];
+    expect(brace && [brace.target, brace.statuses]).toEqual(['self', [{ status: 'def_up', turns: 2, to: 'self' }]]);
+    expect(brace?.hits.every((h) => h.mult === 0)).toBe(true);
+    expect(l?.passive).toBeUndefined();
+  });
+
   it('opens with a ten-stage first zone', () => {
     expect(LOCATIONS[0].stages).toHaveLength(10);
   });

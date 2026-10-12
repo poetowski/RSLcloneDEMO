@@ -47,8 +47,9 @@ The roster today:
 | Captain Gareth (`captain_gareth`) | Elite | Ember | Damage | Azure Crown | starter |
 | Rime Scholar (`rime_scholar`) | Elite | Tide | Support | Sanguine Dominion | after the first battle (clear 1-1) |
 | Skirmisher (`skirmisher`) | Common | Bloom | Damage | Azure Crown | clear 1-5 (a stand-in) |
+| Lineholder (`lineholder`) | Common | Tide | Tank | Azure Crown | clear 1-7 (a stand-in) |
 
-Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8): Gareth's Line Cut, Iron Blow and Wide Sweep, no passive; the Rime Scholar's Pale Strike and Rimebind, no A3, and the passive Cold Rebuke. The Skirmisher is his brief of 2026-10-11 (DESIGN_DECISIONS.md 12): one A1 that always hits twice. Their stats and the numbers in their skills are stand-ins ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 9). A champion has one to three skills; a save whose champions no longer exist (the stand-ins `azure_warrior` and `sanguine_support`) keeps its progress, regains the champions its cleared stages bring and starts its team over from the starters.
+Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8): Gareth's Line Cut, Iron Blow and Wide Sweep, no passive; the Rime Scholar's Pale Strike and Rimebind, no A3, and the passive Cold Rebuke. The Skirmisher is his brief of 2026-10-11 (DESIGN_DECISIONS.md 12): one A1 that always hits twice. The Lineholder is his brief of the same day (DESIGN_DECISIONS.md 13): Guard Cut, and Brace, DEF Up on himself for 2 turns. Their stats and the numbers in their skills are stand-ins ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 9). A champion has one to three skills; a save whose champions no longer exist (the stand-ins `azure_warrior` and `sanguine_support`) keeps its progress, regains the champions its cleared stages bring and starts its team over from the starters.
 
 ## 3. The campaign (`src/game/data/campaign.ts`)
 
@@ -60,7 +61,7 @@ Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8):
 
 | Location | Zone | Stages |
 | --- | --- | --- |
-| I. Fracture Reach | `zone1` | 1-1 to 1-10 (1-1 brings the Rime Scholar, 1-5 the Skirmisher; 1-10 is the boss) |
+| I. Fracture Reach | `zone1` | 1-1 to 1-10 (1-1 brings the Rime Scholar, 1-5 the Skirmisher, 1-7 the Lineholder; 1-10 is the boss) |
 | II. Verdant Grove (after 1-10) | none yet | not designed |
 
 Zone 1 follows Jakub's working notes (DESIGN_DECISIONS.md 5.3), which are not locked: the stage texts quote them (contact, the settlement, escalation, the turning point, leaving). Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed. Zone 2 (the mystic arena in a Court of Root forest) has its node in the jungle and no stages yet. The world map follows his brief (DESIGN_DECISIONS.md 5.4a): the edge of a continent, a rift in the west, jungle toward the east, nothing beyond its north and south edges.

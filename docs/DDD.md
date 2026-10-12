@@ -77,7 +77,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Role | Tank, Damage, Support: how the budget is spent (no fourth role; Control, Bruiser and the like are descriptive tags) | `Role`, `ROLES` |
 | Faction | one of four powers: the Azure Crown, the Sanguine Dominion, the Court of Root, the Ashveil Reign; story and standard, no mechanics | `FactionId`, `FACTIONS`, `FactionDef.standard` |
 | Standard | a faction's heraldry: the Azure Crown a gold crown on blue, the Sanguine Dominion a red hexagon on black, the Court of Root a brown claw on green, the Ashveil Reign a white bone across a dark grey | `FactionDef.standard`, `emblem_<faction>` |
-| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather), never its faction's | `ChampionDef.color`, `ChampionArt.iconBg` |
+| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
 | Muzzle | where projectiles leave a ranged champion's sprite | `ChampionDef.muzzle` |
 | Approach | how the actor travels before the attack | `Approach` |
 | Stat score, budget | weighted stat sum, and its target per rarity (±5%) | `statScore`, `budgetDelta`, `BUDGET_TOLERANCE` |

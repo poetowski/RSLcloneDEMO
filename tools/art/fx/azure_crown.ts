@@ -2,12 +2,39 @@
 // the sword, never in the sword: the cut glows white-hot and sheds embers, the
 // heavy blow bursts, the sweep leaves a flat arc of heat. The Skirmisher's
 // Bloom shows the same way: his two cuts glow green-gold and tear leaves loose.
-import { rampDither } from '../paint.ts';
+// The Lineholder's effects come from his gear and what he does with it, not
+// from his affinity (affinities are abstract, Jakub, 2026-10-11): the mace
+// lands in a dull white flash, dust and iron chips; when he braces, dust
+// kicks up round his feet.
+import { dith, ellipseRing, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng } from '../raster.ts';
-import { burst, cut, FxDef, ramps, ring, sparks } from './kit.ts';
+import { burst, cut, FxDef, ramps, ring, sparks, W } from './kit.ts';
 
 const F = ramps.fire;
 const G = ramps.green;
+const DU = ramps.dust;
+/** A dull flash: grey to white, no hue of its own. */
+const DULL: RGBA[] = [DU[0], DU[2], DU[3], DU[4], W];
+
+/** Dust thrown out from a point: soft dithered puffs that drift, grow and thin; t in [0,1]. */
+function dust(b: Bitmap, cx: number, cy: number, n: number, spread: number, t: number, seed: number, lift = 6) {
+  const r = rng(seed);
+  for (let k = 0; k < n; k++) {
+    const a = Math.PI + (r() - 0.5) * Math.PI * 1.1 + (k % 2 ? Math.PI : 0);
+    const sp = (0.45 + r() * 0.55) * spread;
+    const ease = 1 - (1 - t) * (1 - t);
+    const x = cx + Math.cos(a) * sp * ease, y = cy - Math.abs(Math.sin(a)) * sp * ease * 0.35 - lift * t;
+    const rad = 2 + r() * 2.5 + t * 3.5;
+    const alpha = (1 - t) * 0.85;
+    for (let yy = Math.floor(y - rad); yy <= Math.ceil(y + rad); yy++) {
+      for (let xx = Math.floor(x - rad); xx <= Math.ceil(x + rad); xx++) {
+        const d = Math.hypot(xx + 0.5 - x, yy + 0.5 - y) / rad;
+        if (d > 1 || !dith(xx, yy, alpha * (1 - d * 0.6))) continue;
+        b.set(xx, yy, rampDither(DU, 3.2 - d * 1.4 - t, xx, yy));
+      }
+    }
+  }
+}
 
 /** Leaves torn loose by a cut: they flutter out, then drift down turning; t in [0,1]. */
 function leaves(b: Bitmap, cx: number, cy: number, n: number, spread: number, t: number, seed: number) {
@@ -126,6 +153,33 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
       }
       if (i >= 1) embers(b, cx, cy, 24, 48, (i - 1) / 6, 29, 42);
       if (i >= 2) sparks(b, cx, cy, 12, 38, (i - 2) / 5, F, 31, 14);
+    },
+  },
+  /** Guard Cut: the mace comes down over the shield's rim and lands: a dull white flash, iron chips, a ring of dust rolling out. */
+  mace_blow: {
+    w: 84, h: 84, n: 8, ms: 45, ax: 0.5, ay: 0.5, pad: [6, 8, 10, 8],
+    draw: (b, t, i) => {
+      const cx = 42, cy = 44;
+      // the path of the blow, from above
+      if (i < 2) cut(b, 47, 8, 42, cy, -1, [2.4, 3.2][i], DULL, [1.3, 1.1][i], [0.7, 1][i]);
+      if (i >= 1 && i < 4) burst(b, cx, cy, 8, [3, 4, 2][i - 1], [15, 21, 13][i - 1], [2.4, 3, 1.8][i - 1], DULL, 0.2 + i * 0.1);
+      if (i >= 2) {
+        const r = 8 + (i - 2) * 6.5;
+        ring(b, cx, cy + 6, r, r * 0.4, Math.max(0.8, 2.6 - (i - 2) * 0.4), DU, 1.25 - (i - 2) * 0.15);
+      }
+      if (i >= 1) dust(b, cx, cy + 6, 8, 26, (i - 1) / 6, 61);
+      if (i >= 1) sparks(b, cx, cy, 14, 32, (i - 1) / 6, DULL, 67, 26);
+    },
+  },
+  /** Brace: he sets his feet and the shield, and dust kicks up round them. */
+  brace_dust: {
+    w: 80, h: 40, n: 9, ms: 60, ax: 0.5, ay: 0.9, pad: [2, 6, 2, 6],
+    draw: (b, t, i) => {
+      const cx = 40, gy = 36;
+      const rr = [8, 16, 22, 26, 28, 29, 29, 28, 26][i];
+      ellipseRing(b, cx, gy - 2, rr, rr * 0.22, i < 6 ? 1.5 : 1, (x, y, a) => (dith(x, y, 1 - t * 0.8) ? rampDither(DU, 3.1 - t * 1.3 + Math.sin(a) * 0.6, x, y) : 0));
+      dust(b, cx + 4, gy - 3, 10, 30, t, 73, 8);
+      if (i >= 1 && i < 6) sparks(b, cx + 12, gy - 4, 7, 16, (i - 1) / 5, DU, 79, 30);
     },
   },
   /** Wide Sweep: a wide, flat arc of heat crosses the target, leading edge thick, then embers. */

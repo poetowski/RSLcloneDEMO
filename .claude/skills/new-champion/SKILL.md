@@ -22,14 +22,14 @@ Read first: `docs/DESIGN_DECISIONS.md` (Jakub's world, categories, factions and 
 2. The four categories are Jakub's (DESIGN_DECISIONS.md 2), independent of each other: a faction does not imply an affinity, a role or a rarity.
    - **Faction:** the Azure Crown, the Sanguine Dominion, the Court of Root or the Ashveil Reign.
    - **Rarity:** Common, Elite, Heroic or Mythic (sets the stat budget).
-   - **Affinity:** Ember, Bloom or Tide (Ember beats Bloom, Bloom beats Tide, Tide beats Ember; no Void).
+   - **Affinity:** Ember, Bloom or Tide (Ember beats Bloom, Bloom beats Tide, Tide beats Ember; no Void). An affinity is abstract (Jakub, 2026-10-11: "affinity should not dictate colors or elements or anything"): never derive a colour, material, element or effect from it. Ember is not fire, Bloom is not leaves, Tide is not water.
    - **Role:** Tank, Damage or Support. There is no fourth role: control, bruiser, assassin and the like are descriptive tags.
 3. Pick the **role** first, then shape the kit around it:
-   - Tank: a taunt or shield A2/A3, high HP/DEF, A1 with a defensive rider (DEF Down, Weaken).
+   - Tank: a taunt or shield A2/A3, high HP/DEF, A1 with a defensive rider (DEF Down, Weaken). Without a Taunt the AI ignores a Tank until the others are low (MDA T20).
    - Damage: multi-hit or execute, high ATK/SPD/CRIT, low DEF. Tagged *bruiser*: sustain (lifesteal, shields) plus a big A3. Tagged *control*: chance-based debuffs on A1/A2, one guaranteed 1-turn control on A3.
    - Support: heal/cleanse/buff on A2, a team-wide payoff on A3.
-4. Give the kit one idea the roster does not have yet. The engine has Counterattack, Undying, ally Turn Meter, Overdrive, Dispel and skill control with no champion using them today; check `docs/MECHANICS_GUIDE.md` sections 8-9 for what exists. A passive is `undying`, `overdrive` or `rebuke` (`PassiveDef` in `types.ts`; the Rime Scholar's Cold Rebuke); a new kind follows step 2.6. A kit has one to three skills (the Rime Scholar has no A3, the Skirmisher only an A1). A status the champion places on itself starts counting at its next turn (Iron Blow's ATK Up covers two turns).
-5. Choose an **affinity** that makes the stage that brings the champion interesting against the player's likely teams (team select shows strong/weak counts).
+4. Give the kit one idea the roster does not have yet. The engine has Counterattack, Undying, ally Turn Meter, Overdrive, Dispel and skill control with no champion using them today; check `docs/MECHANICS_GUIDE.md` sections 8-9 for what exists. A passive is `undying`, `overdrive` or `rebuke` (`PassiveDef` in `types.ts`; the Rime Scholar's Cold Rebuke); a new kind follows step 2.6. A kit has one to three skills (the Rime Scholar has no A3, the Skirmisher only an A1). A status the champion places on itself starts counting at its next turn (Iron Blow's ATK Up and the Lineholder's Brace cover two turns).
+5. When Jakub's brief leaves it open, choose an **affinity** that makes the stage that brings the champion interesting against the player's likely teams (team select shows strong/weak counts). It changes matchups, never the look (step 2).
 
 ## 2. Rules module
 
@@ -43,7 +43,7 @@ Read first: `docs/DESIGN_DECISIONS.md` (Jakub's world, categories, factions and 
 ## 3. Art module
 
 1. Copy `templates/champion-art.template.ts` to `tools/art/champions/<id>.ts` (or the closest existing champion, see the worksheet) and register it in `tools/art/champions/index.ts`.
-2. Dims within the proportions of ART_GUIDE 2.2; materials only from `MAT`, `ACCENT`, `INK` — **no color literals** in the module.
+2. Dims within the proportions of ART_GUIDE 2.2; materials only from `MAT`, `ACCENT`, `INK` — **no color literals** in the module. The look comes from the brief and the champion's own story, never from its affinity (step 1.2, ART_GUIDE 2.4).
 3. Build order in `build()`: things behind the body (cape, wings, back weapon) -> far leg and arm (`shade: -1`) -> torso and costume -> head -> near leg -> weapon (+ `smear` on frames flagged `smear`) -> near arm. Use `parts.ts` (`leg`, `arm`, `torsoPts`, `cape`, `sword`, `smear`, and `robe` for long robes and dresses, which also stays right when the champion falls) and `common.ts` (`face`, `glint`).
 4. The silhouette feature must survive a solid-black fill; check it in the collection (locked cards) or by filling the lineup.
    Check the details at pixel level with `npx tsx tools/art/zoom.ts <id> idle 0 out.png 9`. Typical problems it catches: a band drawn as a capsule along a limb turns into a blob (draw thin rings across the limb instead), jewellery hidden behind the jaw, a hat that reads as a different hat.
@@ -52,7 +52,7 @@ Read first: `docs/DESIGN_DECISIONS.md` (Jakub's world, categories, factions and 
 
 ## 4. Effects
 
-New `fx` names go into `tools/art/fx/<faction>.ts` (or `common.ts`), built from `fx/kit.ts` (`crescent`, `cut`, `burst`, `sparks`, `ring`, `shard`, `flame`, `motes`, `stamp`, `crossedBlades`) with `FXR` ramps. Chest impacts use `ay 0.5`; ground pillars and circles `ay 0.9-1.0` (the battle plants them on the feet). Light effects are additive (add the name to `ADDITIVE` in `src/game/view/scene.ts`). Preview: `npx tsx tools/art/fxpreview.ts out.png 2 name1,name2`.
+New `fx` names go into `tools/art/fx/<faction>.ts` (or `common.ts`), built from `fx/kit.ts` (`crescent`, `cut`, `burst`, `sparks`, `ring`, `shard`, `flame`, `motes`, `stamp`, `crossedBlades`) with `FXR` ramps. Chest impacts use `ay 0.5`; ground pillars and circles `ay 0.9-1.0` (the battle plants them on the feet). Light effects are additive (add the name to `ADDITIVE` in `src/game/view/scene.ts`). An effect shows what the skill does with the weapon or the body (a cut, a blow, a shield set), in the champion's own materials or in neutral light and dust, never its affinity (step 1.2): the Lineholder is Tide, and his mace lands in a dull white flash and dust. Preview: `npx tsx tools/art/fxpreview.ts out.png 2 name1,name2`.
 
 ## 5. Campaign placement
 
