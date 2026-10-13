@@ -1,11 +1,11 @@
 // Champion registry. Adding a champion = one data module here + one art module
 // in tools/art/champions/ (see .claude/skills/new-champion). The roster is
-// Jakub's (docs/DESIGN_DECISIONS.md sections 4, 8 and 12-19): the starter,
+// Jakub's (docs/DESIGN_DECISIONS.md sections 4, 8 and 12-20): the starter,
 // Captain Gareth; the Rime Scholar, who joins after the first battle; the
 // Skirmisher, the Lineholder and the Quartermaster, Commons of the Azure Crown;
 // the Dominion Medic, the Bloodhound and the Enforcer, Commons of the Sanguine
-// Dominion; the Follower and the Walking Bush, Commons of the Court of Root;
-// everything else waits for his design.
+// Dominion; the Follower, the Walking Bush and the Wild Speaker, Commons of the
+// Court of Root; everything else waits for his design.
 import { ChampionDef } from '../types';
 import { bloodhound } from './bloodhound';
 import { captainGareth } from './captain_gareth';
@@ -17,9 +17,10 @@ import { quartermaster } from './quartermaster';
 import { rimeScholar } from './rime_scholar';
 import { skirmisher } from './skirmisher';
 import { walkingBush } from './walking_bush';
+import { wildSpeaker } from './wild_speaker';
 
 /** Collection order: the order champions join. */
-export const CHAMPIONS: ChampionDef[] = [captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer, walkingBush];
+export const CHAMPIONS: ChampionDef[] = [captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer, walkingBush, wildSpeaker];
 
 const byId = new Map(CHAMPIONS.map((c) => [c.id, c]));
 
@@ -29,4 +30,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { bloodhound, captainGareth, dominionMedic, enforcer, follower, lineholder, quartermaster, rimeScholar, skirmisher, walkingBush };
+export { bloodhound, captainGareth, dominionMedic, enforcer, follower, lineholder, quartermaster, rimeScholar, skirmisher, walkingBush, wildSpeaker };

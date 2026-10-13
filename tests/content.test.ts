@@ -243,6 +243,18 @@ describe('design decisions', () => {
     expect(w?.passive).toBeUndefined();
   });
 
+  it('has the Wild Speaker of his brief: a Common Support of the Court of Root, Ember; A1 a single-target attack, A2 a single-target attack with, after it, a 50% chance of ATK Down for 2 turns, cooldown 4', () => {
+    const w = CHAMPIONS.find((c) => c.id === 'wild_speaker');
+    expect(w && [w.name, w.rarity, w.role, w.faction, w.affinity]).toEqual(['Wild Speaker', 'common', 'Support', 'court_of_root', 'ember']);
+    expect(w?.skills).toHaveLength(2);
+    const a1 = w?.skills[0], a2 = w?.skills[1];
+    expect(a1 && [a1.slot, a1.target, a1.statuses ?? []]).toEqual([1, 'enemy', []]);
+    expect(a1?.hits.some((h) => h.mult > 0)).toBe(true);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'enemy', 4, [{ status: 'atk_down', turns: 2, chance: 0.5, to: 'targets' }]]);
+    expect(a2?.hits.some((h) => h.mult > 0)).toBe(true);
+    expect(w?.passive).toBeUndefined();
+  });
+
   it('opens with a ten-stage first zone', () => {
     expect(LOCATIONS[0].stages).toHaveLength(10);
   });

@@ -147,6 +147,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: APPROACH,
         enemies: [{ champion: 'follower' }, { champion: 'follower' }, { champion: 'follower' }],
         power: 0.7,
+        // a stand-in: the stage that brings the Wild Speaker is not Jakub's
+        recruit: 'wild_speaker',
       },
       {
         id: '2-3',

@@ -10,8 +10,9 @@ import { quartermaster } from './quartermaster.ts';
 import { rimeScholar } from './rime_scholar.ts';
 import { skirmisher } from './skirmisher.ts';
 import { walkingBush } from './walking_bush.ts';
+import { wildSpeaker } from './wild_speaker.ts';
 
-export const CHAMPION_ART: Record<string, ChampionArt> = { captain_gareth: captainGareth, rime_scholar: rimeScholar, follower, skirmisher, dominion_medic: dominionMedic, lineholder, bloodhound, quartermaster, enforcer, walking_bush: walkingBush };
+export const CHAMPION_ART: Record<string, ChampionArt> = { captain_gareth: captainGareth, rime_scholar: rimeScholar, follower, skirmisher, dominion_medic: dominionMedic, lineholder, bloodhound, quartermaster, enforcer, walking_bush: walkingBush, wild_speaker: wildSpeaker };
 
 /** Rig + animations by champion id (what the frame tools work with). */
 export const HEROES: Record<string, CharDef> = Object.fromEntries(Object.entries(CHAMPION_ART).map(([id, a]) => [id, a.char]));

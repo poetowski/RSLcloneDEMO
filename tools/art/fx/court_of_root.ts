@@ -3,12 +3,15 @@
 // flying; his Rend: three ragged tears ripping down and back across the
 // enemy's guard, bits of it falling away. The Walking Bush's Root Lash: the
 // crack of a root across the target and chips of his wood; his Thicket: roots
-// of the same wood curling up round a champion's feet. Neutral light, dust and
-// their own wood, never their affinities (affinities are abstract, Jakub,
-// 2026-10-11). Light effects are additive in src/game/view/scene.ts.
+// of the same wood curling up round a champion's feet. The Wild Speaker's
+// Staff Blow: the line of a thrust and a dull flash where the head of his
+// stick lands, dust pushed on; his Quell: the stroke of the stick coming down,
+// a heavier flash and dust thrown out low along the ground. Neutral light,
+// dust and their own wood, never their affinities (affinities are abstract,
+// Jakub, 2026-10-11). Light effects are additive in src/game/view/scene.ts.
 import { dith, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng } from '../raster.ts';
-import { burst, cut, FxDef, ramps, sparks, W } from './kit.ts';
+import { burst, cut, FxDef, ramps, ring, sparks, W } from './kit.ts';
 
 const DU = ramps.dust;
 /** A dull flash: grey to white, no hue of its own. */
@@ -131,6 +134,33 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
         }
       }
       if (i < 4) sparks(b, gx, gy - 1, 12, 20, i / 4, ramps.dust, 163, 6);
+    },
+  },
+  /** Staff Blow: the line of the thrust runs into the target, a dull flash where the head lands, a ring of the push and dust driven on. */
+  staff_blow: {
+    w: 60, h: 44, n: 6, ms: 40, ax: 0.5, ay: 0.5, pad: [4, 6, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 34, cy = 22;
+      const reach = [0.6, 1, 1, 1, 1, 1][i], heat = [1.2, 1.4, 1.1, 0.8, 0.55, 0.35][i];
+      if (i < 4) cut(b, 4, cy, cx, cy, 0, [1.6, 2.2, 1.6, 1.0][i], DULL, heat, reach);
+      if (i === 1 || i === 2) burst(b, cx, cy, 8, 2, [10, 7][i - 1], 1.3, DULL, 0.3);
+      if (i >= 1 && i <= 4) ring(b, cx + 2 + i * 2, cy, 2 + i * 0.8, 5 + i * 2.2, 1.1, DULL, [1.2, 1.0, 0.7, 0.45][i - 1]);
+      if (i >= 1) sparks(b, cx + 2, cy, 12, 20, (i - 1) / 4.5, DULL, 171, 6);
+    },
+  },
+  /** Quell: the stroke of the stick comes down onto the target, a heavier dull flash, and dust thrown out low to both sides. */
+  quell: {
+    w: 72, h: 72, n: 8, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 8, 6],
+    draw: (b, t, i) => {
+      const cx = 38, cy = 38;
+      const heat = [1.3, 1.45, 1.2, 0.95, 0.7, 0.5, 0.32, 0.2][i];
+      if (i < 4) cut(b, 18, 4, cx, cy, 7, [2.4, 3.0, 2.2, 1.4][i], DULL, heat, [0.55, 1, 1, 1][i]);
+      if (i >= 1 && i <= 3) burst(b, cx, cy, 10, 2, [14, 11, 7][i - 1], 1.5, DULL, 0.2);
+      if (i >= 2) ring(b, cx, cy + 8, 6 + (i - 2) * 4, 2 + (i - 2) * 0.9, 1.2, DULL, Math.max(0.3, 1.1 - (i - 2) * 0.18));
+      if (i >= 1) {
+        sparks(b, cx - 3, cy + 4, 10, 26, (i - 1) / 6.5, ramps.dust, 181, 22);
+        sparks(b, cx + 3, cy + 4, 10, 26, (i - 1) / 6.5, ramps.dust, 191, 22);
+      }
     },
   },
 };

@@ -6,7 +6,7 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 
 ![Battle](docs/images/battle.gif)
 
-- **10 champions**: Captain Gareth, the Skirmisher, the Lineholder and the Quartermaster of the Azure Crown, the Rime Scholar, the Dominion Medic, the Bloodhound (the first on four legs) and the Enforcer of the Sanguine Dominion, and the Follower, a grey wolf, and the Walking Bush, a small ent of a bush, of the Court of Root, each with idle, run, every skill, hurt, death and a victory pose, rendered for both facings. Four factions: the Azure Crown, the Sanguine Dominion, the Court of Root and the Ashveil Reign.
+- **11 champions**: Captain Gareth, the Skirmisher, the Lineholder and the Quartermaster of the Azure Crown, the Rime Scholar, the Dominion Medic, the Bloodhound (the first on four legs) and the Enforcer of the Sanguine Dominion, and the Follower, a grey wolf, the Walking Bush, a small ent of a bush, and the Wild Speaker, a tattooed man with a long stick, of the Court of Root, each with idle, run, every skill, hurt, death and a victory pose, rendered for both facings. Four factions: the Azure Crown, the Sanguine Dominion, the Court of Root and the Ashveil Reign.
 - **A combat background** for Zone 1, the *Fracture Reach*: dawn in autumn after a raid, a haystack burning by a stubble field, a hay cart overturned with a wheel off, bulky floating islands, a broken windmill in the middle field, ravens wheeling over the burnt farm and the burning field, farm tools left in the fields, and a rift torn in the cosmos waving veils of cosmic fabric, with leaves blowing across and now and then a flash of strange light across the sky.
 - **A campaign** on a painted world map a screen and a half wide that grows east area by area: a rift torn diagonally through the land in the west, the Fracture Reach's village in its autumn fields, the river, and the forest around the Verdant Grove; one node per area, each opening its list of stages (drag the map, step between areas with the arrows, or press `M` for the whole world). Zone 1 holds 10 stages; Zone 2 holds 10 placeholder stages to test it. The second champion joins after the first battle.
 - **A Weaver Matrix** for every champion: six named slots in two triangles holding Thread Spools, each with a main stat and strands, and eight Weave Patterns that two spools of a kind weave, on the champion page's MATRIX tab (spools have no sources yet; `?spools=1` adds a sample).
@@ -43,7 +43,7 @@ Deep links: `?screen=campaign|team|battle|collection|champion|academy|options|re
 
 ## The champions
 
-All ten are Jakub's ([docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md) 8, Starter Heroes, 12, the Skirmisher, 13, the Lineholder, 14, the Quartermaster, 15, the Enforcer, 16, the Bloodhound, 17, the Dominion Medic, 18, the Follower, and 19, the Walking Bush): names, looks, kits and what each one teaches. Their stats and the numbers in their skills are stand-ins until he sets them ([docs/MECHANICS_GUIDE.md](docs/MECHANICS_GUIDE.md) 9).
+All eleven are Jakub's ([docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md) 8, Starter Heroes, 12, the Skirmisher, 13, the Lineholder, 14, the Quartermaster, 15, the Enforcer, 16, the Bloodhound, 17, the Dominion Medic, 18, the Follower, 19, the Walking Bush, and 20, the Wild Speaker): names, looks, kits and what each one teaches. Their stats and the numbers in their skills are stand-ins until he sets them ([docs/MECHANICS_GUIDE.md](docs/MECHANICS_GUIDE.md) 9).
 
 | | Champion | Kit |
 | --- | --- | --- |
@@ -57,6 +57,7 @@ All ten are Jakub's ([docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md) 8, Sta
 | ![](docs/images/reel_quartermaster.gif) | **Quartermaster**. Common Bloom Support, Azure Crown. A grey-haired man of the road in a long brown leather coat, a big pack on his back, the Crown's blue badge on his chest and a tall walking stick. Joins after 1-9. | **Stick Rap** (A1): a plain rap of the walking stick. **Field Rations** (A2): every ally heals by 15% of his max HP, then the ally lowest on HP (not himself) gains 15% Turn Meter. |
 | ![](docs/images/reel_enforcer.gif) | **Enforcer**. Common Ember Damage, Sanguine Dominion. A soldier in crimson half armour with the black hexagon on his chest, a plain cap of dark iron and a long bastard sword held in both hands. Joins after 1-10. | **Heavy Cut** (A1): a two-handed cut of the long sword at one enemy. **Keen Edge** (passive): +10% C.RATE in every battle. No A2. |
 | ![](docs/images/reel_walking_bush.gif) | **Walking Bush**. Common Bloom Tank, Court of Root. A small, weak ent grown from a bush: a fat round body of woody stems on stumpy root legs, branches standing up from his top, no head, long arms of root. Joins after 2-1. | **Root Lash** (A1): lashes one enemy with a root hand. **Thicket** (A2): DEF Up for 1 turn on himself and one chosen ally (cooldown 3). |
+| ![](docs/images/reel_wild_speaker.gif) | **Wild Speaker**. Common Ember Support, Court of Root. A barefoot tribesman with tattoos on his bare arms and legs, his torso in dark leather, and a long stick with two green ribbons tied at its head. Joins after 2-2. | **Staff Blow** (A1): drives the head of his long stick into one enemy. **Quell** (A2): an overhead blow of the stick on one enemy, then a 50% chance of ATK Down for 2 turns (cooldown 4). |
 
 ### Skill icons (one row per champion: A1, A2, A3 or the passive)
 
@@ -64,7 +65,7 @@ All ten are Jakub's ([docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md) 8, Sta
 
 ## The world
 
-The campaign is a line of areas crossed from left to right. Zone 1, the *Fracture Reach*, follows Jakub's working notes: ten stages in the arc contact, the settlement, escalation, the turning point and leaving. The notes are not locked; the stages' enemies are copies of the two champions until enemies are designed. Zone 2, the *Verdant Grove*, has ten placeholder stages on its jungle-ruin background so the area can be tested in game; their enemies are copies of the champions, and the first clear brings the Walking Bush.
+The campaign is a line of areas crossed from left to right. Zone 1, the *Fracture Reach*, follows Jakub's working notes: ten stages in the arc contact, the settlement, escalation, the turning point and leaving. The notes are not locked; the stages' enemies are copies of the two champions until enemies are designed. Zone 2, the *Verdant Grove*, has ten placeholder stages on its jungle-ruin background so the area can be tested in game; their enemies are copies of the champions, and the first clears of 2-1 and 2-2 bring the Walking Bush and the Wild Speaker.
 
 | Fracture Reach |
 | --- |

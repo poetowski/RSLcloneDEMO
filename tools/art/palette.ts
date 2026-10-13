@@ -176,6 +176,8 @@ export const INK = {
   lip: hex('#8a3a3a'),
   warpaint: hex('#9e1c2a'),
   frostLip: hex('#4a6fb0'),
+  /** the Wild Speaker's tribal tattoos: a dark blue-green ink on his bare arms, legs and cheek */
+  tattoo: hex('#1a3f47'),
   black: hex('#0a0810'),
   white: hex('#ffffff'),
 };

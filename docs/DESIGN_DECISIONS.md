@@ -50,6 +50,7 @@ Section 7 lists what is not decided.
 | 2026-10-13 | The Court of Root's standard: a brown paw in place of the claw | 3.3, 3.6 |
 | 2026-10-13 | Zone 2: ten placeholder stages, to test the area in game | 5.4 |
 | 2026-10-13 | The Walking Bush, a Common of the Court of Root | 19 |
+| 2026-10-13 | The Wild Speaker, a Common of the Court of Root | 20 |
 
 ---
 
@@ -1284,3 +1285,40 @@ the game: "one chosen ally" is someone other than himself while anyone else
 stands (alone, he is his own chosen ally, and the DEF Up lands once); placed
 on his own turn, his DEF Up lasts until the end of his next turn, and the
 ally's until the end of the ally's next turn (section 10).
+
+## 20. The Wild Speaker (received 2026-10-13)
+
+Jakub's brief, verbatim:
+
+```
+create new hero.
+rarity common, support, faction court of root. affinity ember.
+name = Wild Speaker
+design - humanoid with tribal tattoos with a long stick. there are two green ribbons on head of the stick. naked legs and arms, torso covered in leather.
+kit: A1 - attack single target. A2 - single target attack, after attack it has 50% chance to cause ATK DOWN on the target for 2 turns. CD 4.
+```
+
+| | |
+|---|---|
+| Rarity | Common |
+| Role | Support |
+| Faction | Court of Root |
+| Affinity | Ember |
+| Kit | A1 an attack on one enemy; A2 an attack on one enemy that has, after the attack, a 50% chance to place ATK Down on the target for 2 turns, cooldown 4 (the brief names no A3 and no passive) |
+| Look | a humanoid with tribal tattoos and a long stick, two green ribbons on the head of the stick; bare legs and arms, the torso covered in leather |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the skills' names
+(Staff Blow, Quell) and texts, their multipliers (1.0, a plain attack; 1.3),
+the stats, the lore line, the stage that brings him (the first clear of
+2-2; no stage power changed), and the details of his art and effects: a
+lean man of the Court's semi-wild tribes, barefoot, a sleeveless tunic of
+dark leather laced at the chest over a short fringed skirt and flap, bands,
+zigzags and chevrons of a dark blue-green ink on his arms and legs and two
+strokes on his cheek, loose dark hair; the stick taller than he is, of plain
+wood with a gnarled knob, the two ribbons tied under it with a green wrap
+and stirring as it moves; Staff Blow a thrust of the stick's head with both
+hands, Quell the stick swung up over his head and brought down, their
+effects a dull flash with the ring of the push and a heavier flash with dust
+thrown out low. Read by the game: "humanoid" drawn as a man; the ATK Down
+comes after the hit and meets the target's RES like any debuff (section 10);
+his signature colour is his ink's teal, as green is his faction's.
