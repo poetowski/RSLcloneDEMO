@@ -9,8 +9,12 @@
 // settlement, escalation, the turning point and leaving. The notes are not locked. Stages have no
 // names; their texts quote the notes; the enemies are copies of the two
 // champions that exist, standing in for the warriors of both worlds until
-// enemies are designed. Zone 2, the Verdant Grove, is a node on the map whose
-// stages wait for him. Both names are his (2026-10-11).
+// enemies are designed. Zone 2, the Verdant Grove, has ten placeholder stages
+// Jakub asked for to test the area in game (2026-10-13): their texts quote the
+// arc of his notes (5.4: approach, arrival, the contest, the outcome; "not
+// about arena", so the contest takes place in something that only looks like
+// one), and their enemies are copies of the champions that exist, standing in
+// until he dictates them. Both names are his (2026-10-11).
 import { LocationDef, StageDef } from './types';
 
 /**
@@ -28,6 +32,10 @@ export const STARTERS = ['captain_gareth'];
 const CONTACT = 'Azure Crown and Sanguine Dominion warriors meet where they should not be able to.';
 const SETTLEMENT = 'The settlement and its surroundings.';
 const ESCALATION = 'Two worlds in one place draw more through, or trigger a larger engagement.';
+const APPROACH = 'Travelling through the forest. The Court of Root are a presence, not just enemies.';
+const ARRIVAL = 'Meeting the Court of Root. They have rules.';
+const CONTEST = 'The contest, in something that only looks like an arena.';
+const OUTCOME = 'Winning, losing, being judged.';
 
 export const LOCATIONS: LocationDef[] = [
   {
@@ -116,8 +124,8 @@ export const LOCATIONS: LocationDef[] = [
     ],
   },
   {
-    // Zone 2 of the notes (DESIGN_DECISIONS.md 5.4): a node on the map, its stages not designed yet; its
-    // background painted on Jakub's brief (2026-10-12)
+    // Zone 2 of the notes (DESIGN_DECISIONS.md 5.4), its background painted on Jakub's brief (2026-10-12);
+    // its ten stages are placeholders to test it in game (2026-10-13): enemies, powers and texts are stand-ins
     id: 'zone2',
     chapter: 'II',
     name: 'Verdant Grove',
@@ -125,7 +133,68 @@ export const LOCATIONS: LocationDef[] = [
     blurb: 'A grove deep in the forest, inside Court of Root territory.',
     requires: '1-10',
     map: { x: 722, y: 206 },
-    stages: [],
+    stages: [
+      {
+        id: '2-1',
+        blurb: APPROACH,
+        enemies: [{ champion: 'follower' }, { champion: 'follower' }],
+        power: 1.03,
+      },
+      {
+        id: '2-2',
+        blurb: APPROACH,
+        enemies: [{ champion: 'follower' }, { champion: 'follower' }, { champion: 'follower' }],
+        power: 0.7,
+      },
+      {
+        id: '2-3',
+        blurb: ARRIVAL,
+        enemies: [{ champion: 'lineholder' }, { champion: 'follower' }, { champion: 'quartermaster' }],
+        power: 0.89,
+      },
+      {
+        id: '2-4',
+        blurb: ARRIVAL,
+        enemies: [{ champion: 'bloodhound' }, { champion: 'follower' }, { champion: 'dominion_medic' }],
+        power: 0.99,
+      },
+      {
+        id: '2-5',
+        blurb: CONTEST,
+        enemies: [{ champion: 'enforcer' }, { champion: 'skirmisher' }, { champion: 'follower' }],
+        power: 0.82,
+      },
+      {
+        id: '2-6',
+        blurb: CONTEST,
+        enemies: [{ champion: 'lineholder' }, { champion: 'rime_scholar' }, { champion: 'follower' }],
+        power: 0.81,
+      },
+      {
+        id: '2-7',
+        blurb: CONTEST,
+        enemies: [{ champion: 'bloodhound' }, { champion: 'enforcer' }, { champion: 'quartermaster' }],
+        power: 1.02,
+      },
+      {
+        id: '2-8',
+        blurb: CONTEST,
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'follower' }, { champion: 'follower' }],
+        power: 0.76,
+      },
+      {
+        id: '2-9',
+        blurb: OUTCOME,
+        enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'dominion_medic' }],
+        power: 0.84,
+      },
+      {
+        id: '2-10',
+        blurb: `${OUTCOME} The last stage of the area.`,
+        enemies: [{ champion: 'follower', boss: true }, { champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
+        power: 0.71,
+      },
+    ],
   },
 ];
 

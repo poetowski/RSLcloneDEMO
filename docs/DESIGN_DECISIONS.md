@@ -48,6 +48,7 @@ Section 7 lists what is not decided.
 | 2026-10-12 | Zone 2's battle background, the Verdant Grove, painted on his brief | 5.4, 5.4b |
 | 2026-10-13 | The Follower, a Common of the Court of Root and the faction's first champion | 18 |
 | 2026-10-13 | The Court of Root's standard: a brown paw in place of the claw | 3.3, 3.6 |
+| 2026-10-13 | Zone 2: ten placeholder stages, to test the area in game | 5.4 |
 
 ---
 
@@ -497,7 +498,9 @@ now, and so do the rift's veils, which had the same fault.
 
 *(2026-10-11: the area is the **Verdant Grove**. It is not about an arena:
 its battles only take place in something that looks like one. 2026-10-12:
-its battle background painted on his brief, 5.4b.)*
+its battle background painted on his brief, 5.4b. 2026-10-13: ten placeholder
+stages, on his request: "i want you to add 10 placeholder stages in area 2 like we have for area 1, so i can test it there ingame". Their texts quote the arc below;
+their enemies, powers and texts are stand-ins.)*
 
 **Setting:** a **mystic arena in a deep forest**, inside Court of Root
 territory.
