@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend']);
 
 export class BattleScene {
   readonly clock = new Clock();

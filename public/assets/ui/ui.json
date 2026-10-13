@@ -36,62 +36,74 @@
    40,
    40
   ],
-  "twin_cut": [
+  "snap": [
    246,
    0,
    40,
    40
   ],
-  "tonic": [
+  "rend": [
    287,
    0,
    40,
    40
   ],
-  "guard_cut": [
+  "twin_cut": [
    328,
    0,
    40,
    40
   ],
-  "brace": [
+  "tonic": [
    369,
    0,
    40,
    40
   ],
-  "bite": [
+  "guard_cut": [
    410,
    0,
    40,
    40
   ],
-  "bay": [
+  "brace": [
    451,
    0,
    40,
    40
   ],
-  "stick_rap": [
+  "bite": [
    492,
    0,
    40,
    40
   ],
-  "field_rations": [
+  "bay": [
    533,
    0,
    40,
    40
   ],
-  "heavy_cut": [
+  "stick_rap": [
    574,
    0,
    40,
    40
   ],
-  "keen_edge": [
+  "field_rations": [
    615,
+   0,
+   40,
+   40
+  ],
+  "heavy_cut": [
+   656,
+   0,
+   40,
+   40
+  ],
+  "keen_edge": [
+   697,
    0,
    40,
    40
@@ -933,38 +945,44 @@
    28,
    28
   ],
-  "skirmisher": [
+  "follower": [
    58,
    259,
    28,
    28
   ],
-  "dominion_medic": [
+  "skirmisher": [
    87,
    259,
    28,
    28
   ],
-  "lineholder": [
+  "dominion_medic": [
    116,
    259,
    28,
    28
   ],
-  "bloodhound": [
+  "lineholder": [
    145,
    259,
    28,
    28
   ],
-  "quartermaster": [
+  "bloodhound": [
    174,
    259,
    28,
    28
   ],
-  "enforcer": [
+  "quartermaster": [
    203,
+   259,
+   28,
+   28
+  ],
+  "enforcer": [
+   232,
    259,
    28,
    28

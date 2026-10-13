@@ -38,7 +38,7 @@ The four enums are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 2): indep
 | Rarity | Common, **Elite**, **Heroic**, **Mythic** | the stat budget (`norms.ts`, the proof of concept's budgets carried over) and the card frame color; what rarity gates is not decided |
 | Affinity | **Ember**, **Bloom**, **Tide** | Ember > Bloom > Tide > Ember; a strong hit deals +20% damage and a weak hit -20% (the proof of concept's rule: the mechanism is not decided) |
 | Role | Tank, Damage, Support | how the budget is spent and what the kit does; whether roles are mechanical is not decided |
-| Faction | Azure Crown, Sanguine Dominion, Court of Root, Ashveil Reign | story and standard (the medallion on cards and pages, named on the champion page's lore tab); no mechanics. Standards: a gold crown on blue, a red hexagon on black, a brown claw on green, a white bone across a dark grey |
+| Faction | Azure Crown, Sanguine Dominion, Court of Root, Ashveil Reign | story and standard (the medallion on cards and pages, named on the champion page's lore tab); no mechanics. Standards: a gold crown on blue, a red hexagon on black, a brown paw on green, a white bone across a dark grey |
 
 The roster today:
 
@@ -46,6 +46,7 @@ The roster today:
 | --- | --- | --- | --- | --- | --- |
 | Captain Gareth (`captain_gareth`) | Elite | Ember | Damage | Azure Crown | starter |
 | Rime Scholar (`rime_scholar`) | Elite | Tide | Support | Sanguine Dominion | after the first battle (clear 1-1) |
+| Follower (`follower`) | Common | Tide | Damage | Court of Root | clear 1-4 (a stand-in) |
 | Skirmisher (`skirmisher`) | Common | Bloom | Damage | Azure Crown | clear 1-5 (a stand-in) |
 | Dominion Medic (`dominion_medic`) | Common | Tide | Support | Sanguine Dominion | clear 1-6 (a stand-in) |
 | Lineholder (`lineholder`) | Common | Tide | Tank | Azure Crown | clear 1-7 (a stand-in) |
@@ -53,7 +54,7 @@ The roster today:
 | Quartermaster (`quartermaster`) | Common | Bloom | Support | Azure Crown | clear 1-9 (a stand-in) |
 | Enforcer (`enforcer`) | Common | Ember | Damage | Sanguine Dominion | clear 1-10 (a stand-in) |
 
-Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8): Gareth's Line Cut, Iron Blow and Wide Sweep, no passive; the Rime Scholar's Pale Strike and Rimebind, no A3, and the passive Cold Rebuke. The Skirmisher is his brief of 2026-10-11 (DESIGN_DECISIONS.md 12): one A1 that always hits twice. The Lineholder is his brief of the same day (DESIGN_DECISIONS.md 13): Guard Cut, and Brace, DEF Up on himself for 2 turns. The Quartermaster is his brief of 2026-10-12 (DESIGN_DECISIONS.md 14): a plain A1, and an A2 that heals every ally by 15% of his max HP, then lends 15% Turn Meter to the ally lowest on HP. The Enforcer is his brief of the same day (DESIGN_DECISIONS.md 15): a plain A1, and the passive Keen Edge, +10% C.RATE in every battle, extra to his stats and not shown with them outside battle. The Bloodhound is his brief of the same day too (DESIGN_DECISIONS.md 16), the first champion on four legs: a plain A1, and an A2 that puts Taunt on himself for 1 turn, cooldown 4. The Dominion Medic is his brief of the same day (DESIGN_DECISIONS.md 17): one skill, an A1 that heals every ally by 10% of his max HP and strikes nobody. Their stats and the numbers in their skills are stand-ins ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 9). A champion has one to three skills; a save whose champions no longer exist (the stand-ins `azure_warrior` and `sanguine_support`) keeps its progress, regains the champions its cleared stages bring and starts its team over from the starters.
+Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8): Gareth's Line Cut, Iron Blow and Wide Sweep, no passive; the Rime Scholar's Pale Strike and Rimebind, no A3, and the passive Cold Rebuke. The Skirmisher is his brief of 2026-10-11 (DESIGN_DECISIONS.md 12): one A1 that always hits twice. The Lineholder is his brief of the same day (DESIGN_DECISIONS.md 13): Guard Cut, and Brace, DEF Up on himself for 2 turns. The Quartermaster is his brief of 2026-10-12 (DESIGN_DECISIONS.md 14): a plain A1, and an A2 that heals every ally by 15% of his max HP, then lends 15% Turn Meter to the ally lowest on HP. The Enforcer is his brief of the same day (DESIGN_DECISIONS.md 15): a plain A1, and the passive Keen Edge, +10% C.RATE in every battle, extra to his stats and not shown with them outside battle. The Bloodhound is his brief of the same day too (DESIGN_DECISIONS.md 16), the first champion on four legs: a plain A1, and an A2 that puts Taunt on himself for 1 turn, cooldown 4. The Dominion Medic is his brief of the same day (DESIGN_DECISIONS.md 17): one skill, an A1 that heals every ally by 10% of his max HP and strikes nobody. The Follower is his brief of 2026-10-13 (DESIGN_DECISIONS.md 18), the Court of Root's first champion and the second on four legs, a grey wolf: an A1 on one enemy, and an A2 on one enemy with a 50% chance of DEF Down for 2 turns, cooldown 4. Their stats and the numbers in their skills are stand-ins ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 9). A champion has one to three skills; a save whose champions no longer exist (the stand-ins `azure_warrior` and `sanguine_support`) keeps its progress, regains the champions its cleared stages bring and starts its team over from the starters.
 
 ## 3. The campaign (`src/game/data/campaign.ts`)
 
@@ -65,7 +66,7 @@ Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8):
 
 | Location | Zone | Stages |
 | --- | --- | --- |
-| I. Fracture Reach | `zone1` | 1-1 to 1-10 (1-1 brings the Rime Scholar, 1-5 the Skirmisher, 1-6 the Dominion Medic, 1-7 the Lineholder, 1-8 the Bloodhound, 1-9 the Quartermaster; 1-10 is the boss and brings the Enforcer) |
+| I. Fracture Reach | `zone1` | 1-1 to 1-10 (1-1 brings the Rime Scholar, 1-4 the Follower, 1-5 the Skirmisher, 1-6 the Dominion Medic, 1-7 the Lineholder, 1-8 the Bloodhound, 1-9 the Quartermaster; 1-10 is the boss and brings the Enforcer) |
 | II. Verdant Grove (after 1-10) | `zone2` | not designed |
 
 Zone 1 follows Jakub's working notes (DESIGN_DECISIONS.md 5.3), which are not locked: the stage texts quote them (contact, the settlement, escalation, the turning point, leaving). Its enemies are copies of the two champions, standing in for the warriors of both worlds until enemies are designed. Zone 2 (a jungle ruin in Court of Root territory, its battle background painted on Jakub's brief: DESIGN_DECISIONS.md 5.4b) has its node in the jungle and its background, and no stages yet: `?screen=battle&stage=1-1&zone=zone2` fights any stage on it. The world map follows his brief (DESIGN_DECISIONS.md 5.4a): the edge of a continent, a rift in the west, jungle toward the east, nothing beyond its north and south edges.

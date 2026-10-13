@@ -294,8 +294,8 @@ export function gem(aff: keyof typeof UIR.affinity): Bitmap {
 const EMBLEMS: Record<keyof typeof UIR.faction, string[]> = {
   azure_crown: ['.......', '#..#..#', '##.#.##', '#######', '#######', '.......', '#######'],
   sanguine_dominion: ['.......', '..###..', '.#####.', '#######', '.#####.', '..###..', '.......'],
-  // a talon: thick at its root, curving down to a point
-  court_of_root: ['..lll##..', '...ll##s.', '....l##s.', '....l##s.', '...l##s..', '..l##s...', '.l##s....', '.l#s.....', 'l........'],
+  // a paw: four toe pads over the main pad, its lower edge in three lobes (Jakub, 2026-10-13)
+  court_of_root: ['..l#.l#..', '..#s.#s..', 'l#.....l#', '#s.l##.#s', '..l###s..', '.l#####s.', '.l#####s.', '.##s.#ss.', '.........'],
   // one bone laid across
   ashveil_reign: ['.......', '.......', '##...##', '.#####.', '##...##', '.......', '.......'],
 };

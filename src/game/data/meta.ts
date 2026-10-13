@@ -49,7 +49,7 @@ export const FACTIONS: Record<FactionId, FactionDef> = {
     name: 'Court of Root',
     color: '#6cb85a',
     desc: 'Everything with no crown, no dominion and no reign: semi-wild tribes, animals and very intelligent feral entities. They share a nature, not a hierarchy, fight each other as readily as outsiders, and hide in jungle and forest.',
-    standard: 'Green, with a brown claw.',
+    standard: 'Green, with a brown paw.',
   },
   ashveil_reign: {
     id: 'ashveil_reign',

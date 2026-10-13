@@ -62,12 +62,14 @@ export const LOCATIONS: LocationDef[] = [
         blurb: SETTLEMENT,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
         power: 0.86,
+        // a stand-in: the stage that brings the Follower is not Jakub's
+        recruit: 'follower',
       },
       {
         id: '1-5',
         blurb: SETTLEMENT,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
-        power: 0.67,
+        power: 0.92,
         // a stand-in: the stage that brings the Skirmisher is not Jakub's
         recruit: 'skirmisher',
       },

@@ -46,6 +46,8 @@ Section 7 lists what is not decided.
 | 2026-10-12 | The main menu's Campaign glyph: proper crossed swords with longer blades | 10 |
 | 2026-10-12 | Regen heals 15% max HP; Weaken removed | 10 |
 | 2026-10-12 | Zone 2's battle background, the Verdant Grove, painted on his brief | 5.4, 5.4b |
+| 2026-10-13 | The Follower, a Common of the Court of Root and the faction's first champion | 18 |
+| 2026-10-13 | The Court of Root's standard: a brown paw in place of the claw | 3.3, 3.6 |
 
 ---
 
@@ -202,7 +204,8 @@ Open questions:
 
 **Status:** locked.
 
-**Standard:** green, with a brown claw. *(decided 2026-10-10)*
+**Standard:** green, with a brown paw. *(decided 2026-10-10 as a brown claw;
+a paw since 2026-10-13, see 3.6)*
 
 **What it is.** The faction for everything with no crown, no dominion, no
 reign: semi-wild primitive tribes, animals, and very intelligent feral
@@ -288,12 +291,22 @@ The pattern is not a rule to be applied to future factions.
 |---|---|
 | Azure Crown | Blue, with a gold crown |
 | Sanguine Dominion | Black, with a red hexagon inside |
-| Court of Root | Green, with a brown claw |
+| Court of Root | Green, with a brown paw |
 | Ashveil Reign | Dark grey (about 80%), with one horizontal white bone |
 
 *Updated 2026-10-10: Jakub confirmed the gold of the Azure Crown's crown and
 set the standards of the Court of Root and the Ashveil Reign (they were "not
 yet designed" in the first export).*
+
+*Updated 2026-10-13: the Court of Root's charge is a paw, not the claw. When
+its emblem first showed on the Champions screen, Jakub wrote:*
+
+```
+logo of court of root should be a pawn instead of root on background. you used this in champions list now when you added new faction. change logo for this faction.
+```
+
+*"Pawn" was read as a paw, an animal's paw print (the claw had been drawn as
+a talon that read as a root); it stays brown on green.*
 
 ---
 
@@ -1193,3 +1206,39 @@ at the belt and one in his hand when he heals, bandaged forearms, the rose
 light of the heal. Read by the game: his faction is the Sanguine Dominion;
 his heal includes himself; an A1 that strikes no enemy has no answer to give,
 so he never counterattacks.
+
+## 18. The Follower (received 2026-10-13)
+
+Jakub's brief, verbatim:
+
+```
+I want to create new hero.
+name = Follower
+damage common championin affinity tide.
+faction = court of root.
+design = this is 4 legged wolf in grey colors, can look a bit wild. no collar.
+kit = A1 attack single target. A2 attack single target with 50% chance to cause DEF DOWN on enemy for 2 turns. CD 4.
+```
+
+| | |
+|---|---|
+| Rarity | Common |
+| Role | Damage |
+| Faction | Court of Root (its first champion) |
+| Affinity | Tide |
+| Kit | A1 an attack on one enemy; A2 an attack on one enemy with a 50% chance to place DEF Down on it for 2 turns, cooldown 4 (the brief names no A3 and no passive) |
+| Look | a wolf on four legs, in grey colours, a little wild; no collar |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the skills' names
+(Snap, Rend) and texts, their multipliers (1.0, a plain attack; 1.4), the
+stats, the lore line, the stage that brings him (the first clear of 1-4,
+which raised the power of 1-5), and the details of his art and effects: a
+lean grey wolf about as tall as the Bloodhound and longer in the leg, a
+darker saddle along the back and the tail, cream on the throat, the belly
+and the legs, a shaggy ruff, a nick in one ear and a fang showing at the
+lip; Snap a lunge, Rend a leap onto the enemy and a wrench of the head, their
+effects two white jaws closing and three ragged tears. Read by the game:
+"damage common championin affinity tide" gives his role, rarity and
+affinity; the DEF Down comes after the hit, so it never weakens the Rend that
+places it, and its 50% meets the target's RES like any debuff (section 10).
+With no collar he carries no insignia.

@@ -88,6 +88,10 @@ export const MAT = {
   /** the Bloodhound's coat: tan on the head, the legs and the chest, black over the back, the ears and the tail */
   furTan: m('furTan', 'fur', ['#1a0c0c', '#3a1a14', '#683419', '#9c5626', '#c57d42', '#e4a86c']),
   furBlack: m('furBlack', 'fur', ['#080608', '#120e10', '#1e1719', '#2c2224', '#3e3133', '#5a484a']),
+  /** the Follower's coat, a grey wolf: grey over the body and the head, a darker saddle along the back and the tail, cream under the belly, the throat and the muzzle */
+  furGrey: m('furGrey', 'fur', ['#16151c', '#2b2b34', '#46464f', '#68686e', '#8e8c8c', '#b8b2a8']),
+  furSaddle: m('furSaddle', 'fur', ['#0c0b10', '#18171d', '#26252c', '#37363c', '#4c4b4f', '#6a675f']),
+  furCream: m('furCream', 'fur', ['#29251f', '#524b42', '#7f766a', '#aba18f', '#cdc4b1', '#ebe5d6']),
 
   // --- skins -------------------------------------------------------------
   skinLight: m('skinLight', 'skin', ['#2e1512', '#5c2a24', '#934c3c', '#d08262', '#f0ad86', '#ffd6b5']),
@@ -237,7 +241,7 @@ export const UIR = {
    * [field, glyph, glyph lit edge, glyph shaded edge] per faction, after its
    * standard in docs/DESIGN_DECISIONS.md 3.6: the Azure Crown a gold crown on
    * blue, the Sanguine Dominion a red hexagon on black, the Court of Root a
-   * brown claw on green, the Ashveil Reign a white bone across a dark grey
+   * brown paw on green, the Ashveil Reign a white bone across a dark grey
    * (about 80% dark).
    */
   faction: {
