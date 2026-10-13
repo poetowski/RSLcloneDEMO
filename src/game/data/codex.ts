@@ -57,7 +57,7 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'figure', id: 'skills' },
       { kind: 'p', text: 'A cooldown counts your champion\'s own turns: a skill with Cooldown 3 used now is ready again on the fourth turn after it. The number shown on a greyed-out skill is how many turns are left.' },
       { kind: 'h', text: 'Targets' },
-      { kind: 'list', items: ['Single enemy: pick any enemy (Taunt can force your choice).', 'All enemies: hits every enemy, usually for less damage each.', 'All allies: buffs, heals or shields your whole team.'] },
+      { kind: 'list', items: ['Single enemy: pick any enemy (Taunt can force your choice).', 'All enemies: hits every enemy, usually for less damage each.', 'All allies: buffs, heals or shields your whole team.', 'One ally: pick the ally to help. A skill that also helps its user, like the Walking Bush\'s Thicket, picks among the others.'] },
       { kind: 'tip', text: 'Keys 1, 2 and 3 pick a skill. Pick a group skill twice, or press Enter, to use it.' },
     ],
     demo: { skill: 'wide_sweep', label: 'See Wide Sweep' },

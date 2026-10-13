@@ -93,6 +93,10 @@ export const MAT = {
   furSaddle: m('furSaddle', 'fur', ['#0c0b10', '#18171d', '#26252c', '#37363c', '#4c4b4f', '#6a675f']),
   furCream: m('furCream', 'fur', ['#29251f', '#524b42', '#7f766a', '#aba18f', '#cdc4b1', '#ebe5d6']),
 
+  // --- woods of the living ---------------------------------------------------
+  /** the Walking Bush's bark: the grey-brown of a bush's woody stems (his few leaves are `moss`) */
+  bark: m('bark', 'matte', ['#14100e', '#2a201b', '#45352a', '#64503c', '#8a7253', '#b39b74']),
+
   // --- skins -------------------------------------------------------------
   skinLight: m('skinLight', 'skin', ['#2e1512', '#5c2a24', '#934c3c', '#d08262', '#f0ad86', '#ffd6b5']),
   skinTan: m('skinTan', 'skin', ['#2a140f', '#4f281d', '#7a4430', '#a8674a', '#c98a66', '#e8b08a']),
@@ -199,6 +203,8 @@ export const FXR = {
   blood: fx(['#3a0a10', '#7a1420', '#c02a30', '#ff6a5a', '#ffd0c0']),
   /** the rose light of the Dominion Medic's potions */
   rose: fx(['#4a1030', '#a03068', '#e0609a', '#ffa8cc', '#fff0f6']),
+  /** wood: the Walking Bush's chips and roots, his own bark paling to a white core */
+  wood: fx(['#2a1f17', '#5e4a30', '#8d7350', '#c4ab80', '#f2e6cc']),
   magenta: fx(['#3a0a2c', '#8a1a64', '#d0409a', '#ff8ad0', '#ffe8f6']),
   cosmic: fx(['#1a0a3a', '#4a2a8a', '#4a8ae0', '#8af0f0', '#f0ffff']),
   core: fx(['#3a1a06', '#c06a12', '#ffc850', '#fff0a8', '#ffffff']),

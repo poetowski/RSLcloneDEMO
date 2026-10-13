@@ -89,6 +89,11 @@ export const warden = fixture('warden', {
   ],
 });
 
+/** A2 aimed at one ally: DEF Up on the chosen ally and on itself for 1 turn. */
+export const sheltering = fixture('sheltering', {
+  skills: [undefined, skill('shelter', 2, { target: 'ally', approach: 'none', hits: [{ mult: 0 }], statuses: [{ status: 'def_up', turns: 1, to: 'targets' }, { status: 'def_up', turns: 1, to: 'self' }] })],
+});
+
 /** Two-hit A1 rolling Poison on every hit; A3 ends the turn with 25% turn meter. */
 export const stalker = fixture('stalker', {
   stats: { spd: 118 },

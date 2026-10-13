@@ -78,8 +78,8 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Role | Tank, Damage, Support: how the budget is spent (no fourth role; Control, Bruiser and the like are descriptive tags) | `Role`, `ROLES` |
 | Faction | one of four powers: the Azure Crown, the Sanguine Dominion, the Court of Root, the Ashveil Reign; story and standard, no mechanics | `FactionId`, `FACTIONS`, `FactionDef.standard` |
 | Standard | a faction's heraldry: the Azure Crown a gold crown on blue, the Sanguine Dominion a red hexagon on black, the Court of Root a brown paw on green, the Ashveil Reign a white bone across a dark grey | `FactionDef.standard`, `emblem_<faction>` |
-| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal, the Quartermaster's brown leather, the Enforcer's crimson, the Bloodhound's tan, the Dominion Medic's rose, the Follower's wolf grey), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
-| Footprint | how long a champion's shadow is, as a share of a standing champion's: a beast on four legs casts a longer one (the Bloodhound and the Follower 1.9) | `CharDef.footprint`, the atlas json, `UnitView.footprint` |
+| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal, the Quartermaster's brown leather, the Enforcer's crimson, the Bloodhound's tan, the Dominion Medic's rose, the Follower's wolf grey, the Walking Bush's bark), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
+| Footprint | how long a champion's shadow is, as a share of a standing champion's: a beast on four legs casts a longer one (the Bloodhound and the Follower 1.9, the round Walking Bush 1.3) | `CharDef.footprint`, the atlas json, `UnitView.footprint` |
 | Muzzle | where projectiles leave a ranged champion's sprite | `ChampionDef.muzzle` |
 | Approach | how the actor travels before the attack | `Approach` |
 | Stat score, budget | weighted stat sum, and its target per rarity (±5%) | `statScore`, `budgetDelta`, `BUDGET_TOLERANCE` |
@@ -377,6 +377,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C14 | A battle ends when one side has no living unit; it always ends | code; test (40 seeded auto battles); termination relies on every A1 dealing damage |
 | INV-C15 | A Rebuke answers only a critical, non-lethal hit by an enemy that leaves its holder below `value`; then it rests for `cooldown` of the holder's turns | code; tests |
 | INV-C16 | A debuff placed on an enemy lands with at most its chance: all of it while the placer's ACC is at least the target's RES, cut by `landShare` above; buffs and effects on allies never meet RES; when ACC is at least RES the random draws are the same as without the rule | code (`tryApply`); tests |
+| INV-C17 | A skill aimed at one ally that also gives its user a status is aimed at another ally while one stands (alone, the user is its own target); a status reaches each unit once per skill | code (`validTargets`, `useSkill`); test |
 
 ### 6.2 Catalog
 

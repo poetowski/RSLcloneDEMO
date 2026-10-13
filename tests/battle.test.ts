@@ -6,7 +6,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { brute, cleaver, drummer, fixture, freezer, guard, inAffinity, keen, medic, mender, overdrive, provisioner, rebuker, stalker, striker, twin, undying, warden } from './fixtures';
+import { brute, cleaver, drummer, fixture, freezer, guard, inAffinity, keen, medic, mender, overdrive, provisioner, rebuker, sheltering, stalker, striker, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -275,6 +275,20 @@ describe('statuses', () => {
     t.hp = 1;
     b.useSkill(b.get('p0'), skill(twin, 'twin_chop'), 'e0');
     expect(t.alive).toBe(false);
+  });
+
+  it('aims a skill that also gives its user the status at another ally, and gives it to each of them once', () => {
+    const shelter = skill(sheltering, 'shelter');
+    const b = new Battle(combatants([sheltering, guard, twin]), ENEMY, { seed: 3 });
+    const me = b.get('p0');
+    expect(b.validTargets(me, shelter).map((u) => u.uid)).toEqual(['p1', 'p2']);
+    const r = b.useSkill(me, shelter, 'p2');
+    expect(r.events.filter((e) => e.kind === 'status').map((e) => e.target).sort()).toEqual(['p0', 'p2']);
+    expect(b.has(me, 'def_up') && b.has(b.get('p2'), 'def_up') && !b.has(b.get('p1'), 'def_up')).toBe(true);
+    // alone, it is its own chosen ally, and the status lands once
+    const solo = new Battle(combatants([sheltering]), ENEMY, { seed: 3 });
+    expect(solo.validTargets(solo.get('p0'), shelter).map((u) => u.uid)).toEqual(['p0']);
+    expect(solo.useSkill(solo.get('p0'), shelter, 'p0').events.filter((e) => e.kind === 'status')).toHaveLength(1);
   });
 
   it('places a status on every enemy with an AoE skill', () => {

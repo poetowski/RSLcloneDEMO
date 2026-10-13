@@ -233,7 +233,7 @@ Every skill is data (`SkillDef` in `types.ts`); these are the levers a kit can p
 
 ### ME3 The roster
 
-Jakub's champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4 and 8, Starter Heroes; 12, the Skirmisher; 13, the Lineholder; 14, the Quartermaster; 15, the Enforcer; 16, the Bloodhound; 17, the Dominion Medic; 18, the Follower): names, looks, kits and what each teaches are his; stats and the numbers in the skills are stand-ins.
+Jakub's champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4 and 8, Starter Heroes; 12, the Skirmisher; 13, the Lineholder; 14, the Quartermaster; 15, the Enforcer; 16, the Bloodhound; 17, the Dominion Medic; 18, the Follower; 19, the Walking Bush): names, looks, kits and what each teaches are his; stats and the numbers in the skills are stand-ins.
 
 | Champion (`id`) | Role, rarity, affinity, faction | SPD | Signature idea | Met / joins |
 | --- | --- | --- | --- | --- |
@@ -246,8 +246,9 @@ Jakub's champions ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 4 and 8, Starter H
 | Bloodhound (`bloodhound`) | Tank, common, Ember, Sanguine Dominion | 100 | a plain bite (1.0); Bay, Taunt on himself for 1 turn on a cooldown of 4: the roster's first Taunt, so the first Tank that draws fire while it lasts, and its first champion on four legs | after 1-8 (a stand-in), not fought there |
 | Quartermaster (`quartermaster`) | Support, common, Bloom, Azure Crown | 104 | a plain rap of his walking stick; Field Rations heals every ally by 15% of his own max HP, then lends 15% Turn Meter to the ally lowest on HP: the roster's first heal and its first turn meter boost | after 1-9 (a stand-in), not fought there |
 | Enforcer (`enforcer`) | Damage, common, Ember, Sanguine Dominion | 98 | Heavy Cut, one plain two-handed cut (1.0); Keen Edge, +10% C.RATE in every battle (12.5%): the roster's first stat passive, extra to the budget and only its text outside battle, and the first champion who crits often | after 1-10 (a stand-in), not fought there |
+| Walking Bush (`walking_bush`) | Tank, common, Bloom, Court of Root | 90 | Root Lash, a plain lash of a root arm (1.0); Thicket, DEF Up for 1 turn on himself and one chosen ally, on a cooldown of 3: the roster's first skill aimed at one chosen ally and its first buff shared with another. The most HP (1400) and the slowest; with no Taunt, the AI aims elsewhere (T20) | after 2-1 (a stand-in), not fought there |
 
-Spread: roles Damage 4, Support 3, Tank 2; affinities Tide 4, Ember 3, Bloom 2; rarities Elite 2, Common 7 (Heroic and Mythic have budgets but no champions, T8); factions Azure Crown 4, Sanguine Dominion 4, Court of Root 1, the Ashveil Reign none.
+Spread: roles Damage 4, Support 3, Tank 3; affinities Tide 4, Ember 3, Bloom 3; rarities Elite 2, Common 8 (Heroic and Mythic have budgets but no champions, T8); factions Azure Crown 4, Sanguine Dominion 4, Court of Root 2, the Ashveil Reign none.
 
 ### ME4 The campaign
 
@@ -266,11 +267,11 @@ Zone 1, the *Fracture Reach*, from Jakub's working notes (DESIGN_DECISIONS.md 5.
 | 1-9 | 2 Gareths, Rime Scholar | 0.68 | normal | Ember -1, Tide +2 | seven champions to choose three from; brings the Quartermaster |
 | 1-10 | Gareth (boss), 2 Rime Scholars | 0.70 | boss | Ember -2, Tide +1 | boss HP and crown; eight champions to choose three from; brings the Enforcer |
 
-Zone 2, the *Verdant Grove*: ten placeholder stages Jakub asked for to test the area in game (2026-10-13). Their texts quote the arc of his notes (DESIGN_DECISIONS.md 5.4: approach, arrival, the contest, the outcome); their enemies are copies of the roster's champions, the Court of Root's only one, the Follower, in eight of them, and stand in until he dictates them. The player owns all nine champions there, so every row averages the 84 teams of three, and no stage brings a champion.
+Zone 2, the *Verdant Grove*: ten placeholder stages Jakub asked for to test the area in game (2026-10-13). Their texts quote the arc of his notes (DESIGN_DECISIONS.md 5.4: approach, arrival, the contest, the outcome); their enemies are copies of the roster's champions, the Court of Root's only one, the Follower, in eight of them, and stand in until he dictates them. The player owns all nine champions at 2-1 (84 teams of three) and ten from 2-2 (120 teams), as the first clear of 2-1 brings the Walking Bush (a stand-in).
 
 | Stage | Enemies | Power | Kind | Lean (Ember / Bloom / Tide attackers) | First introduces |
 | --- | --- | --- | --- | --- | --- |
-| 2-1 | 2 Followers | 1.03 | normal | Ember -2, Bloom +2, Tide 0 | the Follower as an enemy: two wolves faster than most of the roster |
+| 2-1 | 2 Followers | 1.03 | normal | Ember -2, Bloom +2, Tide 0 | the Follower as an enemy: two wolves faster than most of the roster; brings the Walking Bush |
 | 2-2 | 3 Followers | 0.70 | normal | Ember -3, Bloom +3, Tide 0 | a pack of three |
 | 2-3 | Lineholder, Follower, Quartermaster | 0.89 | normal | Ember -1, Bloom +2, Tide -1 | a Tank and a healer among the enemies |
 | 2-4 | Bloodhound, Follower, Dominion Medic | 0.99 | normal | Ember -2, Bloom +1, Tide +1 | an enemy Taunt and an enemy who heals every turn |
@@ -278,7 +279,7 @@ Zone 2, the *Verdant Grove*: ten placeholder stages Jakub asked for to test the 
 | 2-6 | Lineholder, Rime Scholar, Follower | 0.81 | normal | Ember -3, Bloom +3, Tide 0 | Rimebind and Cold Rebuke in the Grove |
 | 2-7 | Bloodhound, Enforcer, Quartermaster | 1.02 | normal | Ember +1, Bloom -2, Tide +1 | a slow, sturdy line: the player opens most battles |
 | 2-8 | Gareth, 2 Followers | 0.76 | normal | Ember -2, Bloom +1, Tide +1 | an Elite among the enemies |
-| 2-9 | Gareth, Rime Scholar, Dominion Medic | 0.84 | normal | Ember -2, Bloom +1, Tide +1 | both Elites with a healer |
+| 2-9 | Gareth, Rime Scholar, Dominion Medic | 0.83 | normal | Ember -2, Bloom +1, Tide +1 | both Elites with a healer |
 | 2-10 | Follower (boss), Gareth, Rime Scholar | 0.71 | boss | Ember -2, Bloom +1, Tide +1 | a boss wolf with both Elites |
 
 ### ME5 Feel: the presentation mechanics
@@ -404,26 +405,26 @@ Jakub's content: Captain Gareth and the Rime Scholar (the Starter Heroes record,
 
 (Skipped turns and Cold Rebukes are per battle.) Since 2026-10-13 the Follower fights from 1-5: the fastest champion (SPD 114), so the player opens 90% of the battles there, and a Tide wolf who hits the Gareth copies strong, so the team of three won every battle at 1-5's old power (0.67) and 1-5 runs at 0.92; 1-6 to 1-10 got easier (78 / 78 / 76 / 65 / 50% from 81 / 71 / 65 / 60 / 46%) inside their bands, so their powers stay. At 1-6 Gareth, the Follower and the Skirmisher win 49%, the other three teams 81-95%. From 1-6 the Skirmisher fights too: the player opens most battles (his SPD 110), weak hits outnumber strong ones (his Bloom cuts the Gareth copies weak, and their Ember cuts him strong), and flawless wins all but vanish at 1-6 and 1-7 (12-18% of wins): with HP 960 he is the one who falls, and three stars need all three standing. From 1-8 the Lineholder joins and the four teams split wide: Gareth and the Rime Scholar with either Common win 77-100% (flawless in 8-69% of wins), the Rime Scholar with both Commons 47-63%, Gareth with both Commons 9-22%. The rows average them, so 1-8 to 1-10 run at lower powers (T20), and flawless wins come back (9-42%). From 1-7 the Dominion Medic joins, who heals and never strikes: the teams that take him in place of an attacker fight longer (battles now run to 27.7 actions at 1-10) and Gareth with the Skirmisher and him wins only 12-28%; Gareth and the Rime Scholar with any third still win 92-100%, and the teams of Commons alone 0-16%. Averaged over four, ten, twenty and thirty-five teams, 1-7, 1-9 and 1-10 run at lower powers (0.82 -> 0.73, 0.71 -> 0.68, 0.72 -> 0.70; 1-8 stays at 0.71). The curve falls from 93% to 50%; on these seeds 1-4 sits a few points above 1-3, inside the noise of 300 battles (on seeds 1-300 the curve falls but for 1-6 and 1-7, a point above 1-5, see MECHANICS_GUIDE 10). Battles run 6.8 to 26.3 actions. The Rime Scholar hits Gareth's copies strong, so strong hits now outnumber weak ones, and stages of Gareths need more power; their Wide Sweeps make flawless wins rare there (18-20% of wins). Cold Rebuke fires once in 8 to 25 battles: both kits crit at 2.5%, as Jakub keeps crit out of Gareth's kit, so it rarely meets a critical hit in Zone 1; it is the roster's only control (T19).
 
-Impact (2026-10-12, `npm run balance` section 3, 960 battles per champion, band 40-60%), with the Enforcer six champions (Gareth 83%, the Rime Scholar 71%, the Enforcer 44%, the Skirmisher 44%, the Quartermaster 37%, the Lineholder 23%), with the Bloodhound seven, with the Dominion Medic eight (Gareth 84%, the Rime Scholar 72%, the Skirmisher 52%, the Enforcer 49%, the Quartermaster 43%, the Bloodhound 42%, the Lineholder 30%, the Dominion Medic 28%), with the Follower nine (2026-10-13): Gareth 80%, the Rime Scholar 72%, the Skirmisher 56%, the Follower 55%, the Enforcer 45%, the Quartermaster 45%, the Bloodhound 39%, the Lineholder 33%, the Dominion Medic 28%. Random teams pit the two Elites against Commons, so whoever has them wins; the Lineholder hits least, and the Medic never strikes (T20); the Bloodhound, Ember, slipped a point under the band when the Follower, who hits Embers strong, joined. The five lines out of band wait for Jakub's balance (decision log, 2026-10-12 and 2026-10-13).
+Impact (2026-10-12, `npm run balance` section 3, 960 battles per champion, band 40-60%), with the Enforcer six champions (Gareth 83%, the Rime Scholar 71%, the Enforcer 44%, the Skirmisher 44%, the Quartermaster 37%, the Lineholder 23%), with the Bloodhound seven, with the Dominion Medic eight (Gareth 84%, the Rime Scholar 72%, the Skirmisher 52%, the Enforcer 49%, the Quartermaster 43%, the Bloodhound 42%, the Lineholder 30%, the Dominion Medic 28%), with the Follower nine (Gareth 80%, the Rime Scholar 72%, the Skirmisher 56%, the Follower 55%, the Enforcer 45%, the Quartermaster 45%, the Bloodhound 39%, the Lineholder 33%, the Dominion Medic 28%), with the Walking Bush ten (2026-10-13): Gareth 84%, the Rime Scholar 73%, the Follower 57%, the Skirmisher 56%, the Enforcer 51%, the Quartermaster 44%, the Bloodhound 40%, the Walking Bush 34%, the Lineholder 32%, the Dominion Medic 29%. Random teams pit the two Elites against Commons, so whoever has them wins; the two Tanks with no Taunt hit least and draw no fire, and the Medic never strikes (T20); the Bloodhound, a point under the band with nine, is back in it. The five lines out of band wait for Jakub's balance (decision log, 2026-10-12 and 2026-10-13).
 
 ### 6.0b Zone 2's placeholder stages (2026-10-13)
 
-Measured the same way over the 84 teams the player owns there (all nine champions), 300 battles each (seeds 1000-1299):
+Measured the same way over every team the player owns there (all nine champions at 2-1, 84 teams; ten from 2-2, 120 teams), 300 battles each (seeds 1000-1299), re-measured with the Walking Bush (2026-10-13):
 
 | Stage | Power | Team size | Auto win | Actions | 3-star share of wins | Player opens | Strong / weak hits | Skipped turns | Cold Rebukes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2-1 | 1.03 | 3 (84 teams) | 89% | 14.4 | 40% | 16% | 32% / 24% | 0.00 | 0.01 |
-| 2-2 | 0.70 | 3 (84 teams) | 88% | 17.8 | 42% | 10% | 31% / 23% | 0.01 | 0.01 |
-| 2-3 | 0.89 | 3 (84 teams) | 82% | 28.2 | 37% | 29% | 35% / 28% | 0.01 | 0.01 |
-| 2-4 | 0.99 | 3 (84 teams) | 79% | 36.9 | 55% | 28% | 29% / 31% | 0.01 | 0.01 |
-| 2-5 | 0.82 | 3 (84 teams) | 79% | 18.0 | 37% | 23% | 37% / 32% | 0.01 | 0.02 |
-| 2-6 | 0.81 | 3 (84 teams) | 75% | 26.0 | 27% | 27% | 31% / 24% | 0.04 | 0.07 |
-| 2-7 | 1.02 | 3 (84 teams) | 67% | 27.9 | 34% | 81% | 34% / 38% | 0.02 | 0.03 |
-| 2-8 | 0.76 | 3 (84 teams) | 64% | 18.4 | 33% | 16% | 28% / 31% | 0.01 | 0.01 |
-| 2-9 | 0.84 | 3 (84 teams) | 61% | 33.8 | 37% | 57% | 26% / 29% | 0.04 | 0.06 |
-| 2-10 | 0.71 | 3 (84 teams) | 53% | 22.7 | 21% | 27% | 29% / 28% | 0.02 | 0.04 |
+| 2-2 | 0.70 | 3 (120 teams) | 88% | 18.9 | 37% | 9% | 32% / 27% | 0.01 | 0.01 |
+| 2-3 | 0.89 | 3 (120 teams) | 77% | 29.6 | 32% | 27% | 34% / 28% | 0.01 | 0.01 |
+| 2-4 | 0.99 | 3 (120 teams) | 72% | 39.5 | 50% | 26% | 32% / 34% | 0.01 | 0.01 |
+| 2-5 | 0.82 | 3 (120 teams) | 72% | 19.1 | 32% | 21% | 35% / 32% | 0.01 | 0.02 |
+| 2-6 | 0.81 | 3 (120 teams) | 72% | 27.2 | 24% | 25% | 32% / 28% | 0.04 | 0.06 |
+| 2-7 | 1.02 | 3 (120 teams) | 57% | 28.6 | 31% | 77% | 33% / 37% | 0.02 | 0.03 |
+| 2-8 | 0.76 | 3 (120 teams) | 58% | 19.2 | 29% | 14% | 30% / 34% | 0.01 | 0.01 |
+| 2-9 | 0.83 | 3 (120 teams) | 56% | 34.6 | 36% | 53% | 28% / 31% | 0.04 | 0.05 |
+| 2-10 | 0.71 | 3 (120 teams) | 47% | 23.4 | 19% | 25% | 30% / 31% | 0.02 | 0.04 |
 
-The powers were found by search against the report's 20 battles per team, for a curve from 89% down to 54% (MECHANICS_GUIDE 10). Teams split wide on every stage: the best win every battle, while the weakest wins a third of the battles at 2-1 and 2-2 and almost none from 2-3 on (0-10%). Wherever Followers stand among the enemies the player seldom opens (10-29%): at SPD 114 they outpace every other champion. Healers and Taunt make battles long (2-4 runs to 36.9 actions on average).
+The powers were found by search against the report's 20 battles per team, for a curve from 89% down to 54% (MECHANICS_GUIDE 10). The Walking Bush joins after 2-1: a team that takes him in place of an attacker fights longer and wins less, so from 2-3 the averages fell 3-10 points (2-9 under the band, its power 0.84 -> 0.83) and battles run longer (2-4 to 39.5 actions on average). Teams split wide on every stage: the best win every battle, while the weakest wins about a third of the battles at 2-1 and 2-2 and almost none from 2-3 on (0-4%). Wherever Followers stand among the enemies the player seldom opens (9-27%): at SPD 114 they outpace every other champion.
 
 The sections below are the proof of concept's baseline (commit `8dd9a26`, 2026-10-06, 39 tests): thirteen champions and ten stages that no longer exist, kept as the reference for a full roster.
 
@@ -588,6 +589,7 @@ Record every change that moves a dynamic out of its band, changes a band, or cha
 | 2026-10-13 | The Follower (Jakub's brief, DESIGN_DECISIONS.md 18): Common, Damage, Tide, Court of Root, the faction's first champion and the second on four legs, a grey wolf; Snap (1.0), and Rend (1.4) with a 50% chance of DEF Down for 2 turns on a cooldown of 4: the roster's first debuff left to a chance and its first DEF Down. Joins on the first clear of 1-4 (a stand-in), so 1-5 is played by three and its power rises (0.67 -> 0.92) | AE3, AE4 | auto win 1-5 to 1-10 79 / 78 / 78 / 76 / 65 / 50% (was 85 / 81 / 71 / 65 / 60 / 46%); the player opens 61-90% of battles; impact with nine: Gareth 80%, the Rime Scholar 72%, the Skirmisher 56%, the Follower 55%, the Enforcer 45%, the Quartermaster 45%, the Bloodhound 39%, the Lineholder 33%, the Dominion Medic 28%, five outside 40-60% (the Bloodhound new, a point under: the Follower's Tide hits him strong, and no number of the Follower's moved him) | 6.0 re-measured | set by Jakub; the names Snap and Rend, their numbers, the stats, the recruiting stage and 1-5's power are stand-ins; no champion retuned |
 | 2026-10-13 | The Court of Root's standard: a brown paw in place of the claw (Jakub: "logo of court of root should be a pawn instead of root on background"; "pawn" read as a paw) | AE5 | none in play | the talon charge -> a paw print | set by Jakub |
 | 2026-10-13 | Zone 2's ten placeholder stages (Jakub: "i want you to add 10 placeholder stages in area 2 like we have for area 1, so i can test it there ingame"): 2-1 to 2-10 on the Verdant Grove, texts quoting the arc of his notes, enemies copied from the roster (the Follower in eight), 2-10 a boss; no champion joins there | AE4, AE6 | the curve goes on past 1-10: auto win 89% at 2-1 down to 53% at 2-10 (84 teams each, every stage in band); battles up to 36.9 actions (2-4) | 6.0b measured | set by Jakub; the enemies, powers and texts are stand-ins |
+| 2026-10-13 | The Walking Bush (Jakub's brief, DESIGN_DECISIONS.md 19): Common, Tank, Bloom, Court of Root, a small weak ent grown from a bush; Root Lash (1.0), and Thicket, DEF Up for 1 turn on himself and one chosen ally, cooldown 3. Rules: a skill aimed at one ally that also gives its user a status is aimed at another ally while one stands; a status reaches each unit once per skill. Joins on the first clear of 2-1 (a stand-in), so 2-2 to 2-10 average 120 teams, and 2-9's power falls 0.84 -> 0.83 | AE3, AE4 | auto win 2-2 to 2-10 88 / 77 / 72 / 72 / 72 / 57 / 58 / 56 / 47% (was 88 / 82 / 79 / 79 / 75 / 67 / 64 / 61 / 53%); impact with ten: Gareth 84%, the Rime Scholar 73%, the Follower 57%, the Skirmisher 56%, the Enforcer 51%, the Quartermaster 44%, the Bloodhound 40%, the Walking Bush 34%, the Lineholder 32%, the Dominion Medic 29%, five outside 40-60% (the Walking Bush new, beside the Lineholder: Tanks with no Taunt, T20; the Bloodhound back in band) | 6.0b re-measured | set by Jakub; the names Root Lash and Thicket, the numbers, the stats, the recruiting stage and 2-9's power are stand-ins; no champion retuned |
 
 ## 10. Keeping this document true
 

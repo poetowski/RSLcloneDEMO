@@ -231,6 +231,18 @@ describe('design decisions', () => {
     expect(f?.passive).toBeUndefined();
   });
 
+  it('has the Walking Bush of his brief: a Common Tank of the Court of Root, Bloom; A1 a single-target attack, A2 DEF Up on himself and one chosen ally for 1 turn, cooldown 3', () => {
+    const w = CHAMPIONS.find((c) => c.id === 'walking_bush');
+    expect(w && [w.name, w.rarity, w.role, w.faction, w.affinity]).toEqual(['Walking Bush', 'common', 'Tank', 'court_of_root', 'bloom']);
+    expect(w?.skills).toHaveLength(2);
+    const a1 = w?.skills[0], a2 = w?.skills[1];
+    expect(a1 && [a1.slot, a1.target, a1.statuses ?? []]).toEqual([1, 'enemy', []]);
+    expect(a1?.hits.some((h) => h.mult > 0)).toBe(true);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'ally', 3, [{ status: 'def_up', turns: 1, to: 'targets' }, { status: 'def_up', turns: 1, to: 'self' }]]);
+    expect(a2?.hits.every((h) => h.mult === 0)).toBe(true);
+    expect(w?.passive).toBeUndefined();
+  });
+
   it('opens with a ten-stage first zone', () => {
     expect(LOCATIONS[0].stages).toHaveLength(10);
   });

@@ -267,7 +267,14 @@ export class Battle {
       }
       case 'enemies':
         return this.foes(u);
-      case 'ally':
+      case 'ally': {
+        // a skill that gives its user the effect too is aimed at someone else while anyone else
+        // stands (the Walking Bush's Thicket: himself and one chosen ally)
+        const all = this.allies(u);
+        if (!s.statuses?.some((x) => x.to === 'self')) return all;
+        const others = all.filter((a) => a !== u);
+        return others.length ? others : all;
+      }
       case 'allies':
         return this.allies(u);
       case 'self':
@@ -330,11 +337,14 @@ export class Battle {
         }
       }
     }
+    // a status reaches each unit once per skill: alone, the Walking Bush is his own chosen ally
+    const given = new Set<string>();
     for (const app of skill.statuses ?? []) {
       if (app.perHit) continue;
       const recipients = app.to === 'self' ? [actor] : app.to === 'allies' ? this.allies(actor) : targets;
       for (const r of recipients) {
-        if (!r.alive) continue;
+        if (!r.alive || given.has(r.uid + app.status)) continue;
+        given.add(r.uid + app.status);
         this.tryApply(actor, r, app.status, app.turns, app.chance, app.value, last, events);
       }
     }

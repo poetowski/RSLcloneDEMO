@@ -139,6 +139,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: APPROACH,
         enemies: [{ champion: 'follower' }, { champion: 'follower' }],
         power: 1.03,
+        // a stand-in: the stage that brings the Walking Bush is not Jakub's
+        recruit: 'walking_bush',
       },
       {
         id: '2-2',
@@ -186,7 +188,7 @@ export const LOCATIONS: LocationDef[] = [
         id: '2-9',
         blurb: OUTCOME,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'dominion_medic' }],
-        power: 0.84,
+        power: 0.83,
       },
       {
         id: '2-10',

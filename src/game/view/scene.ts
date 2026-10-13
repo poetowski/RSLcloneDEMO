@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -513,6 +513,8 @@ export class BattleScene {
       } else {
         targets.forEach((t) => groupFx(t));
       }
+      // a skill aimed at one ally that gives its user the effect too shows it on the user as well (the Walking Bush's Thicket)
+      if (skill.target === 'ally' && !targets.includes(actor) && skill.statuses?.some((x) => x.to === 'self')) this.spawnHitFx(fxName, actor, flip);
       applyWhere((e) => e.hit === k && e.target === actor.uid && e.kind === 'status' && STATUSES[e.status].buff && !targets.includes(actor));
       landed++;
       if (skill.shake) this.shake(skill.shake);

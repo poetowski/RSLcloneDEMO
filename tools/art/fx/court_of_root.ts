@@ -1,12 +1,14 @@
 // The Court of Root's effects. The Follower's Snap: two jaws seen from the
 // side closing on the target, a white flash where their fangs meet and chips
 // flying; his Rend: three ragged tears ripping down and back across the
-// enemy's guard, bits of it falling away. Neutral light and dust, never his
-// affinity (affinities are abstract, Jakub, 2026-10-11). Light effects are
-// additive in src/game/view/scene.ts.
-import { rampDither } from '../paint.ts';
+// enemy's guard, bits of it falling away. The Walking Bush's Root Lash: the
+// crack of a root across the target and chips of his wood; his Thicket: roots
+// of the same wood curling up round a champion's feet. Neutral light, dust and
+// their own wood, never their affinities (affinities are abstract, Jakub,
+// 2026-10-11). Light effects are additive in src/game/view/scene.ts.
+import { dith, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng } from '../raster.ts';
-import { burst, FxDef, ramps, sparks, W } from './kit.ts';
+import { burst, cut, FxDef, ramps, sparks, W } from './kit.ts';
 
 const DU = ramps.dust;
 /** A dull flash: grey to white, no hue of its own. */
@@ -88,6 +90,47 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
       }
       if (i === 1 || i === 2) burst(b, cx + 6, cy - 6, 8, 2, [12, 8][i - 1], 1.3, DULL, 0.4);
       if (i >= 2) sparks(b, cx - 2, cy + 4, 16, 26, (i - 2) / 5, DULL, 139, 16);
+    },
+  },
+  /** Root Lash: a root whips across the target, a pale crack where it lands, chips of wood and dust flying on. */
+  root_lash: {
+    w: 64, h: 56, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 4, 6, 4],
+    draw: (b, t, i) => {
+      const WO = ramps.wood;
+      const reach = [0.55, 1, 1, 1, 1, 1][i], heat = [1.3, 1.4, 1.1, 0.8, 0.55, 0.35][i], th = [2.6, 3.2, 2.6, 1.8, 1.2, 0.8][i];
+      if (i < 5) cut(b, 8, 18, 56, 34, -5, th, WO, heat, reach);
+      if (i === 1 || i === 2) burst(b, 38, 30, 7, 2, [11, 7][i - 1], 1.3, WO, 0.5);
+      if (i >= 1) sparks(b, 38, 30, 14, 24, (i - 1) / 4.5, WO, 157, 16);
+    },
+  },
+  /**
+   * Thicket: roots of the Walking Bush's wood curl up out of the ground round a
+   * champion's feet into a little thicket, hold, and sink back; dust where
+   * they break the ground. Played at the feet of the chosen ally and at his.
+   */
+  thicket: {
+    w: 60, h: 48, n: 10, ms: 70, ax: 0.5, ay: 1, pad: [2, 4, 8, 4],
+    draw: (b, t, i) => {
+      const WO = ramps.wood;
+      const gx = 30, gy = 46;
+      const grow = [0.25, 0.55, 0.85, 1, 1, 1, 1, 0.8, 0.5, 0.2][i];
+      const fade = i < 7 ? 1 : [0.75, 0.5, 0.25][i - 7];
+      // seven roots, twisting as they climb, the outer ones leaning in so that they cross
+      for (let k = 0; k < 7; k++) {
+        const x0 = gx + [-18, -12, -6, 0, 6, 12, 18][k], h = [15, 22, 27, 31, 26, 21, 14][k] * grow, lean = [0.32, 0.5, 0.18, -0.04, -0.2, -0.48, -0.3][k];
+        for (let s = 0; s <= h; s += 0.5) {
+          const f = s / Math.max(1, h);
+          const x = x0 + lean * s + Math.sin(f * 5 + k * 1.9) * 2.6 * f, y = gy - s;
+          const w = 2.1 * (1 - f) + 0.45;
+          for (let o = -w; o <= w; o += 0.5) {
+            const px = Math.round(x + o), py = Math.round(y);
+            if (!dith(px, py, fade)) continue;
+            // dark wood, lit along one side; only the tips catch the light
+            b.set(px, py, rampDither(WO, Math.min(3.4, 0.5 + (1 - Math.abs(o + w * 0.4) / (w * 1.4)) * 1.6 + f * 1.1), px, py));
+          }
+        }
+      }
+      if (i < 4) sparks(b, gx, gy - 1, 12, 20, i / 4, ramps.dust, 163, 6);
     },
   },
 };

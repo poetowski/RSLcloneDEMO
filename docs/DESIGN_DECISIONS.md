@@ -49,6 +49,7 @@ Section 7 lists what is not decided.
 | 2026-10-13 | The Follower, a Common of the Court of Root and the faction's first champion | 18 |
 | 2026-10-13 | The Court of Root's standard: a brown paw in place of the claw | 3.3, 3.6 |
 | 2026-10-13 | Zone 2: ten placeholder stages, to test the area in game | 5.4 |
+| 2026-10-13 | The Walking Bush, a Common of the Court of Root | 19 |
 
 ---
 
@@ -1245,3 +1246,41 @@ effects two white jaws closing and three ragged tears. Read by the game:
 affinity; the DEF Down comes after the hit, so it never weakens the Rend that
 places it, and its 50% meets the target's RES like any debuff (section 10).
 With no collar he carries no insignia.
+
+## 19. The Walking Bush (received 2026-10-13)
+
+Jakub's brief, verbatim:
+
+```
+i want to create new hero.
+name = Walking Bush
+this is common tank of court of root.
+affinity bloom.
+A1 attack single target
+A2 add DEF UP for yourself and one chosen ally for 1 turn. CD 3.
+design - this is a small weak ent but not from tree but from a bush. make it woody and fat with branches. does not have to have a head. attacks with his hand roots.
+```
+
+| | |
+|---|---|
+| Rarity | Common |
+| Role | Tank |
+| Faction | Court of Root |
+| Affinity | Bloom |
+| Kit | A1 an attack on one enemy; A2 DEF Up for 1 turn on himself and on one chosen ally, cooldown 3 (the brief names no A3 and no passive) |
+| Look | a small, weak ent grown from a bush, not a tree; woody and fat, with branches; no need of a head; he attacks with his root hands |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the skills' names
+(Root Lash, Thicket) and texts, A1's multiplier (1.0, a plain attack), the
+stats, the lore line, the stage that brings him (the first clear of 2-1,
+which lowered the power of 2-9), and the details of his art and effects: a
+fat round body of grey-brown woody stems on two stumpy root legs, branches
+standing up from his top and twigs from his sides with a few clusters of a
+bush's small leaves, no head but two dark hollows for eyes in the bark, long
+arms of root ending in four splayed root fingers; Root Lash a lash of one
+arm, Thicket his root fingers driven into the ground, their effects a crack
+of wood with chips and roots of his wood curling up round the feet. Read by
+the game: "one chosen ally" is someone other than himself while anyone else
+stands (alone, he is his own chosen ally, and the DEF Up lands once); placed
+on his own turn, his DEF Up lasts until the end of his next turn, and the
+ally's until the end of the ally's next turn (section 10).
