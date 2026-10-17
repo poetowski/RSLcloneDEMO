@@ -13,9 +13,14 @@
 // ally it shields. Big Ears' darts: a slim dart with a poisoned green point,
 // landing in a small flash and drops of the poison; his Hidden in the
 // Undergrowth: the grass stirring round his feet and his eye catching the
-// light. Neutral light, dust, their own wood, the bell's bronze and the darts'
-// poison, never their affinities (affinities are abstract, Jakub,
-// 2026-10-11). Light effects are additive in src/game/view/scene.ts.
+// light. The Grove Keeper's Thornburst: thorns of the grove's wood stabbing up
+// from the ground round the enemy and sinking back, the sap they draw drifting
+// home to him as green motes; his Cleansing Rite: leaves and green light
+// whirling up round an ally, carrying the afflictions off as violet motes that
+// fade; his Keeper's Balm: a sprig of green light sprouting at an ally's feet.
+// Neutral light, dust, their own wood, the bell's bronze, the darts' poison
+// and the grove's green, never their affinities (affinities are abstract,
+// Jakub, 2026-10-11). Light effects are additive in src/game/view/scene.ts.
 import { disc, dith, ellipseRing, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng, withAlpha } from '../raster.ts';
 import { burst, crescent, cut, FxDef, motes, ramps, ring, sparks, W } from './kit.ts';
@@ -313,6 +318,137 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
         b.set(cx, cy + Math.min(k, 3), c);
         b.set(cx, cy - Math.min(k, 3), c);
       }
+    },
+  },
+
+  /**
+   * Thornburst: thorns of the grove's wood stab up out of the ground round the
+   * enemy's feet, barbed, leaning out, hold and sink back; dust where they
+   * break the ground. Anchored at the feet.
+   */
+  thornburst: {
+    w: 72, h: 60, n: 10, ms: 55, ax: 0.5, ay: 1, pad: [4, 4, 6, 4],
+    draw: (b, t, i) => {
+      const WO = ramps.wood;
+      const gx = 36, gy = 58;
+      const grow = [0.35, 0.8, 1, 1, 1, 1, 0.85, 0.6, 0.35, 0.12][i];
+      const fade = i < 7 ? 1 : [0.7, 0.45, 0.2][i - 7];
+      for (let k = 0; k < 7; k++) {
+        const x0 = gx + [-20, -13, -6, 0, 7, 13, 20][k], h = [20, 30, 40, 46, 38, 28, 19][k] * grow, lean = [-0.55, -0.35, -0.14, 0.02, 0.18, 0.38, 0.58][k];
+        for (let q = 0; q <= h; q += 0.5) {
+          const f = q / Math.max(1, h);
+          const x = x0 + lean * q + Math.sin(f * 3 + k) * 1.2 * f, y = gy - q;
+          const w = 2.6 * (1 - f) + 0.35;
+          for (let o = -w; o <= w; o += 0.5) {
+            const px = Math.round(x + o), py = Math.round(y);
+            if (!dith(px, py, fade)) continue;
+            b.set(px, py, rampDither(WO, Math.min(4, 0.6 + (1 - Math.abs(o + w * 0.4) / (w * 1.4)) * 1.7 + f * 1.4), px, py));
+          }
+          // a barb off the thorn, every so often
+          if (Math.abs(q - h * 0.45) < 0.25 || Math.abs(q - h * 0.72) < 0.25) {
+            const side = (k + Math.round(q)) % 2 ? 1 : -1;
+            for (let s2 = 1; s2 <= 3; s2++) {
+              const px = Math.round(x + side * (w + s2)), py = Math.round(y - s2 * 0.8);
+              if (dith(px, py, fade)) b.set(px, py, WO[s2 < 3 ? 2 : 3]);
+            }
+          }
+        }
+      }
+      if (i < 4) sparks(b, gx, gy - 1, 14, 26, i / 4, ramps.dust, 359, 8);
+    },
+  },
+  /** The sap a thorn draws, drifting home to the Grove Keeper: a mote of green light (drawn as it flies; the battle does not turn it). */
+  sap_mote: {
+    w: 9, h: 9, n: 2, ms: 80, ax: 0.5, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      const cx = 4, cy = 4;
+      b.set(cx, cy, W);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(cx + dx, cy + dy, GN[i ? 3 : 4]);
+      if (i) for (const [dx, dy] of [[1, 1], [-1, -1]]) b.set(cx + dx, cy + dy, GN[2]);
+    },
+  },
+  /**
+   * Cleansing Rite reaches an ally: leaves and green light whirl up round it,
+   * and its afflictions are carried off as violet motes that fade as they rise.
+   * Anchored at the feet.
+   */
+  cleansing_rite: {
+    w: 60, h: 92, n: 11, ms: 60, ax: 0.5, ay: 1, pad: [2, 4, 6, 4],
+    draw: (b, t, i) => {
+      const VI = ramps.violet;
+      const cx = 30, gy = 90;
+      ellipseRing(b, cx, gy - 2, 10 + t * 10, 3 + t * 2, 1.4, (x, y, a) => (dith(x, y, 1 - t * 0.8) ? rampDither(GN, 2.6 + Math.sin(a) * 0.7, x, y) : 0));
+      // a column of soft green light rising through the ally, thinning as it goes
+      const col = Math.sin(Math.min(1, t * 1.6) * Math.PI) * 0.5;
+      for (let y = 6; y < gy - 2; y++) {
+        const k = (gy - 2 - y) / (gy - 8);
+        for (let dx = -9; dx <= 9; dx++) {
+          const e = 1 - Math.abs(dx) / 10;
+          const x = cx + dx;
+          if (dith(x, y, col * e * e * (1 - k * 0.7))) b.set(x, y, rampDither(GN, 1.4 + e * 1.6, x, y));
+        }
+      }
+      // the whirl: leaves and points of green light winding up round the ally
+      for (let k = 0; k < 16; k++) {
+        const tt = t * 1.3 - (k / 16) * 0.42;
+        if (tt < 0 || tt > 1) continue;
+        const a = tt * Math.PI * 3.4 + k * 0.4;
+        const rr = 12 + Math.sin(tt * Math.PI) * 5;
+        const x = Math.round(cx + Math.cos(a) * rr), y = Math.round(gy - 6 - tt * 76);
+        const front = Math.sin(a) > 0;
+        if (!dith(x, y, (front ? 1 : 0.65) * (1 - tt * 0.35))) continue;
+        if (k % 4 === 0) {
+          b.set(x, y, W);
+          for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(x + dx, y + dy, GN[4]);
+        } else {
+          // a leaf turning in the whirl
+          const s2 = Math.cos(a + k) > 0 ? 1 : -1;
+          b.set(x, y, GN[front ? 4 : 3]);
+          b.set(x + s2, y, GN[front ? 3 : 2]);
+          b.set(x, y + 1, GN[front ? 3 : 2]);
+        }
+      }
+      // the afflictions lifted out of it, violet motes fading as they rise
+      const r = rng(367);
+      for (let k = 0; k < 7; k++) {
+        const x0 = cx + (r() - 0.5) * 18, start = 0.12 + r() * 0.3, sp = 1 + r() * 0.4;
+        const tt = (t - start) * sp;
+        if (tt <= 0 || tt >= 1) continue;
+        const x = Math.round(x0 + Math.sin(tt * 6 + k) * 2), y = Math.round(gy - 28 - tt * 54);
+        if (!dith(x, y, 1 - tt * 0.8)) continue;
+        b.set(x, y, VI[Math.max(2, Math.round(4 - tt * 2))]);
+        if (tt < 0.6) for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(x + dx, y + dy, VI[2]);
+      }
+    },
+  },
+  /**
+   * Keeper's Balm reaches an ally: a sprig of green light sprouts at its feet,
+   * its two leaves opening, and soft green motes rise round it. Anchored at the
+   * feet.
+   */
+  keepers_balm: {
+    w: 48, h: 60, n: 9, ms: 65, ax: 0.5, ay: 1, pad: [2, 4, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 24, gy = 58;
+      const grow = [0.25, 0.55, 0.85, 1, 1, 1, 1, 0.8, 0.5][i];
+      const fade = i < 6 ? 1 : [0.7, 0.45, 0.2][i - 6];
+      const h = 16 * grow;
+      for (let q = 0; q <= h; q += 0.5) {
+        const x = Math.round(cx + Math.sin(q * 0.3) * 1.2), y = Math.round(gy - q);
+        if (dith(x, y, fade)) b.set(x, y, rampDither(GN, 1.6 + (q / 16) * 2.4, x, y));
+      }
+      if (grow > 0.6) {
+        const top = gy - h;
+        for (const side of [-1, 1]) {
+          for (let q = 0; q <= 6 * grow; q += 0.5) {
+            const x = Math.round(cx + side * q), y = Math.round(top + 4 - Math.sin((q / 6) * Math.PI) * 2.6 - q * 0.3);
+            if (dith(x, y, fade)) b.set(x, y, rampDither(GN, 2.6 + (1 - q / 6), x, y));
+            if (q > 1 && q < 5 && dith(x, y + 1, fade * 0.7)) b.set(x, y + 1, GN[2]);
+          }
+        }
+      }
+      ellipseRing(b, cx, gy - 2, 6 + t * 10, 2 + t * 1.6, 1.1, (x, y, a) => (dith(x, y, fade * (1 - t * 0.6)) ? rampDither(GN, 2.4 + Math.sin(a) * 0.6, x, y) : 0));
+      motes(b, cx, gy - 4, 26, 40, 7, t, GN, 373);
     },
   },
 };

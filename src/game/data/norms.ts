@@ -1,6 +1,7 @@
 // Balance norms: the numeric guardrails every champion and stage must respect.
 // Enforced by tests/content.test.ts and reported by `npm run balance`.
 // Changing a norm is a design decision: update docs/MECHANICS_GUIDE.md too.
+import { STATUSES } from './statuses';
 import { ChampionDef, Rarity, SkillDef, Stats } from './types';
 
 /** Weighted stat sum used to compare champions of different roles on one scale. */
@@ -97,9 +98,14 @@ export function auditChampion(c: ChampionDef): string[] {
   if (p?.kind === 'rebuke' && !(p.cooldown && p.cooldown >= 1)) out.push(`${p.id}: a rebuke needs a cooldown`);
   // a stat passive is extra, outside the budget (Jakub, 2026-10-12): it only has to name its stat
   if (p?.kind === 'stat' && !p.stat) out.push(`${p.id}: a stat passive needs a stat`);
-  // so is a fallen passive, which also needs its cap; tend and ward have something to give, and ward a chance
+  // so is a fallen passive, which also needs its cap; tend, ward, retaliate and remedy have something to give,
+  // a chance between 0 and 1 when they roll one; a retaliation hurts the attacker, and a remedy, answering a
+  // debuff, only helps (a debuff would answer itself)
   if (p?.kind === 'fallen' && (!p.stat || !p.max)) out.push(`${p.id}: a fallen passive needs a stat and a cap`);
-  if ((p?.kind === 'tend' || p?.kind === 'ward') && !p.statuses?.length) out.push(`${p.id}: a ${p.kind} passive needs statuses`);
-  if (p?.kind === 'ward' && !(p.chance && p.chance > 0 && p.chance <= 1)) out.push(`${p.id}: a ward needs a chance`);
+  if ((p?.kind === 'tend' || p?.kind === 'ward' || p?.kind === 'retaliate' || p?.kind === 'remedy') && !p.statuses?.length) out.push(`${p.id}: a ${p.kind} passive needs statuses`);
+  if (p?.chance !== undefined && !(p.chance > 0 && p.chance <= 1)) out.push(`${p.id}: a chance of ${p.chance}`);
+  if (p?.kind === 'retaliate' && p.statuses?.some((st) => STATUSES[st.status].buff)) out.push(`${p.id}: a retaliation places debuffs`);
+  if (p?.kind === 'remedy' && p.statuses?.some((st) => !STATUSES[st.status].buff)) out.push(`${p.id}: a remedy gives buffs`);
+  if (p?.self && p.kind !== 'ward') out.push(`${p.id}: only a ward guards its holder alone`);
   return out;
 }

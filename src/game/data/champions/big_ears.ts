@@ -20,7 +20,7 @@ export const bigEars: ChampionDef = {
   affinity: 'ember',
   faction: 'court_of_root',
   color: '#c79aa8',
-  muzzle: [44, 32],
+  muzzle: [46, 32],
   stats: { hp: 960, atk: 124, def: 56, spd: 118, crit: 0.05, critDmg: 1, acc: 0, res: 0 },
   lore: 'A small dweller of the undergrowth of the Court of Root, which hides in jungle and forest: a big head, two great ears that miss nothing, and a blowpipe of poisoned darts. Like every champion, a fragment the Archivist recollects.',
   skills: [

@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -279,9 +279,22 @@ export class BattleScene {
           v.hp = v.lagHp = a.hp;
         });
       }
+      // nor a heal a blow returns to its user
+      if (skill.healSelf) {
+        actor.hp = Math.round(actor.maxHp * 0.6);
+        const v = this.view(actor.uid);
+        v.hp = v.lagHp = actor.hp;
+      }
       this.active = this.view(actor.uid);
       const valid = this.battle.validTargets(actor, skill);
-      const target = valid[Math.min(targetSlot, valid.length - 1)]?.uid;
+      // a cleanse only shows on the afflicted: the demo afflicts an ally other than the user and aims at it
+      const slot = skill.cleanseAll && valid.length > 1 ? Math.max(1, targetSlot) : targetSlot;
+      const target = valid[Math.min(slot, valid.length - 1)]?.uid;
+      if (skill.cleanseAll && target) {
+        const t = this.battle.get(target);
+        for (const s of ['poison', 'atk_down'] as const) this.battle.addStatus(t, s, 2, 0, 'demo');
+        this.syncStatuses(this.view(target));
+      }
       await this.clock.wait(500);
       const res = this.battle.useSkill(actor, skill, target);
       await this.perform(res);
@@ -501,8 +514,10 @@ export class BattleScene {
           pale_shard: ['#f2feff', '#c8f0ff', '#5cc4ea'],
           // Big Ears' darts: a wisp of the poison on their tips
           dart: ['#eaffc8', '#a2f56a', '#4cd43a'],
+          // the Associate's motes, white light shedding a pale blue
+          mote_bolt: ['#ffffff', '#cfe9ff', '#8fc0ff'],
         };
-        const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10, dart: 4 };
+        const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10, dart: 4, mote_bolt: 6 };
         const slow = skill.projectile === 'ice_shard' || skill.projectile === 'grave_orb' || skill.projectile === 'sound_ring';
         for (const t of targets) {
           pendings.push(this.fx.projectile(skill.projectile, from, t.chest(), { speed: slow ? 440 : 620, arc: skill.projectile.startsWith('arrow') ? 8 : arcs[skill.projectile] ?? 0, trail: trails[skill.projectile], rotate: skill.projectile !== 'sun_orb' }).then(() => groupFx(t)));
@@ -571,6 +586,19 @@ export class BattleScene {
           (async () => {
             await this.clock.wait(n * 70);
             await this.fx.projectile('wisp', primary.chest(), actor.chest(), { speed: 260, arc: 18 + n * 6, rotate: false, trail: ['#fbe8ff', '#a44cff', '#3a0f5a'] });
+          })(),
+        );
+      }
+      await Promise.all(ws);
+    }
+    // a heal the blow returns to its user (the Grove Keeper's Thornburst): the sap drifts back to him before it shows
+    if (skill.healSelf && primary && primary !== actor && res.events.some((e) => e.kind === 'heal' && e.target === actor.uid)) {
+      const ws: Promise<void>[] = [];
+      for (let n = 0; n < 3; n++) {
+        ws.push(
+          (async () => {
+            await this.clock.wait(n * 90);
+            await this.fx.projectile('sap_mote', { x: primary.x, y: primary.y - 6 }, actor.chest(), { speed: 240, arc: 14 + n * 8, rotate: false, trail: ['#eaffc8', '#a2f56a', '#22922c'] });
           })(),
         );
       }
@@ -715,8 +743,9 @@ export class BattleScene {
         this.fx.text(v.uid, v.x, top(), 'RESIST', { color: '#c0c8d8' });
         break;
       case 'cleanse':
-        this.syncStatuses(v);
-        this.fx.text(v.uid, v.x, top(), 'CLEANSED', { color: '#eaffc8' });
+        // each debuff a cleanse lifts, by name, like a dispel's
+        this.removeStatus(v, e.status);
+        this.fx.text(v.uid, v.x, top(), `-${STATUSES[e.status].name.toUpperCase()}`, { color: '#eaffc8' });
         break;
       case 'dispel': {
         const had = v.statuses.some((s) => s.id === e.status);
@@ -752,15 +781,19 @@ export class BattleScene {
         break;
       case 'passive': {
         const src = e.source ? this.views.get(e.source) : undefined;
-        if (e.effect === 'tend' || e.effect === 'ward') {
-          // a passive that guards an ally acts often: no banner, its name over its holder and its ward on the ally
+        if (e.effect === 'tend' || e.effect === 'ward' || e.effect === 'retaliate' || e.effect === 'remedy') {
+          // a passive acting in the flow of the fight acts often: no banner, its name over its holder, then its
+          // effects as its data names them, on the holder (the Jungle Herder's bell) and on whom it reaches
+          // (the ally it shields or soothes, the enemy it answers)
           const holder = src ?? v;
+          const p = holder.champion.passive;
           this.fx.text(holder.uid, holder.x, holder.head().y - 30 - (holder.boss ? 8 : 0), e.name.toUpperCase(), { color: '#a2f56a' });
-          if (e.effect === 'tend' && src) {
-            // the Jungle Herder's bell chimes at his belt (the effect stands on his feet), then the ward settles on the frailest
-            void this.fx.spawn('herd_bell', src.x, src.y, { layer: 'top', additive: true, flip: src.facing === 'L' });
-            void this.clock.wait(140).then(() => this.fx.spawn('herd_ward', v.x, v.y + 1, { layer: 'top', additive: true }));
-          } else void this.fx.spawn('flag_ward', v.chest().x, v.chest().y, { layer: 'top', additive: true, flip: v.facing === 'L' });
+          if (p?.holderFx) this.spawnHitFx(p.holderFx, holder, holder.facing === 'L');
+          const reach = p?.fx;
+          if (reach) {
+            if (p?.holderFx) void this.clock.wait(140).then(() => this.spawnHitFx(reach, v, v.facing === 'L'));
+            else this.spawnHitFx(reach, v, v.facing === 'L');
+          }
           break;
         }
         this.hud.showBanner(e.name, v.team === 'player' ? '#ffe9a0' : '#ffc0b0');

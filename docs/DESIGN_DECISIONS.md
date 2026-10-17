@@ -56,6 +56,11 @@ Section 7 lists what is not decided.
 | 2026-10-17 | Red Cloak, an Elite of the Sanguine Dominion, Damage | 23 |
 | 2026-10-17 | Big Ears, an Elite of the Court of Root, Damage | 24 |
 | 2026-10-17 | The affinities of the four Elites: Jakub sets them later | 7, 21-24 |
+| 2026-10-17 | Big Ears' face made more animal, his ears smaller and curved | 24 |
+| 2026-10-17 | The Associate, an Elite Support of the Azure Crown | 25 |
+| 2026-10-17 | The Black Rhino, an Elite Tank of the Sanguine Dominion | 26 |
+| 2026-10-17 | The Grove Keeper, an Elite Support of the Court of Root | 27 |
+| 2026-10-17 | The affinities of the Associate, the Black Rhino and the Grove Keeper: not set | 7, 25-27 |
 
 ---
 
@@ -665,11 +670,15 @@ open questions.
   Quartermaster's, the Enforcer's, the Bloodhound's and the Dominion
   Medic's 2026-10-12, sections 14-17, the Follower's, the Walking Bush's and
   the Wild Speaker's 2026-10-13, sections 18-20, and the Jungle Herder's,
-  Emissary Handlings', Red Cloak's and Big Ears' 2026-10-17, sections 21-24;
-  their numbers are not)*
+  Emissary Handlings', Red Cloak's, Big Ears', the Associate's, the Black
+  Rhino's and the Grove Keeper's 2026-10-17, sections 21-27; their numbers
+  are not)*
 - The affinities of the Jungle Herder, Emissary Handlings, Red Cloak and Big
   Ears: Jakub, 2026-10-17, "i will optimize affinities for these 4 new heroes
   later" *(the game stands in Bloom, Tide, Bloom and Ember)*
+- The affinities of the Associate ("Todo"), the Black Rhino ("Not specified")
+  and the Grove Keeper ("Todo"), his proposals of 2026-10-17, sections 25-27
+  *(the game stands in Ember, Bloom and Tide)*
 - Art pipeline specification
 - Save and progression *(gear decided: the Weaver Matrix, section 9; levels,
   ranks, ascension and skill upgrades are not)*
@@ -1566,7 +1575,8 @@ the Elite budget, C.RATE 5%), the lore line, the stage that brings him (the
 first clear of 2-9), and the details of his art and effects: a small dweller
 of the undergrowth, the Court's hidden kind: a big round head with a short
 snout and one large amber eye for the dark, two great ears, broad and splayed
-like a bat's, pink inside, thin limbs, big hands and feet, a dusky mauve hide;
+like a bat's, pink inside (his face and ears since reworked on his word,
+below), thin limbs, big hands and feet, a dusky mauve hide;
 a loincloth of dark hide, a sash with a quiver of cane holding fletched darts,
 a gourd of poison with a green stopper at his belt, a string of small teeth
 round his neck; the blowpipe a cane longer than he is tall, bound with dark
@@ -1580,3 +1590,212 @@ bonus shows over him. Read by the game: a dead ally is one fallen in this
 battle; the bonus is extra to the stat budget and applies in battle only, like
 a stat passive (section 10); Dart Volley's Heal Block, with no chance named,
 is certain, and meets RES like every debuff.
+
+His word the same day, verbatim (section 25 quotes the whole message):
+
+```
+also, rework the face of big ears and also make his ears a little smaller and curved. his face should look more animalistic maybe without defined humanoid efatures and fangs.
+```
+
+Built: the face of a beast of the undergrowth: a long pointed snout ending in
+a dark wet nose, whiskers, the eye amber with a slit of a pupil in a mask of
+darker fur, with no lid and no smile, a ruff of fur at the cheek, the mouth
+running back under the snout with two fangs over the lip; the ears shorter
+(21 px where they were 25 and 24) and curving back along their length, folds
+in their pink skin, his height kept at the game's 64 px floor; the dart now
+leaves the pipe 2 px further on, at its new end. Read: "without defined
+humanoid features and fangs" as no human features, and fangs.
+
+## 25. The Associate (received 2026-10-17)
+
+Jakub's proposal, verbatim (his file of proposals, `newHeroes_md.md.txt`,
+updated the same day with three new champions; the three are sections 25-27):
+
+```
+## Associate
+
+- **Champion name:** Associate
+- **Faction:** Azure Crown
+- **Affinity:** Todo
+- **Class:** Support
+- **Rarity:** Elite
+
+### Kit
+
+A1 - attack 1 enemy. Has 50% chance to debuff target enemy with Attack Down for 1 turn.
+A2 - buff all allies with SPEED UP for 2 turns and ATTACK UP for 1 turn. CD 5 turns.
+A3 passive - when this champion is hit by enemy attack, has 35% chance to retaliate with poison debuff on that enemy for 1 turn.
+
+### Design
+
+Woman mage wearing a full azure robe with white stripes and dark-blue woven shoulders. She carries a magic staff with small white particles around its broader top. She has medium-length dark curly hair.
+```
+
+His message with it, verbatim:
+
+```
+i updated the newHeroes_md.md.txt file with 3 new hero designs. proceed with their delivery based on the file instructions. be creative in design art. also, rework the face of big ears and also make his ears a little smaller and curved. his face should look more animalistic maybe without defined humanoid efatures and fangs.
+```
+
+| | |
+|---|---|
+| Rarity | Elite |
+| Role | Support |
+| Faction | Azure Crown |
+| Affinity | not set ("Todo", section 7) |
+| Kit | A1 an attack on one enemy with a 50% chance to place ATK Down on it for 1 turn; A2 SPD Up on all allies for 2 turns and ATK Up for 1 turn, cooldown 5; her A3 a passive: when an enemy attack hits her, a 35% chance to answer with Poison on that enemy for 1 turn |
+| Look | a woman mage in a full azure robe with white stripes and dark-blue woven shoulders, a magic staff with small white particles round its broader top, medium-length dark curly hair |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the affinity
+(Ember), the names Mote Bolt, Quickening and Bitter Motes and their texts,
+A1's multiplier (1.0, a plain attack), the stats (on the Elite budget, a
+little under it for the passive), the lore line, the stage that brings her
+(the first clear of 2-4), and the details of her art and effects: a mage of
+the Crown, tall and calm, warm brown skin; a full robe of azure from her
+throat to her feet, two white stripes down its front and side and up the
+bodice, a white band at the hem, at the cuffs of the wide sleeves and at the
+collar, a white cord knotted at the waist; over her shoulders a short cape of
+dark-blue cloth in a basket weave, fringed; dark curls in round bunches to
+her shoulders, a curl by her cheek; slippers of the cape's blue; the staff
+of dark polished wood shod in silver, its broader head three silver tines
+opening like a small crown with a pale light at their heart, and seven white
+motes circling it, each rising and sinking at its own pace. Mote Bolt: she
+draws the staff back over her shoulder as the motes gather in the tines, then
+points it with both hands and they fly as one bolt, bursting white on the
+enemy and sinking as they dim; Quickening: she lifts the staff high in both
+hands, the motes flare and spread round its head, then she sweeps it out over
+her allies and the motes wind up round each of them with streaks of speed;
+Bitter Motes: her motes circle the enemy that struck her, close in and sting,
+turning the green of the poison (the poison is what the passive does). Read
+by the game: "hit by enemy attack" is an enemy skill that damages her and
+leaves her standing (a counterattack too), answered once per skill, however
+many hits it took, while the attacker stands; the Poison meets its RES like
+every debuff (section 10), and placed on its own turn it counts from its
+next, so it ticks once; the ATK Down meets RES too; "all allies" includes her,
+and her own SPD Up and ATK Up, placed on her turn, cover her next two turns
+and her next one.
+
+## 26. The Black Rhino (received 2026-10-17)
+
+Jakub's proposal, verbatim (section 25 quotes his message):
+
+```
+## Black Rhino
+
+- **Champion name:** Black Rhino
+- **Faction:** Sanguine Dominion
+- **Affinity:** Not specified
+- **Class:** Tank
+- **Rarity:** Elite
+
+### Kit
+
+A1 - attack one enemy target. has 20% chance to stun target for 1 turn.
+A2 - apply buff DEF UP for all allies for 2 turns. Add counter buff on this champion for 2 turns. CD 5 turns.
+A3 passive - when this champion is hit by enemy, apply shield on himself of 10% of this champion max HP for 1 turn. after the enemy hit.
+
+### Design
+
+Bulky, furry black bull with long prosthetic tusks designed to increase its damage. Its master has painted a red X mark on its back.
+```
+
+| | |
+|---|---|
+| Rarity | Elite |
+| Role | Tank |
+| Faction | Sanguine Dominion |
+| Affinity | not set ("Not specified", section 7) |
+| Kit | A1 an attack on one enemy with a 20% chance to Stun it for 1 turn; A2 DEF Up on all allies for 2 turns and Counterattack on himself for 2 turns, cooldown 5; his A3 a passive: when an enemy hits him, a Shield of 10% of his max HP on himself for 1 turn, after the hit |
+| Look | a bulky, furry black bull with long prosthetic tusks made to raise its damage, a red X its master painted on its back |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the affinity
+(Bloom), the names Gore, War Bellow and Thick Hide and their texts, A1's
+multiplier (1.0, a plain attack), the stats (on the Elite budget, a little
+under it for the passive), the lore line, the stage that brings him (the
+first clear of 2-6), and the details of his art and effects: a great black
+bull, the roster's largest beast, low and massive: a shoulder hump under a
+shaggy mane running down his neck, his chest and the tops of his forelegs,
+the hindquarters sleeker, a long switch of a tail; his own horns sawn to
+stumps and capped in iron; the prosthetic tusks two long tusks of ivory,
+banded and tipped with iron, held to his muzzle by a band of leather,
+running forward under his nose and curving up before it; a broad grey muzzle
+and a deep-set eye with a red glint; the X his master painted, two crude
+strokes of red with drips, across his back behind the hump. Gore: he drops
+his head with the tusks levelled, drives them forward and up through the
+enemy and tosses his head; War Bellow: he paws the ground, stamps, throws his
+head up and bellows; their effects two thrusts of light where the tusks go, a
+dull flash and chips tossed up, and heavy rings of sound from his mouth, with
+the dust of the stamp at each ally's feet and a wall of dull iron light
+rising before it. Thick Hide: a shell of dull light closes over him, his coat
+bristling. Read by the game: the brief names him a rhino and describes a
+bull, so he is drawn as the bull of the brief, and the lore line says he is
+called the Black Rhino for the tusks his master strapped on; "hit by enemy" is
+an enemy skill that damages him and leaves him standing (a counterattack
+too), answered every time, once per skill however many hits it took (Poison
+and Burn are no hit); the Shield, placed again, refreshes to the larger
+value like every status, and placed on an enemy's turn it lasts until the
+end of his next turn; the Stun meets RES; "all allies" includes himself, and
+his Counterattack, placed on his own turn, covers his next two turns.
+
+## 27. The Grove Keeper (received 2026-10-17)
+
+Jakub's proposal, verbatim (section 25 quotes his message):
+
+```
+## Grove Keeper
+
+- **Champion name:** Grove Keeper
+- **Faction:** Court of Root
+- **Affinity:** Todo
+- **Class:** Support
+- **Rarity:** Elite
+
+### Kit
+
+A1 - attack 1 enemy target. heal this champion for 7% of his max HP.
+A2 - remove all debuffs from single ally target. CD 3.
+A3 passive - when enemy applies debuff on ally, has 35% chance to buff this ally with REGEN buff for 1 turn.
+
+### Design
+
+This is old man with antlers and druidic ornamental robe and druidic staff. This guy has long gray hair.
+```
+
+| | |
+|---|---|
+| Rarity | Elite |
+| Role | Support |
+| Faction | Court of Root |
+| Affinity | not set ("Todo", section 7) |
+| Kit | A1 an attack on one enemy that heals him by 7% of his max HP; A2 removes every debuff from one ally, cooldown 3; his A3 a passive: when an enemy places a debuff on an ally, a 35% chance to give that ally Regen for 1 turn |
+| Look | an old man with antlers in a druidic ornamental robe, with a druidic staff and long grey hair |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the affinity
+(Tide), the names Thornburst, Cleansing Rite and Keeper's Balm and their
+texts, A1's multiplier (1.0, a plain attack), the stats (on the Elite
+budget, a little under it for the passive), the lore line, the stage that
+brings him (the first clear of 2-8), and the details of his art and effects:
+an old keeper of the groves, tall and a little stooped; two branching antlers
+from his brow, the near one sweeping back, the far one rising forward, their
+tips pale; long grey hair down his back, a long grey beard to his chest,
+bushy brows over deep-set eyes; a long robe of moss green worked with old
+gold, a border of knotwork at its hem, a band down its front, gold at the
+collar and at the cuffs of its wide sleeves; a cord at his waist hung with a
+disc of carved bone and a feather; bare feet; a staff of gnarled wood taller
+than he is, ivy twining up it, its head three roots twisting round a seed of
+pale green light, leaves sprouting from them. Thornburst: he lifts the staff
+in both hands and drives its foot into the ground; thorns of the grove's wood
+stab up round the enemy's feet and sink back, and their sap drifts home to
+him as green motes before the heal shows; Cleansing Rite: he raises the
+staff, the seed blazes, and he sweeps his open hand toward the ally; leaves
+and green light whirl up round it, carrying its afflictions off as violet
+motes. Keeper's Balm: a sprig of green light sprouts at the ally's feet. Read
+by the game: the heal comes after the hit, and Heal Block stops it; the
+"single ally target" may be himself, and every debuff goes, Stun and Freeze
+too; the AI keeps the rite for when an ally carries a debuff and aims it at
+the one carrying the most; "enemy applies debuff on ally" is a debuff an
+enemy lands (one resisted was never applied), from a skill or a passive, on
+anyone on his side, himself included, and each debuff that lands rolls once,
+so a skill placing two rolls twice; the Regen, placed on the enemy's turn,
+heals at the start of the ally's next turn (15% of its max HP, section 10)
+and then ends.

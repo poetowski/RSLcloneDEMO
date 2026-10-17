@@ -1,12 +1,13 @@
 // Battle rules. Every rule is proven on the synthetic champions of
 // tests/fixtures.ts; the last block runs the real roster through full battles.
 import { describe, expect, it } from 'vitest';
+import { decide } from '../src/game/battle/ai';
 import { Battle, combatants, landShare } from '../src/game/battle/battle';
 import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { bannerman, brute, cleaver, drummer, fixture, freezer, guard, inAffinity, keen, medic, mender, mourner, overdrive, provisioner, rebuker, sheltering, stalker, striker, tender, twin, undying, warden } from './fixtures';
+import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, guard, hide, inAffinity, keen, medic, mender, mourner, overdrive, provisioner, rebuker, sheltering, stalker, stinger, striker, tender, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -535,6 +536,118 @@ describe('statuses', () => {
     b2.get('e1').hp = 1;
     b2.useSkill(b2.get('p0'), mourner.skills[0], 'e1');
     expect(b2.critRate(b2.get('p0'))).toBe(0);
+  });
+
+  it('wards only its holder with a ward of its own, after every enemy blow on it, once per skill', () => {
+    const b = new Battle(combatants([hide, striker]), combatants([twin]), { seed: 5 });
+    const r = b.useSkill(b.get('e0'), skill(twin, 'twin_sweep'));
+    // the sweep struck both, twice each: the hide answers once, for itself alone
+    expect(r.events.filter((e) => e.kind === 'passive').map((e) => e.kind === 'passive' && [e.effect, e.target, e.source])).toEqual([['ward', 'p0', 'p0']]);
+    expect(r.events.filter((e) => e.kind === 'damage').every((e) => e.kind === 'damage' && e.absorbed === 0)).toBe(true);
+    expect(b.get('p0').statuses.find((x) => x.id === 'shield')?.value).toBe(150);
+    expect(b.has(b.get('p1'), 'shield')).toBe(false);
+    // every time, with no chance to roll
+    for (let seed = 1; seed <= 30; seed++) {
+      const h = new Battle(combatants([hide]), combatants([striker]), { seed });
+      expect(h.useSkill(h.get('e0'), striker.skills[0], 'p0').events.some((e) => e.kind === 'passive'), `seed ${seed}`).toBe(true);
+    }
+  });
+
+  it('answers an enemy blow on its holder on the attacker after the hit, once per skill, and never once the holder has fallen', () => {
+    const b = new Battle(combatants([stinger(1), striker]), combatants([twin]), { seed: 3 });
+    const r = b.useSkill(b.get('e0'), skill(twin, 'twin_sweep'));
+    const answers = r.events.filter((e) => e.kind === 'passive');
+    expect(answers.map((e) => e.kind === 'passive' && [e.effect, e.target, e.source])).toEqual([['retaliate', 'e0', 'p0']]);
+    expect(r.events.findIndex((e) => e.kind === 'passive')).toBeGreaterThan(r.events.map((e) => e.kind).lastIndexOf('damage'));
+    expect(b.has(b.get('e0'), 'poison')).toBe(true);
+    // a blow that fells it, or a skill of its own side, is answered by nobody
+    const k = new Battle(combatants([stinger(1), striker]), combatants([twin]), { seed: 3 });
+    k.get('p0').hp = 1;
+    expect(k.useSkill(k.get('e0'), skill(twin, 'twin_chop'), 'p0').events.some((e) => e.kind === 'passive')).toBe(false);
+    expect(k.useSkill(k.get('p1'), striker.skills[0], 'e0').events.some((e) => e.kind === 'passive')).toBe(false);
+    // the Poison meets the attacker's RES
+    const tough = { ...twin, stats: { ...twin.stats, res: 1e9 } };
+    const res = new Battle(combatants([stinger(1)]), [{ def: tough }], { seed: 3 });
+    const rr = res.useSkill(res.get('e0'), tough.skills[0], 'p0');
+    expect(rr.events.some((e) => e.kind === 'resist' && e.status === 'poison' && e.target === 'e0')).toBe(true);
+  });
+
+  it("retaliates with its chance, and a 1-turn Poison placed on the attacker's own turn ticks once", () => {
+    let answered = 0;
+    for (let seed = 1; seed <= 200; seed++) {
+      const b = new Battle(combatants([stinger(0.35)]), combatants([striker]), { seed });
+      if (b.useSkill(b.get('e0'), striker.skills[0], 'p0').events.some((e) => e.kind === 'passive')) answered++;
+    }
+    expect(answered).toBeGreaterThan(45);
+    expect(answered).toBeLessThan(95);
+    const b = new Battle(combatants([stinger(1)]), combatants([striker]), { seed: 8 });
+    const a = b.get('e0');
+    b.startTurn(a);
+    b.useSkill(a, striker.skills[0], 'p0');
+    b.endTurn(a);
+    expect(b.has(a, 'poison')).toBe(true);
+    const tick = b.startTurn(a).events.filter((e) => e.kind === 'damage');
+    expect(tick.map((e) => e.kind === 'damage' && e.dot)).toEqual(['poison']);
+    b.endTurn(a);
+    expect(b.has(a, 'poison')).toBe(false);
+  });
+
+  it('soothes an ally an enemy debuffs, the holder included, once for each debuff that lands', () => {
+    const b = new Battle(combatants([balm(1), striker]), combatants([warden]), { seed: 2 });
+    const r = b.useSkill(b.get('e0'), skill(warden, 'dispel_strike'), 'p1');
+    const kinds = r.events.filter((e) => e.target === 'p1' && e.kind !== 'damage').map((e) => (e.kind === 'status' ? `${e.kind}:${e.status}` : e.kind === 'passive' ? `${e.kind}:${e.effect}` : e.kind));
+    expect(kinds).toEqual(['status:def_down', 'passive:remedy', 'status:regen']);
+    expect(r.events.find((e) => e.kind === 'passive')).toMatchObject({ target: 'p1', source: 'p0' });
+    expect(b.has(b.get('p1'), 'regen')).toBe(true);
+    // the holder itself
+    const own = b.useSkill(b.get('e0'), skill(warden, 'dispel_strike'), 'p0');
+    expect(own.events.some((e) => e.kind === 'passive' && e.target === 'p0')).toBe(true);
+    // a resisted debuff was never placed
+    const res = new Battle([{ def: balm(1) }, { def: striker, stats: { ...striker.stats, res: 1e9 } }], combatants([warden]), { seed: 2 });
+    const rr = res.useSkill(res.get('e0'), skill(warden, 'dispel_strike'), 'p1');
+    expect(rr.events.some((e) => e.kind === 'resist')).toBe(true);
+    expect(rr.events.some((e) => e.kind === 'passive')).toBe(false);
+    // with its chance
+    let soothed = 0;
+    for (let seed = 1; seed <= 200; seed++) {
+      const h = new Battle(combatants([balm(0.35), striker]), combatants([warden]), { seed });
+      if (h.useSkill(h.get('e0'), skill(warden, 'dispel_strike'), 'p1').events.some((e) => e.kind === 'passive')) soothed++;
+    }
+    expect(soothed).toBeGreaterThan(45);
+    expect(soothed).toBeLessThan(95);
+  });
+
+  it('heals its user by a share of its own max HP after the blow, unless Heal Block stops it', () => {
+    const b = new Battle(combatants([druid]), combatants([striker]), { seed: 1 });
+    const d = b.get('p0');
+    d.hp = 600;
+    const r = b.useSkill(d, skill(druid, 'briar'), 'e0');
+    expect(r.events.filter((e) => e.kind === 'heal').map((e) => e.kind === 'heal' && [e.target, e.amount])).toEqual([['p0', 84]]);
+    expect(r.events.findIndex((e) => e.kind === 'heal')).toBeGreaterThan(r.events.findIndex((e) => e.kind === 'damage'));
+    expect(d.hp).toBe(684);
+    b.addStatus(d, 'heal_block', 2, 0, 'test');
+    const blocked = b.useSkill(d, skill(druid, 'briar'), 'e0');
+    expect(blocked.events.some((e) => e.kind === 'blocked' && e.target === 'p0')).toBe(true);
+    expect(d.hp).toBe(684);
+  });
+
+  it('lifts every debuff off the one ally with a full cleanse, and the AI keeps it for an afflicted ally', () => {
+    const b = new Battle(combatants([druid, striker, guard]), combatants([twin]), { seed: 1 });
+    const s = b.get('p1');
+    for (const id of ['poison', 'atk_down', 'stun', 'def_up'] as const) b.addStatus(s, id, 2, 0, 'test');
+    b.addStatus(b.get('p2'), 'burn', 2, 0, 'test');
+    const r = b.useSkill(b.get('p0'), skill(druid, 'rite'), 'p1');
+    expect(r.events.filter((e) => e.kind === 'cleanse').map((e) => e.kind === 'cleanse' && [e.target, e.status])).toEqual([['p1', 'poison'], ['p1', 'atk_down'], ['p1', 'stun']]);
+    expect(s.statuses.map((x) => x.id)).toEqual(['def_up']);
+    // only the chosen ally
+    expect(b.has(b.get('p2'), 'burn')).toBe(true);
+    // the AI: nothing to cleanse, no cleanse; then the most afflicted ally
+    const c = new Battle(combatants([druid, striker, guard]), combatants([twin]), { seed: 1 });
+    expect(decide(c, c.get('p0')).skill.id).not.toBe('rite');
+    c.addStatus(c.get('p1'), 'poison', 2, 0, 'test');
+    c.addStatus(c.get('p2'), 'poison', 2, 0, 'test');
+    c.addStatus(c.get('p2'), 'def_down', 2, 0, 'test');
+    expect(decide(c, c.get('p0'))).toMatchObject({ skill: { id: 'rite' }, target: 'p2' });
   });
 });
 

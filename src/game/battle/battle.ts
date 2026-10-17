@@ -343,12 +343,22 @@ export class Battle {
     if (skill.healAllies) {
       for (const a of this.allies(actor)) this.heal(a, Math.round((skill.healOf === 'caster' ? actor.maxHp : a.maxHp) * skill.healAllies), last, events);
     }
+    if (skill.healSelf && actor.alive) this.heal(actor, Math.round(actor.maxHp * skill.healSelf), last, events);
     if (skill.cleanse) {
       for (const a of this.allies(actor)) {
         const deb = a.statuses.find((s) => !STATUSES[s.id].buff);
         if (deb) {
           a.statuses.splice(a.statuses.indexOf(deb), 1);
           events.push({ kind: 'cleanse', target: a.uid, status: deb.id, hit: last });
+        }
+      }
+    }
+    if (skill.cleanseAll) {
+      for (const t of targets) {
+        if (!t.alive) continue;
+        for (const deb of t.statuses.filter((s) => !STATUSES[s.id].buff)) {
+          t.statuses.splice(t.statuses.indexOf(deb), 1);
+          events.push({ kind: 'cleanse', target: t.uid, status: deb.id, hit: last });
         }
       }
     }
@@ -389,8 +399,9 @@ export class Battle {
       }
     }
     if (skill.selfTm && !asCounter) actor.pendingTm = skill.selfTm;
-    // a passive answering the blow on each ally it struck comes after the hit
+    // a passive answering the blow on each ally it struck comes after the hit, then one answering the attacker
     this.ward(actor, damaged, last, events);
+    this.retaliate(actor, damaged, last, events);
 
     const result: SkillResult = { actor: actor.uid, skill, target: primary?.uid, targets: targets.map((t) => t.uid), events, counter: asCounter, counters: [] };
 
@@ -417,6 +428,8 @@ export class Battle {
     const v = value ? Math.round(actor.maxHp * value) : 0;
     this.addStatus(r, status, turns, v, actor.uid);
     events.push({ kind: 'status', target: r.uid, status, turns, hit });
+    // a debuff an enemy placed may be answered on its holder's side (the Grove Keeper's Keeper's Balm)
+    if (!STATUSES[status].buff && r.team !== actor.team) this.remedy(r, hit, events);
   }
 
   /** Heals unless Heal Block is present; returns HP restored. */
@@ -529,17 +542,51 @@ export class Battle {
    * enemy skill damaged and left standing may receive the passive's statuses
    * after the hit, once per skill, with the passive's chance (Emissary
    * Handlings' Unbroken Flag: a Shield of 15% of his max HP, half the time).
+   * A ward of its holder alone (`self`) answers only the blows on it (the
+   * Black Rhino's Thick Hide: a Shield of 10% of his max HP, every time).
    */
   private ward(actor: Unit, damaged: Set<Unit>, hit: number, events: BattleEvent[]) {
     for (const d of damaged) {
       if (!d.alive || d.team === actor.team) continue;
       for (const h of this.allies(d)) {
         const p = h.champion.passive;
-        if (p?.kind !== 'ward') continue;
+        if (p?.kind !== 'ward' || (p.self && h !== d)) continue;
         if (p.chance !== undefined && !this.rng.chance(p.chance)) continue;
         events.push({ kind: 'passive', target: d.uid, name: p.name, hit, effect: 'ward', source: h.uid });
         for (const st of p.statuses ?? []) this.tryApply(h, d, st.status, st.turns, undefined, p.value, hit, events);
       }
+    }
+  }
+
+  /**
+   * Retaliate (passive): a holder an enemy skill damaged and left standing may
+   * answer the attacker after the hit, once per skill, with the passive's
+   * chance (the Associate's Bitter Motes: Poison for 1 turn, 35% of the time).
+   * The debuff meets the attacker's RES like any other.
+   */
+  private retaliate(actor: Unit, damaged: Set<Unit>, hit: number, events: BattleEvent[]) {
+    for (const d of damaged) {
+      const p = d.champion.passive;
+      if (p?.kind !== 'retaliate' || !d.alive || !actor.alive || d.team === actor.team) continue;
+      if (p.chance !== undefined && !this.rng.chance(p.chance)) continue;
+      events.push({ kind: 'passive', target: actor.uid, name: p.name, hit, effect: 'retaliate', source: d.uid });
+      for (const st of p.statuses ?? []) this.tryApply(d, actor, st.status, st.turns, undefined, p.value, hit, events);
+    }
+  }
+
+  /**
+   * Remedy (passive): when an enemy places a debuff on an ally of the holder,
+   * the holder included, that ally may receive the passive's statuses, with
+   * the passive's chance, once for each debuff placed (the Grove Keeper's
+   * Keeper's Balm: Regen for 1 turn, 35% of the time).
+   */
+  private remedy(r: Unit, hit: number, events: BattleEvent[]) {
+    for (const h of this.allies(r)) {
+      const p = h.champion.passive;
+      if (p?.kind !== 'remedy' || !r.alive) continue;
+      if (p.chance !== undefined && !this.rng.chance(p.chance)) continue;
+      events.push({ kind: 'passive', target: r.uid, name: p.name, hit, effect: 'remedy', source: h.uid });
+      for (const st of p.statuses ?? []) this.tryApply(h, r, st.status, st.turns, undefined, p.value, hit, events);
     }
   }
 

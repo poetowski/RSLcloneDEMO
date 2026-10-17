@@ -51,5 +51,6 @@ export const emissaryHandlings: ChampionDef = {
     value: 0.15,
     chance: 0.5,
     statuses: [{ status: 'shield', turns: 1 }],
+    fx: 'flag_ward',
   },
 };

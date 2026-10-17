@@ -7,9 +7,13 @@
 // cut and chips; his Crimson Blade: a crimson-hot rising cut shedding
 // embers, because the blade burns and so does the cut; his Onrush: a line of
 // light driven through the enemy, a war cry in rings from his mouth, and a
-// gust of wind running past each ally it sends on. Never their affinity
-// (affinities are abstract, Jakub, 2026-10-11). Light effects are additive in
-// src/game/view/scene.ts.
+// gust of wind running past each ally it sends on. The Black Rhino's Gore: two
+// thrusts of light driven in where his tusks go, a dull flash and chips tossed
+// up; his War Bellow: heavy rings of sound from his mouth, and at each ally's
+// feet the dust of his stamp with a wall of dull iron light rising in front;
+// his Thick Hide: a shell of dull light closing over him, his coat bristling.
+// Never their affinity (affinities are abstract, Jakub, 2026-10-11). Light
+// effects are additive in src/game/view/scene.ts.
 import { ACCENT } from '../palette.ts';
 import { disc, dith, ellipseFill, ellipseRing, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng, withAlpha } from '../raster.ts';
@@ -306,6 +310,106 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
         }
       }
       sparks(b, 36, 36, 8, 24, t, ramps.gold, 283, -10);
+    },
+  },
+
+  /** Gore: two thrusts of light driven in where his tusks go, a dull flash, chips tossed up and falling. */
+  gore: {
+    w: 80, h: 64, n: 7, ms: 45, ax: 0.45, ay: 0.55, pad: [8, 6, 8, 4],
+    draw: (b, t, i) => {
+      const cx = 36, cy = 35;
+      const reach = [0.55, 1, 1, 1, 1, 1, 1][i], heat = [1.4, 1.5, 1.2, 0.95, 0.7, 0.5, 0.3][i];
+      if (i < 5) for (const [dy, k] of [[-5, 1], [5, 0.85]] as const) cut(b, 2, cy + dy + 6, cx + 18, cy + dy - 5, -2, [1.8, 2.4, 1.9, 1.3, 0.9][i] * k, DULL, heat, reach);
+      if (i >= 1 && i <= 3) burst(b, cx + 9, cy - 3, 10, 2, [15, 11, 7][i - 1], 1.5, DULL, 0.3);
+      if (i >= 1) sparks(b, cx + 9, cy - 3, 16, 30, (i - 1) / 5, DULL, 331, 26);
+    },
+  },
+  /**
+   * War Bellow: heavy rings of sound open from the Black Rhino's mouth, up and
+   * forward (additive), on the skill's `cast` event. The scene plays it 8 px
+   * ahead of the top of his standing sprite and 8 below it; his mouth, head
+   * thrown up, is 31 px ahead of that point and 11 below it.
+   */
+  war_bellow: {
+    w: 110, h: 96, n: 10, ms: 60, ax: 0.136, ay: 0.49, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 46, cy = 58;
+      for (let k = 0; k < 4; k++) {
+        const age = i - k * 1.6;
+        if (age < 0 || age > 7) continue;
+        const r = 5 + age * 6;
+        const fade = 1 - age / 7.5;
+        for (let deg = -95; deg <= 25; deg += 1.2) {
+          const a = (deg * Math.PI) / 180;
+          const edge = 1 - Math.abs(deg + 35) / 62;
+          for (const dr of [0, 0.8, 1.6]) {
+            if (dr > 0.8 && age > 3) continue;
+            const x = Math.round(cx + Math.cos(a) * (r + dr)), y = Math.round(cy + Math.sin(a) * (r + dr));
+            if (!dith(x, y, Math.min(1, fade * 1.3) * (0.35 + edge * 0.75))) continue;
+            b.set(x, y, rampDither(DULL, Math.min(4, 1.2 + edge * 2.2 + fade), x, y));
+          }
+        }
+      }
+    },
+  },
+  /**
+   * War Bellow reaches an ally: the dust of the stamp rolls out round its feet
+   * and a curved wall of dull iron light rises before it for a moment (DEF Up),
+   * then settles. Anchored at the feet.
+   */
+  bellow_stand: {
+    w: 72, h: 76, n: 10, ms: 60, ax: 0.5, ay: 1, pad: [2, 4, 4, 4],
+    draw: (b, t, i) => {
+      const ST = ramps.steel;
+      const cx = 36, gy = 74;
+      // the dust rolling out from under its feet, both ways
+      ellipseRing(b, cx, gy - 2, 8 + t * 22, 2.4 + t * 3, 2.2 - t, (x, y, a) => (dith(x, y, (1 - t) * 0.9 * (0.6 + 0.4 * Math.abs(Math.cos(a)))) ? rampDither(DU, 3.2 - t * 1.6 + Math.sin(a) * 0.5, x, y) : 0));
+      const r = rng(347);
+      for (let k = 0; k < 10; k++) {
+        const side = k % 2 ? 1 : -1, sp = 0.5 + r() * 0.5;
+        const x = cx + side * (10 + t * 24 * sp), y = gy - 3 - r() * 3 - t * 5;
+        const rad = 2.2 + r() * 1.8 + t * 2.6;
+        disc(b, x, y, rad, (xx, yy, d) => (dith(xx, yy, (1 - t) * 0.85 * (1 - d * 0.5)) ? rampDither(DU, 3.4 - d * 1.2 - t, xx, yy) : 0));
+      }
+      // the wall of iron light: a tall arc before it, bright at its edge, rising and fading
+      const up = [0.25, 0.6, 0.9, 1, 1, 1, 1, 0.92, 0.8, 0.6][i];
+      const fade = i < 6 ? 1 : [0.75, 0.5, 0.3, 0.15][i - 6];
+      const top = gy - 6 - 52 * up;
+      for (let y = Math.floor(top); y <= gy - 6; y++) {
+        const k = (y - top) / Math.max(1, gy - 6 - top);
+        const bow = Math.sin(k * Math.PI) * 7;
+        for (let dx = 0; dx < 5; dx++) {
+          const x = Math.round(cx + 13 + bow - dx);
+          if (!dith(x, y, fade * (dx === 0 ? 1 : 0.75 - dx * 0.13) * (0.45 + 0.55 * (1 - Math.abs(k - 0.45)))) ) continue;
+          b.set(x, y, rampDither(ST, (dx === 0 ? 3.6 : 2.8 - dx * 0.35) + (1 - k) * 0.4, x, y));
+        }
+      }
+      if (i >= 2 && i <= 5) sparks(b, cx + 18, top + 4, 8, 12, (i - 2) / 4, ST, 349, 8);
+    },
+  },
+  /**
+   * Thick Hide: a shell of dull light closes over the Black Rhino after a blow,
+   * short streaks bristling out from it like his coat standing on end, then it
+   * settles into him (additive). Played at his chest.
+   */
+  thick_hide: {
+    w: 84, h: 64, n: 8, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 42, cy = 32;
+      const close = [1.25, 1.1, 1, 1, 1, 0.95, 0.9, 0.85][i];
+      const fade = i < 4 ? 1 : [0.75, 0.5, 0.3, 0.15][i - 4];
+      ellipseRing(b, cx, cy, 34 * close, 25 * close, 2.2 * fade + 0.6, (x, y, a) => (dith(x, y, fade * (0.45 + 0.55 * Math.max(0, -Math.sin(a)))) ? rampDither(DULL, 1.6 + fade * 2 - Math.sin(a) * 0.6, x, y) : 0));
+      if (i >= 1 && i <= 5) {
+        const r = rng(353);
+        for (let k = 0; k < 14; k++) {
+          const a = -Math.PI * (0.1 + r() * 0.8);
+          const r0 = 1 + r() * 0.06, len = 3 + r() * 4;
+          for (let q = 0; q < len; q++) {
+            const x = Math.round(cx + Math.cos(a) * (34 * close * r0 + q)), y = Math.round(cy + Math.sin(a) * (25 * close * r0 + q));
+            if (dith(x, y, fade * (1 - q / len))) b.set(x, y, rampDither(DULL, 3.2 - q * 0.4, x, y));
+          }
+        }
+      }
     },
   },
 };

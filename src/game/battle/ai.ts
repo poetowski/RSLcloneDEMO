@@ -1,7 +1,8 @@
 // Enemy (and auto-battle) decision making. Deliberately simple and readable:
 // strongest ready skill first, support skills only when allies need them,
 // focus fire on weakened targets, respect taunt, avoid wasting control,
-// and dispel skills go for the most buffed enemy.
+// dispel skills go for the most buffed enemy and cleanses for the most
+// afflicted ally.
 import { STATUSES } from '../data/statuses';
 import { SkillDef } from '../data/types';
 import { Battle, Unit } from './battle';
@@ -11,6 +12,8 @@ export interface Decision {
   target?: string;
 }
 
+const debuffs = (u: Unit) => u.statuses.filter((x) => !STATUSES[x.id].buff).length;
+
 export function decide(b: Battle, actor: Unit): Decision {
   const skills = [...actor.champion.skills].filter((s) => b.ready(actor, s)).sort((a, c) => (c.ai?.priority ?? 0) - (a.ai?.priority ?? 0));
   for (const s of skills) {
@@ -19,6 +22,8 @@ export function decide(b: Battle, actor: Unit): Decision {
       const hurt = allies.some((a) => a.hp / a.maxHp < 0.7) || allies.some((a) => a.statuses.some((x) => !STATUSES[x.id].buff));
       if (!hurt) continue;
     }
+    // a cleanse waits for something to cleanse
+    if (s.ai?.when === 'allyDebuffed' && !b.allies(actor).some((a) => debuffs(a) > 0)) continue;
     return { skill: s, target: pickTarget(b, actor, s) };
   }
   const basic = actor.champion.skills[0];
@@ -39,6 +44,11 @@ function pickTarget(b: Battle, actor: Unit, s: SkillDef): string | undefined {
     const buffs = (u: Unit) => u.statuses.filter((x) => STATUSES[x.id].buff).length;
     const best = [...valid].sort((x, y) => buffs(y) - buffs(x))[0];
     if (buffs(best) > 0) return best.uid;
+  }
+  if (s.cleanseAll) {
+    // the ally carrying the most debuffs, the one lower on HP on a tie
+    const best = [...valid].sort((x, y) => debuffs(y) - debuffs(x) || x.hp / x.maxHp - y.hp / y.maxHp)[0];
+    if (debuffs(best) > 0) return best.uid;
   }
   // focus the weakest most of the time, otherwise spread pressure
   if (b.rng.chance(0.7)) return [...valid].sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0].uid;

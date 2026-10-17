@@ -59,8 +59,8 @@ function pipeAt(s: Skel, P: Record<string, number>): Pipe {
   return { back, front: at(back, ang, PIPE), ang };
 }
 
-/** Where his lips are, head-local: the end of the snout. */
-const mouth = (s: Skel) => s.H(8.6, -3.6);
+/** Where his lips are, head-local: under the tip of the snout. */
+const mouth = (s: Skel) => s.H(11.0, -3.9);
 
 function build(d: Draw, s: Skel, info: BuildInfo) {
   const P = s.pose.p;
@@ -163,58 +163,92 @@ function blowpipe(d: Draw, p: Pipe, z: number) {
 }
 
 /**
- * The head: a big round skull and a short snout, one large amber eye for the
- * dark, a small nose, cheeks that puff out before a dart (`puff`); the two
- * great ears standing up from the back of the skull, swaying slowly and laid
- * back in a run (`earN`, `earF`).
+ * The head of a beast of the undergrowth (Jakub, 2026-10-17: "more
+ * animalistic ... without defined humanoid features and fangs"): a big round
+ * skull in coarse fur, a long pointed snout ending in a dark wet nose, a large
+ * eye of amber with a slit pupil set in a mask of darker fur, a ruff at the
+ * cheek, the mouth running back under the snout with two fangs over the lip,
+ * whiskers; cheeks that puff out before a dart (`puff`). The two ears, smaller
+ * than at first and curving back, stand from the back of the skull, swaying
+ * slowly and laid back in a run (`earN`, `earF`).
  */
 function head(d: Draw, s: Skel, P: Record<string, number>) {
   const H = s.H;
   const ha = s.headDir - 90;
   d.capsule({ mat: DH, z: 37.2, group: 'neck' }, s.neck, H(-0.6, -4.0), 2.4, 2.6);
-  // the far ear behind the skull, leaning forward
-  ear(d, H(1.6, 6.6), s.headDir - 16 + (P.earF ?? 0), 24, 5.6, 37.0, -1, 'earF');
-  // skull, snout and lower jaw
-  d.ellipse({ mat: DH, z: 38, group: 'head' }, H(-0.8, 1.4), 9.8, 8.8, ha);
-  d.ellipse({ mat: DH, z: 38.05, group: 'head' }, H(5.6, -2.4), 5.0, 3.8, ha);
-  d.ellipse({ mat: DH, z: 38.04, group: 'head', shade: -1 }, H(4.0, -5.0), 3.8, 2.0, ha);
-  if (P.puff) d.ellipse({ mat: DH, z: 38.06, group: 'head' }, H(6.0, -2.8), 4.4, 3.6, ha);
-  // the near ear, broad, splayed back from the top of the skull
-  ear(d, H(-3.6, 6.2), s.headDir + 30 + (P.earN ?? 0), 25, 6.4, 38.5, 0, 'earN');
-  // the face: a big eye with its lid, the nose at the snout's end, the mouth
+  // the far ear behind the skull, standing up and curving back
+  ear(d, H(1.0, 6.4), s.headDir - 16 + (P.earF ?? 0), 21, 5.2, 37.0, -1, 'earF');
+  // the skull in coarse fur, the ruff at the cheek
+  d.ellipse({ mat: DH, z: 38, group: 'head', tex: coat }, H(-1.0, 1.4), 9.4, 8.6, ha);
+  d.poly(
+    { mat: DH, z: 38.02, group: 'head', shade: -1, tex: coat },
+    [H(-2.4, -1.6), H(-3.8, -4.8), H(-2.0, -5.2), H(-2.6, -7.6), H(-0.4, -6.4), H(0.6, -8.4), H(2.0, -5.8), H(3.0, -3.6), H(1.0, -1.0)],
+    { kind: 'bevel', w: 1 },
+  );
+  // the lower jaw, then the long snout over it
+  d.poly({ mat: DH, z: 38.04, group: 'head', shade: -1 }, [H(1.6, -3.6), H(6.0, -4.4), H(10.0, -4.4), H(10.6, -5.2), H(8.0, -6.4), H(3.4, -6.2)], { kind: 'bevel', w: 1 });
+  d.poly(
+    { mat: DH, z: 38.05, group: 'head' },
+    [H(1.4, 2.6), H(5.4, 1.4), H(9.0, -0.2), H(11.6, -1.6), H(12.4, -2.8), H(11.6, -3.9), H(8.0, -4.2), H(4.0, -4.0), H(1.2, -2.8)],
+    { kind: 'dome', c: H(6.4, -1.2), r: 6.4, bevel: 1.1 },
+  );
+  if (P.puff) d.ellipse({ mat: DH, z: 38.06, group: 'head' }, H(5.4, -2.6), 4.0, 3.2, ha);
+  // the near ear, broad at its root and curving back from the top of the skull
+  ear(d, H(-3.8, 6.0), s.headDir + 26 + (P.earN ?? 0), 21, 6.0, 38.5, 0, 'earN');
   const px: { p: V; c: RGBA }[] = [];
-  const e = H(3.6, 1.8);
+  // the mask of darker fur round the eye, and the eye: amber, a slit of a pupil, a glint
+  const e = H(3.4, 2.0);
   const E = (dx: number, dy: number) => v(Math.floor(e.x) + 0.5 + dx, Math.floor(e.y) + 0.5 + dy);
-  for (let dx = -1; dx <= 2; dx++) for (let dy = -1; dy <= 2; dy++) if (!((dx === -1 || dx === 2) && (dy === -1 || dy === 2))) px.push({ p: E(dx, dy), c: ACCENT.eyeAmber });
-  px.push({ p: E(0, 0), c: INK.eye }, { p: E(1, 0), c: INK.eye }, { p: E(1, 1), c: INK.eye }, { p: E(0, 1), c: INK.eye }, { p: E(-1, 1), c: INK.eyeWhite });
-  for (const dx of [-2, -1, 0, 1, 2, 3]) px.push({ p: E(dx, 3), c: DH.ramp[1] });
-  px.push({ p: H(10.2, -1.8), c: DH.ramp[0] }, { p: H(9.8, -2.6), c: DH.ramp[1] });
-  if (P.blow) px.push({ p: H(9.0, -3.8), c: INK.black });
-  else if (!P.aim || P.aim < 0.5) for (const k of [5.6, 6.6, 7.6, 8.4]) px.push({ p: H(k, -4.6 + (k - 5.6) * 0.25), c: DH.ramp[1] });
+  for (const [dx, dy] of [[-2, 0], [-2, 1], [-1, 2], [0, 2], [1, 2], [2, 1], [3, 0], [3, -1], [2, -2], [1, -2], [0, -2], [-1, -1]] as const) px.push({ p: E(dx, dy), c: DH.ramp[1] });
+  for (let dx = -1; dx <= 2; dx++) for (let dy = -1; dy <= 1; dy++) px.push({ p: E(dx, dy), c: ACCENT.eyeAmber });
+  px.push({ p: E(1, 1), c: INK.eye }, { p: E(1, 0), c: INK.eye }, { p: E(1, -1), c: INK.eye }, { p: E(0, 1), c: INK.white });
+  // the dark wet nose at the tip of the snout, its glint, whiskers
+  px.push({ p: H(12.0, -2.4), c: INK.eye }, { p: H(11.4, -2.0), c: INK.eye }, { p: H(12.2, -3.2), c: INK.eye }, { p: H(11.6, -1.6), c: DH.ramp[4] });
+  for (const [x, y] of [[9.6, -2.2], [10.4, -3.0], [9.0, -3.2]] as const) px.push({ p: H(x, y), c: DH.ramp[1] });
+  // the mouth under the snout, open in a blow; two fangs over the lip
+  if (P.blow) px.push({ p: H(11.2, -4.0), c: INK.black }, { p: H(10.4, -4.2), c: INK.black });
+  else {
+    for (const k of [4.4, 5.6, 6.8, 8.0, 9.2, 10.4]) px.push({ p: H(k, -4.4 + (k - 4.4) * 0.04), c: DH.ramp[0] });
+    if (!P.aim || P.aim < 0.5) px.push({ p: H(9.6, -5.0), c: INK.white }, { p: H(9.6, -5.8), c: BN.ramp[3] }, { p: H(7.6, -5.0), c: INK.white });
+  }
   d.pixels({ mat: DH, z: 38.6, group: 'head' }, px);
 }
 
-/** One ear: a long leaf of hide from `base` along `ang`, the pink skin inside it, a tuft at its tip. */
+/** Coarse fur on the head: a darker hair here and there. */
+const coat = (_h: unknown, x: number, y: number) => ((x * 3 + Math.floor(y / 2) * 5) % 9 === 0 ? -1 : 0);
+
+/**
+ * One ear: a leaf of hide from `base` along `ang`, curving back over its
+ * length, the pink skin inside it ribbed with folds, a tuft at its tip.
+ */
 function ear(d: Draw, base: V, ang: number, len: number, w: number, z: number, shade: number, group: string) {
+  const n = 8;
+  // the ear's spine, bending back as it rises
+  const C: V[] = [base];
+  for (let i = 1; i <= n; i++) C.push(at(C[i - 1], ang + (i / n) * 36, len / n));
+  const dirAt = (i: number) => angleOf(sub(C[Math.min(n, i + 1)], C[Math.max(0, i - 1)]));
   const edge = (k: number) => {
     const L: V[] = [], R: V[] = [];
-    const n = 7;
     for (let i = 0; i <= n; i++) {
       const t = i / n;
-      const c = at(base, ang, len * t);
-      const wt = w * k * (t < 0.2 ? 0.75 + t * 1.25 : Math.max(0.05, 1 - Math.pow((t - 0.2) / 0.8, 1.6)));
-      L.push(at(c, ang + 90, wt));
-      R.push(at(c, ang - 90, wt * 0.9));
+      const a = dirAt(i);
+      const wt = w * k * (t < 0.25 ? 0.8 + t * 0.8 : Math.max(0.06, 1 - Math.pow((t - 0.25) / 0.75, 1.5)));
+      L.push(at(C[i], a + 90, wt));
+      R.push(at(C[i], a - 90, wt * 0.85));
     }
     return { L, R };
   };
   const o = edge(1);
-  const tip = at(base, ang, len + 1);
+  const tip = at(C[n], dirAt(n), 1);
   d.poly({ mat: DH, z, group, shade, line: 'soft' }, [...o.L, tip, ...[...o.R].reverse()], { kind: 'cyl', a: base, b: tip, r: w + 0.5, bevel: 1 });
-  const i = edge(0.52);
-  const inner = [...i.L.slice(1, 7), ...[...i.R.slice(1, 7)].reverse()].map((p) => at(p, ang + 90, w * 0.12));
-  d.poly({ mat: EP, z: z + 0.05, group, shade, line: 'none' }, inner, { kind: 'cyl', a: at(base, ang, len * 0.15), b: at(base, ang, len * 0.85), r: w * 0.6 });
-  d.pixels({ mat: DH, z: z + 0.06, group }, [{ p: at(tip, ang, 0.6), c: DH.ramp[4] }, { p: at(at(tip, ang, -1.2), ang + 90, 0.9), c: DH.ramp[5] }]);
+  const i = edge(0.5);
+  const inner = [...i.L.slice(1, n), ...[...i.R.slice(1, n)].reverse()].map((p, k) => at(p, dirAt(Math.min(n, k < n - 1 ? k + 1 : 2 * n - 2 - k)) + 90, w * 0.14));
+  d.poly({ mat: EP, z: z + 0.05, group, shade, line: 'none' }, inner, { kind: 'cyl', a: C[1], b: C[n - 1], r: w * 0.6 });
+  // folds across the inner skin, and the tuft at the tip
+  const px: { p: V; c: RGBA }[] = [];
+  for (const k of [3, 5]) px.push({ p: at(C[k], dirAt(k) + 90, w * 0.2), c: EP.ramp[1] }, { p: at(C[k], dirAt(k) - 90, w * 0.05), c: EP.ramp[2] });
+  px.push({ p: at(tip, dirAt(n), 0.6), c: DH.ramp[4] }, { p: at(at(tip, dirAt(n), -1.2), dirAt(n) + 90, 0.9), c: DH.ramp[5] });
+  d.pixels({ mat: DH, z: z + 0.06, group }, px);
 }
 
 // ---------------------------------------------------------------------------
@@ -418,10 +452,10 @@ function iconDart(d: Draw, tail: V, tip: V, z: number) {
 
 /** The great ears and the eye in an icon. */
 function iconHead(d: Draw, c: V, z: number) {
-  ear(d, v(c.x - 1, c.y + 6), 98, 17, 4.4, z - 0.5, -1, 'ieF');
+  ear(d, v(c.x - 1, c.y + 6), 92, 15, 4.2, z - 0.5, -1, 'ieF');
   d.ellipse({ mat: DH, z, group: 'ihead' }, c, 9, 8, 0);
-  d.ellipse({ mat: DH, z: z + 0.05, group: 'ihead' }, v(c.x + 6, c.y - 3), 4.6, 3.6, 0);
-  ear(d, v(c.x - 4, c.y + 5), 116, 19, 5, z + 0.2, 0, 'ieN');
+  d.poly({ mat: DH, z: z + 0.05, group: 'ihead' }, [v(c.x + 2, c.y + 1), v(c.x + 8, c.y - 1), v(c.x + 12.4, c.y - 3.4), v(c.x + 11.6, c.y - 5.2), v(c.x + 6, c.y - 6), v(c.x + 2, c.y - 5)], { kind: 'dome', c: v(c.x + 7, c.y - 3), r: 6, bevel: 1 });
+  ear(d, v(c.x - 4, c.y + 5), 112, 16, 4.8, z + 0.2, 0, 'ieN');
 }
 
 const E = ACCENT;
@@ -450,19 +484,25 @@ export const bigEars: ChampionArt = {
           b.set(33, 30 + k, k === 0 ? E.white : E.red);
         }
       }),
-    hidden_in_the_undergrowth: () =>
-      compose(DH, glyph((d) => {
-        iconHead(d, v(21, 12), 10);
-      }), (b) => {
-        // the undergrowth he hides in: blades of grass across the lower half, his eye glinting through (screen space)
-        const G = FXR.green;
-        for (let x = 3; x < 37; x++) {
-          const h = 9 + Math.round(5 * Math.abs(Math.sin(x * 1.7)) + (x % 3));
-          for (let y = 0; y < h; y++) b.set(x + (y > h - 3 ? (x % 2 ? 1 : -1) : 0), 37 - y, y > h - 3 ? G[2] : y % 4 === 0 ? G[0] : G[1]);
-        }
-        b.set(27, 24, E.eyeAmber);
-        b.set(28, 24, E.eyeAmber);
-        b.set(27, 23, E.white);
-      }),
+    hidden_in_the_undergrowth: () => {
+      // his head peering out of the undergrowth: the ears up, the eye glinting over the grass
+      const art = glyph((d) => {
+        const c = v(17, 15);
+        iconHead(d, c, 10);
+        const e = v(Math.floor(c.x + 4.6) + 0.5, Math.floor(c.y + 2.4) + 0.5);
+        const px: { p: V; c: RGBA }[] = [];
+        for (const [dx, dy] of [[-1, 1], [0, 1], [1, 1], [2, 1], [-1, 0], [0, 0], [1, 0], [2, 0], [0, -1], [1, -1]] as const) px.push({ p: v(e.x + dx, e.y + dy), c: E.eyeAmber });
+        px.push({ p: v(e.x + 1, e.y + 1), c: INK.eye }, { p: v(e.x + 1, e.y), c: INK.eye }, { p: v(e.x, e.y + 1), c: INK.white });
+        for (const [dx, dy] of [[-2, 1], [-2, 0], [-1, 2], [0, 2], [1, 2], [2, 2], [3, 1], [3, 0]] as const) px.push({ p: v(e.x + dx, e.y + dy), c: DH.ramp[1] });
+        d.pixels({ mat: DH, z: 20, group: 'ieye' }, px);
+      });
+      // blades of grass over the lower half of the icon, his jaw hidden in them (screen space)
+      const G = FXR.green;
+      for (let x = 3; x < 37; x++) {
+        const h = 10 + Math.round(5 * Math.abs(Math.sin(x * 1.7)) + (x % 3));
+        for (let y = 0; y < h; y++) art.set(x + (y > h - 3 ? (x % 2 ? 1 : -1) : 0), 37 - y, y > h - 3 ? G[2] : y % 4 === 0 ? G[0] : G[1]);
+      }
+      return compose(DH, art);
+    },
   },
 };

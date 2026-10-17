@@ -141,6 +141,22 @@ export const tender = fixture('tender', {
 export const bannerman = (chance: number) =>
   fixture(`bannerman_${chance}`, { stats: { hp: 1400 }, passive: { id: 'ward', name: 'Ward', desc: '', kind: 'ward', value: 0.15, chance, statuses: [{ status: 'shield', turns: 1 }] } });
 
+/** A ward of its holder alone: a Shield of 10% of its max HP for 1 turn after every enemy blow on it. */
+export const hide = fixture('hide', { stats: { hp: 1500 }, passive: { id: 'hide', name: 'Hide', desc: '', kind: 'ward', self: true, value: 0.1, statuses: [{ status: 'shield', turns: 1 }] } });
+
+/** Retaliate: an enemy skill that damaged it gets Poison for 1 turn on its attacker after the hit, with `chance`. */
+export const stinger = (chance: number) =>
+  fixture(`stinger_${chance}`, { passive: { id: 'sting', name: 'Sting', desc: '', kind: 'retaliate', value: 0, chance, statuses: [{ status: 'poison', turns: 1 }] } });
+
+/** Remedy: an ally an enemy places a debuff on gets Regen for 1 turn, with `chance`. */
+export const balm = (chance: number) =>
+  fixture(`balm_${chance}`, { passive: { id: 'balm', name: 'Balm', desc: '', kind: 'remedy', value: 0, chance, statuses: [{ status: 'regen', turns: 1 }] } });
+
+/** A1 heals itself by 7% of its max HP after the hit; A2 removes every debuff from one ally, and the AI keeps it for when there is one. */
+export const druid = fixture('druid', {
+  skills: [skill('briar', 1, { healSelf: 0.07 }), skill('rite', 2, { target: 'ally', approach: 'none', hits: [{ mult: 0 }], cleanseAll: true, ai: { priority: 2, when: 'allyDebuffed' } })],
+});
+
 /** Fallen: +20% C.RATE for each fallen ally, up to +30%; no C.RATE of its own. */
 export const mourner = fixture('mourner', { stats: { crit: 0 }, passive: { id: 'fallen', name: 'Fallen', desc: '', kind: 'fallen', stat: 'crit', value: 0.2, max: 0.3 } });
 

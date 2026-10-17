@@ -65,6 +65,9 @@ describe('champions', () => {
         for (const f of [...s.hits.map((h) => h.fx), s.projectile, s.castFx, s.actorFx, s.allyFx]) if (f) expect(fx[f], `${s.id} -> fx ${f}`).toBeTruthy();
         if (s.projectile) expect(c.muzzle, `${c.id} fires projectiles, needs a muzzle`).toBeTruthy();
       }
+      for (const f of [c.passive?.fx, c.passive?.holderFx]) if (f) expect(fx[f], `${c.passive?.id} -> fx ${f}`).toBeTruthy();
+      // a passive that acts in the flow of the fight shows on whom it reaches
+      if (c.passive && ['tend', 'ward', 'retaliate', 'remedy'].includes(c.passive.kind)) expect(c.passive.fx, `${c.passive.id} needs an fx`).toBeTruthy();
     }
   });
 
@@ -302,6 +305,43 @@ describe('design decisions', () => {
     expect(b?.passive && [b.passive.name, b.passive.kind, b.passive.stat, b.passive.value, b.passive.max]).toEqual(['Hidden in the Undergrowth', 'fallen', 'crit', 0.15, 0.3]);
     // like a stat passive, extra: his own stats stay on the Elite budget
     expect(b?.stats.crit).toBeLessThanOrEqual(0.15);
+  });
+
+  it('has the Associate of his proposal: an Elite Support of the Azure Crown; A1 an attack with a 50% chance of ATK Down for 1 turn, A2 SPD Up for 2 turns and ATK Up for 1 on all allies, cooldown 5, a passive answering a hit on her with a 35% chance of Poison on that enemy for 1 turn', () => {
+    const a = CHAMPIONS.find((c) => c.id === 'associate');
+    expect(a && [a.name, a.rarity, a.role, a.faction]).toEqual(['Associate', 'elite', 'Support', 'azure_crown']);
+    expect(a?.skills).toHaveLength(2);
+    const a1 = a?.skills[0], a2 = a?.skills[1];
+    expect(a1 && [a1.slot, a1.target, a1.statuses]).toEqual([1, 'enemy', [{ status: 'atk_down', turns: 1, chance: 0.5, to: 'targets' }]]);
+    expect(a1?.hits.some((x) => x.mult > 0)).toBe(true);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'allies', 5, [{ status: 'spd_up', turns: 2, to: 'allies' }, { status: 'atk_up', turns: 1, to: 'allies' }]]);
+    expect(a2?.hits.every((x) => x.mult === 0)).toBe(true);
+    expect(a?.passive && [a.passive.kind, a.passive.chance, a.passive.statuses]).toEqual(['retaliate', 0.35, [{ status: 'poison', turns: 1 }]]);
+  });
+
+  it('has the Black Rhino of his proposal: an Elite Tank of the Sanguine Dominion; A1 an attack with a 20% chance of Stun for 1 turn, A2 DEF Up on all allies for 2 turns and Counterattack on himself for 2, cooldown 5, a passive Shield of 10% of his max HP on himself for 1 turn after an enemy hits him', () => {
+    const r = CHAMPIONS.find((c) => c.id === 'black_rhino');
+    expect(r && [r.name, r.rarity, r.role, r.faction]).toEqual(['Black Rhino', 'elite', 'Tank', 'sanguine_dominion']);
+    expect(r?.skills).toHaveLength(2);
+    const a1 = r?.skills[0], a2 = r?.skills[1];
+    expect(a1 && [a1.slot, a1.target, a1.statuses]).toEqual([1, 'enemy', [{ status: 'stun', turns: 1, chance: 0.2, to: 'targets' }]]);
+    expect(a1?.hits.some((x) => x.mult > 0)).toBe(true);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'allies', 5, [{ status: 'def_up', turns: 2, to: 'allies' }, { status: 'counter', turns: 2, to: 'self' }]]);
+    expect(a2?.hits.every((x) => x.mult === 0)).toBe(true);
+    // every hit, on himself alone
+    expect(r?.passive && [r.passive.kind, r.passive.self, r.passive.value, r.passive.chance, r.passive.statuses]).toEqual(['ward', true, 0.1, undefined, [{ status: 'shield', turns: 1 }]]);
+  });
+
+  it('has the Grove Keeper of his proposal: an Elite Support of the Court of Root; A1 an attack that heals him by 7% of his max HP, A2 removing every debuff from one ally, cooldown 3, a passive with a 35% chance of Regen for 1 turn on an ally an enemy debuffs', () => {
+    const g = CHAMPIONS.find((c) => c.id === 'grove_keeper');
+    expect(g && [g.name, g.rarity, g.role, g.faction]).toEqual(['Grove Keeper', 'elite', 'Support', 'court_of_root']);
+    expect(g?.skills).toHaveLength(2);
+    const a1 = g?.skills[0], a2 = g?.skills[1];
+    expect(a1 && [a1.slot, a1.target, a1.healSelf, a1.statuses ?? []]).toEqual([1, 'enemy', 0.07, []]);
+    expect(a1?.hits.some((x) => x.mult > 0)).toBe(true);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.cleanseAll, a2.statuses ?? []]).toEqual([2, 'ally', 3, true, []]);
+    expect(a2?.hits.every((x) => x.mult === 0)).toBe(true);
+    expect(g?.passive && [g.passive.kind, g.passive.chance, g.passive.statuses]).toEqual(['remedy', 0.35, [{ status: 'regen', turns: 1 }]]);
   });
 
   it('opens with a ten-stage first zone', () => {

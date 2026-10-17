@@ -81,6 +81,10 @@ export interface SkillDef {
   healOf?: 'ally' | 'caster';
   /** removes one debuff from each ally */
   cleanse?: boolean;
+  /** removes every debuff from the targets, on the last hit (the Grove Keeper's Cleansing Rite on the ally he chooses) */
+  cleanseAll?: boolean;
+  /** heals the actor by this fraction of its own max HP, on the last hit (the Grove Keeper's Thornburst) */
+  healSelf?: number;
   /** removes every buff from the targets before the first hit */
   stripBuffs?: boolean;
   /** heals the actor by this fraction of damage dealt */
@@ -104,8 +108,8 @@ export interface SkillDef {
   /** effect on each ally a buff of this skill reaches while the skill strikes enemies (Onrush's gust) */
   allyFx?: string;
   shake?: number;
-  /** AI preference: higher = earlier; 'allyHurt' only when an ally needs help */
-  ai?: { priority: number; when?: 'allyHurt' };
+  /** AI preference: higher = earlier; 'allyHurt' only when an ally needs help, 'allyDebuffed' only when an ally carries a debuff */
+  ai?: { priority: number; when?: 'allyHurt' | 'allyDebuffed' };
 }
 
 export interface PassiveDef {
@@ -125,23 +129,37 @@ export interface PassiveDef {
    *            `value` x the champion's max HP; then the passive rests for `cooldown` of the
    *            champion's turns (the Jungle Herder's Herder's Ward, Jakub, 2026-10-17)
    * ward:      when an enemy skill damages an ally (the champion included) who is still
-   *            standing, `chance` to give that ally `statuses` after the hit, a Shield worth
-   *            `value` x the champion's max HP (Emissary Handlings' Unbroken Flag, 2026-10-17)
+   *            standing, `chance` (always when absent) to give that ally `statuses` after the
+   *            hit, a Shield worth `value` x the champion's max HP (Emissary Handlings' Unbroken
+   *            Flag, 2026-10-17); with `self`, only the champion itself (the Black Rhino's Thick
+   *            Hide, 2026-10-17)
    * fallen:    in battle, adds `value` to the champion's `stat` for each fallen ally, up to
    *            `max`; extra, outside the stat budget, like a stat passive (Big Ears' Hidden in
    *            the Undergrowth, 2026-10-17)
+   * retaliate: when an enemy skill damages the champion and leaves it standing, `chance` to
+   *            place `statuses` on the attacker after the hit (the Associate's Bitter Motes:
+   *            Poison for 1 turn, 2026-10-17)
+   * remedy:    when an enemy places a debuff on an ally (the champion included), `chance` to
+   *            give that ally `statuses` (the Grove Keeper's Keeper's Balm: Regen for 1 turn,
+   *            2026-10-17)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
   /** rebuke and tend: the champion's own turns the passive rests after it acts */
   cooldown?: number;
   /** stat and fallen: the stat it raises */
   stat?: StatId;
-  /** ward: the chance of each answer, 0..1 */
+  /** ward, retaliate and remedy: the chance of each answer, 0..1 */
   chance?: number;
   /** fallen: the most it adds */
   max?: number;
+  /** ward: it guards only the champion itself, not its allies */
+  self?: boolean;
+  /** presentation: the effect played on the champion the passive reaches (the ally it shields, the enemy it answers) */
+  fx?: string;
+  /** presentation: the effect played on the champion itself as the passive acts (the Jungle Herder's bell) */
+  holderFx?: string;
 }
 
 export interface Stats {

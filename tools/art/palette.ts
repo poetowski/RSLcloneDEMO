@@ -81,6 +81,8 @@ export const MAT = {
   crimsonPlate: m('crimsonPlate', 'metal', ['#1a0510', '#3a0a1e', '#64102c', '#9a1a38', '#c62c48', '#ee6660']),
   /** black cloth: the Dominion Medic's tunic between its red stripes */
   blackCloth: m('blackCloth', 'cloth', ['#07060a', '#121016', '#1c1922', '#28242f', '#383341', '#4e4858']),
+  /** white cloth, cool and crisp: the stripes of the Associate's azure robe */
+  whiteCloth: m('whiteCloth', 'cloth', ['#1c2234', '#4a5674', '#8a96b4', '#c8d2e6', '#eef2fa', '#ffffff']),
 
   // --- furs ----------------------------------------------------------------
   furWhite: m('furWhite', 'fur', ['#262838', '#4b5068', '#7a849c', '#b0bccc', '#dbe4ee', '#fbfdff']),
@@ -94,6 +96,8 @@ export const MAT = {
   furCream: m('furCream', 'fur', ['#29251f', '#524b42', '#7f766a', '#aba18f', '#cdc4b1', '#ebe5d6']),
   /** the Jungle Herder's mantle: the shaggy russet hide of a jungle beast, over his hump and shoulders */
   furRusset: m('furRusset', 'fur', ['#1a0c0a', '#3a1912', '#62301c', '#8c4a28', '#b46a3a', '#d8955c']),
+  /** the Black Rhino's coat: a shaggy black, its sheen a cool grey where the light catches it */
+  bullBlack: m('bullBlack', 'fur', ['#060509', '#0e0d13', '#18171f', '#24222c', '#36333f', '#545060']),
 
   // --- woods of the living ---------------------------------------------------
   /** the Walking Bush's bark: the grey-brown of a bush's woody stems (his few leaves are `moss`) */

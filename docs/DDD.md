@@ -53,13 +53,14 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Strong / weak hit | ±20% damage from the affinity cycle | `affinityEdge`, `edge` |
 | Execute | bonus multiplier against targets below an HP fraction | `SkillDef.execute` |
 | Dispel | removes every buff from the targets before the first hit | `stripBuffs`, `dispel` event |
-| Cleanse | removes one debuff from each ally on the last hit | `cleanse` |
+| Cleanse | removes one debuff from each ally on the last hit; a full cleanse removes every debuff from the skill's targets (Cleansing Rite: one ally) | `cleanse`, `cleanseAll` |
+| Self-heal | a blow that heals its user by a share of its own max HP on the last hit (Thornburst) | `healSelf` |
 | Lifesteal | heals the actor by a fraction of the HP damage dealt | `lifesteal` |
 | Heal | restores HP, never past the maximum: a share of each ally's own max HP, or of the healer's | `healAllies`, `healOf`, `heal` event |
 | Turn meter boost / drain | adds to the other allies' meters or to the one lowest on HP after the heals, or takes from the targets' | `tmAllies`, `tmLowestAlly`, `tmTargets`, `tm` event |
 | Kept meter | the actor ends its turn with this meter instead of 0 | `selfTm`, `Unit.pendingTm` |
 | Counterattack | the `counter` status, and the A1 it answers with | `counter`, `SkillResult.counter` |
-| Passive | a rule that wakes by itself: Undying, Overdrive, Rebuke (answers a critical hit below a threshold, then rests); a tend (Herder's Ward: at the end of its holder's turn the ally with the lowest max HP gets a Shield, then it rests); a ward (Unbroken Flag: an ally an enemy struck may get a Shield after the hit); a stat passive, a stat raised in every battle (Keen Edge, C.RATE +10%: extra to the budget, outside battle only its text); or a fallen passive, a stat raised for each fallen ally up to a cap (Hidden in the Undergrowth) | `PassiveDef.kind`, `PassiveDef.cooldown`, `PassiveDef.stat`, `PassiveDef.chance`, `PassiveDef.max`, `battleStats`, `Battle.critRate`, `Battle.fallenBonus`, `Unit.revived`, `Unit.overdriven`, `Unit.cooldowns[passive id]` |
+| Passive | a rule that wakes by itself: Undying, Overdrive, Rebuke (answers a critical hit below a threshold, then rests); a tend (Herder's Ward: at the end of its holder's turn the ally with the lowest max HP gets a Shield, then it rests); a ward (Unbroken Flag: an ally an enemy struck may get a Shield after the hit; Thick Hide, a ward of its holder alone, `self`, after every hit); a retaliation (Bitter Motes: a hit on its holder may be answered with Poison on the attacker); a remedy (Keeper's Balm: an ally an enemy debuffs may get Regen); a stat passive, a stat raised in every battle (Keen Edge, C.RATE +10%: extra to the budget, outside battle only its text); or a fallen passive, a stat raised for each fallen ally up to a cap (Hidden in the Undergrowth) | `PassiveDef.kind`, `PassiveDef.cooldown`, `PassiveDef.stat`, `PassiveDef.chance`, `PassiveDef.max`, `PassiveDef.self`, `PassiveDef.fx`, `PassiveDef.holderFx`, `battleStats`, `Battle.critRate`, `Battle.fallenBonus`, `Unit.revived`, `Unit.overdriven`, `Unit.cooldowns[passive id]` |
 | Boss | an enemy slot with x1.6 HP, a crown and an intro | `EnemySlot.boss`, `BOSS_HP` |
 | Power | a stage's multiplier on enemy HP and ATK | `StageDef.power`, `BattleOptions.enemyPower` |
 | Battle event | one fact the rules produced, for the view to present | `BattleEvent` |
@@ -277,7 +278,7 @@ winner()           checked before choosing and after every action
 2. Cooldown: set to `cooldown + 1`, because `endTurn` of this same turn ticks it once.
 3. Dispel: every buff removed from the targets (events at hit 0).
 4. For each hit `k`, for each living target: roll damage, then apply it (the shield absorbs first and expires at 0; then death, Undying or Overdrive), then, on a critical hit, the target's Rebuke (its statuses land on the actor), then the lifesteal heal, then the per-hit status rolls.
-5. On the last hit: ally heals, cleanse, status applications in the order written in the skill (recipients by `to`), target meter change, ally meter change, the meter of the ally lowest on HP.
+5. On the last hit: ally heals, the self-heal, cleanse, full cleanse, status applications in the order written in the skill (recipients by `to`), target meter change, ally meter change, the meter of the ally lowest on HP.
 6. The kept meter (`selfTm`) waits for `endTurn`.
 7. Counterattacks: each damaged, living enemy defender that holds Counter and is neither stunned nor frozen answers once with its A1 at the actor. Counters set no cooldown, keep no meter and are never countered.
 
@@ -344,11 +345,11 @@ winner()           checked before choosing and after every action
 | `status` | `tryApply`, Overdrive | last hit, or the hit for per-hit rolls | `status`, `turns` | the status name, plus a cue (Taunt, Poison, Burn, Counter, or a buff/debuff burst); stun stars and the ice block as overlays | Buffs, Debuffs, Crowd Control |
 | `resist` | `tryApply` (failed debuff roll; failed buff rolls emit nothing) | as `status` | `status` | `RESIST` | Debuffs |
 | `expire` | `endTurn`; a shield used up in `applyDamage` | 0, or the hit | `status` | the icon disappears; ice shatters | Buffs, Debuffs |
-| `cleanse` | `useSkill` | last | `status` | `CLEANSED` | Special Mechanics |
+| `cleanse` | `useSkill` | last | `status` | the debuff's name, `-POISON` | Special Mechanics |
 | `dispel` | `useSkill`, before the hits | 0 | `status` | `-NAME` and a dispel burst | Buffs, Special Mechanics |
 | `tm` | `useSkill` (`tmTargets`, `tmAllies`, `tmLowestAlly`) | last | `delta` | `+n% TURN` / `-n% TURN` | Turn Meter & Speed, Special Mechanics |
 | `revive` | `applyDamage` (Undying) | hit | `hp` | fall, tomb-light helix, `UNDYING!`, rise | Special Mechanics |
-| `passive` | `applyDamage` (Overdrive; a fallen passive as an ally dies), `endTurn` (a tend), `useSkill` (a ward) | hit; 0 for a tend; the last hit for a ward | `name`, `effect`, `source` (the holder of a tend or a ward; the attacker for a Rebuke) | Overdrive: banner, burst, `OVERDRIVE!` (fixed text, DR-14); a tend or a ward: its name over the holder and its ward on the ally (no banner: they act often); fallen: banner, the stat it gains, the undergrowth at the holder's feet | Special Mechanics |
+| `passive` | `applyDamage` (Overdrive; a fallen passive as an ally dies), `endTurn` (a tend), `useSkill` (a ward, a retaliation), `tryApply` (a remedy, as an enemy's debuff lands) | hit; 0 for a tend; the last hit for a ward or a retaliation; the debuff's hit for a remedy | `name`, `effect`, `source` (the holder of a tend, a ward, a retaliation or a remedy; the attacker for a Rebuke) | Overdrive: banner, burst, `OVERDRIVE!` (fixed text, DR-14); a tend, a ward, a retaliation or a remedy: its name over the holder, its `holderFx` on the holder and its `fx` on whom it reaches (no banner: they act often); fallen: banner, the stat it gains, the undergrowth at the holder's feet | Special Mechanics |
 | `death` | `applyDamage` | hit | - | death animation, fade | The Basics |
 
 **Ordering guarantees.** Start of turn: `damage` (Poison), `damage` (Burn), `heal` or `blocked` (Regen). Inside one damage instance: `expire` (a used-up shield), `damage`, then `revive`, `death` or `passive` with its `status` events. Within an action, the resolution order of section 4.1, then a ward's `passive` and `status` events for each ally struck (before any counterattack). A death may be followed by a fallen passive's `passive` on its holder. End of turn: a tend's `passive` and `status` first, then one `expire` per status that ran out. Counterattack results follow the action that provoked them, in the order the defenders were hit, and the view plays them after the attacker is back in formation.
@@ -380,6 +381,10 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C17 | A skill aimed at one ally that also gives its user a status is aimed at another ally while one stands (alone, the user is its own target); a status reaches each unit once per skill | code (`validTargets`, `useSkill`); test |
 | INV-C18 | A tend acts at the end of each of its holder's turns, skipped ones too, while it is ready: the living ally with the lowest max HP, the holder included (ties: the lower HP share, then the front), gets its statuses worth `value` x the holder's max HP; then it rests `cooldown` of the holder's turns | code (`Battle.tend`); tests |
 | INV-C19 | A ward answers each ally an enemy skill damaged and left standing, the holder included, once per skill, after the skill's last hit, with its chance; its own side's skills never trigger it | code (`Battle.ward`); tests |
+| INV-C21 | A retaliation answers an enemy skill that damaged its holder and left it standing, once per skill, after the skill's last hit, with its chance, while the attacker stands; the debuff meets the attacker's RES; its own side's skills never trigger it | code (`Battle.retaliate`); tests |
+| INV-C22 | A remedy answers each debuff an enemy lands on an ally of its holder, the holder included, once per debuff, with its chance; a resisted debuff never triggers it, and it gives buffs only, so it never answers itself | code (`Battle.remedy`, from `tryApply`), norms; tests |
+| INV-C23 | A ward of its holder alone (`self`) answers only blows on its holder; with no chance it answers every one | code (`Battle.ward`); test |
+| INV-C24 | A full cleanse removes every debuff from the skill's living targets on the last hit; a self-heal heals the actor after the damage, and Heal Block stops it | code (`Battle.useSkill`); tests |
 | INV-C20 | A fallen passive adds `value` per fallen ally of its holder, up to `max`, to the stat it names, in battle only; the champion's own stats never change; its event shows only while the bonus grows | code (`Battle.fallenBonus`, `critRate`, `mourn`); test |
 
 ### 6.2 Catalog
@@ -388,7 +393,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | --- | --- | --- |
 | INV-K1 | Champion ids are unique; rarity, affinity, faction and role exist | test |
 | INV-K2 | Stats within ±5% of the rarity budget and inside the limits | test, balance 1 |
-| INV-K3 | Slots in order A1-A2(-A3); cooldowns, multipliers, durations and the guaranteed-control slot within the norms; a passive's control lasts one turn, a Rebuke has a cooldown, a stat passive names its stat, a fallen passive its stat and cap, a tend or a ward its statuses and a ward its chance | type (tuple of two or three), test, balance 2 |
+| INV-K3 | Slots in order A1-A2(-A3); cooldowns, multipliers, durations and the guaranteed-control slot within the norms; a passive's control lasts one turn, a Rebuke has a cooldown, a stat passive names its stat, a fallen passive its stat and cap, a tend, a ward, a retaliation or a remedy its statuses, any chance it rolls lies in (0, 1], a retaliation places debuffs and a remedy gives buffs, only a ward guards its holder alone, and a passive acting in the flow of a fight names its `fx` (content test) | type (tuple of two or three), test, balance 2 |
 | INV-K4 | `hits.length` equals the hit frames of the animation; leap needs `jump`, `actorFx` needs `cast`; Undying needs `rise` | test |
 | INV-K5 | Every effect a skill names exists; a champion with a projectile has a `muzzle` | test |
 | INV-K6 | Every champion has an atlas, a portrait and one icon per skill | test |
@@ -458,7 +463,8 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | Status rules | apply, refresh, resist, tick, expire | `tryApply`, `addStatus`, `endTurn` |
 | Cooldowns | when a skill is ready | `useSkill`, `endTurn`, `ready` |
 | Death and passives | death, Undying, Overdrive, a fallen passive's growth | `Battle.applyDamage`, `mourn` |
-| Passives that shield | Herder's Ward at the end of its holder's turn, Unbroken Flag after a blow on an ally | `Battle.tend` (from `endTurn`), `Battle.ward` (from `useSkill`) |
+| Passives that shield | Herder's Ward at the end of its holder's turn, Unbroken Flag after a blow on an ally, Thick Hide after a blow on its holder | `Battle.tend` (from `endTurn`), `Battle.ward` (from `useSkill`) |
+| Passives that answer | Bitter Motes on the attacker after a blow on its holder; Keeper's Balm on an ally as an enemy's debuff lands | `Battle.retaliate` (from `useSkill`), `Battle.remedy` (from `tryApply`) |
 | Live stats | the critical rate a unit strikes with | `Battle.critRate` |
 | AI | skill and target | `ai.ts`: highest `ai.priority` ready skill (a heal with priority 4 and `allyHurt` goes before the A3 when an ally is hurt); `allyHurt` below 70% HP or with a debuff; control aims at the uncontrolled with the highest ATK; dispel at the most buffed; otherwise 70% lowest HP%, 30% random |
 | Stars | 3 / 2 / 1 | `starsFor` |

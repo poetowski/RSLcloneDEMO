@@ -10,13 +10,27 @@
 // Rallying Standard raises the shape of the standard in light behind each
 // ally, gold and azure, the colours of the Crown's standard he carries; his
 // Unbroken Flag sweeps a band of that azure round the ally it shields and
-// flashes a kite shield of gold.
+// flashes a kite shield of gold. The Associate's are the motes of her staff,
+// white light with a pale blue edge: her Mote Bolt flies as a bright mote with
+// others swirling behind it and bursts on the enemy, the motes scattering and
+// sinking as they dim; in Quickening they flare round her raised staff, then
+// wind up round each ally with streaks of speed; her Bitter Motes circle the
+// enemy that struck her, close in and sting, turning the green of poison.
 import { dith, ellipseRing, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng } from '../raster.ts';
 import { burst, cut, FxDef, motes, ramps, ring, sparks, W } from './kit.ts';
 
 const DU = ramps.dust;
 const GO = ramps.gold;
+/** The Associate's motes: white light, a pale blue at their edges. */
+const IC = ramps.ice;
+
+/** One mote of light: a white point, or a small cross of light with an edge from `ramp` (screen space). */
+function mote(b: Bitmap, x: number, y: number, big: boolean, ramp: RGBA[], fade = 1) {
+  if (!dith(x, y, fade)) return;
+  b.set(x, y, fade > 0.5 ? W : ramp[3]);
+  if (big) for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (dith(x + dx, y + dy, fade)) b.set(x + dx, y + dy, ramp[fade > 0.6 ? 3 : 2]);
+}
 /** A dull flash: grey to white, no hue of its own. */
 const DULL: RGBA[] = [DU[0], DU[2], DU[3], DU[4], W];
 
@@ -269,6 +283,109 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
       });
       if (i >= 2 && i <= 6) kite(b, cx, cy - 2, 9, 12, fade);
       if (i >= 1 && i <= 5) sparks(b, cx, cy, 10, 26, (i - 1) / 5, GO, 257, 0);
+    },
+  },
+
+  /** Mote Bolt in flight: a bright mote at its head and others swirling behind it (drawn pointing right; the battle turns it). */
+  mote_bolt: {
+    w: 22, h: 11, n: 3, ms: 60, ax: 0.8, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      const hx = 17, hy = 5;
+      // the head: a white core in a halo of pale light
+      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+        const d = Math.abs(dx) + Math.abs(dy);
+        if (d <= 2) b.set(hx + dx, hy + dy, d === 0 ? W : d === 1 ? IC[4] : IC[2 + ((i + dx) & 1)]);
+      }
+      b.set(hx + 3, hy, IC[3]);
+      for (let k = 1; k <= 5; k++) {
+        const x = Math.round(hx - k * 2.8), y = Math.round(hy + Math.sin(i * 2.1 + k * 1.4) * 2.2);
+        mote(b, x, y, k === 2, IC, 1 - k * 0.12);
+      }
+    },
+  },
+  /** Mote Bolt lands: a white flash, a ring of pale light, the motes thrown out and sinking as they dim. */
+  mote_burst: {
+    w: 48, h: 48, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const cx = 24, cy = 24;
+      if (i < 3) burst(b, cx, cy, 8, 1, [7, 11, 8][i], 1.2, IC, 0.4);
+      if (i >= 1) ring(b, cx, cy, 4 + (i - 1) * 3.4, 4 + (i - 1) * 3.4, Math.max(0.6, 1.6 - (i - 1) * 0.25), IC, Math.max(0.3, 1.2 - (i - 1) * 0.18));
+      if (i >= 1) {
+        const r = rng(311);
+        const k1 = (i - 1) / 5;
+        for (let k = 0; k < 10; k++) {
+          const a = r() * Math.PI * 2, sp = 0.6 + r() * 0.5;
+          const d = 18 * sp * Math.sqrt(k1);
+          mote(b, Math.round(cx + Math.cos(a) * d), Math.round(cy + Math.sin(a) * d + k1 * k1 * 9), k % 3 === 0, IC, 1 - k1 * 0.8);
+        }
+      }
+    },
+  },
+  /**
+   * Quickening's flare: the motes blaze up round the head of her raised staff
+   * and burst outward (additive), on the skill's `cast` event. The scene plays it
+   * 8 px ahead of the top of her standing sprite and 8 below it; the head of her
+   * staff stands 7.5 px behind that point and 42 above it, where the flare sits.
+   */
+  mote_flare: {
+    w: 56, h: 92, n: 8, ms: 55, ax: 0.634, ay: 0.737, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 26;
+      if (i < 4) burst(b, cx, cy, 10, [2, 3, 2, 1][i], [10, 16, 12, 7][i], [1.6, 2.0, 1.4, 1][i], IC, 0.3 + i * 0.2);
+      ring(b, cx, cy, 4 + t * 18, 3 + t * 9, Math.max(0.6, 1.8 - t * 1.2), IC, 1.1 - t * 0.6);
+      for (let k = 0; k < 9; k++) {
+        const a = (k / 9) * Math.PI * 2 + t * 2;
+        const d = 6 + t * 22;
+        mote(b, Math.round(cx + Math.cos(a) * d), Math.round(cy + Math.sin(a) * d * 0.55), k % 3 === 0, IC, 1 - t * 0.7);
+      }
+    },
+  },
+  /**
+   * Quickening reaches an ally: the motes wind up round it in a spiral, streaks
+   * of speed run up past it, and a ring of pale light settles at its feet.
+   * Anchored at the feet.
+   */
+  quicken: {
+    w: 56, h: 84, n: 10, ms: 60, ax: 0.5, ay: 1, pad: [2, 4, 6, 4],
+    draw: (b, t, i) => {
+      const cx = 28, gy = 82;
+      ellipseRing(b, cx, gy - 2, 8 + t * 12, 2.4 + t * 2, 1.2, (x, y, a) => (dith(x, y, 1 - t * 0.8) ? rampDither(IC, 2.4 + Math.sin(a) * 0.6, x, y) : 0));
+      for (let k = 0; k < 12; k++) {
+        const tt = t * 1.35 - (k / 12) * 0.45;
+        if (tt < 0 || tt > 1) continue;
+        const a = tt * Math.PI * 4 + k * 0.55;
+        const front = Math.sin(a) > 0;
+        mote(b, Math.round(cx + Math.cos(a) * 14), Math.round(gy - 6 - tt * 66), k % 2 === 0, IC, (front ? 1 : 0.55) * (1 - tt * 0.5));
+      }
+      const r = rng(317);
+      for (let k = 0; k < 5; k++) {
+        const x = Math.round(cx - 14 + r() * 28), sp = 0.8 + r() * 0.5, len = 6 + r() * 6, ph = r() * 0.3;
+        const head = gy - 4 - (t * sp + ph) * 80;
+        for (let q = 0; q < len; q++) {
+          const y = Math.round(head + q);
+          if (y < 0 || y >= 84 || !dith(x, y, (1 - q / len) * (1 - t * 0.5))) continue;
+          b.set(x, y, rampDither(IC, 1.4 + (1 - q / len) * 2.6, x, y));
+        }
+      }
+    },
+  },
+  /**
+   * Bitter Motes: her motes circle the enemy that struck her, close in and
+   * sting, turning the green of the poison they leave. Played at its chest.
+   */
+  bitter_motes: {
+    w: 52, h: 52, n: 9, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 6, 2],
+    draw: (b, t, i) => {
+      const GR = ramps.green;
+      const cx = 26, cy = 26;
+      for (let k = 0; k < 8; k++) {
+        const a = (k / 8) * Math.PI * 2 + t * 5;
+        const r = 21 * (1 - t * 0.78);
+        const sour = t > 0.3 + k * 0.04;
+        mote(b, Math.round(cx + Math.cos(a) * r), Math.round(cy + Math.sin(a) * r * 0.8), k % 2 === 0, sour ? GR : IC, i < 8 ? 1 : 0.5);
+      }
+      if (i >= 5 && i <= 7) burst(b, cx, cy, 6, 1, [6, 9, 6][i - 5], 1, GR, 0.3);
+      if (i >= 6) sparks(b, cx, cy, 10, 16, (i - 6) / 3, GR, 337, 12);
     },
   },
 };

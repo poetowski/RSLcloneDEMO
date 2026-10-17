@@ -48,5 +48,7 @@ export const jungleHerder: ChampionDef = {
     value: 0.1,
     statuses: [{ status: 'shield', turns: 1 }],
     cooldown: 1,
+    fx: 'herd_ward',
+    holderFx: 'herd_bell',
   },
 };

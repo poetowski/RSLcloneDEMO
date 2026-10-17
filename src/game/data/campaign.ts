@@ -163,6 +163,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: ARRIVAL,
         enemies: [{ champion: 'bloodhound' }, { champion: 'follower' }, { champion: 'dominion_medic' }],
         power: 0.99,
+        // a stand-in: the stage that brings the Associate is not Jakub's
+        recruit: 'associate',
       },
       {
         id: '2-5',
@@ -177,6 +179,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: CONTEST,
         enemies: [{ champion: 'lineholder' }, { champion: 'rime_scholar' }, { champion: 'follower' }],
         power: 0.81,
+        // a stand-in: the stage that brings the Black Rhino is not Jakub's
+        recruit: 'black_rhino',
       },
       {
         id: '2-7',
@@ -191,6 +195,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: CONTEST,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'follower' }, { champion: 'follower' }],
         power: 0.76,
+        // a stand-in: the stage that brings the Grove Keeper is not Jakub's
+        recruit: 'grove_keeper',
       },
       {
         id: '2-9',

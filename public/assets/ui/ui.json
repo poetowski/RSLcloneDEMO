@@ -150,56 +150,110 @@
    40,
    40
   ],
-  "banner_strike": [
+  "mote_bolt": [
    0,
    41,
    40,
    40
   ],
-  "rallying_standard": [
+  "quickening": [
    41,
    41,
    40,
    40
   ],
-  "unbroken_flag": [
+  "bitter_motes": [
    82,
    41,
    40,
    40
   ],
-  "cleave": [
+  "banner_strike": [
    123,
    41,
    40,
    40
   ],
-  "crimson_blade": [
+  "rallying_standard": [
    164,
    41,
    40,
    40
   ],
-  "onrush": [
+  "unbroken_flag": [
    205,
    41,
    40,
    40
   ],
-  "poison_dart": [
+  "gore": [
    246,
    41,
    40,
    40
   ],
-  "dart_volley": [
+  "war_bellow": [
    287,
    41,
    40,
    40
   ],
-  "hidden_in_the_undergrowth": [
+  "thick_hide": [
    328,
+   41,
+   40,
+   40
+  ],
+  "cleave": [
+   369,
+   41,
+   40,
+   40
+  ],
+  "crimson_blade": [
+   410,
+   41,
+   40,
+   40
+  ],
+  "onrush": [
+   451,
+   41,
+   40,
+   40
+  ],
+  "thornburst": [
+   492,
+   41,
+   40,
+   40
+  ],
+  "cleansing_rite": [
+   533,
+   41,
+   40,
+   40
+  ],
+  "keepers_balm": [
+   574,
+   41,
+   40,
+   40
+  ],
+  "poison_dart": [
+   615,
+   41,
+   40,
+   40
+  ],
+  "dart_volley": [
+   656,
+   41,
+   40,
+   40
+  ],
+  "hidden_in_the_undergrowth": [
+   697,
    41,
    40,
    40
@@ -1101,20 +1155,38 @@
    28,
    28
   ],
-  "emissary_handlings": [
+  "associate": [
    348,
    300,
    28,
    28
   ],
-  "red_cloak": [
+  "emissary_handlings": [
    377,
    300,
    28,
    28
   ],
-  "big_ears": [
+  "black_rhino": [
    406,
+   300,
+   28,
+   28
+  ],
+  "red_cloak": [
+   435,
+   300,
+   28,
+   28
+  ],
+  "grove_keeper": [
+   464,
+   300,
+   28,
+   28
+  ],
+  "big_ears": [
+   493,
    300,
    28,
    28
