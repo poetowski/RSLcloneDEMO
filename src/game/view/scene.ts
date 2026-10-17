@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -169,7 +169,7 @@ export class BattleScene {
         const frozen = this.battle.has(actor, 'freeze');
         this.fx.text(av.uid, av.x, av.head().y - 6, frozen ? 'FROZEN' : 'STUNNED', { color: frozen ? '#a6ecff' : '#fff070', variant: 'bold' });
         await this.clock.wait(750);
-        this.endTurn(actor);
+        await this.endTurn(actor);
         await this.clock.wait(150);
         continue;
       }
@@ -183,7 +183,7 @@ export class BattleScene {
       const res = this.battle.useSkill(actor, d.skill, d.target);
       await this.perform(res);
       if (!live()) return;
-      this.endTurn(actor);
+      await this.endTurn(actor);
       await this.clock.wait(160);
     }
     if (!live()) return;
@@ -192,12 +192,14 @@ export class BattleScene {
     this.outro(this.battle.winner()!);
   }
 
-  private endTurn(actor: Unit) {
+  private async endTurn(actor: Unit) {
     const ev = this.battle.endTurn(actor);
     const v = this.view(actor.uid);
     v.tm = actor.tm;
     for (const e of ev) this.applyEvent(e, null);
     this.syncStatuses(v);
+    // a passive acting at the end of the turn (the Jungle Herder's ward) is given a moment to be seen
+    if (ev.some((e) => e.kind === 'passive')) await this.clock.wait(560);
   }
 
   private async intro() {
@@ -497,8 +499,10 @@ export class BattleScene {
           sun_javelin: ['#e8fff8', '#36d0c0', '#b02a8c'],
           sound_ring: ['#e8fff8', '#90f5e2', '#18908a'],
           pale_shard: ['#f2feff', '#c8f0ff', '#5cc4ea'],
+          // Big Ears' darts: a wisp of the poison on their tips
+          dart: ['#eaffc8', '#a2f56a', '#4cd43a'],
         };
-        const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10 };
+        const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10, dart: 4 };
         const slow = skill.projectile === 'ice_shard' || skill.projectile === 'grave_orb' || skill.projectile === 'sound_ring';
         for (const t of targets) {
           pendings.push(this.fx.projectile(skill.projectile, from, t.chest(), { speed: slow ? 440 : 620, arc: skill.projectile.startsWith('arrow') ? 8 : arcs[skill.projectile] ?? 0, trail: trails[skill.projectile], rotate: skill.projectile !== 'sun_orb' }).then(() => groupFx(t)));
@@ -701,7 +705,9 @@ export class BattleScene {
           burn: () => void this.fx.spawn('burn', v.x, v.y, { layer: 'top' }),
           counter: () => void this.fx.spawn('counter', v.x, v.head().y - 10, { layer: 'top', additive: true }),
         };
-        if (cue[e.status]) cue[e.status]!();
+        // a buff an attack brings to the actor's side shows the skill's own effect on each ally (Onrush's gust)
+        if (skill?.allyFx && def.buff && (skill.target === 'enemy' || skill.target === 'enemies')) this.spawnHitFx(skill.allyFx, v, v.facing === 'L');
+        else if (cue[e.status]) cue[e.status]!();
         else if (e.status !== 'shield' && e.status !== 'freeze' && e.status !== 'stun') void this.fx.spawn(def.buff ? 'buff' : 'debuff', v.x, v.y, { layer: 'top', additive: def.buff });
         break;
       }
@@ -745,7 +751,27 @@ export class BattleScene {
         })();
         break;
       case 'passive': {
+        const src = e.source ? this.views.get(e.source) : undefined;
+        if (e.effect === 'tend' || e.effect === 'ward') {
+          // a passive that guards an ally acts often: no banner, its name over its holder and its ward on the ally
+          const holder = src ?? v;
+          this.fx.text(holder.uid, holder.x, holder.head().y - 30 - (holder.boss ? 8 : 0), e.name.toUpperCase(), { color: '#a2f56a' });
+          if (e.effect === 'tend' && src) {
+            // the Jungle Herder's bell chimes at his belt (the effect stands on his feet), then the ward settles on the frailest
+            void this.fx.spawn('herd_bell', src.x, src.y, { layer: 'top', additive: true, flip: src.facing === 'L' });
+            void this.clock.wait(140).then(() => this.fx.spawn('herd_ward', v.x, v.y + 1, { layer: 'top', additive: true }));
+          } else void this.fx.spawn('flag_ward', v.chest().x, v.chest().y, { layer: 'top', additive: true, flip: v.facing === 'L' });
+          break;
+        }
         this.hud.showBanner(e.name, v.team === 'player' ? '#ffe9a0' : '#ffc0b0');
+        if (e.effect === 'fallen') {
+          // an ally falls and the holder grows keener: the undergrowth stirs round its feet, its eyes catch the light
+          const p = v.champion.passive;
+          void this.fx.spawn('undergrowth', v.x, v.y + 1, { layer: 'top' });
+          void this.fx.spawn('keen_eyes', v.chest().x, v.chest().y, { layer: 'top', additive: true, flip: v.facing === 'L' });
+          if (p) this.fx.text(v.uid, v.x, top() - 6, `+${Math.round(p.value * 100)}% ${p.stat === 'crit' ? 'C.RATE' : (p.stat ?? '').toUpperCase()}`, { color: '#ff5ac0', variant: 'bold' });
+          break;
+        }
         if (e.effect === 'rebuke') {
           // a blow answered: the cold flares around the holder and a shard of it strikes the attacker
           void this.fx.spawn('cold_rebuke', v.x, v.y + 1, { layer: 'top' });
@@ -753,7 +779,6 @@ export class BattleScene {
           this.fx.text(v.uid, v.x, top() - 6, 'REBUKE!', { color: '#c8f0ff', variant: 'display', outline: '#10284a' });
           this.flash = Math.max(this.flash, 0.1);
           this.shake(2);
-          const src = e.source ? this.views.get(e.source) : undefined;
           if (src) {
             void (async () => {
               await this.clock.wait(160);

@@ -3,7 +3,7 @@
 // replays the returned events. Rules are documented in docs/MECHANICS_GUIDE.md.
 import { AFFINITY_BONUS, affinityEdge } from '../data/meta';
 import { STATUSES } from '../data/statuses';
-import { ChampionDef, PassiveDef, SkillDef, Stats, StatusId, TeamId } from '../data/types';
+import { ChampionDef, PassiveDef, SkillDef, StatId, Stats, StatusId, TeamId } from '../data/types';
 import { Rng } from './rng';
 
 export interface StatusInst {
@@ -201,6 +201,19 @@ export class Battle {
     return u.stats.def * k;
   }
 
+  /** The critical rate a unit strikes with: its stats, and a passive that grows as its allies fall (Big Ears'). */
+  critRate(u: Unit): number {
+    return u.stats.crit + this.fallenBonus(u, 'crit');
+  }
+
+  /** Fallen (passive): `value` for each fallen ally of the holder, up to `max`. */
+  fallenBonus(u: Unit, stat: StatId): number {
+    const p = u.champion.passive;
+    if (p?.kind !== 'fallen' || p.stat !== stat) return 0;
+    const fallen = this.units.filter((x) => x.team === u.team && x !== u && !x.alive).length;
+    return Math.min(p.max ?? Infinity, fallen * p.value);
+  }
+
   // --- turn meter ----------------------------------------------------------
 
   /** Fills every turn meter until someone reaches 100. Returns the actor. */
@@ -232,9 +245,11 @@ export class Battle {
     return { events, skip };
   }
 
-  /** End of the actor's turn: TM reset, durations and cooldowns tick down (a status placed during this turn starts counting at the next). */
+  /** End of the actor's turn: a passive that acts now, then TM reset, durations and cooldowns tick down (a status placed during this turn starts counting at the next). */
   endTurn(u: Unit): BattleEvent[] {
     const events: BattleEvent[] = [];
+    // still the holder's turn: a Shield it gives itself now covers its next turn, like any status placed on its own turn
+    this.tend(u, events);
     if (this.acting === u) this.acting = null;
     u.tm = u.alive ? Math.min(TURN_FULL - 1, u.pendingTm) : 0;
     u.pendingTm = 0;
@@ -374,6 +389,8 @@ export class Battle {
       }
     }
     if (skill.selfTm && !asCounter) actor.pendingTm = skill.selfTm;
+    // a passive answering the blow on each ally it struck comes after the hit
+    this.ward(actor, damaged, last, events);
 
     const result: SkillResult = { actor: actor.uid, skill, target: primary?.uid, targets: targets.map((t) => t.uid), events, counter: asCounter, counters: [] };
 
@@ -417,7 +434,7 @@ export class Battle {
   }
 
   rollDamage(a: Unit, t: Unit, s: SkillDef, mult: number): { amount: number; crit: boolean; edge: -1 | 0 | 1 } {
-    const crit = this.rng.chance(a.stats.crit);
+    const crit = this.rng.chance(this.critRate(a));
     const edge = affinityEdge(a.champion.affinity, t.champion.affinity);
     let dmg = this.attack(a) * mult * DAMAGE_SCALE;
     dmg *= DEF_SCALE / this.defense(t);
@@ -456,6 +473,7 @@ export class Battle {
         t.statuses = [];
         t.tm = 0;
         events.push({ kind: 'death', target: t.uid, hit });
+        this.mourn(t, hit, events);
       }
     } else if (t.alive && p?.kind === 'overdrive' && !t.overdriven && t.hp / t.maxHp < p.value) {
       // the core overloads once: a second phase for bosses like Mwamba
@@ -487,6 +505,54 @@ export class Battle {
       return;
     }
     u.statuses.push({ id, turns, value, source, ...(fresh ? { fresh } : {}) });
+  }
+
+  /**
+   * Tend (passive): at the end of its holder's turn, skipped or not, the ally
+   * with the lowest max HP, the holder included, receives the passive's
+   * statuses; then it rests for `cooldown` of the holder's turns (the Jungle
+   * Herder's Herder's Ward: a Shield of 10% of his max HP every second turn,
+   * from his first). Ties go to the one lower on HP, then to the front.
+   */
+  private tend(u: Unit, events: BattleEvent[]) {
+    const p = u.champion.passive;
+    if (p?.kind !== 'tend' || !u.alive || (u.cooldowns[p.id] ?? 0) > 0) return;
+    const ward = [...this.allies(u)].sort((x, y) => x.maxHp - y.maxHp || x.hp / x.maxHp - y.hp / y.maxHp || x.slot - y.slot)[0];
+    // the rest counts the holder's own turns, and this turn's cooldowns tick right after
+    u.cooldowns[p.id] = (p.cooldown ?? 0) + 1;
+    events.push({ kind: 'passive', target: ward.uid, name: p.name, hit: 0, effect: 'tend', source: u.uid });
+    for (const st of p.statuses ?? []) this.tryApply(u, ward, st.status, st.turns, undefined, p.value, 0, events);
+  }
+
+  /**
+   * Ward (passive): each ally of the holder, the holder included, that an
+   * enemy skill damaged and left standing may receive the passive's statuses
+   * after the hit, once per skill, with the passive's chance (Emissary
+   * Handlings' Unbroken Flag: a Shield of 15% of his max HP, half the time).
+   */
+  private ward(actor: Unit, damaged: Set<Unit>, hit: number, events: BattleEvent[]) {
+    for (const d of damaged) {
+      if (!d.alive || d.team === actor.team) continue;
+      for (const h of this.allies(d)) {
+        const p = h.champion.passive;
+        if (p?.kind !== 'ward') continue;
+        if (p.chance !== undefined && !this.rng.chance(p.chance)) continue;
+        events.push({ kind: 'passive', target: d.uid, name: p.name, hit, effect: 'ward', source: h.uid });
+        for (const st of p.statuses ?? []) this.tryApply(h, d, st.status, st.turns, undefined, p.value, hit, events);
+      }
+    }
+  }
+
+  /** Fallen (passive): the fall of an ally raises its holder's stat (`fallenBonus`); shown while the bonus still grows. */
+  private mourn(t: Unit, hit: number, events: BattleEvent[]) {
+    for (const h of this.allies(t)) {
+      const p = h.champion.passive;
+      if (p?.kind !== 'fallen') continue;
+      const fallen = this.units.filter((x) => x.team === h.team && x !== h && !x.alive).length;
+      const cap = p.max ?? Infinity;
+      if (Math.min(cap, fallen * p.value) <= Math.min(cap, (fallen - 1) * p.value) + 1e-9) continue;
+      events.push({ kind: 'passive', target: h.uid, name: p.name, hit, effect: 'fallen' });
+    }
   }
 
   /** Rebuke (passive): a critical hit on its holder below the threshold answers the attacker, then the passive rests. */

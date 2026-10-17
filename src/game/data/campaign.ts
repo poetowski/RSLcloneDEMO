@@ -155,6 +155,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: ARRIVAL,
         enemies: [{ champion: 'lineholder' }, { champion: 'follower' }, { champion: 'quartermaster' }],
         power: 0.89,
+        // a stand-in: the stage that brings the Jungle Herder is not Jakub's
+        recruit: 'jungle_herder',
       },
       {
         id: '2-4',
@@ -167,6 +169,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: CONTEST,
         enemies: [{ champion: 'enforcer' }, { champion: 'skirmisher' }, { champion: 'follower' }],
         power: 0.82,
+        // a stand-in: the stage that brings Emissary Handlings is not Jakub's
+        recruit: 'emissary_handlings',
       },
       {
         id: '2-6',
@@ -179,6 +183,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: CONTEST,
         enemies: [{ champion: 'bloodhound' }, { champion: 'enforcer' }, { champion: 'quartermaster' }],
         power: 1.02,
+        // a stand-in: the stage that brings Red Cloak is not Jakub's
+        recruit: 'red_cloak',
       },
       {
         id: '2-8',
@@ -191,6 +197,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: OUTCOME,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'dominion_medic' }],
         power: 0.83,
+        // a stand-in: the stage that brings Big Ears is not Jakub's
+        recruit: 'big_ears',
       },
       {
         id: '2-10',

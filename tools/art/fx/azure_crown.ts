@@ -5,8 +5,13 @@
 // a heavy blow a dull grey-white flash with dust rolling out, a sweep a flat
 // arc of light. The Lineholder's mace lands the same way and his Brace kicks
 // up dust; the Quartermaster's stick raps, and his Field Rations reach each
-// ally as warm light with small white crosses rising.
-import { dith, ellipseRing, rampDither } from '../paint.ts';
+// ally as warm light with small white crosses rising. Emissary Handlings'
+// Banner Strike lands as a dull flash with a glint of the finial's gold; his
+// Rallying Standard raises the shape of the standard in light behind each
+// ally, gold and azure, the colours of the Crown's standard he carries; his
+// Unbroken Flag sweeps a band of that azure round the ally it shields and
+// flashes a kite shield of gold.
+import { dith, ellipseRing, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng } from '../raster.ts';
 import { burst, cut, FxDef, motes, ramps, ring, sparks, W } from './kit.ts';
 
@@ -75,6 +80,20 @@ function lightCut(b: Bitmap, i: number, x0: number, y0: number, x1: number, y1: 
   if (i < 6) cut(b, x0, y0, x1, y1, bend, th, DULL, heat, reach);
   if (i === 1 || i === 2) burst(b, flash[0], flash[1], 6, 2, [12, 8][i - 1], 1.3, DULL, flash[2]);
   if (i >= 1) sparks(b, flash[0], flash[1], 14, 30, (i - 1) / 5, DULL, seed, 20);
+}
+
+/** A kite shield of gold light: a dithered body and a bright rim, top edge straight, sides running to the point. */
+function kite(b: Bitmap, cx: number, cy: number, hw: number, hh: number, fade: number) {
+  const pts: [number, number][] = [[cx - hw, cy - hh * 0.45], [cx + hw, cy - hh * 0.45], [cx + hw * 0.9, cy + hh * 0.2], [cx, cy + hh], [cx - hw * 0.9, cy + hh * 0.2]];
+  polyFill(b, pts, (x, y) => (dith(x, y, fade * 0.45) ? GO[2] : 0));
+  for (let k = 0; k < pts.length; k++) {
+    const [x0, y0] = pts[k], [x1, y1] = pts[(k + 1) % pts.length];
+    const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) * 1.5);
+    for (let s = 0; s <= n; s++) {
+      const x = Math.round(x0 + ((x1 - x0) * s) / n), y = Math.round(y0 + ((y1 - y0) * s) / n);
+      if (dith(x, y, fade)) b.set(x, y, k === 0 ? W : GO[4]);
+    }
+  }
 }
 
 export const AZURE_CROWN_FX: Record<string, FxDef> = {
@@ -176,6 +195,80 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
       const a0 = Math.PI * 0.98, a1 = a0 - Math.PI * 0.96 * grow;
       if (i < 6) flatArc(b, 48, 20, 44, 17, 16 * (1 - t * 0.45), a0, a1, DULL, heat);
       if (i >= 1) sparks(b, 58, 30, 12, 24, (i - 1) / 5, DULL, 37, 12);
+    },
+  },
+
+  /** Banner Strike: the pole's gilded head lands: a dull flash with a glint of its gold, a ring of the blow, chips flying. */
+  banner_strike: {
+    w: 64, h: 64, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 6, 4],
+    draw: (b, t, i) => {
+      const cx = 32, cy = 32;
+      if (i < 2) cut(b, 12, 8, cx, cy, -2, [2.2, 3.0][i], DULL, [1.3, 1.1][i], [0.7, 1][i]);
+      if (i >= 1 && i <= 3) burst(b, cx, cy, 10, 2, [14, 10, 7][i - 1], 1.5, DULL, 0.25);
+      if (i === 1 || i === 2) burst(b, cx + 1, cy - 1, 4, 1, [6, 4][i - 1], 1, GO, 0.8);
+      if (i >= 2) ring(b, cx, cy, 6 + (i - 2) * 4, 6 + (i - 2) * 4, Math.max(0.7, 2 - (i - 2) * 0.35), DULL, Math.max(0.3, 1.2 - (i - 2) * 0.2));
+      if (i >= 1) sparks(b, cx, cy, 12, 24, (i - 1) / 5, GO, 241, 14);
+    },
+  },
+  /**
+   * Rallying Standard reaches an ally: the shape of the standard rises behind
+   * it in light, a pole of gold 12 px behind the ally and an azure pennant
+   * unfurling back from it, and a gold ring settles at its feet. Anchored at
+   * the feet; the pole stands behind the body so the light never hides it.
+   */
+  rally: {
+    w: 64, h: 100, n: 11, ms: 65, ax: 0.6875, ay: 1, pad: [2, 4, 8, 4],
+    draw: (b, t, i) => {
+      const AZ = ramps.steel;
+      const cx = 32, gy = 98;
+      const up = [0.15, 0.4, 0.7, 0.9, 1, 1, 1, 1, 1, 1, 1][i];
+      const fade = i < 7 ? 1 : [0.75, 0.5, 0.3, 0.15][i - 7];
+      const top = gy - 84 * up;
+      for (let y = Math.floor(top); y <= gy; y++) {
+        if (!dith(cx, y, fade * (0.55 + 0.45 * (y - top) / Math.max(1, gy - top)))) continue;
+        b.set(cx, y, GO[3]);
+        if (dith(cx + 1, y, 0.5)) b.set(cx + 1, y, GO[2]);
+      }
+      if (i >= 3) {
+        const unf = Math.min(1, (i - 2) / 3), wd = 20 * unf, hgt = 26;
+        for (let yy = 0; yy < hgt; yy++) {
+          const tail = yy > hgt - 7 && Math.abs(yy - (hgt - 3)) < 3 ? wd * 0.35 : 0;
+          const wv = wd * (1 - (yy / hgt) * 0.25);
+          for (let xx = 2; xx <= wv; xx++) {
+            if (tail && Math.abs(xx - wv * 0.55) < tail * 0.5) continue;
+            const x = cx - xx, y = Math.round(top + 3 + yy + Math.sin(xx * 0.4 + t * 6) * 1.2);
+            if (!dith(x, y, fade * 0.85)) continue;
+            b.set(x, y, rampDither(AZ, 1.6 + Math.sin(xx * 0.5 - t * 5) * 0.8 + (xx < 4 ? 0.8 : 0), x, y));
+          }
+        }
+      }
+      ellipseRing(b, cx + 12, gy - 2, 6 + up * 14, 2 + up * 3, 1.2, (x, y, a) => (dith(x, y, fade) ? rampDither(GO, 2.6 + Math.sin(a) * 0.6, x, y) : 0));
+      motes(b, cx + 12, gy - 6, 30, 70, 8, t, GO, 251);
+    },
+  },
+  /**
+   * Unbroken Flag: an ally struck takes the ward of the standard: a band of
+   * azure light, as of the banner's cloth, sweeps round it, and a kite
+   * shield of gold light flashes and fades. Played at its chest.
+   */
+  flag_ward: {
+    w: 64, h: 64, n: 8, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const AZ = ramps.steel;
+      const cx = 32, cy = 32;
+      const sweep = [0.3, 0.65, 1, 1, 1, 1, 1, 1][i];
+      const fade = i < 4 ? 1 : [0.8, 0.55, 0.35, 0.15][i - 4];
+      const a0 = -Math.PI * 0.9, span = Math.PI * 1.6 * sweep;
+      ellipseRing(b, cx, cy, 22, 25, 3.2 * fade + 0.8, (x, y, a) => {
+        let rel = a - a0;
+        while (rel < 0) rel += Math.PI * 2;
+        if (rel > span) return 0;
+        const k = rel / Math.max(0.01, span);
+        if (!dith(x, y, fade * (0.6 + 0.4 * Math.sin(k * Math.PI)))) return 0;
+        return rampDither(AZ, 1.4 + Math.sin(k * Math.PI) * 2 + Math.sin(rel * 6 - t * 8) * 0.4, x, y);
+      });
+      if (i >= 2 && i <= 6) kite(b, cx, cy - 2, 9, 12, fade);
+      if (i >= 1 && i <= 5) sparks(b, cx, cy, 10, 26, (i - 1) / 5, GO, 257, 0);
     },
   },
 };

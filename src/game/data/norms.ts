@@ -34,8 +34,9 @@ export const STAT_LIMITS = {
 /** Total damage multiplier (sum of hit mults) allowed per slot, single target vs AoE. */
 export const SKILL_NORMS: Record<1 | 2 | 3, { cooldown: [number, number]; single: [number, number]; aoe: [number, number] }> = {
   1: { cooldown: [0, 0], single: [0.9, 1.25], aoe: [0.5, 0.8] },
-  // A2 cooldown 4: Jakub's Bloodhound (2026-10-12), whose Taunt rests a turn longer
-  2: { cooldown: [3, 4], single: [1.1, 1.6], aoe: [0.5, 1.1] },
+  // A2 cooldown 4: Jakub's Bloodhound (2026-10-12), whose Taunt rests a turn longer;
+  // 5: his Emissary Handlings' Rallying Standard and Big Ears' Dart Volley (2026-10-17)
+  2: { cooldown: [3, 5], single: [1.1, 1.6], aoe: [0.5, 1.1] },
   3: { cooldown: [4, 5], single: [1.3, 2.6], aoe: [0.7, 1.2] },
 };
 
@@ -96,5 +97,9 @@ export function auditChampion(c: ChampionDef): string[] {
   if (p?.kind === 'rebuke' && !(p.cooldown && p.cooldown >= 1)) out.push(`${p.id}: a rebuke needs a cooldown`);
   // a stat passive is extra, outside the budget (Jakub, 2026-10-12): it only has to name its stat
   if (p?.kind === 'stat' && !p.stat) out.push(`${p.id}: a stat passive needs a stat`);
+  // so is a fallen passive, which also needs its cap; tend and ward have something to give, and ward a chance
+  if (p?.kind === 'fallen' && (!p.stat || !p.max)) out.push(`${p.id}: a fallen passive needs a stat and a cap`);
+  if ((p?.kind === 'tend' || p?.kind === 'ward') && !p.statuses?.length) out.push(`${p.id}: a ${p.kind} passive needs statuses`);
+  if (p?.kind === 'ward' && !(p.chance && p.chance > 0 && p.chance <= 1)) out.push(`${p.id}: a ward needs a chance`);
   return out;
 }

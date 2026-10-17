@@ -131,6 +131,19 @@ export const medic = (() => {
   return { ...c, skills: [c.skills[0]] as ChampionDef['skills'] };
 })();
 
+/** Tend: at the end of its turn a Shield of 10% of its max HP for 1 turn on the ally with the lowest max HP, then a turn of rest. */
+export const tender = fixture('tender', {
+  stats: { hp: 1500 },
+  passive: { id: 'tend', name: 'Tend', desc: '', kind: 'tend', value: 0.1, statuses: [{ status: 'shield', turns: 1 }], cooldown: 1 },
+});
+
+/** Ward: an ally an enemy skill damaged gets a Shield of 15% of its max HP for 1 turn after the hit, with `chance`. */
+export const bannerman = (chance: number) =>
+  fixture(`bannerman_${chance}`, { stats: { hp: 1400 }, passive: { id: 'ward', name: 'Ward', desc: '', kind: 'ward', value: 0.15, chance, statuses: [{ status: 'shield', turns: 1 }] } });
+
+/** Fallen: +20% C.RATE for each fallen ally, up to +30%; no C.RATE of its own. */
+export const mourner = fixture('mourner', { stats: { crit: 0 }, passive: { id: 'fallen', name: 'Fallen', desc: '', kind: 'fallen', stat: 'crit', value: 0.2, max: 0.3 } });
+
 /** A stat passive: +95% C.RATE in battle, so with its own 5% every hit is critical. */
 export const keen = fixture('keen', { passive: { id: 'keen', name: 'Keen', desc: '', kind: 'stat', stat: 'crit', value: 0.95 } });
 

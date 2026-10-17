@@ -51,6 +51,11 @@ Section 7 lists what is not decided.
 | 2026-10-13 | Zone 2: ten placeholder stages, to test the area in game | 5.4 |
 | 2026-10-13 | The Walking Bush, a Common of the Court of Root | 19 |
 | 2026-10-13 | The Wild Speaker, a Common of the Court of Root | 20 |
+| 2026-10-17 | The Jungle Herder, an Elite Tank of the Court of Root | 21 |
+| 2026-10-17 | Emissary Handlings, an Elite Tank of the Azure Crown | 22 |
+| 2026-10-17 | Red Cloak, an Elite of the Sanguine Dominion, Damage | 23 |
+| 2026-10-17 | Big Ears, an Elite of the Court of Root, Damage | 24 |
+| 2026-10-17 | The affinities of the four Elites: Jakub sets them later | 7, 21-24 |
 
 ---
 
@@ -656,9 +661,15 @@ open questions.
 - Champion schema (what fields a champion has beyond the enums) *(partly
   decided 2026-10-11: no subtitle, eight stats; section 10)*
 - Kit / skill design *(the starter pair's kits decided 2026-10-10, section 8,
-  the Skirmisher's and the Lineholder's 2026-10-11, sections 12 and 13, and
-  the Quartermaster's, the Enforcer's, the Bloodhound's and the Dominion
-  Medic's 2026-10-12, sections 14-17; their numbers are not)*
+  the Skirmisher's and the Lineholder's 2026-10-11, sections 12 and 13, the
+  Quartermaster's, the Enforcer's, the Bloodhound's and the Dominion
+  Medic's 2026-10-12, sections 14-17, the Follower's, the Walking Bush's and
+  the Wild Speaker's 2026-10-13, sections 18-20, and the Jungle Herder's,
+  Emissary Handlings', Red Cloak's and Big Ears' 2026-10-17, sections 21-24;
+  their numbers are not)*
+- The affinities of the Jungle Herder, Emissary Handlings, Red Cloak and Big
+  Ears: Jakub, 2026-10-17, "i will optimize affinities for these 4 new heroes
+  later" *(the game stands in Bloom, Tide, Bloom and Ember)*
 - Art pipeline specification
 - Save and progression *(gear decided: the Weaver Matrix, section 9; levels,
   ranks, ascension and skill upgrades are not)*
@@ -1322,3 +1333,250 @@ effects a dull flash with the ring of the push and a heavier flash with dust
 thrown out low. Read by the game: "humanoid" drawn as a man; the ATK Down
 comes after the hit and meets the target's RES like any debuff (section 10);
 his signature colour is his ink's teal, as green is his faction's.
+
+## 21. The Jungle Herder (received 2026-10-17)
+
+Jakub's proposal, verbatim (his champion proposals of 2026-10-17, a file he
+put in the project, `newHeroes_md.md.txt`; the four are sections 21-24):
+
+```
+## Jungle Herder
+
+- **Champion name:** Jungle Herder
+- **Faction:** Court of Root
+- **Affinity:** Not specified
+- **Class:** Tank
+- **Rarity:** Elite
+
+### Kit
+
+- **A1:** Single-target attack.
+- **A2:** Taunt self for 1 turn. Add the Counter buff to yourself for 2 turns. No attack. Cooldown: 4 turns.
+- **A3 (Passive):** At the end of this champion's turn, grant a Shield buff valued at 10% of this champion's maximum HP to the ally with the lowest maximum HP for 1 turn. Cooldown: 1 (applies every second turn).
+
+### Design
+
+Bipedal humanoid with a hunchback and a herding staff. Has a medium-sized bell at his belt.
+```
+
+His answers the same day, verbatim (the part on the four's affinities, the
+Jungle Herder, Emissary Handlings and Red Cloak; sections 22 and 23 quote
+theirs), then "go":
+
+```
+i will optimize affinities for these 4 new heroes later. jungle herder shield is applied to ally with lowest max HP in current roster. can land on himself as well. this starts on first turn because it is not on cooldown yet. emissary shield goes after hit. can be on himself as well. red cloack crimson blade place 1 burn for 2 turns. now go, and properly deliver all 4 new hores based on your md file i put here and all info. be very creative and consistent with art and visuals. properly test afterwards. i will come back later to see the results. go
+```
+
+| | |
+|---|---|
+| Rarity | Elite |
+| Role | Tank |
+| Faction | Court of Root |
+| Affinity | not set: Jakub sets the four affinities later (section 7) |
+| Kit | A1 an attack on one enemy; A2 Taunt on himself for 1 turn and Counterattack for 2 turns, no attack, cooldown 4; his A3 a passive: at the end of his turn a Shield worth 10% of his max HP for 1 turn on the ally with the lowest max HP in the team, himself included, from his first turn, as it is not on cooldown yet; then it rests a turn (cooldown 1: every second turn) |
+| Look | a bipedal humanoid with a hunchback and a herding staff, a medium-sized bell at his belt |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the affinity
+(Bloom), the skills' names (Crook Strike, Bellwether, Herder's Ward) and
+texts, A1's multiplier (1.0, a plain attack), the stats (on the Elite budget,
+a little under it for the passive), the lore line, the stage that brings him
+(the first clear of 2-3), and the details of his art and effects: an old
+herder of the jungle's beasts, broad and bent under a great hump draped in a
+mantle of shaggy russet hide, his head thrust forward under a wide hat of
+woven straw with a macaw's red feather in its band; dark skin, a grizzled
+beard, long arms with the forearms wrapped, wrapped shins and bare feet, a
+jerkin of dark cloth and a wrap of hide; the staff a long crook of gnarled
+wood with its hook curled over at the top, a leather binding, beads of bone
+and a tuft of hide under it; the bell bronze, hanging from a rope belt and
+swinging as he moves. Crook Strike brings the hook down from over his hump;
+in Bellwether he drives the crook into the ground behind him, takes the bell
+from his belt and rings it out before him; their effects a dull flash under
+the curl of the hook, and rings of sound in the bell's bronze. Herder's Ward
+chimes the bell at his belt and draws the hook of a crook in warm light over
+the ally it shields. Read by the game: "the end of his turn" is also a turn
+he loses to Stun or Freeze (a passive is no action); the "current roster" is
+his team in the battle, the living; on a tie for the lowest max HP the Shield
+goes to the one lower on HP, then to the one in front; placed on his own turn,
+his own Shield lasts until the end of his next turn, an ally's until the end
+of the ally's next turn (section 10); a Shield placed again refreshes to the
+larger value, like every status.
+
+## 22. Emissary Handlings (received 2026-10-17)
+
+Jakub's proposal, verbatim:
+
+```
+## Emissary Handlings
+
+- **Champion name:** Emissary Handlings
+- **Faction:** Azure Crown
+- **Affinity:** To be decided
+- **Class:** Tank
+- **Rarity:** Elite
+
+### Kit
+
+- **A1 — Banner Strike:** Attacks 1 enemy. Has a 20% chance to place a Stun debuff.
+- **A2 — Rallying Standard:** No attack. Places Increase DEF on all allies for 2 turns. Cooldown: 5 turns.
+- **A3 (Passive) — Unbroken Flag:** Whenever an enemy attacks an ally, has a 50% chance to place a Shield buff on that ally for 1 turn. The Shield is valued at 15% of this champion's maximum HP.
+
+### Design
+
+Tall human wearing medium armor and a blue cloak, holding a flag banner. Carries no other weapon. Looks proudly.
+```
+
+His answer the same day, verbatim (section 21 quotes the whole message):
+
+```
+emissary shield goes after hit. can be on himself as well.
+```
+
+| | |
+|---|---|
+| Rarity | Elite |
+| Role | Tank |
+| Faction | Azure Crown |
+| Affinity | not set: Jakub sets the four affinities later (section 7) |
+| Kit | A1 Banner Strike, an attack on one enemy with a 20% chance to place Stun; A2 Rallying Standard, no attack, DEF Up on all allies for 2 turns, cooldown 5 (the norms allow an A2 cooldown of 3-5 since); his A3 the passive Unbroken Flag: whenever an enemy attacks an ally, himself included, a 50% chance to place a Shield worth 15% of his max HP on that ally for 1 turn, after the hit |
+| Look | a tall human in medium armour and a blue cloak, holding a flag banner, no other weapon, a proud look |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the affinity
+(Tide), the texts, A1's multiplier (1.0, a plain attack), the Stun's 1 turn
+(control lasts a single turn, section 10's norms), the stats (on the Elite
+budget, a little under it for the passive), the lore line, the stage that
+brings him (the first clear of 2-5), and the details of his art and effects:
+tall and upright, his chin up and his free hand on his hip; clean-shaven, fair
+hair combed back from a high brow; a breastplate of polished steel edged in
+gold over mail, pauldrons, vambraces and a gorget of the same steel, charcoal
+trousers and tall boots; a long bright-blue cloak with a gold crown at its
+clasp; the banner taller than he is: a pole of dark polished wood with gold
+fittings and a gilded finial crowned with three points, a crossbar under it,
+and the Crown's standard hanging from it, blue with a gold crown, a swallowtail
+hem and a gold fringe, rippling slowly. Banner Strike swings the pole down so
+its gilded head strikes; in Rallying Standard he lifts the banner in both
+hands and plants it; their effects a dull flash with a glint of gold, and the
+shape of the standard in light, a gold pole and an azure pennant, rising
+behind each ally. Unbroken Flag sweeps a band of the standard's azure round
+the ally it shields and flashes a kite shield of gold. Read by the game: an
+attack is an enemy skill that damages the ally (a counterattack too), and
+each ally it struck rolls once per skill, however many hits it took; an ally
+the attack kills gets nothing; the Stun meets RES like every debuff (section
+10); his flag answers while he stands, also when he is stunned (a passive is
+no action); "medium armour" drawn as steel plates over mail; the standard he
+carries is the Azure Crown's (section 3.6): it belongs on a banner.
+
+## 23. Red Cloak (received 2026-10-17)
+
+Jakub's proposal, verbatim:
+
+```
+## Red Cloak
+
+- **Champion name:** Red Cloak
+- **Faction:** Sanguine Dominion
+- **Affinity:** Todo
+- **Class:** Damage
+- **Rarity:** Elite
+
+### Kit
+
+- **A1:** Single-target attack.
+- **A2 — Crimson Blade:** Attacks 1 target. Has a 50% chance to place Burn debuffs on the target for 2 turns. Cooldown: 3 turns.
+- **A3:** Attacks 1 enemy and places Increase SPD on all allies for 2 turns. Cooldown: 5 turns.
+
+### Design
+
+Man in plate armor with a red back cloak. Bald, with only a goatee, and wielding an ornamented silver zweihander.
+```
+
+His answer the same day, verbatim (section 21 quotes the whole message):
+
+```
+red cloack crimson blade place 1 burn for 2 turns.
+```
+
+| | |
+|---|---|
+| Rarity | Elite |
+| Role | Damage |
+| Faction | Sanguine Dominion |
+| Affinity | not set: Jakub sets the four affinities later (section 7) |
+| Kit | A1 an attack on one enemy; A2 Crimson Blade, an attack on one target with a 50% chance to place one Burn on it for 2 turns, cooldown 3; A3 an attack on one enemy that places SPD Up on all allies for 2 turns, cooldown 5 |
+| Look | a man in plate armour with a red cloak at his back, bald with only a goatee, wielding an ornamented silver zweihander |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the affinity
+(Bloom), the names Cleave and Onrush and the texts, the multipliers (A1 1.0,
+a plain attack; A2 1.3; A3 1.8), the stats (on the Elite budget), the lore
+line, the stage that brings him (the first clear of 2-7), and the details of
+his art and effects: a knight of the Dominion in full plate blackened as its
+standard's black and edged in silver; a long scarlet cloak from his shoulders
+to his calves; a bald head, a dark goatee and moustache, a pale old scar
+through the brow; the zweihander nearly as long as he is tall, resting on his
+near shoulder: a silver blade with a fuller and gold engraving at its root, a
+ricasso wrapped in red leather between parrying lugs, a cross-guard with
+scrolled ends and a red stone, a long grip and a heavy pommel with another.
+Cleave brings it from the shoulder over and down through the enemy; in Crimson
+Blade he draws it back low and it glows crimson for a rising cut (the glow is
+the skill's own, its name, never an affinity); in Onrush he draws the point
+back at his hip, lunges it through the enemy, then raises the sword high with
+a war cry; their effects a great white cut and chips, a crimson-hot rising cut
+shedding embers, and a line of light driven through the target, rings of the
+shout and a gust of wind past each ally the SPD Up reaches. Read by the game:
+"all allies" includes himself, as for every skill (his own SPD Up, placed on
+his turn, covers his next two); the Burn and the SPD Up come after the hit;
+the Burn meets RES like every debuff (section 10).
+
+## 24. Big Ears (received 2026-10-17)
+
+Jakub's proposal, verbatim:
+
+```
+## Big Ears
+
+- **Champion name:** Big Ears
+- **Faction:** Court of Root
+- **Affinity:** Todo
+- **Class:** Damage
+- **Rarity:** Elite
+
+### Kit
+
+- **A1:** Attacks 1 enemy. Has a 35% chance to place a Poison debuff on the target for 1 turn.
+- **A2 — Dart Volley:** Attacks all enemies and places Block Healing debuffs on them for 2 turns. Cooldown: 5 turns.
+- **A3 (Passive) — Hidden in the Undergrowth:** Increases this champion's Crit Rate by 15% for each dead ally, up to a maximum increase of 30%.
+
+### Design
+
+Small humanoid with a large head and two big ears, blowing poisoned darts at enemies.
+```
+
+| | |
+|---|---|
+| Rarity | Elite |
+| Role | Damage |
+| Faction | Court of Root |
+| Affinity | not set: Jakub sets the four affinities later (section 7) |
+| Kit | A1 an attack on one enemy with a 35% chance to place Poison on it for 1 turn; A2 Dart Volley, an attack on all enemies that places Heal Block ("Block Healing") on them for 2 turns, cooldown 5; his A3 the passive Hidden in the Undergrowth: +15% C.RATE for each dead ally, up to +30% |
+| Look | a small humanoid with a large head and two big ears, blowing poisoned darts at enemies |
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the affinity
+(Ember), the name Poison Dart and the texts, the multipliers (A1 1.0, a plain
+attack; A2 three breaths of darts, 0.2 each, at every enemy), the stats (on
+the Elite budget, C.RATE 5%), the lore line, the stage that brings him (the
+first clear of 2-9), and the details of his art and effects: a small dweller
+of the undergrowth, the Court's hidden kind: a big round head with a short
+snout and one large amber eye for the dark, two great ears, broad and splayed
+like a bat's, pink inside, thin limbs, big hands and feet, a dusky mauve hide;
+a loincloth of dark hide, a sash with a quiver of cane holding fletched darts,
+a gourd of poison with a green stopper at his belt, a string of small teeth
+round his neck; the blowpipe a cane longer than he is tall, bound with dark
+hide, a mouthpiece of bone. Poison Dart: he lifts the pipe to his lips, fills
+his cheeks and blows; Dart Volley: a deep breath with his ears laid back, then
+three quick darts at every enemy; the dart a slim shaft with a green poisoned
+point and a white-and-red fletch, landing in a small flash and drops of green
+poison (the poison is what the skills do). Hidden in the Undergrowth: when an
+ally falls the grass stirs round his feet, his eye catches the light, and the
+bonus shows over him. Read by the game: a dead ally is one fallen in this
+battle; the bonus is extra to the stat budget and applies in battle only, like
+a stat passive (section 10); Dart Volley's Heal Block, with no chance named,
+is certain, and meets RES like every debuff.

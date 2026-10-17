@@ -59,7 +59,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Turn meter boost / drain | adds to the other allies' meters or to the one lowest on HP after the heals, or takes from the targets' | `tmAllies`, `tmLowestAlly`, `tmTargets`, `tm` event |
 | Kept meter | the actor ends its turn with this meter instead of 0 | `selfTm`, `Unit.pendingTm` |
 | Counterattack | the `counter` status, and the A1 it answers with | `counter`, `SkillResult.counter` |
-| Passive | a rule that wakes by itself: Undying, Overdrive, Rebuke (answers a critical hit below a threshold, then rests); or a stat passive, a stat raised in every battle (Keen Edge, C.RATE +10%: extra to the budget, outside battle only its text) | `PassiveDef.kind`, `PassiveDef.cooldown`, `PassiveDef.stat`, `battleStats`, `Unit.revived`, `Unit.overdriven`, `Unit.cooldowns[passive id]` |
+| Passive | a rule that wakes by itself: Undying, Overdrive, Rebuke (answers a critical hit below a threshold, then rests); a tend (Herder's Ward: at the end of its holder's turn the ally with the lowest max HP gets a Shield, then it rests); a ward (Unbroken Flag: an ally an enemy struck may get a Shield after the hit); a stat passive, a stat raised in every battle (Keen Edge, C.RATE +10%: extra to the budget, outside battle only its text); or a fallen passive, a stat raised for each fallen ally up to a cap (Hidden in the Undergrowth) | `PassiveDef.kind`, `PassiveDef.cooldown`, `PassiveDef.stat`, `PassiveDef.chance`, `PassiveDef.max`, `battleStats`, `Battle.critRate`, `Battle.fallenBonus`, `Unit.revived`, `Unit.overdriven`, `Unit.cooldowns[passive id]` |
 | Boss | an enemy slot with x1.6 HP, a crown and an intro | `EnemySlot.boss`, `BOSS_HP` |
 | Power | a stage's multiplier on enemy HP and ATK | `StageDef.power`, `BattleOptions.enemyPower` |
 | Battle event | one fact the rules produced, for the view to present | `BattleEvent` |
@@ -78,7 +78,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Role | Tank, Damage, Support: how the budget is spent (no fourth role; Control, Bruiser and the like are descriptive tags) | `Role`, `ROLES` |
 | Faction | one of four powers: the Azure Crown, the Sanguine Dominion, the Court of Root, the Ashveil Reign; story and standard, no mechanics | `FactionId`, `FACTIONS`, `FactionDef.standard` |
 | Standard | a faction's heraldry: the Azure Crown a gold crown on blue, the Sanguine Dominion a red hexagon on black, the Court of Root a brown paw on green, the Ashveil Reign a white bone across a dark grey | `FactionDef.standard`, `emblem_<faction>` |
-| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal, the Quartermaster's brown leather, the Enforcer's crimson, the Bloodhound's tan, the Dominion Medic's rose, the Follower's wolf grey, the Walking Bush's bark, the Wild Speaker's tattoo teal), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
+| Signature hue | the champion's own colour in the UI and its art (Gareth's amber, the Rime Scholar's frost, the Skirmisher's blue leather, the Lineholder's dark-blue shield on charcoal, the Quartermaster's brown leather, the Enforcer's crimson, the Bloodhound's tan, the Dominion Medic's rose, the Follower's wolf grey, the Walking Bush's bark, the Wild Speaker's tattoo teal, the Jungle Herder's russet hide, Emissary Handlings' bright azure, Red Cloak's scarlet, Big Ears' dusky mauve), never its faction's and never its affinity's (affinity is abstract, Jakub 2026-10-11) | `ChampionDef.color`, `ChampionArt.iconBg` |
 | Footprint | how long a champion's shadow is, as a share of a standing champion's: a beast on four legs casts a longer one (the Bloodhound and the Follower 1.9, the round Walking Bush 1.3) | `CharDef.footprint`, the atlas json, `UnitView.footprint` |
 | Muzzle | where projectiles leave a ranged champion's sprite | `ChampionDef.muzzle` |
 | Approach | how the actor travels before the attack | `Approach` |
@@ -348,10 +348,10 @@ winner()           checked before choosing and after every action
 | `dispel` | `useSkill`, before the hits | 0 | `status` | `-NAME` and a dispel burst | Buffs, Special Mechanics |
 | `tm` | `useSkill` (`tmTargets`, `tmAllies`, `tmLowestAlly`) | last | `delta` | `+n% TURN` / `-n% TURN` | Turn Meter & Speed, Special Mechanics |
 | `revive` | `applyDamage` (Undying) | hit | `hp` | fall, tomb-light helix, `UNDYING!`, rise | Special Mechanics |
-| `passive` | `applyDamage` (Overdrive) | hit | `name` | banner with the name, burst, `OVERDRIVE!` (fixed text, DR-14) | Special Mechanics |
+| `passive` | `applyDamage` (Overdrive; a fallen passive as an ally dies), `endTurn` (a tend), `useSkill` (a ward) | hit; 0 for a tend; the last hit for a ward | `name`, `effect`, `source` (the holder of a tend or a ward; the attacker for a Rebuke) | Overdrive: banner, burst, `OVERDRIVE!` (fixed text, DR-14); a tend or a ward: its name over the holder and its ward on the ally (no banner: they act often); fallen: banner, the stat it gains, the undergrowth at the holder's feet | Special Mechanics |
 | `death` | `applyDamage` | hit | - | death animation, fade | The Basics |
 
-**Ordering guarantees.** Start of turn: `damage` (Poison), `damage` (Burn), `heal` or `blocked` (Regen). Inside one damage instance: `expire` (a used-up shield), `damage`, then `revive`, `death` or `passive` with its `status` events. Within an action, the resolution order of section 4.1. End of turn: one `expire` per status that ran out. Counterattack results follow the action that provoked them, in the order the defenders were hit, and the view plays them after the attacker is back in formation.
+**Ordering guarantees.** Start of turn: `damage` (Poison), `damage` (Burn), `heal` or `blocked` (Regen). Inside one damage instance: `expire` (a used-up shield), `damage`, then `revive`, `death` or `passive` with its `status` events. Within an action, the resolution order of section 4.1, then a ward's `passive` and `status` events for each ally struck (before any counterattack). A death may be followed by a fallen passive's `passive` on its holder. End of turn: a tend's `passive` and `status` first, then one `expire` per status that ran out. Counterattack results follow the action that provoked them, in the order the defenders were hit, and the view plays them after the attacker is back in formation.
 
 ## 6. Invariants
 
@@ -378,6 +378,9 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C15 | A Rebuke answers only a critical, non-lethal hit by an enemy that leaves its holder below `value`; then it rests for `cooldown` of the holder's turns | code; tests |
 | INV-C16 | A debuff placed on an enemy lands with at most its chance: all of it while the placer's ACC is at least the target's RES, cut by `landShare` above; buffs and effects on allies never meet RES; when ACC is at least RES the random draws are the same as without the rule | code (`tryApply`); tests |
 | INV-C17 | A skill aimed at one ally that also gives its user a status is aimed at another ally while one stands (alone, the user is its own target); a status reaches each unit once per skill | code (`validTargets`, `useSkill`); test |
+| INV-C18 | A tend acts at the end of each of its holder's turns, skipped ones too, while it is ready: the living ally with the lowest max HP, the holder included (ties: the lower HP share, then the front), gets its statuses worth `value` x the holder's max HP; then it rests `cooldown` of the holder's turns | code (`Battle.tend`); tests |
+| INV-C19 | A ward answers each ally an enemy skill damaged and left standing, the holder included, once per skill, after the skill's last hit, with its chance; its own side's skills never trigger it | code (`Battle.ward`); tests |
+| INV-C20 | A fallen passive adds `value` per fallen ally of its holder, up to `max`, to the stat it names, in battle only; the champion's own stats never change; its event shows only while the bonus grows | code (`Battle.fallenBonus`, `critRate`, `mourn`); test |
 
 ### 6.2 Catalog
 
@@ -385,16 +388,16 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | --- | --- | --- |
 | INV-K1 | Champion ids are unique; rarity, affinity, faction and role exist | test |
 | INV-K2 | Stats within ±5% of the rarity budget and inside the limits | test, balance 1 |
-| INV-K3 | Slots in order A1-A2(-A3); cooldowns, multipliers, durations and the guaranteed-control slot within the norms; a passive's control lasts one turn, a Rebuke has a cooldown and a stat passive names its stat | type (tuple of two or three), test, balance 2 |
+| INV-K3 | Slots in order A1-A2(-A3); cooldowns, multipliers, durations and the guaranteed-control slot within the norms; a passive's control lasts one turn, a Rebuke has a cooldown, a stat passive names its stat, a fallen passive its stat and cap, a tend or a ward its statuses and a ward its chance | type (tuple of two or three), test, balance 2 |
 | INV-K4 | `hits.length` equals the hit frames of the animation; leap needs `jump`, `actorFx` needs `cast`; Undying needs `rise` | test |
 | INV-K5 | Every effect a skill names exists; a champion with a projectile has a `muzzle` | test |
 | INV-K6 | Every champion has an atlas, a portrait and one icon per skill | test |
 | INV-K7 | Every status has an icon and is taught in the Academy; Academy demos and icons exist | test |
 | INV-K8 | Every faction, affinity, role and rarity has its UI part (`emblem_`, `gem_`, `role_`, `card_`) | convention: screens throw on a missing part (R-6) |
 | INV-K9 | An A1 that strikes no enemy (the Dominion Medic's heal) never counterattacks, because counterattacks answer with A1; every other A1 targets a single enemy | code (`useSkill`), test |
-| INV-K10 | Effect names are unique across effect modules (a later module would silently override an earlier one) | convention, true today: 82 names (R-6) |
+| INV-K10 | Effect names are unique across effect modules (a later module would silently override an earlier one) | convention, true today: 104 names (R-6) |
 | INV-K11 | Every faction has a deliberate home zone | convention: `homeZone()` returns the first zone for every faction until zones belong to factions (DR-12) |
-| INV-K12 | Numbers in skill descriptions equal the data | convention, true today for all 14 skills and both passives (R-1) |
+| INV-K12 | Numbers in skill descriptions equal the data | convention, true today for all 29 skills and the five passives (R-1) |
 | INV-K13 | Numbers in the Academy, its figures and the stat tips equal the rules | test for the turn-meter numbers it quotes; the rest by convention (DR-5, R-1) |
 | INV-K14 | Definitions do not change at runtime | convention: objects are not frozen |
 | INV-K15 | The interface ramps repeat the category colours: `UIR.rarity` and `UIR.affinity` base entries (`palette.ts`) equal the colours in `meta.ts`; faction medallions follow the standards instead (the Azure Crown's crown is gold on its blue field) | convention, true today for all 7 (R-6) |
@@ -454,7 +457,9 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | Damage | how much a hit deals | `Battle.rollDamage` |
 | Status rules | apply, refresh, resist, tick, expire | `tryApply`, `addStatus`, `endTurn` |
 | Cooldowns | when a skill is ready | `useSkill`, `endTurn`, `ready` |
-| Death and passives | death, Undying, Overdrive | `Battle.applyDamage` |
+| Death and passives | death, Undying, Overdrive, a fallen passive's growth | `Battle.applyDamage`, `mourn` |
+| Passives that shield | Herder's Ward at the end of its holder's turn, Unbroken Flag after a blow on an ally | `Battle.tend` (from `endTurn`), `Battle.ward` (from `useSkill`) |
+| Live stats | the critical rate a unit strikes with | `Battle.critRate` |
 | AI | skill and target | `ai.ts`: highest `ai.priority` ready skill (a heal with priority 4 and `allyHurt` goes before the A3 when an ally is hurt); `allyHurt` below 70% HP or with a debuff; control aims at the uncontrolled with the highest ATK; dispel at the most buffed; otherwise 70% lowest HP%, 30% random |
 | Stars | 3 / 2 / 1 | `starsFor` |
 | Unlocks | open stages and locations | `stageOpen`, `locationOpen`, `frontier` |

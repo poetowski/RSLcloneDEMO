@@ -101,6 +101,8 @@ export interface SkillDef {
   castFx?: string;
   /** effect at the actor's head on the animation's `cast` event (a howl, a flare) */
   actorFx?: string;
+  /** effect on each ally a buff of this skill reaches while the skill strikes enemies (Onrush's gust) */
+  allyFx?: string;
   shake?: number;
   /** AI preference: higher = earlier; 'allyHurt' only when an ally needs help */
   ai?: { priority: number; when?: 'allyHurt' };
@@ -118,14 +120,28 @@ export interface PassiveDef {
    * stat:      always on in battle: adds `value` to the champion's `stat` (0.1 C.RATE =
    *            +10%). Extra, outside the stat budget, and never shown with the
    *            champion's stats outside battle (Jakub, 2026-10-12)
+   * tend:      at the end of each of the champion's turns, while it is ready, the ally with
+   *            the lowest max HP (the champion included) receives `statuses`, a Shield worth
+   *            `value` x the champion's max HP; then the passive rests for `cooldown` of the
+   *            champion's turns (the Jungle Herder's Herder's Ward, Jakub, 2026-10-17)
+   * ward:      when an enemy skill damages an ally (the champion included) who is still
+   *            standing, `chance` to give that ally `statuses` after the hit, a Shield worth
+   *            `value` x the champion's max HP (Emissary Handlings' Unbroken Flag, 2026-10-17)
+   * fallen:    in battle, adds `value` to the champion's `stat` for each fallen ally, up to
+   *            `max`; extra, outside the stat budget, like a stat passive (Big Ears' Hidden in
+   *            the Undergrowth, 2026-10-17)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
-  /** rebuke: the champion's own turns before it can answer again */
+  /** rebuke and tend: the champion's own turns the passive rests after it acts */
   cooldown?: number;
-  /** stat: the stat it raises */
+  /** stat and fallen: the stat it raises */
   stat?: StatId;
+  /** ward: the chance of each answer, 0..1 */
+  chance?: number;
+  /** fallen: the most it adds */
+  max?: number;
 }
 
 export interface Stats {

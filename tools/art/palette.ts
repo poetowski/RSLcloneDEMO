@@ -92,6 +92,8 @@ export const MAT = {
   furGrey: m('furGrey', 'fur', ['#16151c', '#2b2b34', '#46464f', '#68686e', '#8e8c8c', '#b8b2a8']),
   furSaddle: m('furSaddle', 'fur', ['#0c0b10', '#18171d', '#26252c', '#37363c', '#4c4b4f', '#6a675f']),
   furCream: m('furCream', 'fur', ['#29251f', '#524b42', '#7f766a', '#aba18f', '#cdc4b1', '#ebe5d6']),
+  /** the Jungle Herder's mantle: the shaggy russet hide of a jungle beast, over his hump and shoulders */
+  furRusset: m('furRusset', 'fur', ['#1a0c0a', '#3a1912', '#62301c', '#8c4a28', '#b46a3a', '#d8955c']),
 
   // --- woods of the living ---------------------------------------------------
   /** the Walking Bush's bark: the grey-brown of a bush's woody stems (his few leaves are `moss`) */
@@ -103,6 +105,10 @@ export const MAT = {
   skinBrown: m('skinBrown', 'skin', ['#24100c', '#452018', '#6a3524', '#985035', '#be704b', '#e09a70']),
   skinDeep: m('skinDeep', 'skin', ['#1a0c08', '#2e1810', '#4a2a1c', '#6a3e28', '#8a5638', '#ac7450']),
   skinPale: m('skinPale', 'skin', ['#2a1a2a', '#54405a', '#86708a', '#c2aab8', '#e4d0d8', '#fbf0f2']),
+  /** Big Ears' hide: a dusky mauve-grey, a creature of the undergrowth at dusk */
+  duskHide: m('duskHide', 'skin', ['#1c1420', '#3a2a3c', '#5c4558', '#84687a', '#aa8c98', '#cfb4b6']),
+  /** the thin skin inside Big Ears' ears, lit pink */
+  earPink: m('earPink', 'skin', ['#2a1218', '#5e2c38', '#8e4c5a', '#c27a84', '#e6a6a8', '#ffd6cc']),
 
   // --- hair ----------------------------------------------------------------
   hairBlonde: m('hairBlonde', 'hair', ['#2e1c0c', '#5c3a14', '#946222', '#cf9a3a', '#efcb6a', '#fff0a8']),

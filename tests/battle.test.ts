@@ -6,7 +6,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { brute, cleaver, drummer, fixture, freezer, guard, inAffinity, keen, medic, mender, overdrive, provisioner, rebuker, sheltering, stalker, striker, twin, undying, warden } from './fixtures';
+import { bannerman, brute, cleaver, drummer, fixture, freezer, guard, inAffinity, keen, medic, mender, mourner, overdrive, provisioner, rebuker, sheltering, stalker, striker, tender, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -441,6 +441,100 @@ describe('statuses', () => {
     const r = b.useSkill(b.get('p0'), skill(twin, 'twin_chop'), 'e0');
     expect(c.alive).toBe(false);
     expect(r.events.some((e) => e.kind === 'passive')).toBe(false);
+  });
+
+  it('tends the ally with the lowest max HP at the end of its turn, every second turn from the first', () => {
+    // the striker (1200 max HP) is the frailest of the three
+    const b = new Battle(combatants([tender, striker, guard]), combatants([twin]), { seed: 4 });
+    const t = b.get('p0'), s = b.get('p1');
+    b.startTurn(t);
+    let ev = b.endTurn(t);
+    const p = ev.find((e) => e.kind === 'passive');
+    expect(p?.kind === 'passive' && [p.effect, p.target, p.source]).toEqual(['tend', 'p1', 'p0']);
+    expect(ev.some((e) => e.kind === 'status' && e.status === 'shield' && e.target === 'p1')).toBe(true);
+    expect(s.statuses.find((x) => x.id === 'shield')?.value).toBe(150);
+    // it rests on his next turn, and gives again on the one after
+    b.startTurn(t);
+    ev = b.endTurn(t);
+    expect(ev.some((e) => e.kind === 'passive')).toBe(false);
+    b.startTurn(t);
+    expect(b.endTurn(t).some((e) => e.kind === 'passive')).toBe(true);
+    // the ally keeps it for 1 turn: until the end of its own next turn
+    b.startTurn(s);
+    expect(b.has(s, 'shield')).toBe(true);
+    b.endTurn(s);
+    expect(b.has(s, 'shield')).toBe(false);
+  });
+
+  it('tends itself when it is the frailest, the Shield covering its next turn, also after a skipped turn', () => {
+    const big = { ...guard, stats: { ...guard.stats, hp: 1700 } };
+    const b = new Battle(combatants([tender, big]), combatants([twin]), { seed: 4 });
+    const t = b.get('p0');
+    b.addStatus(t, 'stun', 1, 0, 'test');
+    expect(b.startTurn(t).skip).toBe(true);
+    b.endTurn(t);
+    expect(b.has(t, 'shield')).toBe(true);
+    // hit in between, it absorbs; it lasts through his next turn and goes at its end
+    const r = b.useSkill(b.get('e0'), skill(twin, 'twin_chop'), 'p0');
+    expect(r.events.some((e) => e.kind === 'damage' && e.absorbed > 0)).toBe(true);
+    b.startTurn(t);
+    b.endTurn(t);
+    expect(b.has(t, 'shield')).toBe(false);
+  });
+
+  it('wards each ally an enemy skill damaged, after the hit, once per skill, the holder included', () => {
+    const flag = bannerman(1);
+    const b = new Battle(combatants([flag, striker]), combatants([twin]), { seed: 9 });
+    const r = b.useSkill(b.get('e0'), skill(twin, 'twin_sweep'));
+    const wards = r.events.filter((e) => e.kind === 'passive');
+    expect(wards.map((e) => e.target).sort()).toEqual(['p0', 'p1']);
+    expect(wards.every((e) => e.kind === 'passive' && e.effect === 'ward' && e.source === 'p0' && e.hit === 1)).toBe(true);
+    // the Shield comes after the hits: they were not absorbed
+    expect(r.events.filter((e) => e.kind === 'damage').every((e) => e.kind === 'damage' && e.absorbed === 0)).toBe(true);
+    const lastDamage = r.events.map((e) => e.kind).lastIndexOf('damage');
+    expect(r.events.findIndex((e) => e.kind === 'passive')).toBeGreaterThan(lastDamage);
+    expect(b.get('p1').statuses.find((x) => x.id === 'shield')?.value).toBe(210);
+  });
+
+  it('wards nobody an attack kills, nobody its own side strikes, and about half the time with a 50% chance', () => {
+    const flag = bannerman(1);
+    const b = new Battle(combatants([flag, striker]), combatants([twin]), { seed: 9 });
+    b.get('p1').hp = 1;
+    const r = b.useSkill(b.get('e0'), skill(twin, 'twin_sweep'));
+    expect(b.get('p1').alive).toBe(false);
+    expect(r.events.filter((e) => e.kind === 'passive').map((e) => e.target)).toEqual(['p0']);
+    // its own team's skills are no blow to answer
+    const own = new Battle(combatants([flag, striker]), combatants([twin]), { seed: 9 });
+    expect(own.useSkill(own.get('p1'), striker.skills[0], 'e0').events.some((e) => e.kind === 'passive')).toBe(false);
+    let shielded = 0;
+    for (let seed = 1; seed <= 200; seed++) {
+      const h = new Battle(combatants([bannerman(0.5)]), combatants([striker]), { seed });
+      if (h.useSkill(h.get('e0'), striker.skills[0], 'p0').events.some((e) => e.kind === 'passive')) shielded++;
+    }
+    expect(shielded).toBeGreaterThan(70);
+    expect(shielded).toBeLessThan(130);
+  });
+
+  it('raises a fallen passive with each fallen ally, up to its cap, and shows it while it grows', () => {
+    const b = new Battle(combatants([mourner, striker, guard]), combatants([twin]), { seed: 2 });
+    const m = b.get('p0');
+    expect(b.critRate(m)).toBe(0);
+    b.get('p1').hp = 1;
+    let r = b.useSkill(b.get('e0'), skill(twin, 'twin_chop'), 'p1');
+    expect(b.get('p1').alive).toBe(false);
+    expect(r.events.filter((e) => e.kind === 'passive').map((e) => e.kind === 'passive' && [e.target, e.effect])).toEqual([['p0', 'fallen']]);
+    expect(b.critRate(m)).toBeCloseTo(0.2);
+    // the second fall reaches the cap: +30%, not +40%
+    b.get('p2').hp = 1;
+    r = b.useSkill(b.get('e0'), skill(twin, 'twin_chop'), 'p2');
+    expect(r.events.some((e) => e.kind === 'passive')).toBe(true);
+    expect(b.critRate(m)).toBeCloseTo(0.3);
+    // the champion's own stats are untouched; an enemy's fall does nothing for it
+    expect(m.stats.crit).toBe(0);
+    const b2 = new Battle(combatants([mourner]), combatants([striker, twin]), { seed: 2 });
+    b2.get('e1').hp = 1;
+    b2.useSkill(b2.get('p0'), mourner.skills[0], 'e1');
+    expect(b2.critRate(b2.get('p0'))).toBe(0);
   });
 });
 

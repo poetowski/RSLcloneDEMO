@@ -10,7 +10,7 @@ import { CHAPTERS } from '../src/game/data/codex';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../src/game/data/meta';
 import { auditChampion } from '../src/game/data/norms';
 import { STATUSES } from '../src/game/data/statuses';
-import { StatusId } from '../src/game/data/types';
+import { ChampionDef, StatusId } from '../src/game/data/types';
 import { ZONES } from '../src/game/data/zones';
 import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, stageOpen, writeSave } from '../src/game/archivist';
 import { PATTERN_IDS } from '../src/game/data/matrix';
@@ -62,7 +62,7 @@ describe('champions', () => {
   it('reference effects that exist', () => {
     for (const c of CHAMPIONS) {
       for (const s of c.skills) {
-        for (const f of [...s.hits.map((h) => h.fx), s.projectile, s.castFx, s.actorFx]) if (f) expect(fx[f], `${s.id} -> fx ${f}`).toBeTruthy();
+        for (const f of [...s.hits.map((h) => h.fx), s.projectile, s.castFx, s.actorFx, s.allyFx]) if (f) expect(fx[f], `${s.id} -> fx ${f}`).toBeTruthy();
         if (s.projectile) expect(c.muzzle, `${c.id} fires projectiles, needs a muzzle`).toBeTruthy();
       }
     }
@@ -253,6 +253,55 @@ describe('design decisions', () => {
     expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'enemy', 4, [{ status: 'atk_down', turns: 2, chance: 0.5, to: 'targets' }]]);
     expect(a2?.hits.some((h) => h.mult > 0)).toBe(true);
     expect(w?.passive).toBeUndefined();
+  });
+
+  it('has the Jungle Herder of his proposal: an Elite Tank of the Court of Root; A1 a single-target attack, A2 Taunt for 1 turn and Counterattack for 2 on himself, no attack, cooldown 4; a passive Shield of 10% of his max HP for 1 turn on the ally with the lowest max HP at the end of his turn, every second turn', () => {
+    const h = CHAMPIONS.find((c) => c.id === 'jungle_herder');
+    expect(h && [h.name, h.rarity, h.role, h.faction]).toEqual(['Jungle Herder', 'elite', 'Tank', 'court_of_root']);
+    expect(h?.skills).toHaveLength(2);
+    const a1 = h?.skills[0], a2 = h?.skills[1];
+    expect(a1 && [a1.slot, a1.target, a1.statuses ?? []]).toEqual([1, 'enemy', []]);
+    expect(a1?.hits.some((x) => x.mult > 0)).toBe(true);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'self', 4, [{ status: 'taunt', turns: 1, to: 'self' }, { status: 'counter', turns: 2, to: 'self' }]]);
+    expect(a2?.hits.every((x) => x.mult === 0)).toBe(true);
+    // his answers of 2026-10-17: the lowest max HP in the team, himself included, from his first turn (cooldown 1: every second turn)
+    expect(h?.passive && [h.passive.kind, h.passive.value, h.passive.statuses, h.passive.cooldown]).toEqual(['tend', 0.1, [{ status: 'shield', turns: 1 }], 1]);
+  });
+
+  it('has Emissary Handlings of his proposal: an Elite Tank of the Azure Crown; A1 Banner Strike with a 20% chance of Stun, A2 Rallying Standard (DEF Up on all allies for 2 turns, no attack, cooldown 5), the passive Unbroken Flag (a 50% chance of a Shield of 15% of his max HP for 1 turn on an ally an enemy attacks, after the hit)', () => {
+    const e = CHAMPIONS.find((c) => c.id === 'emissary_handlings');
+    expect(e && [e.name, e.rarity, e.role, e.faction]).toEqual(['Emissary Handlings', 'elite', 'Tank', 'azure_crown']);
+    expect(e?.skills.map((x) => [x.slot, x.name])).toEqual([[1, 'Banner Strike'], [2, 'Rallying Standard']]);
+    const a1 = e?.skills[0], a2 = e?.skills[1];
+    expect(a1 && [a1.target, a1.statuses]).toEqual(['enemy', [{ status: 'stun', turns: 1, chance: 0.2, to: 'targets' }]]);
+    expect(a2 && [a2.target, a2.cooldown, a2.statuses]).toEqual(['allies', 5, [{ status: 'def_up', turns: 2, to: 'allies' }]]);
+    expect(a2?.hits.every((x) => x.mult === 0)).toBe(true);
+    expect(e?.passive && [e.passive.name, e.passive.kind, e.passive.value, e.passive.chance, e.passive.statuses]).toEqual(['Unbroken Flag', 'ward', 0.15, 0.5, [{ status: 'shield', turns: 1 }]]);
+  });
+
+  it('has Red Cloak of his proposal: an Elite of the Sanguine Dominion, Damage; A1 a single-target attack, A2 Crimson Blade (one Burn for 2 turns at 50%, cooldown 3), A3 an attack on one enemy with SPD Up on all allies for 2 turns, cooldown 5', () => {
+    const r = CHAMPIONS.find((c) => c.id === 'red_cloak');
+    expect(r && [r.name, r.rarity, r.role, r.faction]).toEqual(['Red Cloak', 'elite', 'Damage', 'sanguine_dominion']);
+    expect(r?.skills).toHaveLength(3);
+    const [a1, a2, a3] = r!.skills as [ChampionDef['skills'][0], ChampionDef['skills'][0], ChampionDef['skills'][0]];
+    expect([a1.slot, a1.target, a1.statuses ?? []]).toEqual([1, 'enemy', []]);
+    expect([a2.slot, a2.name, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'Crimson Blade', 'enemy', 3, [{ status: 'burn', turns: 2, chance: 0.5, to: 'targets' }]]);
+    expect([a3.slot, a3.target, a3.cooldown, a3.statuses]).toEqual([3, 'enemy', 5, [{ status: 'spd_up', turns: 2, to: 'allies' }]]);
+    for (const k of [a1, a2, a3]) expect(k.hits.some((x) => x.mult > 0), k.id).toBe(true);
+    expect(r?.passive).toBeUndefined();
+  });
+
+  it('has Big Ears of his proposal: an Elite of the Court of Root, Damage; A1 an attack with a 35% chance of Poison for 1 turn, A2 Dart Volley on all enemies with Heal Block for 2 turns, cooldown 5, the passive Hidden in the Undergrowth (+15% C.RATE for each dead ally, up to +30%)', () => {
+    const b = CHAMPIONS.find((c) => c.id === 'big_ears');
+    expect(b && [b.name, b.rarity, b.role, b.faction]).toEqual(['Big Ears', 'elite', 'Damage', 'court_of_root']);
+    expect(b?.skills).toHaveLength(2);
+    const a1 = b?.skills[0], a2 = b?.skills[1];
+    expect(a1 && [a1.slot, a1.target, a1.statuses]).toEqual([1, 'enemy', [{ status: 'poison', turns: 1, chance: 0.35, to: 'targets' }]]);
+    expect(a2 && [a2.slot, a2.name, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'Dart Volley', 'enemies', 5, [{ status: 'heal_block', turns: 2, to: 'targets' }]]);
+    expect(a2?.hits.some((x) => x.mult > 0)).toBe(true);
+    expect(b?.passive && [b.passive.name, b.passive.kind, b.passive.stat, b.passive.value, b.passive.max]).toEqual(['Hidden in the Undergrowth', 'fallen', 'crit', 0.15, 0.3]);
+    // like a stat passive, extra: his own stats stay on the Elite budget
+    expect(b?.stats.crit).toBeLessThanOrEqual(0.15);
   });
 
   it('opens with a ten-stage first zone', () => {

@@ -137,7 +137,9 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'h', text: 'Rebuke' },
       { kind: 'p', text: 'A passive that answers a blow. The Rime Scholar\'s Cold Rebuke: while she is below 35% HP, an enemy whose critical hit lands on her is Frozen for 1 turn, and the passive then rests for a few turns. Statuses can happen in response to being hurt.' },
       { kind: 'h', text: 'Stat passives' },
-      { kind: 'p', text: "A passive can raise a stat in every battle, on top of the champion's own stats and its Weaver Matrix. The champion's page shows the stats without it. The Enforcer's Keen Edge adds 10% C.RATE." },
+      { kind: 'p', text: "A passive can raise a stat in every battle, on top of the champion's own stats and its Weaver Matrix. The champion's page shows the stats without it. The Enforcer's Keen Edge adds 10% C.RATE. Some grow during the fight: Big Ears' Hidden in the Undergrowth adds 15% C.RATE for each ally that has fallen, up to 30%." },
+      { kind: 'h', text: 'Passives that shield' },
+      { kind: 'p', text: "A passive can give allies Shields. The Jungle Herder's Herder's Ward shields the ally with the lowest max HP, himself included, at the end of every second turn of his. Emissary Handlings' Unbroken Flag has a chance to shield an ally an enemy has just struck, after the hit. Protect the frail, and strike the shielded last." },
     ],
   },
   {

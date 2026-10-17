@@ -3,8 +3,12 @@
 // Enforcer's Heavy Cut: a plain line of light and chips, the light of the
 // steel; the Bloodhound's Bite: two rows of white teeth snapping shut, and his
 // Bay: rings of sound from his mouth; the Dominion Medic's Tonic: the rose light
-// of his potions rising round each ally. Never their affinity (affinities are
-// abstract, Jakub, 2026-10-11). Light effects are additive in
+// of his potions rising round each ally. Red Cloak's Cleave: a great white
+// cut and chips; his Crimson Blade: a crimson-hot rising cut shedding
+// embers, because the blade burns and so does the cut; his Onrush: a line of
+// light driven through the enemy, a war cry in rings from his mouth, and a
+// gust of wind running past each ally it sends on. Never their affinity
+// (affinities are abstract, Jakub, 2026-10-11). Light effects are additive in
 // src/game/view/scene.ts.
 import { ACCENT } from '../palette.ts';
 import { disc, dith, ellipseFill, ellipseRing, rampDither } from '../paint.ts';
@@ -222,6 +226,86 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
     draw: (b, t, i) => {
       if (i < 4) burst(b, 28, 28, 12, [3, 4, 3, 2][i], [14, 24, 18, 10][i], [2.2, 2.6, 1.8, 1.2][i], I, 0.2 + i * 0.1);
       ring(b, 28, 28, 5 + t * 20, 5 + t * 20, Math.max(0.6, 2 - t * 1.4), I, 1.1 - t * 0.6);
+    },
+  },
+
+  /** Cleave: one great cut of the zweihander from high to low through the target, a white line that thins away, a flash where it bites, chips flying. */
+  cleave: {
+    w: 96, h: 96, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
+    draw: (b, t, i) => {
+      const reach = [0.5, 0.9, 1, 1, 1, 1, 1][i];
+      const heat = [1.5, 1.4, 1.15, 0.9, 0.65, 0.45, 0.3][i];
+      const th = [4.2, 5.6, 4.6, 3.4, 2.4, 1.6, 1.1][i];
+      if (i < 6) cut(b, 14, 6, 82, 84, -6, th, DULL, heat, reach);
+      if (i === 1 || i === 2) burst(b, 50, 48, 10, 2, [18, 12][i - 1], 1.7, DULL, 0.35);
+      if (i >= 1) sparks(b, 50, 48, 18, 38, (i - 1) / 5, DULL, 263, 24);
+    },
+  },
+  /** Crimson Blade: the burning blade cuts up through the target, a crimson-hot line, a flash, and embers falling from the cut: it burns. */
+  crimson_cut: {
+    w: 92, h: 92, n: 8, ms: 45, ax: 0.5, ay: 0.5, pad: [6, 6, 12, 6],
+    draw: (b, t, i) => {
+      const BL = ramps.blood;
+      const reach = [0.5, 0.9, 1, 1, 1, 1, 1, 1][i];
+      const heat = [1.5, 1.45, 1.2, 0.95, 0.7, 0.5, 0.35, 0.22][i];
+      const th = [4.0, 5.2, 4.4, 3.2, 2.2, 1.5, 1.1, 0.8][i];
+      if (i < 7) cut(b, 12, 82, 82, 12, 6, th, BL, heat, reach);
+      if (i === 1 || i === 2) burst(b, 46, 46, 10, 2, [16, 11][i - 1], 1.6, BL, 0.2);
+      if (i >= 1) sparks(b, 46, 46, 14, 30, (i - 1) / 6, BL, 269, 10);
+      if (i >= 2) sparks(b, 46, 40, 12, 22, (i - 2) / 5, ramps.fire, 271, 40);
+    },
+  },
+  /** Onrush: the point drives through the target: a straight line of light piercing it, a burst where it enters, a ring of the impact. */
+  onrush: {
+    w: 88, h: 56, n: 7, ms: 45, ax: 0.45, ay: 0.5, pad: [4, 6, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 40, cy = 28;
+      const reach = [0.55, 1, 1, 1, 1, 1, 1][i], heat = [1.4, 1.5, 1.2, 0.95, 0.7, 0.5, 0.3][i];
+      if (i < 5) cut(b, 4, cy, 84, cy, 0, [2.0, 2.8, 2.2, 1.5, 1.0][i], DULL, heat, reach);
+      if (i >= 1 && i <= 3) burst(b, cx, cy, 10, 2, [16, 12, 8][i - 1], 1.6, DULL, 0.2);
+      if (i >= 2) ring(b, cx + 4, cy, 4 + (i - 2) * 3, 8 + (i - 2) * 5, 1.2, DULL, Math.max(0.3, 1.1 - (i - 2) * 0.2));
+      if (i >= 1) sparks(b, cx + 6, cy, 14, 30, (i - 1) / 5, DULL, 277, 8);
+    },
+  },
+  /** Onrush's war cry: rings of the shout opening from his mouth, up and forward (additive), at his head on the `cast` event. */
+  war_cry: {
+    w: 64, h: 56, n: 8, ms: 55, ax: 0.3, ay: 0.65, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 19, cy = 36;
+      for (let k = 0; k < 3; k++) {
+        const age = i - k * 1.4;
+        if (age < 0 || age > 5.5) continue;
+        const r = 4 + age * 5;
+        const fade = 1 - age / 6;
+        for (let deg = -80; deg <= 30; deg += 1.5) {
+          const a = (deg * Math.PI) / 180;
+          const edge = 1 - Math.abs(deg + 25) / 60;
+          for (const dr of [0, 0.8]) {
+            const xx = Math.round(cx + Math.cos(a) * (r + dr)), yy = Math.round(cy + Math.sin(a) * (r + dr));
+            if (!dith(xx, yy, Math.min(1, fade * 1.4) * (0.5 + edge * 0.7))) continue;
+            b.set(xx, yy, rampDither(DULL, Math.min(4, 1.5 + edge * 2.2 + fade), xx, yy));
+          }
+        }
+      }
+    },
+  },
+  /** Onrush's gust: the line driven on behind him, streaks of wind running forward past an ally and a few motes of gold (additive), at its chest. */
+  onrush_gust: {
+    w: 72, h: 72, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 4, 2, 4],
+    draw: (b, t, i) => {
+      const r = rng(281);
+      for (let k = 0; k < 7; k++) {
+        const y = Math.round(8 + r() * 56), len = 10 + r() * 14, sp = 0.8 + r() * 0.5, ph = r() * 0.4;
+        const head = -10 + (t * sp + ph) * 90;
+        for (let s = 0; s < len; s++) {
+          const x = Math.round(head - s);
+          if (x < 0 || x >= 72) continue;
+          const k2 = 1 - s / len;
+          if (!dith(x, y, k2 * (1 - t * 0.6))) continue;
+          b.set(x, y, rampDither(DULL, 1 + k2 * 3, x, y));
+        }
+      }
+      sparks(b, 36, 36, 8, 24, t, ramps.gold, 283, -10);
     },
   },
 };
