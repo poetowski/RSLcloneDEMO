@@ -61,6 +61,7 @@ Section 7 lists what is not decided.
 | 2026-10-17 | The Black Rhino, an Elite Tank of the Sanguine Dominion | 26 |
 | 2026-10-17 | The Grove Keeper, an Elite Support of the Court of Root | 27 |
 | 2026-10-17 | The affinities of the Associate, the Black Rhino and the Grove Keeper: not set | 7, 25-27 |
+| 2026-10-17 | Zone 3, the Moonlit Basin: its name and description; its battle background, "dynamic"; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.6, 7 |
 
 ---
 
@@ -580,6 +581,23 @@ two worlds by the road. Then the river under a stone bridge and the forest,
 autumn turning green, around the Verdant Grove's glade. The map is 960 pixels
 wide and grows east area by area.
 
+**Extended east (2026-10-17)** for Zone 3, on Jakub's word "extend world map
+to the east" (5.6, verbatim there). As built: the map is 1280 pixels wide, two
+screens, so the whole-map overview at half the size fills the screen's width
+(a wider map will need a smaller overview); everything west of x 832 kept its
+pixels, the two nodes and all he approved with them. Beyond the Verdant Grove
+the forest thins out, its last trees darkening into the night, its roots
+trailing east over the sand, the soil paling into sand. The Moonlit Basin
+lies under its own night: a sunken floor of twilight-moss sparked with glow
+and banks of silver sand, tide-pools with glass reeds on their shores and
+motes of light over them, the moon held in the biggest pool, terraced silver
+slopes up to dark uplands with moss and scrub; its node stands in the basin's
+middle. Along the east edge the eastern hills rise in sharp peaks lit silver
+on their faces toward the moon, and the road, a trail of pale sand through the
+basin, goes on east through a low pass between them. The night over the basin
+on a map drawn by day is my reading of "moonlit" (5.6); its details are first
+takes.
+
 ### 5.4b Zone 2's battle background (2026-10-12)
 
 Jakub's brief, verbatim:
@@ -633,6 +651,66 @@ Zone 1 and Zone 2 should contrast clearly so the horizontal scroll reads as
   recent and disorienting. *(As built: a farm at dawn in autumn, under the
   rift, 5.3a.)*
 - Zone 2: enclosed forest, ancient ritual, deliberately apart from the world.
+- Zone 3 *(2026-10-17, 5.6)*: the Moonlit Basin, open and still under the
+  moon, beyond the forest: silver sand, glowing moss, glass reeds, quiet
+  tide-pools, the eastern hills ahead.
+
+### 5.6 Zone 3 — the Moonlit Basin (2026-10-17)
+
+Jakub's message, verbatim:
+
+```
+extend world map to the east and create new dynamic zone, third area battle background.
+name of the area 3 = Moonlit Basin.
+here ia area description:
+Beyond the trailing roots of Verdant Grove, the soil gradually pales into silver sand, giving rise to low-lying basin floor carpeted in glowing twilight-moss. Pale, glass-like reeds sway softly without a breeze, catching the moonlight in shimmering hues of pale blue and violet as the ground begins its gentle swell toward the sharp silhouette of the eastern hills. Small, airborne dust-motes of bioluminescent flora drift across the sunken landscape, casting soft, pearlescent halos over quiet, crystal-clear tide-pools.
+```
+
+**Readings.** "A new dynamic zone" was read as a background alive throughout,
+its motion calm, as he asked of Zone 1 (5.3a). The eastern hills stand on the
+right of the battle background and along the east edge of the map, since the
+campaign runs west to east. On the world map, drawn by day, "moonlit" was read
+as the basin lying under its own night: the broken loom broke time as well as
+space (5.2).
+
+**The battle background, as built** (`tools/art/zones/zone3.ts`): night. The
+full moon stands in the upper left, the key light, in a soft glow and a faint
+ring of ice; stars and a faint milky band fill the deep indigo sky, violet low
+over the land, and thin clouds drift past the moon. On the right the eastern
+hills rise in sharp crags, their faces toward the moon edged in silver, a mist
+along their foot. On the left the Verdant Grove ends in great trees in
+silhouette, their umbrella crowns rimmed by the moon, lianas hanging from them
+with glowing tips, their roots trailing out over the sand. Between them the
+basin: carpets of twilight-moss sparked with glow, banks of silver sand, a long
+pool holding the moon's path, reed beds on its shores. The arena is the basin
+floor: twilight-moss over silver sand rippled by the tides, three tide-pools
+with pale shallows and pebbles on their clear beds, glass reeds round them and
+in the bottom-right corner, lumen-bells (the glowing flora the motes come from)
+beside them, and one of the grove's roots arching out of the left edge.
+
+Alive: the reeds sway, each clump at its own pace, glints running up the stems
+in pale blue and violet; dust-motes of light drift and rise in soft halos
+turning slowly through rose, ice, lilac and mint, some behind the champions
+and some in front of them; the pools shimmer, and now and then a ring spreads
+across one; pearl halos breathe over the pools; the moss and the lumen-bells
+breathe their glow; stars twinkle; clouds drift; the moon's path flickers on
+the long pool; and rarely, every 14 to 32 seconds, a shooting star crosses
+the sky.
+
+Everything the description did not name is a first take: the moon's ring, the
+milky band, the clouds, the grove's trees and their glowing lianas, the great
+root, the long pool and its reed beds, the stones, pebbles and shells, the
+lumen-bells, the rings on the pools, the shooting stars, the layout and the
+palette. The world map's part is in 5.4a.
+
+**Stages.** Ten placeholder stages, 3-1 to 3-10, opened by 2-10, like Zone 2's
+(5.4): Jakub asked for Zone 2's "so i can test it there ingame"; Zone 3's are
+my addition for the same reason, since without stages its background cannot
+be seen in the game. Their texts walk his description from the grove's roots
+to the eastern hills, the area's blurb is its first sentence; their enemies are
+copies of the roster's champions, 3-10 a boss Black Rhino; their powers are
+tuned stand-ins; no champion joins there. Stages, enemies and story wait for
+him.
 
 ---
 
@@ -695,6 +773,8 @@ open questions.
 - Team size *(the game uses 3)* and how champions are acquired *(one recruit
   per first clear)*
 - Campaign count of zones
+- Zone 3's stages, enemies and story *(the game stands in ten placeholder
+  stages, 5.6)*
 - Whether the Archivist appears as a character or as a presence
 - The relationship of Ashveil Reign to the loom's breaking
 - Whether Court of Root wants the loom repaired
@@ -702,8 +782,9 @@ open questions.
 
 Decided since the first export: the names of the starter pair, and that
 champions are fragments, the first one with the Archivist from the start
-(section 8); the zone names, the Fracture Reach and the Verdant Grove (5.3,
-5.4); that the interface keeps its affinity marks and the cuts made before
+(section 8); the zone names, the Fracture Reach, the Verdant Grove and the
+Moonlit Basin (5.3, 5.4, 5.6), and Zone 3's description (5.6); that the
+interface keeps its affinity marks and the cuts made before
 the affinity rule are plain (2.1).
 
 ---

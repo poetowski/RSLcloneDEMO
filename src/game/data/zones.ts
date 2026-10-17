@@ -38,6 +38,21 @@ export const ZONES: ZoneDef[] = [
     // Jakub: "maybe few butterflies"
     butterflies: [[84, 232], [290, 176], [588, 214], [196, 108], [470, 96]],
   },
+  {
+    // Zone 3, named and described by Jakub (2026-10-17): the Moonlit Basin beyond the trailing roots of the
+    // Verdant Grove, "a new dynamic zone": night under the moon, glowing twilight-moss, glass reeds swaying
+    // without a breeze, tide-pools, dust-motes of bioluminescent flora drifting in pearlescent halos
+    id: 'zone3',
+    name: 'Moonlit Basin',
+    ambient: 'spores',
+    // nothing burns here; the colour a light pool would take
+    glow: [170, 210, 255],
+    // the moon stands high in the upper left: short, soft shadows
+    shadow: { dx: 3, stretch: 1.15 },
+    tint: { color: '#8ea4ff', alpha: 0.06, op: 'soft-light' },
+    // a first take: now and then a shooting star, rarely
+    shootingStars: [14000, 32000],
+  },
 ];
 
 const byId = new Map(ZONES.map((z) => [z.id, z]));

@@ -14,17 +14,23 @@
 // arc of his notes (5.4: approach, arrival, the contest, the outcome; "not
 // about arena", so the contest takes place in something that only looks like
 // one), and their enemies are copies of the champions that exist, standing in
-// until he dictates them. Both names are his (2026-10-11).
+// until he dictates them. Both names are his (2026-10-11). Zone 3, the Moonlit
+// Basin, named and described by Jakub (2026-10-17), has ten placeholder stages
+// like Zone 2's, so it can be played and seen in game: their texts walk his
+// description from the grove's roots to the eastern hills, their enemies are
+// copies of the roster, their powers are tuned stand-ins; no champion joins
+// there.
 import { LocationDef, StageDef } from './types';
 
 /**
- * The campaign world map in pixels: one screen tall and a screen and a half
- * wide, scrolled sideways. Location `map` positions (the campaign nodes) are in
- * this space; `overview` is how many times smaller the whole-world overview is
- * drawn. The map grows east area by area: a new area widens it by its stretch,
+ * The campaign world map in pixels: one screen tall and two screens wide,
+ * scrolled sideways. Location `map` positions (the campaign nodes) are in this
+ * space; `overview` is how many times smaller the whole-world overview is
+ * drawn (at half the size it fills the screen's width, so a wider map needs a
+ * smaller one). The map grows east area by area: a new area widens it by its stretch,
  * and everything west of the stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 960, h: 360, overview: 2 };
+export const WORLD_MAP = { w: 1280, h: 360, overview: 2 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];
@@ -36,6 +42,13 @@ const APPROACH = 'Travelling through the forest. The Court of Root are a presenc
 const ARRIVAL = 'Meeting the Court of Root. They have rules.';
 const CONTEST = 'The contest, in something that only looks like an arena.';
 const OUTCOME = 'Winning, losing, being judged.';
+// Zone 3: Jakub's description of the Moonlit Basin (2026-10-17), from the grove's roots to the eastern hills
+const BEYOND = 'Beyond the trailing roots of Verdant Grove, the soil gradually pales into silver sand.';
+const BASIN = 'A low-lying basin floor carpeted in glowing twilight-moss.';
+const REEDS = 'Pale, glass-like reeds sway softly without a breeze, catching the moonlight in shimmering hues of pale blue and violet.';
+const MOTES = 'Small, airborne dust-motes of bioluminescent flora drift across the sunken landscape.';
+const POOLS = 'Soft, pearlescent halos over quiet, crystal-clear tide-pools.';
+const SWELL = 'The ground begins its gentle swell toward the sharp silhouette of the eastern hills.';
 
 export const LOCATIONS: LocationDef[] = [
   {
@@ -211,6 +224,79 @@ export const LOCATIONS: LocationDef[] = [
         blurb: `${OUTCOME} The last stage of the area.`,
         enemies: [{ champion: 'follower', boss: true }, { champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
         power: 0.71,
+      },
+    ],
+  },
+  {
+    // Zone 3, named and described by Jakub (2026-10-17, DESIGN_DECISIONS.md 5.6); its ten stages are
+    // placeholders like Zone 2's, so the area can be played: enemies, powers and texts are stand-ins
+    id: 'zone3',
+    chapter: 'III',
+    name: 'Moonlit Basin',
+    zone: 'zone3',
+    blurb: 'Beyond the trailing roots of Verdant Grove, the soil gradually pales into silver sand, giving rise to low-lying basin floor carpeted in glowing twilight-moss.',
+    requires: '2-10',
+    map: { x: 1084, y: 200 },
+    stages: [
+      {
+        id: '3-1',
+        blurb: BEYOND,
+        enemies: [{ champion: 'associate' }, { champion: 'follower' }, { champion: 'walking_bush' }],
+        power: 0.92,
+      },
+      {
+        id: '3-2',
+        blurb: BASIN,
+        enemies: [{ champion: 'grove_keeper' }, { champion: 'wild_speaker' }, { champion: 'follower' }],
+        power: 0.84,
+      },
+      {
+        id: '3-3',
+        blurb: REEDS,
+        enemies: [{ champion: 'jungle_herder' }, { champion: 'big_ears' }, { champion: 'follower' }],
+        power: 0.75,
+      },
+      {
+        id: '3-4',
+        blurb: REEDS,
+        enemies: [{ champion: 'emissary_handlings' }, { champion: 'skirmisher' }, { champion: 'rime_scholar' }],
+        power: 0.81,
+      },
+      {
+        id: '3-5',
+        blurb: MOTES,
+        enemies: [{ champion: 'black_rhino' }, { champion: 'enforcer' }, { champion: 'dominion_medic' }],
+        power: 0.86,
+      },
+      {
+        id: '3-6',
+        blurb: POOLS,
+        enemies: [{ champion: 'red_cloak' }, { champion: 'bloodhound' }, { champion: 'associate' }],
+        power: 0.84,
+      },
+      {
+        id: '3-7',
+        blurb: POOLS,
+        enemies: [{ champion: 'jungle_herder' }, { champion: 'grove_keeper' }, { champion: 'big_ears' }],
+        power: 0.81,
+      },
+      {
+        id: '3-8',
+        blurb: SWELL,
+        enemies: [{ champion: 'emissary_handlings' }, { champion: 'captain_gareth' }, { champion: 'associate' }],
+        power: 0.75,
+      },
+      {
+        id: '3-9',
+        blurb: SWELL,
+        enemies: [{ champion: 'black_rhino' }, { champion: 'red_cloak' }, { champion: 'dominion_medic' }],
+        power: 0.81,
+      },
+      {
+        id: '3-10',
+        blurb: `${SWELL} The last stage of the area.`,
+        enemies: [{ champion: 'black_rhino', boss: true }, { champion: 'grove_keeper' }, { champion: 'big_ears' }],
+        power: 0.76,
       },
     ],
   },

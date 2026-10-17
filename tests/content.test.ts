@@ -128,6 +128,12 @@ describe('campaign', () => {
     };
     expect(size('public/assets/map/world.png')).toEqual([WORLD_MAP.w, WORLD_MAP.h]);
     expect(size('public/assets/map/overview.png')).toEqual([WORLD_MAP.w / WORLD_MAP.overview, WORLD_MAP.h / WORLD_MAP.overview]);
+    // the overview shows the whole world on one screen: a map that grows past twice the screen needs a smaller overview
+    expect(WORLD_MAP.w / WORLD_MAP.overview, 'overview width').toBeLessThanOrEqual(640);
+  });
+
+  it('runs its areas west to east, each node east of the one before', () => {
+    for (let i = 1; i < LOCATIONS.length; i++) expect(LOCATIONS[i].map.x, LOCATIONS[i].id).toBeGreaterThan(LOCATIONS[i - 1].map.x + 200);
   });
 
 });
@@ -371,6 +377,12 @@ describe('zones', () => {
         expect(e.colors.length).toBeGreaterThan(0);
       }
       if (z.birds) expect(zj.kinds.bird, `${z.id} birds need bird frames`).toBeTruthy();
+      // rare events stay rare (Jakub's calm motion: a flash every 10-25 s at most)
+      if (z.flash) expect(z.flash.every[0], `${z.id} flash`).toBeGreaterThanOrEqual(10000);
+      if (z.shootingStars) {
+        expect(z.shootingStars[0], `${z.id} shooting stars`).toBeGreaterThanOrEqual(10000);
+        expect(z.shootingStars[1]).toBeGreaterThan(z.shootingStars[0]);
+      }
       expect(zj.spawns.player.length).toBe(3);
       expect(zj.spawns.enemy.length).toBe(3);
     }

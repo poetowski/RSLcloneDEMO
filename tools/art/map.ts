@@ -10,8 +10,12 @@
 // the old road. East of it the Fracture Reach (Zone 1): a farming village in
 // its autumn fields, raided, a farm burnt and a haystack burning. Then the
 // river and, close by, the forest, which also runs along the north and south
-// edges; in it the Verdant Grove (Zone 2), only a glade for its node: the
-// area's own art waits for him.
+// edges; in it the Verdant Grove (Zone 2), only a glade for its node. Beyond
+// the grove (2026-10-17) the Moonlit Basin (Zone 3): the forest thins out, its
+// roots trailing east, the soil pales into silver sand, and the sunken basin
+// lies under its own night, carpeted in glowing twilight-moss round its
+// tide-pools, reeds and motes of light about them; the eastern hills rise in
+// sharp ridges along the east edge.
 //
 // Everything is drawn in world pixels, and every random choice is a hash of
 // its position, so the map grows east area by area: widen WORLD_MAP by the new
@@ -72,6 +76,20 @@ const INK = hex('#07080e');
 const SHADOW = hex('#06080a');
 const GLOW_BLUE = hex('#8ab8ff');
 const GLOW_FIRE = hex('#ff8a30');
+// --- the Moonlit Basin: silver sand, twilight-moss and its glow, clear pools, glass reeds, the eastern hills by night
+const SANDDAY = ramp(['#4a4640', '#58544d', '#67625a', '#767168', '#858077', '#948f86']);
+const SILVER = ramp(['#1e2232', '#272c3e', '#31374a', '#3c4357', '#485066', '#565e74', '#656e84', '#788096', '#8c94a8', '#a2a8ba']);
+const TWMOSS = ramp(['#0b1220', '#0f1828', '#131f31', '#18273a', '#1d3043', '#22394c', '#284256', '#2f4c60', '#37566a']);
+const GLOWN = ramp(['#378a8c', '#62c0b8', '#a8eadc']);
+const GLOWV = ramp(['#7860b4', '#b4a4e2']);
+const BEDN = ramp(['#050a14', '#08101e', '#0c1729', '#112035', '#172a42', '#1e3550', '#27425e', '#33526e']);
+const REEDN = ramp(['#5a6ea4', '#a4b8e0', '#eef4ff']);
+const REEDNV = ramp(['#6a5aa4', '#ac9ee0', '#f0ecff']);
+const PEARLN = ['#ffd8ec', '#d8e8ff', '#e6d8ff', '#d4fff0'].map((h) => hex(h));
+const MOONLIT = ramp(['#8c96b8', '#b8c2dc', '#dce4f4', '#ffffff']);
+const HILLN = ramp(['#0b0c16', '#10111e', '#161828', '#1c1e32', '#23263c', '#2c2f48', '#363a56', '#424666', '#505578', '#62668c', '#7a7ea6']);
+const ROOTN = ramp(['#0e0c12', '#17141c', '#221d28', '#2e2836', '#3c3546']);
+const NIGHTLEAF = ramp(['#050a10', '#08101a', '#0c1724', '#111f2e', '#162838', '#1d3242', '#243c4c', '#2c4656', '#355060', '#3e5a6a']);
 
 // ---------------------------------------------------------------------------
 // noise and geometry, all in world pixels
@@ -182,9 +200,9 @@ const crackHalf = (c: { line: Line; w: [number, number] }, s: number, side: numb
 /** Node positions in world pixels. */
 const NODES = LOCATIONS.map((l): P => [l.map.x, l.map.y]);
 
-/** The road: the old road ends at the far lip, takes up again on this side, and runs through every node to the east edge. */
+/** The road: the old road ends at the far lip, takes up again on this side, and runs through every node to the east edge (through the hills' pass). */
 const ROAD_FAR = curve([[-10, 318], [40, 322], [96, 334], [150, 332], [186, 324]]);
-const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [W + 12, 202]]);
+const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [W + 12, 186]]);
 
 /** The river, from the north edge to the south edge between the two areas. */
 const RIVER = polyline(curve([[530, -12], [526, 30], [540, 66], [532, 104], [546, 142], [540, 180], [548, 206], [544, 236], [556, 272], [548, 310], [560, 374]], 2));
@@ -440,6 +458,11 @@ function farGround(x: number, y: number, light: number): RGBA {
 }
 
 function groundAt(x: number, y: number): RGBA {
+  const g = dayGround(x, y);
+  return x > 850 ? eastGround(x, y, g) : g;
+}
+
+function dayGround(x: number, y: number): RGBA {
   const i = idx(x, y);
   if (riftSd[i] < 0) return riftInside(x, y, i);
   // the torn edge of the ground along the chasm
@@ -484,7 +507,9 @@ function forestAt(x: number, y: number): number {
   const west = x < 200 && !far[i] && y < 200 ? smooth(0.42, 0.6, vnoise(x, y, 30, 623)) * 0.85 : 0;
   // the land beyond: thin dead woods
   const beyond = x <= 330 && far[i] ? (vnoise(x, y, 22, 624) > 0.62 ? 0.22 : 0.02) : 0;
-  return Math.max(edges, east, belt, copse, west, beyond);
+  const wood = Math.max(edges, east, belt, copse, west, beyond);
+  // east of the grove the woods give out, their last trees straggling into the sand
+  return x > 850 ? wood * (1 - smooth(862, 990, x + (vnoise(x, y, 26, 1109) - 0.5) * 104 + (vnoise(x, y, 8, 1112) - 0.5) * 16)) : wood;
 }
 
 // ---------------------------------------------------------------------------
@@ -566,6 +591,7 @@ function deadTree(b: Bitmap, x: number, y: number, h: number, seed: number) {
 
 /** The leaves for a tree at x,y: an autumn hue in the reach, green in the grove. */
 function leaves(x: number, y: number, seed: number): { r: RGBA[]; tone: number } {
+  if (x > 880 && hash2(seed, 6, 666) < nightK(x, y) * 1.4) return { r: NIGHTLEAF, tone: 2.6 + hash2(seed, 9, 663) * 2 + (fbm(x, y, 664) - 0.5) * 1.4 };
   const h = hash2(seed, 7, 661);
   if (h < autumn(x)) {
     // whole groves turn together: the hue follows a slow field, a few trees stray from it
@@ -620,7 +646,7 @@ function meadowTrees(things: Thing[]) {
       const xi = Math.round(x), yi = Math.round(y);
       if (!inBounds(xi, yi) || hash2(gx, gy, 693) > 0.16) continue;
       if (forestAt(x, y) > 0.2 || roadDist[idx(xi, yi)] < 7 || core(x, y) || nodeClear(x, y) || glade(x, y) || inRiver(x, y) > -4 || sdAt(xi, yi) < 10) continue;
-      if (parcelAt(xi, yi) || (xi <= 330 && far[idx(xi, yi)])) continue;
+      if (parcelAt(xi, yi) || (xi <= 330 && far[idx(xi, yi)]) || (x > 850 && paleK(x, y) > 0.1)) continue;
       const seed = gx * 31 + gy * 7;
       const lv = leaves(x, y, seed);
       things.push({ y, draw: () => broadleaf(b0, x, y, 3.6 + hash2(gx, gy, 694) * 2, lv.r, lv.tone, seed, true) });
@@ -1144,6 +1170,14 @@ function road(b: Bitmap, pts: P[]) {
         if (d > 2.4) continue;
         const X = Math.round(x + dx), Y = Math.round(y + dy);
         if (!inBounds(X, Y) || sdAt(X, Y) < 0 || inRiver(X, Y) > 0) continue;
+        if (X > 860 && (poolAt(X, Y).k > -0.15 || dith(X, Y, nightK(X, Y)))) {
+          // in the basin a trail of pale sand, trodden through the moss
+          if (poolAt(X, Y).k > -0.15) continue;
+          if (d > 1.7) {
+            if (dith(X, Y, 0.4)) b.set(X, Y, SILVER[5]);
+          } else b.set(X, Y, rampDither(SILVER, 6.4 + (hash2(X, Y, 882) - 0.5) * 1.2 + (d > 0.9 ? -0.8 : 0.3), X, Y));
+          continue;
+        }
         if (d > 1.7) {
           if (dith(X, Y, 0.5)) b.set(X, Y, mix(b.get(X, Y), ROAD[1], 0.6));
         } else b.set(X, Y, rampDither(ROAD, 3.4 + (hash2(X, Y, 881) - 0.5) * 1.1 + (d > 0.9 ? -0.7 : 0.2), X, Y));
@@ -1190,6 +1224,278 @@ function frame(b: Bitmap) {
       else if (e === 1) b.set(x, y, GOLD[1]);
       else if (e < 6 && dith(x, y, ((6 - e) / 5) * 0.4)) b.set(x, y, mix(b.get(x, y), SHADOW, 0.5));
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// the Moonlit Basin (Zone 3, named and described by Jakub, 2026-10-17): beyond
+// the grove's trailing roots the soil pales into silver sand; a sunken basin
+// floor under its own night, carpeted in glowing twilight-moss, glass reeds
+// round its tide-pools, motes of light drifting over them; the ground swells
+// toward the eastern hills, sharp ridges along the east edge
+// ---------------------------------------------------------------------------
+
+/** How far into the basin's night a point is: 0 by day, 1 under the moon; the edge wavers like a veil. */
+const nightK = (x: number, y: number) => smooth(912, 1004, x + (vnoise(x, y, 38, 1101) - 0.5) * 64 + (vnoise(x, y, 9, 1100) - 0.5) * 10);
+/** How far the grove's soil has paled into silver sand. */
+const paleK = (x: number, y: number) => smooth(868, 930, x + (vnoise(x, y, 24, 1102) - 0.5) * 50);
+/** The basin's rims: how far down from the north edge and up from the south edge the high ground reaches at x. */
+const rimN = (x: number) => 30 + 20 * vnoise(x, 0, 52, 1103) + 6 * vnoise(x, 0, 13, 1104);
+const rimS = (x: number) => 28 + 22 * vnoise(x, 0, 52, 1105) + 6 * vnoise(x, 0, 13, 1106);
+/** The eastern hills' foot at y: where the ground starts to rise into them. */
+const hillFoot = (y: number) => 1170 + 26 * vnoise(0, y, 44, 1107) + 8 * vnoise(0, y, 11, 1108);
+/** The sunken basin: its middle and half sizes; its rim wavers in lobes and bays. */
+const BASIN = { x: 1072, y: 190, rx: 100, ry: 138 };
+/**
+ * How deep in the basin a point lies: 0 up on the uplands round it, 1 on its
+ * floor; between them the slopes, terraced by the tides.
+ */
+function basinDepth(x: number, y: number): number {
+  const dx = (x - BASIN.x) / BASIN.rx, dy = (y - BASIN.y) / BASIN.ry;
+  const a = Math.atan2(dy, dx);
+  const rim = 1 + (vnoise(Math.cos(a) * 3 + 9, Math.sin(a) * 3 + 9, 1, 1124) - 0.5) * 0.42 + (vnoise(Math.cos(a) * 9 + 30, Math.sin(a) * 9 + 30, 1, 1125) - 0.5) * 0.14;
+  const r = Math.hypot(dx, dy) + (vnoise(x, y, 7, 1128) - 0.5) * 0.05;
+  return Math.min(smooth(rim + 0.04, rim - 0.22, r), smooth(hillFoot(y) + 2, hillFoot(y) - 18, x));
+}
+/** The tide-pools of the basin: centre, half width, half height. */
+const BASIN_POOLS: [number, number, number, number][] = [
+  [1014, 144, 16, 6], [1046, 268, 20, 7], [1128, 124, 12, 5], [1148, 284, 15, 6], [1002, 212, 8, 3.5],
+  [1104, 312, 10, 4], [1064, 90, 17, 6], [1130, 226, 9, 4], [1016, 316, 9, 3.5], [1102, 162, 7, 3],
+];
+/** The pool nearest x,y: how far inside it a point is (> 0 in the water), and which pool. */
+function poolAt(x: number, y: number): { k: number; i: number } {
+  let best = { k: -9, i: -1 };
+  BASIN_POOLS.forEach(([px, py, rx, ry], i) => {
+    const d = Math.hypot((x - px) / rx, (y - py) / ry) + (vnoise(x, y, 5, 1110 + i) - 0.5) * 0.28;
+    if (1 - d > best.k) best = { k: 1 - d, i };
+  });
+  return best;
+}
+/** The clearing round the basin's node, where its medallion and its name stand. */
+const basinClear = (x: number, y: number) => clearing(x, y, NODES[2], 64, 36);
+
+/** The eastern hills' stony ground between their peaks: dark, rising, the moon on its faces toward the top-left. */
+function hillGround(x: number, y: number): RGBA {
+  const up = clamp((x - hillFoot(y)) / 60);
+  return rampDither(HILLN, 2.6 + up * 0.8 + relief(x, y) * 0.9 + (vnoise(x, y, 3, 1122) - 0.5) * 1.3 + (vnoise(x, y, 11, 1123) - 0.5) * 0.8, x, y);
+}
+
+/**
+ * The basin by night: a floor of twilight-moss in clumps sparked with glow,
+ * silver sand banks between them with ripple lines left by the tides; the
+ * slopes up to the rims terraced in silver, the north one in shadow and the
+ * south one catching the moon; clear pools with pale shallows and shores.
+ */
+function basinGround(x: number, y: number): RGBA {
+  if (x > hillFoot(y) - 2 && dith(x, y, clamp((x - hillFoot(y) + 2) / 10))) return hillGround(x, y);
+  const pool = poolAt(x, y);
+  if (pool.k > 0) {
+    const [px, py] = BASIN_POOLS[pool.i];
+    // the moon held in the biggest pool
+    if (pool.i === 1 && Math.hypot(x - (px - 6), (y - (py - 2)) * 1.5) < 1.7) return MOONLIT[3];
+    if (pool.k < 0.2) return rampDither(BEDN, 6.4 - pool.k * 6, x, y);
+    // a band of the sky's light along the far side, deep water below it
+    const far = y < py - 1 && pool.k < 0.55;
+    return rampDither(BEDN, far ? 4.6 : 3.4 - pool.k * 2.6 + (hash2(x, y, 1111) > 0.975 ? 3.4 : 0), x, y);
+  }
+  // the pale shore round a pool, wet and darker on its near side
+  if (pool.k > -0.24) {
+    const [, py] = BASIN_POOLS[pool.i];
+    return rampDither(SILVER, y > py ? 7 + pool.k * 3 : 8.4 + pool.k * 4, x, y);
+  }
+  const d = basinDepth(x, y);
+  if (d <= 0.02) {
+    // the uplands round the basin: moonlit sand in low dunes, dark scrub here and there
+    const dune = Math.sin((x * 0.22 + y * 0.5) + vnoise(x, y, 16, 1129) * 6);
+    const scrub = vnoise(x, y, 6, 1130) > 0.7 && hash2(x, y, 1131) > 0.35;
+    if (scrub) return rampDither(NIGHTLEAF, 2.4 + (vnoise(x - 1, y - 1, 2, 1132) - vnoise(x, y, 2, 1132)) * 6, x, y);
+    // the moss creeps up out of the basin in patches, glowing here and there
+    const moss = vnoise(x, y * 1.3, 20, 1136);
+    if (moss > 0.6) {
+      const speck = hash2(x, y, 1137);
+      if (speck > 0.985) return GLOWN[speck > 0.993 ? 1 : 0];
+      return rampDither(TWMOSS, 3.4 + (vnoise(x - 1, y - 1, 1.6, 1118) - vnoise(x, y, 1.6, 1118)) * 5 + (moss - 0.6) * 4, x, y);
+    }
+    return rampDither(SILVER, 3.2 + (dune > 0.6 ? 1.6 : dune * 0.6) + relief(x, y) * 0.9 + (vnoise(x, y, 5, 1133) - 0.5) * 1.2, x, y);
+  }
+  if (d < 0.97) {
+    // the slopes down into it: terraces of silver sand, a darker line along each step; the slopes facing the moon lighter
+    const dx = (x - BASIN.x) / BASIN.rx, dy = (y - BASIN.y) / BASIN.ry;
+    const facing = clamp(0.5 + (dx * 0.5 + dy * 0.8) / Math.max(0.3, Math.hypot(dx, dy)) * 0.5);
+    const u = (1 - d) * 6 + (vnoise(x, y, 12, 1134) - 0.5) * 0.7;
+    let v = 3.6 + facing * 3.2 + (1 - d) * 0.8 + (vnoise(x, y, 4, 1135) - 0.5) * 1;
+    if (u % 1 < 0.18) v -= 1.5;
+    else if (u % 1 > 0.82) v += 0.6;
+    return rampDither(SILVER, clamp(v, 0, SILVER.length - 1), x, y);
+  }
+  // the floor: moss in carpets, silver sand in banks between them
+  const m = vnoise(x, y * 1.4, 24, 1115) * 0.62 + vnoise(x, y * 1.4, 8, 1116) * 0.38;
+  if (m > 0.43 || basinClear(x, y)) {
+    const speck = hash2(x, y, 1117);
+    if (speck > 0.976 && !basinClear(x, y)) return speck > 0.994 ? GLOWV[speck > 0.997 ? 1 : 0] : GLOWN[speck > 0.988 ? 2 : speck > 0.982 ? 1 : 0];
+    // clumps lit on their top-left, dark between
+    const c = vnoise(x, y, 1.6, 1118), cl = vnoise(x - 1, y - 1, 1.6, 1118);
+    return rampDither(TWMOSS, 4 + (cl - c) * 5 + (m - 0.43) * 4 + (vnoise(x, y, 9, 1126) - 0.5) * 1.2, x, y);
+  }
+  // silver sand: ripple lines left by the tides
+  const ripple = Math.sin(y * 1.3 + Math.sin(x * 0.11) * 2.2 + vnoise(x, y, 12, 1127) * 4) > 0.82;
+  return rampDither(SILVER, 6 + (0.43 - m) * 4 - (ripple ? 1.2 : 0) + (vnoise(x, y, 5, 1119) - 0.5) * 0.9, x, y);
+}
+
+/** The ground east of the grove: the soil paling into sand by day, the basin by night, dithered into each other. */
+function eastGround(x: number, y: number, day: RGBA): RGBA {
+  const n = nightK(x, y), p = paleK(x, y);
+  if (n > 0 && dith(x, y, n)) return basinGround(x, y);
+  if (p <= 0) return day;
+  // by day the grove's soil paling into sand, greyer as the night comes near
+  const sand = rampDither(SANDDAY, 2.6 + p * 1.6 - n * 1.4 + (vnoise(x, y, 5, 1120) - 0.5) * 1.2 + relief(x, y) * 0.8, x, y);
+  return dith(x, y, p) ? sand : rampDither(SOIL, 3.2 + relief(x, y) + (vnoise(x, y, 4, 1121) - 0.5), x, y);
+}
+
+/** The grove's great roots trailing out of the wood across the sand: dark, lit along their backs, by night in the basin's colours. */
+function trailingRoots(b: Bitmap) {
+  for (let k = 0; k < 18; k++) {
+    let x = 862 + hash2(k, 0, 1131) * 40, y = 26 + hash2(k, 1, 1132) * 308;
+    let a = (hash2(k, 2, 1133) - 0.5) * 0.8;
+    const len = 60 + hash2(k, 3, 1134) * 90;
+    for (let t = 0; t < len; t += 0.5) {
+      a += (vnoise(t, k, 9, 1135) - 0.5) * 0.1;
+      x += Math.cos(a) * 0.5;
+      y += Math.sin(a) * 0.5;
+      const X = Math.round(x), Y = Math.round(y);
+      if (!inBounds(X, Y) || poolAt(X, Y).k > -0.1 || roadDist[idx(X, Y)] < 3 || basinClear(X, Y)) continue;
+      // it dives under the sand now and then and arches out again
+      if (Math.sin(t * 0.17 + k * 1.7) > 0.84) continue;
+      const night = dith(X, Y, nightK(X, Y));
+      const thick = t < len * 0.45 ? 2 : t < len * 0.8 ? 1 : 0;
+      const R2 = night ? ROOTN : TIMBER;
+      b.set(X, Y - 1, night ? ROOTN[4] : TIMBER[3]);
+      b.set(X, Y, R2[2]);
+      if (thick > 0) b.set(X, Y + 1, R2[1]);
+      if (thick > 1) b.set(X, Y + 2, R2[0]);
+    }
+  }
+}
+
+/** Glass reeds round the pools: pale blue and violet strokes, bright at their tips, thickest on the far shores. */
+function basinReeds(b: Bitmap) {
+  BASIN_POOLS.forEach(([px, py, rx, ry], i) => {
+    const n = Math.round(rx * 1.1);
+    for (let k = 0; k < n; k++) {
+      // in clumps on the far shore, a few on the near one
+      const clump = Math.floor(hash2(i, k >> 2, 1141) * 5);
+      const a = Math.PI * (1.15 + clump * 0.17) + (hash2(i, k, 1146) - 0.5) * 0.25 + (hash2(i, k >> 2, 1147) < 0.2 ? Math.PI * 0.9 : 0);
+      const x = Math.round(px + Math.cos(a) * (rx + 1)), y = Math.round(py + Math.sin(a) * (ry + 1));
+      const h = 2 + Math.floor(hash2(i, k, 1143) * 3);
+      const R2 = hash2(i, k, 1144) < 0.4 ? REEDNV : REEDN;
+      for (let t = 0; t < h; t++) b.set(x + (t > 2 && hash2(i, k, 1145) < 0.5 ? 1 : 0), y - t, t === h - 1 && hash2(i, k, 1148) < 0.5 ? R2[2] : R2[t > 0 ? 1 : 0]);
+    }
+  });
+  // reed beds out in the moss
+  for (let k = 0; k < 90; k++) {
+    const bed = [[990, 250], [1088, 112], [1112, 290], [1036, 180], [1150, 166]][k % 5];
+    const x = Math.round(bed[0] + (hash2(k, 0, 1148) - 0.5) * 22), y = Math.round(bed[1] + (hash2(k, 1, 1149) - 0.5) * 9);
+    if (basinClear(x, y) || roadDist[idx(x, y)] < 3) continue;
+    const h = 2 + Math.floor(hash2(k, 2, 1150) * 3);
+    const R2 = hash2(k, 3, 1151) < 0.4 ? REEDNV : REEDN;
+    for (let t = 0; t < h; t++) b.set(x, y - t, R2[t === h - 1 ? 2 : t > 0 ? 1 : 0]);
+  }
+}
+
+/** Motes of light drifting over the basin in soft halos of pearl, more of them over the pools. */
+function basinMotes(b: Bitmap) {
+  const at: P[] = [];
+  for (let k = 0; k < 60; k++) at.push([968 + hash2(k, 0, 1151) * 196, 40 + hash2(k, 1, 1152) * 280]);
+  BASIN_POOLS.forEach(([px, py, rx], i) => {
+    for (let k = 0; k < 3; k++) at.push([px + (hash2(i, k, 1153) - 0.5) * rx * 2.2, py - 3 - hash2(i, k, 1154) * 8]);
+  });
+  at.forEach(([x0, y0], k) => {
+    const x = Math.round(x0), y = Math.round(y0);
+    if (!inBounds(x, y) || basinClear(x, y) || nightK(x, y) < 0.8 || x > hillFoot(y) - 6) return;
+    const c = PEARLN[k % PEARLN.length];
+    ellipseFill(b, x, y, 3.6, 2.8, (px, py, d) => (dith(px, py, (1 - d) * 0.55) ? mix(b.get(px, py), c, 0.3) : 0));
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(x + dx, y + dy, mix(b.get(x + dx, y + dy), c, 0.55));
+    b.set(x, y, MOONLIT[3]);
+  });
+}
+
+/**
+ * One of the eastern hills from above at a slant: a sharp peak, a shoulder on
+ * one flank, jagged edges; its face toward the moon (the left) lit in grey
+ * silver, the face beyond its ridge dark, strata and gullies on both, its
+ * shadow cast to the bottom right.
+ */
+function eastPeak(b: Bitmap, x: number, y: number, h: number, w: number, seed: number) {
+  shadow(b, x + w * 0.7, y + 1, w * 1.1, Math.min(6, h * 0.14 + 2), 0.55);
+  const ox = Math.floor(x - w - 4), oy = Math.floor(y - h - 4), sw = Math.ceil(w * 2) + 9, sh = Math.ceil(h) + 7;
+  const X = x - ox, Y = y - oy, skew = (hash2(seed, 0, 1161) - 0.5) * w * 0.9;
+  const shoulder = hash2(seed, 1, 1166) < 0.5 ? -1 : 1, sh0 = 0.35 + hash2(seed, 2, 1167) * 0.25;
+  // the outline: a flank up to the peak and down again, a shoulder on one side, jagged in short runs
+  const pts: P[] = [];
+  const N = 8;
+  for (let k = 0; k <= N * 2; k++) {
+    const u = k / (N * 2);
+    const side = u < 0.5 ? -1 : 1;
+    const t = side < 0 ? u * 2 : (1 - u) * 2;
+    let top = h * Math.pow(t, 1.15);
+    if (side === shoulder && t > sh0 - 0.12 && t < sh0 + 0.18) top += h * 0.12;
+    const px = X + skew * t + side * w * (1 - t) + (hash2(seed, k, 1162) - 0.5) * 2.2 * (1 - t * 0.5);
+    pts.push([px, Y - top + (k > 0 && k < N * 2 ? (hash2(seed, k, 1163) - 0.5) * 2 : 0)]);
+  }
+  stamp(b, ox, oy, sw, sh, (s) => {
+    polyFill(s, pts, (px, py) => {
+      const gx = px + ox, gy = py + oy;
+      const down = clamp((py - (Y - h)) / h);
+      const ridge = X + skew + (py - (Y - h)) * 0.2 + (hash2(seed, Math.floor(py / 3), 1168) - 0.5) * 1.6;
+      const lit = px < ridge;
+      // gullies down the lit face, spurs down the dark one
+      const gully = Math.abs(((px - ridge) * 0.55 + py * 0.3 + hash2(seed, 3, 1169) * 7) % 7) < 0.9;
+      const strata = Math.floor((py + (lit ? px * 0.3 : -px * 0.35)) * 0.45 + hash2(seed, 9, 1164) * 3) % 3 === 0 ? -0.8 : 0;
+      const tone = hash2(seed, 4, 1170) * 1.2;
+      const v = lit ? 6.4 + tone - down * 3 + strata - (gully ? 1.4 : 0) - (px > ridge - 2 ? -0.6 : 0) : 2.2 + tone * 0.5 - down * 0.9 + strata * 0.5 + (gully ? 0.7 : 0);
+      return rampDither(HILLN, clamp(v + (hash2(gx, gy, 1165) - 0.5) * 0.7, 0, HILLN.length - 1), gx, gy);
+    });
+    // the moon catches the crest and the left flank
+    for (let k = 0; k < N; k++) {
+      const [ax, ay] = pts[k], [bx, by] = pts[k + 1];
+      const n = Math.ceil(Math.hypot(bx - ax, by - ay) * 2);
+      for (let t = 0; t <= n; t++) {
+        const px = Math.round(ax + ((bx - ax) * t) / n), py = Math.round(ay + ((by - ay) * t) / n) + 1;
+        if (A(s.get(px, py))) s.set(px, py, HILLN[k > N - 3 ? 10 : 9]);
+      }
+    }
+  }, HILLN[0]);
+}
+
+/** The eastern hills: peaks along the east edge, the great ones furthest east, foothills in front, a low pass where the road goes through. */
+function eastHills(things: Thing[]) {
+  for (let gy = -16; gy < H + 34; gy += 12) {
+    for (let gx = 1150; gx < W + 40; gx += 15) {
+      const x = gx + (hash2(gx, gy, 1171) - 0.5) * 16 + (Math.floor(gy / 12) % 2) * 7, y = gy + (hash2(gx, gy, 1172) - 0.5) * 10;
+      const into = (x - hillFoot(y)) / 100;
+      if (into < -0.02 || hash2(gx, gy, 1173) < 0.3 + Math.max(0, 0.25 - into) * 0.8) continue;
+      const pass = Math.abs(y - 187) < 15 && x < W - 26;
+      const k = clamp(into);
+      // the great peaks stand in massifs; between them lower crags
+      const massif = vnoise(x, y, 46, 1176);
+      const h = pass ? 6 + k * 6 + hash2(gx, gy, 1174) * 4 : 8 + k * 22 + massif * k * 26 + hash2(gx, gy, 1174) * (6 + k * 12);
+      const w = h * (0.48 + hash2(gx, gy, 1175) * 0.4) + 3;
+      const seed = gx * 13 + gy;
+      things.push({ y, draw: () => eastPeak(b0, x, y, h, w, seed) });
+    }
+  }
+}
+
+/** Stones on the basin's slopes and at the hills' foot, in the moon's colours. */
+function basinStones(things: Thing[]) {
+  for (let k = 0; k < 70; k++) {
+    const x = 952 + hash2(k, 0, 1181) * 240;
+    const side = hash2(k, 1, 1182);
+    const y = side < 0.4 ? rimN(x) + 2 + hash2(k, 2, 1183) * 14 : side < 0.8 ? H - rimS(x) - 2 - hash2(k, 2, 1183) * 14 : 40 + hash2(k, 2, 1183) * 280;
+    const xi = Math.round(x), yi = Math.round(y);
+    if (!inBounds(xi, yi) || nightK(x, y) < 0.6 || basinClear(x, y) || poolAt(x, y).k > -0.3 || roadDist[idx(xi, yi)] < 4) continue;
+    if (side >= 0.8 && x < hillFoot(y) - 30) continue;
+    things.push({ y, draw: () => boulder(b0, x, y, 1.3 + hash2(k, 3, 1184) * 2.2, HILLN.slice(3, 10)) });
   }
 }
 
@@ -1247,10 +1553,13 @@ function renderWorld(): Bitmap {
       if (hash2(gx, gy, 900) > 0.12) continue;
       const x = gx + Math.floor(hash2(gx, gy, 901) * 4), y = gy + Math.floor(hash2(gx, gy, 902) * 4);
       if (!inBounds(x, y) || sdAt(x, y) < 8 || inRiver(x, y) > -2 || roadDist[idx(x, y)] < 3 || parcelAt(x, y) || (x <= 330 && far[idx(x, y)])) continue;
+      if (x > 850 && paleK(x, y) > 0.1) continue;
       b.set(x, y, FLOWERS[Math.floor(hash2(gx, gy, 903) * FLOWERS.length)]);
     }
   }
   hairlines(b);
+  trailingRoots(b);
+  basinReeds(b);
   road(b, ROAD_FAR);
   road(b, ROAD_NEAR);
   riverBridge(b);
@@ -1294,6 +1603,8 @@ function renderWorld(): Bitmap {
   woods(things);
   meadowTrees(things);
   farmThings(things);
+  eastHills(things);
+  basinStones(things);
   for (const h of [...VILLAGE, ...BURNT]) things.push({ y: h.y, draw: () => house(b, h, smokes) });
   things.push({ y: CHAPEL[1], draw: () => chapel(b, CHAPEL[0], CHAPEL[1]) });
   things.push({ y: WINDMILL[1], draw: () => windmill(b, WINDMILL[0], WINDMILL[1]) });
@@ -1317,6 +1628,7 @@ function renderWorld(): Bitmap {
     if (hash2(gx, gy, 930) > 0.1) continue;
     const x = gx + Math.round(hash2(gx, gy, 931) * 24), y = gy + Math.round(hash2(gx, gy, 932) * 24);
     if (!inBounds(x, y) || sdAt(x, y) < 6 || forestAt(x, y) > 0.3 || parcelAt(x, y) || roadDist[idx(x, y)] < 5 || inRiver(x, y) > -3 || core(x, y) || nodeClear(x, y) || glade(x, y)) continue;
+    if (x > 850 && paleK(x, y) > 0.1) continue;
     const beyond = x <= 330 && far[idx(x, y)] === 1;
     things.push({ y, draw: () => boulder(b, x, y, 1.6 + hash2(gx, gy, 933) * 2, beyond ? ROCK : STONE) });
   }
@@ -1328,6 +1640,7 @@ function renderWorld(): Bitmap {
   for (const [i, [x, y]] of smokes.entries()) plume(b, x, y, BURNT.some((h) => Math.abs(h.x - x) < 12 && Math.abs(h.y - y) < 20) ? 14 : 6, i + 2);
   glow(b, [HAYFIRE, [236, 150]]);
   sparks(b, [HAYFIRE]);
+  basinMotes(b);
   compass(b, W - 40, H - 44);
   frame(b);
   return b;

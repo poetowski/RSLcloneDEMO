@@ -240,8 +240,12 @@ export interface RoleDef {
 export interface ZoneDef {
   id: string;
   name: string;
-  /** snow, blowing sand, star-dust with shooting stars, autumn leaves tumbling in the wind, or pollen drifting in the sunlight */
-  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen';
+  /**
+   * snow, blowing sand, star-dust with shooting stars, autumn leaves tumbling in
+   * the wind, pollen drifting in the sunlight, or spores: glowing dust-motes of
+   * bioluminescent flora drifting in soft, pearlescent halos (the Moonlit Basin)
+   */
+  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen' | 'spores';
   /** color of brazier light pools */
   glow: [number, number, number];
   /** unit shadows: offset away from the key light and horizontal stretch */
@@ -265,6 +269,8 @@ export interface ZoneDef {
    * unfrequently ... light up the sky in weird colors for a moment")
    */
   flash?: { at: [number, number]; every: [number, number]; ms: number; colors: string[] };
+  /** now and then a shooting star streaks across the sky, every `[min, max]` ms (the star-dust ambience has its own, more often) */
+  shootingStars?: [number, number];
 }
 
 export interface EnemySlot {

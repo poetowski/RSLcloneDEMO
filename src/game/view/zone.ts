@@ -3,9 +3,10 @@
 // spark emitters, pre-baked tile layers, props driven by their kind (static,
 // looping, pulsing, burning), the ambience of the zone (falling snow, blowing
 // sand, drifting star-dust with shooting stars, autumn leaves tumbling in the
-// wind, or pollen drifting in the sunlight; circling birds, butterflies, heat
-// haze, now and then a flash of strange light across the sky), light pools, a
-// mood tint and the vignette. Everything zone-specific
+// wind, pollen drifting in the sunlight, or glowing spores drifting in their
+// halos; circling birds, butterflies, heat haze, now and then a flash of
+// strange light across the sky or a shooting star), light pools, a mood tint
+// and the vignette. Everything zone-specific
 // comes from the zone's JSON (art) and ZoneDef (behaviour), so a new zone
 // needs no code here.
 import { Particles } from '../../engine/particles';
@@ -54,6 +55,35 @@ const BUTTERFLY_FRAMES = [
   ['...W...', '...W...', '...W...', '...B...'],
 ];
 
+/**
+ * A glowing dust-mote of the basin's flora (ambient 'spores'): it drifts and
+ * wanders slowly, rising a little, in a soft halo that breathes, its pearl
+ * hue turning from one tint to the next; it kindles when born and fades out.
+ * Far ones are small and drawn behind the champions, near ones in front.
+ */
+interface Spore {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  /** wander: phases and rates (radians a second) of the side-to-side and up-and-down drift */
+  p: [number, number];
+  f: [number, number];
+  /** the breath of its glow: phase and rate (breaths a second) */
+  bp: number;
+  br: number;
+  /** where in the pearl tints it starts, and how fast it turns through them (tints a second) */
+  hue: number;
+  turn: number;
+  near: boolean;
+  age: number;
+  life: number;
+}
+
+/** The pearl tints of the spores' halos (rose, ice, lilac, mint) and their bright cores. */
+const SPORE_HALO = ['#ffcfe6', '#cfe2ff', '#ddd0ff', '#c8fff0'];
+const SPORE_CORE = ['#fff2f8', '#f2f8ff', '#f6f0ff', '#effff9'];
+
 export class ZoneView {
   private tilesLayer: HTMLCanvasElement;
   private light: HTMLCanvasElement;
@@ -71,6 +101,9 @@ export class ZoneView {
   private art: ZoneArt;
   private birds: Bird[] = [];
   private butterflies: Butterfly[] = [];
+  private spores: Spore[] = [];
+  /** one soft halo per pearl tint, small (far spores) and large (near ones) */
+  private sporeHalos: HTMLCanvasElement[][] = [];
   private gust = 0;
   private gustT = 4000;
   /** the sky's rare flash: its mask, one tinted copy per colour, the time to the next one, how far into one we are (-1: none) */
@@ -91,8 +124,13 @@ export class ZoneView {
     this.tilesLayer = this.bakeTiles();
     this.light = makeGlow(64, 40, def.glow);
     this.vignette = makeVignette();
-    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : 70;
+    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'spores' ? 0 : 70;
     for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
+    if (def.ambient === 'spores') {
+      this.sporeHalos = SPORE_HALO.map((c) => [makeHalo(6, c), makeHalo(9, c)]);
+      for (let i = 0; i < SPORES; i++) this.spawnSpore(true);
+    }
+    if (def.shootingStars) this.starT = def.shootingStars[0] * (0.3 + Math.random() * 0.7);
     this.sparkT = (this.json.sparks ?? []).map(() => 0);
     for (let i = 0; i < (def.birds ?? 0); i++) {
       const at = def.birdsAt?.[i % def.birdsAt.length];
@@ -250,6 +288,82 @@ export class ZoneView {
     }
   }
 
+  /**
+   * A spore: most rise from the floor, from the moss and the flora round the
+   * pools; some are born in the air. `anywhere` puts it somewhere in its life
+   * already (the scene opens with motes drifting).
+   */
+  private spawnSpore(anywhere = false) {
+    const fromFloor = Math.random() < 0.6;
+    const life = 9000 + Math.random() * 9000;
+    this.spores.push({
+      x: Math.random() * W,
+      y: fromFloor ? 210 + Math.random() * 140 : 90 + Math.random() * 200,
+      vx: (Math.random() - 0.5) * 5,
+      vy: -(1.5 + Math.random() * 3.5),
+      p: [Math.random() * 6.3, Math.random() * 6.3],
+      f: [0.25 + Math.random() * 0.3, 0.35 + Math.random() * 0.35],
+      bp: Math.random() * 6.3,
+      br: 0.3 + Math.random() * 0.4,
+      hue: Math.random() * 4,
+      turn: 0.06 + Math.random() * 0.08,
+      near: Math.random() < 0.4,
+      age: anywhere ? Math.random() * life : 0,
+      life,
+    });
+  }
+
+  /** Draws the far spores (behind the champions) or the near ones (in front). */
+  private drawSpores(ctx: CanvasRenderingContext2D, near: boolean) {
+    if (!this.spores.length) return;
+    const s = this.t / 1000;
+    ctx.globalCompositeOperation = 'lighter';
+    for (const p of this.spores) {
+      if (p.near !== near) continue;
+      // kindle over the first second and a half, fade over the last three
+      const env = Math.min(1, p.age / 1500, (p.life - p.age) / 3000);
+      if (env <= 0) continue;
+      const breath = 0.6 + 0.4 * Math.sin(s * p.br * Math.PI * 2 + p.bp);
+      const h = (p.hue + s * p.turn) % 4;
+      const i0 = Math.floor(h), i1 = (i0 + 1) % 4, k = h - i0;
+      const x = Math.round(p.x + Math.sin(s * p.f[0] + p.p[0]) * 7), y = Math.round(p.y + Math.sin(s * p.f[1] + p.p[1]) * 3);
+      const a = env * breath * (near ? 0.95 : 0.75);
+      // the halo crossfades from one pearl tint to the next
+      for (const [i, w] of [[i0, 1 - k], [i1, k]] as const) {
+        if (w <= 0.02) continue;
+        const c = this.sporeHalos[i][near ? 1 : 0];
+        ctx.globalAlpha = a * w;
+        ctx.drawImage(c, x - (c.width >> 1), y - (c.height >> 1));
+      }
+      ctx.globalAlpha = env * (0.55 + 0.45 * breath);
+      ctx.fillStyle = SPORE_CORE[k < 0.5 ? i0 : i1];
+      ctx.fillRect(x, y, 1, 1);
+      if (near && breath > 0.7) {
+        ctx.globalAlpha *= 0.5;
+        ctx.fillRect(x - 1, y, 1, 1);
+        ctx.fillRect(x + 1, y, 1, 1);
+        ctx.fillRect(x, y - 1, 1, 1);
+        ctx.fillRect(x, y + 1, 1, 1);
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /** A shooting star streaking down across the sky, its head and tail fading through `fade`. */
+  private shootingStar(fade: [string[], string[]]) {
+    const x0 = 140 + Math.random() * 460, y0 = 6 + Math.random() * 30;
+    const vx = -(150 + Math.random() * 90), vy = 55 + Math.random() * 35;
+    const len = Math.hypot(vx, vy);
+    for (let k = 0; k < 7; k++) {
+      this.sky.add({
+        x: x0 - (vx / len) * k * 1.6, y: y0 - (vy / len) * k * 1.6, vx, vy,
+        life: 520 - k * 30, color: '#ffffff', fade: k < 2 ? fade[0] : fade[1],
+        additive: true,
+      });
+    }
+  }
+
   frame(kind: string, i: number): Rect4 {
     return this.json.propFrames[`${kind}/${i}`];
   }
@@ -260,7 +374,8 @@ export class ZoneView {
     const speedUp = this.def.ambient === 'sand' && this.gust > 0 ? 2.2 : 1;
     amb.update(dt * speedUp);
     for (const p of amb.list) if (p.y > H + 4 || p.y < -6 || p.x > W + 8 || p.x < -60) p.life = 0;
-    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.gust > 0 ? 150 : 70;
+    // the spores are their own system (spawnSpore), not particles
+    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
     while (amb.list.length < target) this.spawnAmbient();
     if (this.def.ambient === 'sand') {
       // every few seconds a gust sweeps a veil of sand across the arena
@@ -271,23 +386,28 @@ export class ZoneView {
       }
       this.gust = Math.max(0, this.gust - dt);
     }
-    if (this.def.ambient === 'motes') {
-      // now and then a shooting star streaks down across the sky
+    if (this.def.ambient === 'motes' || this.def.shootingStars) {
+      // now and then a shooting star streaks down across the sky (rarely, unless the air is full of star-dust)
       this.sky.update(dt);
       this.starT -= dt;
       if (this.starT <= 0) {
-        this.starT = 3500 + Math.random() * 6000;
-        const x0 = 140 + Math.random() * 460, y0 = 6 + Math.random() * 30;
-        const vx = -(150 + Math.random() * 90), vy = 55 + Math.random() * 35;
-        const len = Math.hypot(vx, vy);
-        for (let k = 0; k < 7; k++) {
-          this.sky.add({
-            x: x0 - (vx / len) * k * 1.6, y: y0 - (vy / len) * k * 1.6, vx, vy,
-            life: 520 - k * 30, color: '#ffffff', fade: k < 2 ? ['#ffffff', '#e8fff8', '#90f5e2'] : ['#90f5e2', '#36d0c0', '#18908a'],
-            additive: true,
-          });
-        }
+        const [lo, hi] = this.def.shootingStars ?? [3500, 9500];
+        this.starT = lo + Math.random() * (hi - lo);
+        this.shootingStar(this.def.ambient === 'motes' ? [['#ffffff', '#e8fff8', '#90f5e2'], ['#90f5e2', '#36d0c0', '#18908a']] : [['#ffffff', '#f2f6ff', '#c8d6ff'], ['#c8d6ff', '#8a9ad8', '#4a5694']]);
       }
+    }
+    if (this.spores.length) {
+      // the spores drift, wander and rise; one that has lived its life is born again elsewhere
+      const k = dt / 1000;
+      for (const p of this.spores) {
+        p.age += dt;
+        p.x += p.vx * k;
+        p.y += p.vy * k;
+        if (p.x < -12) p.x += W + 24;
+        else if (p.x > W + 12) p.x -= W + 24;
+      }
+      this.spores = this.spores.filter((p) => p.age < p.life && p.y > 40);
+      while (this.spores.length < SPORES) this.spawnSpore();
     }
     // sparks crackle off the emitters' lines, drift away and twinkle out
     this.sparks.update(dt);
@@ -430,6 +550,7 @@ export class ZoneView {
     this.sparks.draw(ctx);
     ctx.drawImage(this.tilesLayer, 0, 0);
     for (const layer of ['back', 'floor'] as const) for (const p of this.json.props) if (p.layer === layer) this.drawProp(ctx, p);
+    this.drawSpores(ctx, false);
   }
 
   /** Fire is drawn after the units so flames glow over nearby shapes. */
@@ -449,6 +570,7 @@ export class ZoneView {
   drawFront(ctx: CanvasRenderingContext2D) {
     for (const p of this.json.props) if (p.layer === 'fg') this.drawProp(ctx, p);
     this.ambient.draw(ctx);
+    this.drawSpores(ctx, true);
     for (const f of this.butterflies) {
       const rows = BUTTERFLY_FRAMES[f.frame];
       const x0 = Math.round(f.x) - 3, y0 = Math.round(f.y) - 2;
@@ -491,6 +613,34 @@ export class ZoneView {
     }
     ctx.drawImage(this.vignette, 0, 0);
   }
+}
+
+/** How many spores drift in the air at once (ambient 'spores'). */
+const SPORES = 30;
+
+/** A spore's halo: a small soft disc of light, dithered into four bands so it reads as pixel art. */
+function makeHalo(r: number, color: string): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = c.height = r * 2 + 1;
+  const g = c.getContext('2d')!;
+  const img = g.createImageData(c.width, c.height);
+  const rgb = [1, 3, 5].map((i) => parseInt(color.slice(i, i + 2), 16));
+  const bayer = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  for (let y = 0; y < c.height; y++) {
+    for (let x = 0; x < c.width; x++) {
+      const d = Math.hypot(x - r, y - r) / (r + 0.5);
+      if (d >= 1) continue;
+      const k = Math.floor((1 - d) * (1 - d) * 4 + bayer[(y & 3) * 4 + (x & 3)] / 16) / 4;
+      if (k <= 0) continue;
+      const i = (y * c.width + x) * 4;
+      img.data[i] = rgb[0];
+      img.data[i + 1] = rgb[1];
+      img.data[i + 2] = rgb[2];
+      img.data[i + 3] = Math.round(k * 200);
+    }
+  }
+  g.putImageData(img, 0, 0);
+  return c;
 }
 
 /** Soft radial light, quantized into 6 bands so it reads as pixel art. */

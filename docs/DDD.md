@@ -100,7 +100,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Collection | every champion, owned or locked | `CollectionScreen` |
 | Open / cleared / locked | a stage the player may fight / has won / may not fight yet | `stageOpen`, `cleared` |
 | Frontier | the newest playable stage | `frontier()` |
-| World map, overview | the campaign map in world pixels (960x360, growing east area by area), scrolled sideways under a camera: the campaign is a line of areas crossed from left to right; the overview draws the same world on one screen | `WORLD_MAP`, `CampaignScreen` |
+| World map, overview | the campaign map in world pixels (1280x360, growing east area by area), scrolled sideways under a camera: the campaign is a line of areas crossed from left to right; the overview draws the same world on one screen | `WORLD_MAP`, `CampaignScreen` |
 | Stars | 3, 2 or 1 by champions lost; the best is kept | `starsFor`, `MasterArchivist.stars` |
 | Master Archivist | the player and their save: stars, last team, Academy chapters read, settings, and the Reliquary | `MasterArchivist`, `loadArchivist`, `saveArchivist`, `readSave`, `writeSave` |
 | Fresh (NEW) | recruited, not yet opened on the champion page | `HeroSoulFile.fresh`, `isFresh`, `Reliquary.markSeen` |
@@ -413,7 +413,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | ID | Invariant | Enforced by |
 | --- | --- | --- |
 | INV-P1 | Stage ids are unique; 1-3 enemies, all known champions; an area with stages names a known zone; campaign nodes inside the world, clear of its frame and the header | test |
-| INV-P9 | The world map and its overview have the sizes `WORLD_MAP` declares | test |
+| INV-P9 | The world map and its overview have the sizes `WORLD_MAP` declares; the overview fits one screen (`WORLD_MAP.w / overview` at most 640); each area's node stands east of the one before | test |
 | INV-P2 | Every location ends on a boss stage; `requires` names an existing stage | test |
 | INV-P3 | Every non-starter is brought by exactly one stage; it need not be among that stage's enemies | test |
 | INV-P4 | A stage opens when its location is open and the previous stage there is cleared | test (save); the battle route does not check it (DR-11) |
