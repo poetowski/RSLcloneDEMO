@@ -22,7 +22,8 @@ export type StatusId =
   | 'atk_down'
   | 'heal_block';
 
-export type TargetKind = 'enemy' | 'enemies' | 'ally' | 'allies' | 'self';
+/** `fallen`: one fallen ally, chosen at random (the Necromancer's Raise Dead); usable only while one has fallen. */
+export type TargetKind = 'enemy' | 'enemies' | 'ally' | 'allies' | 'self' | 'fallen';
 
 /**
  * How the actor travels before the attack animation:
@@ -85,6 +86,12 @@ export interface SkillDef {
   cleanseAll?: boolean;
   /** heals the actor by this fraction of its own max HP, on the last hit (the Grove Keeper's Thornburst) */
   healSelf?: number;
+  /**
+   * raises the fallen ally the skill targets (`target: 'fallen'`, one at random) with this
+   * fraction of its max HP, on the last hit: no statuses, an empty turn meter (the
+   * Necromancer's Raise Dead)
+   */
+  revive?: number;
   /** removes every buff from the targets before the first hit */
   stripBuffs?: boolean;
   /** heals the actor by this fraction of damage dealt */

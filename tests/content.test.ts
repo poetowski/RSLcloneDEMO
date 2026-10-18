@@ -8,7 +8,7 @@ import { allStages, LOCATIONS, recruitStage, STARTERS, WORLD_MAP } from '../src/
 import { CHAMPIONS } from '../src/game/data/champions';
 import { CHAPTERS } from '../src/game/data/codex';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../src/game/data/meta';
-import { auditChampion } from '../src/game/data/norms';
+import { auditChampion, totalMult } from '../src/game/data/norms';
 import { STATUSES } from '../src/game/data/statuses';
 import { ChampionDef, StatusId } from '../src/game/data/types';
 import { ZONES } from '../src/game/data/zones';
@@ -260,6 +260,17 @@ describe('design decisions', () => {
     expect(r?.passive && [r.passive.kind, r.passive.value, r.passive.statuses]).toEqual(['overdrive', 0.5, [{ status: 'def_up', turns: 2 }]]);
   });
 
+  it('has the Necromancer of his brief: an Elite Support of the Ashveil Reign, Bloom; an A1 with a 35% chance of Slow for 1 turn; an A2 of Poison for 2 turns and SPD Up on all allies for 2, cooldown 4; an A3 that raises one fallen ally at random, cooldown 6', () => {
+    const n = CHAMPIONS.find((c) => c.id === 'necromancer');
+    expect(n && [n.name, n.rarity, n.role, n.faction, n.affinity]).toEqual(['Necromancer', 'elite', 'Support', 'ashveil_reign', 'bloom']);
+    const [a1, a2, a3] = n?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, a1.statuses]).toEqual([1, 'enemy', [{ status: 'spd_down', turns: 1, chance: 0.35, to: 'targets' }]]);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'enemy', 4, [{ status: 'poison', turns: 2, to: 'targets' }, { status: 'spd_up', turns: 2, to: 'allies' }]]);
+    expect(a1 && a2 && totalMult(a1) > 0 && totalMult(a2) > 0).toBe(true);
+    expect(a3 && [a3.slot, a3.target, a3.cooldown, totalMult(a3), a3.revive! > 0]).toEqual([3, 'fallen', 6, 0, true]);
+    expect(n?.passive).toBeUndefined();
+  });
+
   it('has the Follower of his brief: a Common of the Court of Root, Damage, Tide; A1 a single-target attack, A2 a single-target attack with a 50% chance of DEF Down for 2 turns, cooldown 4', () => {
     const f = CHAMPIONS.find((c) => c.id === 'follower');
     expect(f && [f.name, f.rarity, f.role, f.faction, f.affinity]).toEqual(['Follower', 'common', 'Damage', 'court_of_root', 'tide']);
@@ -395,7 +406,6 @@ describe('design decisions', () => {
     ]);
     const scars = LOCATIONS[3];
     expect([scars.requires, scars.stages.map((s) => s.id)]).toEqual(['3-10', ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6', '4-7', '4-8', '4-9', '4-10']]);
-    expect(scars.stages.some((s) => s.recruit)).toBe(false);
   });
 });
 

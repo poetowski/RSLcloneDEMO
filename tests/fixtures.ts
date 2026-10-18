@@ -99,6 +99,11 @@ export const toller = fixture('toller', {
   skills: [skill('toll', 1, { target: 'ally', approach: 'none', hits: [{ mult: 0 }], statuses: [{ status: 'shield', turns: 1, value: 0.1, to: 'targets' }], healSelf: 0.1 })],
 });
 
+/** A3 raises one fallen ally at random with 30% of its max HP, cooldown 6. */
+export const raiser = fixture('raiser', {
+  skills: [undefined, undefined, skill('raise', 3, { target: 'fallen', approach: 'none', cooldown: 6, hits: [{ mult: 0 }], revive: 0.3, ai: { priority: 3 } })],
+});
+
 /** Two-hit A1 rolling Poison on every hit; A3 ends the turn with 25% turn meter. */
 export const stalker = fixture('stalker', {
   stats: { spd: 118 },

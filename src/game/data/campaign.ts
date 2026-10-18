@@ -24,8 +24,8 @@
 // (2026-10-18), the easternmost place, has ten placeholder stages he asked for
 // "like in the past": their texts walk his description, from the steppe and its
 // two ravines to the camp, the yaks, the mountains and the zeppelin; their
-// enemies are copies of the roster and their powers tuned stand-ins; no
-// champion joins there.
+// enemies are copies of the roster and their powers tuned stand-ins; 4-1 brings
+// the Necromancer, the Ashveil Reign's first Elite (a stand-in).
 import { LocationDef, StageDef } from './types';
 
 /**
@@ -335,6 +335,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: STEPPE,
         enemies: [{ champion: 'skeleton' }, { champion: 'follower' }, { champion: 'wild_speaker' }],
         power: 0.83,
+        // a stand-in: the stage that brings the Necromancer is not Jakub's
+        recruit: 'necromancer',
       },
       {
         id: '4-2',

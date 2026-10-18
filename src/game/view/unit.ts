@@ -26,6 +26,8 @@ export class UnitView {
   private t = 0;
   private loop = true;
   private hits = 0;
+  /** played backwards, last frame first (a champion raised from the dead gets up: its death in reverse) */
+  private rev = false;
   private hd: Handlers = {};
   flash = 0;
   alpha = 1;
@@ -76,20 +78,21 @@ export class UnitView {
   }
 
   /** Plays an animation; resolves when a non-looping one ends (loops resolve at once). */
-  play(name: string, opts: { loop?: boolean; hit?: (k: number) => void; event?: (e: string) => void } = {}): Promise<void> {
+  play(name: string, opts: { loop?: boolean; hit?: (k: number) => void; event?: (e: string) => void; reverse?: boolean } = {}): Promise<void> {
     const prev = this.hd.done;
     this.hd = {};
     prev?.();
     const a = this.art.json.anims[name];
     this.anim = name;
-    this.frame = 0;
+    this.rev = !!opts.reverse;
+    this.frame = this.rev ? a.ms.length - 1 : 0;
     this.t = 0;
     this.hits = 0;
     this.loop = opts.loop ?? a.loop;
     return new Promise((res) => {
       this.hd = { hit: opts.hit, event: opts.event, done: this.loop ? undefined : res };
       if (this.loop) res();
-      this.enter(0);
+      if (!this.rev) this.enter(0);
     });
   }
 
@@ -118,6 +121,18 @@ export class UnitView {
     let guard = 0;
     while (this.t >= a.ms[this.frame] && guard++ < 50) {
       this.t -= a.ms[this.frame];
+      if (this.rev) {
+        // backwards, without hits or events; it ends on its first frame
+        if (this.frame > 0) this.frame--;
+        else {
+          this.t = 0;
+          const done = this.hd.done;
+          this.hd = {};
+          done?.();
+          break;
+        }
+        continue;
+      }
       if (this.frame + 1 >= a.ms.length) {
         if (this.loop) {
           this.frame = 0;

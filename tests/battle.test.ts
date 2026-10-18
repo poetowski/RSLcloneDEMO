@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, guard, hide, inAffinity, keen, medic, mender, mourner, overdrive, provisioner, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
+import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, guard, hide, inAffinity, keen, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -305,6 +305,43 @@ describe('statuses', () => {
     // alone, it shields itself
     const solo = new Battle(combatants([toller]), ENEMY, { seed: 3 });
     expect(solo.validTargets(solo.get('p0'), toll).map((u) => u.uid)).toEqual(['p0']);
+  });
+
+  it('raises one fallen ally with a share of its max HP, nothing on it and an empty turn meter, and waits while none has fallen', () => {
+    const raise = skill(raiser, 'raise');
+    const b = new Battle(combatants([raiser, guard, twin]), ENEMY, { seed: 3 });
+    const me = b.get('p0'), g = b.get('p1');
+    expect(b.ready(me, raise)).toBe(false);
+    b.addStatus(g, 'poison', 2, 0, 'test');
+    g.tm = 60;
+    b.applyDamage(g, g.hp + 50, false, 0, 0, []);
+    expect(g.alive).toBe(false);
+    expect(b.ready(me, raise)).toBe(true);
+    expect(b.validTargets(me, raise).map((u) => u.uid)).toEqual(['p1']);
+    const r = b.useSkill(me, raise);
+    expect([g.alive, g.hp, g.statuses, g.tm]).toEqual([true, Math.round(g.maxHp * 0.3), [], 0]);
+    expect(r.targets).toEqual(['p1']);
+    expect(r.events).toContainEqual({ kind: 'raise', target: 'p1', hp: g.hp, hit: 0 });
+    // the cooldown is spent, and with nobody fallen it would wait anyway
+    expect(b.ready(me, raise)).toBe(false);
+    expect(me.cooldowns.raise).toBe(7);
+  });
+
+  it('raises a fallen ally chosen at random, and the AI raises as soon as one has fallen', () => {
+    const raise = skill(raiser, 'raise');
+    const picked = new Set<string>();
+    for (let seed = 1; seed <= 30; seed++) {
+      const b = new Battle(combatants([raiser, guard, twin]), ENEMY, { seed });
+      for (const u of [b.get('p1'), b.get('p2')]) b.applyDamage(u, u.hp + 1, false, 0, 0, []);
+      const r = b.useSkill(b.get('p0'), raise);
+      picked.add(r.targets[0]);
+      expect(b.alive('player')).toHaveLength(2);
+    }
+    expect([...picked].sort()).toEqual(['p1', 'p2']);
+    const b = new Battle(combatants([raiser, guard, twin]), ENEMY, { seed: 4 });
+    expect(decide(b, b.get('p0')).skill.id).not.toBe('raise');
+    b.applyDamage(b.get('p2'), b.get('p2').hp + 1, false, 0, 0, []);
+    expect(decide(b, b.get('p0')).skill.id).toBe('raise');
   });
 
   it('places a status on every enemy with an AoE skill', () => {

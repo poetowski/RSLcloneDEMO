@@ -67,6 +67,7 @@ Section 7 lists what is not decided.
 | 2026-10-18 | The Bellringer, a Common Support of the Ashveil Reign | 3.4, 7, 30 |
 | 2026-10-18 | The Bellringer's affinity: Ember (Bloom in the brief) | 30 |
 | 2026-10-18 | Zone 4, Earth Scars: its name and description; its battle background; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.7, 7 |
+| 2026-10-18 | The Necromancer, an Elite Support of the Ashveil Reign; the first skill that raises a fallen ally | 3.4, 5.7, 7, 31 |
 
 ---
 
@@ -278,8 +279,9 @@ and Sanguine Dominion.
 what came through when it did. To be designed.
 
 **Champions.** *(2026-10-18)* Its first, the Skeleton, a Common (section 28),
-its second, the Rot Hulk, a Common Tank (section 29), and its third, the
-Bellringer, a Common Support (section 30).
+its second, the Rot Hulk, a Common Tank (section 29), its third, the
+Bellringer, a Common Support (section 30), and its fourth, the Necromancer,
+a Support and its first Elite (section 31).
 
 **Name rationale.** "Reign" puts the faction on the same footing as Crown and
 Dominion — ruling nouns, one set. "Ashveil" gives it a distinctive seat
@@ -748,8 +750,9 @@ my addition for the same reason, since without stages its background cannot
 be seen in the game. Their texts walk his description from the grove's roots
 to the eastern hills, the area's blurb is its first sentence; their enemies are
 copies of the roster's champions, 3-10 a boss Black Rhino; their powers are
-tuned stand-ins; no champion joins there. Stages, enemies and story wait for
-him.
+tuned stand-ins. The first clears of 3-1, 3-2 and 3-3 bring the Skeleton, the
+Rot Hulk and the Bellringer (sections 28-30; the stages are stand-ins).
+Stages, enemies and story wait for him.
 
 ### 5.7 Zone 4 — Earth Scars (2026-10-18)
 
@@ -843,8 +846,8 @@ description, from the steppe and its two ravines to the camp, the yaks, the
 mountains and the zeppelin; the area's blurb places it. Their enemies are
 copies of the roster's champions, the Ashveil Reign's Skeleton and Rot Hulk
 among them for the first time, and 4-10 is a boss Red Cloak; their powers are
-tuned stand-ins; no champion joins there. Stages, enemies and story wait for
-him.
+tuned stand-ins. The first clear of 4-1 brings the Necromancer (section 31;
+the stage is a stand-in). Stages, enemies and story wait for him.
 
 ---
 
@@ -884,8 +887,8 @@ open questions.
   the Wild Speaker's 2026-10-13, sections 18-20, and the Jungle Herder's,
   Emissary Handlings', Red Cloak's, Big Ears', the Associate's, the Black
   Rhino's and the Grove Keeper's 2026-10-17, sections 21-27, and the
-  Skeleton's, the Rot Hulk's and the Bellringer's 2026-10-18, sections
-  28-30; their numbers are not)*
+  Skeleton's, the Rot Hulk's, the Bellringer's and the Necromancer's
+  2026-10-18, sections 28-31; their numbers are not)*
 - The affinities of the Jungle Herder, Emissary Handlings, Red Cloak and Big
   Ears: Jakub, 2026-10-17, "i will optimize affinities for these 4 new heroes
   later" *(the game stands in Bloom, Tide, Bloom and Ember)*
@@ -910,6 +913,9 @@ open questions.
   himself every turn, section 30; a lone Dominion Medic heals) *(the game has
   no turn limit: such a battle runs until the player retreats, and the
   balance tool counts one that reaches 400 turns as a loss)*
+- How a raised champion comes back *(the game stands in 30% of its max HP,
+  nothing on it, an empty turn meter, its cooldowns as they were when it fell
+  and a once-a-battle passive still spent, section 31)*
 - Team size *(the game uses 3)* and how champions are acquired *(one recruit
   per first clear)*
 - Campaign count of zones
@@ -2200,3 +2206,84 @@ Left open by the rules: a battle in which one side has only champions that
 never strike left can be neither won nor lost by that side. The Bellringer
 alone, shielding and healing himself every turn, outlasts a lone enemy that
 hits softly and never beats it (section 7).
+
+## 31. The Necromancer (received 2026-10-18)
+
+Jakub's brief, verbatim:
+
+```
+i want you to create new hero.
+name = Necromancer
+rarity ELITE
+affinity bloom
+faction ashveil reign
+class SUPPORT
+kit=
+A1 - hit one enemy target, has 35% chance to cause SPEED DOWN on target for 1 turn.
+A2 - hit one enemy target, cause Poison for 2 turns, also buff all allies with SPEED UP for 2 turns. 4 CD.
+A3 - Revive 1 random dead ally. CD 6 turns.
+design - human dressed in dark black robe with also robe hood over pale head, just a bit of face is steering. holds a necronomicon book in left hand and a small black particles orbits his other hand.
+```
+
+The Ashveil Reign's fourth champion and its first Elite, after the Skeleton,
+the Rot Hulk and the Bellringer (sections 28-30).
+
+**Readings.** SPEED DOWN is the game's Slow and SPEED UP its SPD Up
+(MECHANICS_GUIDE 7). The A2's Poison is certain, but like every debuff it
+meets the target's RES (section 10); "all allies" includes him, as with Red
+Cloak's Onrush. The A3 is a new rule (MECHANICS_GUIDE 8, Revive): it raises
+one fallen ally, chosen at random among them, so the player does not pick. The
+ally comes back with 30% of its max HP, nothing on it (what it carried fell
+with it) and an empty turn meter, and acts when its meter fills again; its
+skills' cooldowns stand where they were when it fell, and a passive that works
+once a battle (Undying, Overdrive) stays spent. While no ally has fallen the
+skill waits, its cooldown unspent: the player cannot use it and the AI keeps
+to his other skills; once an ally has fallen, the AI uses it first. It never
+raises an enemy, and an ally can be raised again each time it falls. A
+cooldown of 6 is a turn longer than the A3 norm allowed (4-5), so the norm is
+4-6 since his kit. "Left hand": facing right, as the player's side does, his
+left hand is the far one, so he holds the book before him in the far hand and
+the motes circle the near one. "Just a bit of face is steering" is read as
+peering out of the hood: its rim shadows his eyes, and of his pale face only
+the nose, the mouth and the chin show.
+
+**As built:** a tall, gaunt man in a black robe to his feet, a little stooped,
+the robe's hem ragged and frayed, with wide sleeves, a mantle over his
+shoulders and a rope belt of charcoal knotted at the front, its ends hanging
+and a small bone through the knot. A deep hood over his head, its point
+hanging back over his nape: its rim comes forward over his brow and down past
+his cheek, so that of his pale face only the nose, the mouth and the chin show
+in its shadow, with one faint violet glint where an eye is. In his far hand,
+before him, a thick book bound in maroon leather, iron at its corners, a strap
+and a clasp across its fore-edge, the Reign's white bone across its cover and
+its yellowed pages along the top. His near hand is gaunt and long-fingered,
+and small black motes circle it on a tilted ring, each with a glint of violet
+on its upper side, so they read against the black of the robe. Idle: he stands
+still, the book before him, the motes going round once a loop and the robe
+stirring at its own pace. Grave Chill: he draws his hand back to his shoulder
+as the motes gather in it, then flings it out at the enemy; the motes fly at
+it in a knot and burst dull, thrown out and sinking. Plague Verse: he opens
+the book on his palm and reads from it, his mouth open on the words, a violet
+glyph glowing on each page and the glint under his hood brightening, then
+turns his hand on the enemy; a dark smoke closes on it and turns sickly, and
+round each ally his motes spiral up. Raise Dead: the book open on his palm,
+its pages flaring, he lifts his near hand high and the motes spiral up from
+it, then sweeps it down to the ground. Where the ally fell a black sigil
+opens, two rings with a violet glint running round them, motes and pale wisps
+rise from it, and the ally gets up, its own fall played backwards, under
+RAISED!. Run: the book clutched to his chest, the near hand trailing its
+motes. Victory: the book raised open in his far hand, the motes rising round
+his near hand. Death: he sinks to his knees and falls forward on his face, the
+book still in his hand.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Grave
+Chill, Plague Verse and Raise Dead and their texts, A1's multiplier (1.0) and
+A2's (1.2), the share of HP the raised ally comes back with (30%), his stats
+(on the Elite budget, a little under it for the revive), the lore line, the
+stage that brings him (the first clear of 4-1), and the details of his art and
+effects (his face in the hood and the glint in its shadow, the robe's cut, the
+rope belt and its bone, the book's maroon binding, its iron, clasp and white
+bone, the motes' ring and their violet glint, the knot of motes he throws, the
+smoke of the verse, the sigil and the wisps, the flare of the pages, and the
+raised getting up through their own fall played backwards). Like the Skeleton,
+he stands in the first zone on his page and in his demos.

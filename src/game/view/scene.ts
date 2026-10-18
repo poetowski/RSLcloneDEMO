@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -78,6 +78,8 @@ export class BattleScene {
   private lastReal = 0;
   paused = false;
   demoSkill: string | null = null;
+  /** champions being raised from the dead, until they stand at their places again */
+  private raising = 0;
 
   constructor(
     private ctx: CanvasRenderingContext2D,
@@ -279,6 +281,19 @@ export class BattleScene {
           v.hp = v.lagHp = a.hp;
         });
       }
+      // a skill that raises the fallen needs someone fallen: the demo fells the user's first ally
+      if (skill.revive) {
+        const ally = this.battle.allies(actor).find((a) => a !== actor);
+        if (ally) {
+          ally.alive = false;
+          ally.hp = 0;
+          ally.tm = 0;
+          const v = this.view(ally.uid);
+          v.dead = true;
+          v.alpha = 0;
+          v.hp = v.lagHp = 0;
+        }
+      }
       // nor a heal a blow returns to its user
       if (skill.healSelf) {
         actor.hp = Math.round(actor.maxHp * 0.6);
@@ -340,7 +355,7 @@ export class BattleScene {
   pickSkill(s: SkillDef) {
     const c = this.choice;
     if (!c || !this.battle.ready(c.actor, s)) return;
-    const group = s.target === 'allies' || s.target === 'enemies' || s.target === 'self';
+    const group = s.target === 'allies' || s.target === 'enemies' || s.target === 'self' || s.target === 'fallen';
     if (c.skill === s && group) c.resolve({ skill: s });
     else c.skill = s;
   }
@@ -516,8 +531,10 @@ export class BattleScene {
           dart: ['#eaffc8', '#a2f56a', '#4cd43a'],
           // the Associate's motes, white light shedding a pale blue
           mote_bolt: ['#ffffff', '#cfe9ff', '#8fc0ff'],
+          // the Necromancer's black motes, a dull violet glint on them as they fly
+          grave_bolt: ['#a088c8', '#383341', '#07060a'],
         };
-        const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10, dart: 4, mote_bolt: 6 };
+        const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10, dart: 4, mote_bolt: 6, grave_bolt: 8 };
         const slow = skill.projectile === 'ice_shard' || skill.projectile === 'grave_orb' || skill.projectile === 'sound_ring';
         for (const t of targets) {
           pendings.push(this.fx.projectile(skill.projectile, from, t.chest(), { speed: slow ? 440 : 620, arc: skill.projectile.startsWith('arrow') ? 8 : arcs[skill.projectile] ?? 0, trail: trails[skill.projectile], rotate: skill.projectile !== 'sun_orb' }).then(() => groupFx(t)));
@@ -625,7 +642,7 @@ export class BattleScene {
   /** Waits for death and revive animations to finish. */
   private async settleDeaths() {
     let g = 0;
-    while ([...this.views.values()].some((v) => (v.dead && v.alpha > 0) || v.anim === 'rise' || (v.anim === 'death' && !v.dead)) && g++ < 400) await this.clock.wait(16);
+    while ((this.raising > 0 || [...this.views.values()].some((v) => (v.dead && v.alpha > 0) || v.anim === 'rise' || (v.anim === 'death' && !v.dead))) && g++ < 400) await this.clock.wait(16);
   }
 
   /** Snaps displayed HP and statuses to the battle state. */
@@ -778,6 +795,27 @@ export class BattleScene {
           this.shake(2);
           if (v.hasAnim('rise')) await v.play('rise');
           v.play('idle');
+        })();
+        break;
+      case 'raise':
+        // raised from the dead by an ally (the Necromancer's Raise Dead): its body shows again where it fell, lying
+        // as its death left it, then it gets up (its own death played backwards) and walks back to its place
+        this.raising++;
+        void (async () => {
+          v.dead = false;
+          v.statuses = [];
+          v.shield = 0;
+          v.stunned = false;
+          v.setFrozen(false);
+          v.hp = v.lagHp = e.hp;
+          v.tm = 0;
+          const up = v.play('death', { reverse: true });
+          await this.clock.tween(v, { alpha: 1 }, 420, ease.outQuad);
+          this.fx.text(v.uid, v.x, top() - 6, 'RAISED!', { color: '#d8c8ff', variant: 'display', outline: '#1a0a2a' });
+          await up;
+          v.play('idle');
+          if (Math.abs(v.x - v.homeX) > 1 || Math.abs(v.y - v.homeY) > 1) await this.goHome(v);
+          this.raising--;
         })();
         break;
       case 'passive': {
@@ -939,12 +977,13 @@ export class BattleScene {
     if (this.active && !this.winner) hud.drawHeroPanel(ctx, this.active);
     if (this.choice && !this.paused) {
       const c = this.choice;
-      const slots: SkillSlot[] = c.actor.champion.skills.map((s) => ({ skill: s, cooldown: c.actor.cooldowns[s.id] ?? 0, selected: s === c.skill }));
+      const slots: SkillSlot[] = c.actor.champion.skills.map((s) => ({ skill: s, cooldown: c.actor.cooldowns[s.id] ?? 0, selected: s === c.skill, blocked: !this.battle.ready(c.actor, s) }));
       hud.drawSkills(ctx, slots, (s) => this.pickSkill(s), this.t);
       const group = c.skill.target === 'enemies' || c.skill.target === 'allies';
-      hud.drawPrompt(ctx, group ? 'Click a target or the skill again' : c.skill.target === 'ally' ? 'Choose an ally' : 'Choose a target');
+      hud.drawPrompt(ctx, c.skill.target === 'fallen' ? 'Click the skill again: a fallen ally rises' : group ? 'Click a target or the skill again' : c.skill.target === 'ally' ? 'Choose an ally' : 'Choose a target');
       for (const v of this.views.values()) {
-        if (!valid.has(v.uid)) continue;
+        // the fallen a skill raises are chosen at random, not clicked
+        if (!valid.has(v.uid) || v.dead) continue;
         const b = v.bounds();
         hud.regions.push({ x: b.x, y: b.y, w: b.w, h: b.h + 6, click: () => this.clickUnit(v), hover: () => (this.hoverUnit = v) });
       }
@@ -1032,7 +1071,7 @@ export class BattleScene {
       const step = k === 'ArrowLeft' || k === 'ArrowUp' ? -1 : 1;
       this.hoverUnit = list[(i + step + list.length) % list.length];
     } else if (c && (k === 'Enter' || k === ' ')) {
-      const group = c.skill.target === 'enemies' || c.skill.target === 'allies' || c.skill.target === 'self';
+      const group = c.skill.target === 'enemies' || c.skill.target === 'allies' || c.skill.target === 'self' || c.skill.target === 'fallen';
       if (group) c.resolve({ skill: c.skill });
       else {
         const t = this.hoverUnit && this.validTargets().includes(this.hoverUnit.uid) ? this.hoverUnit.uid : this.validTargets()[0];

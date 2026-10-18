@@ -8,10 +8,16 @@
 // from his bell in its gold, and on the ally he warns the toll arriving and a
 // shell of the same gold closing round it; his Last Peal: the bell tolling by
 // itself and the gold closing round him. The bell's gold is light (additive).
+// The Necromancer's black motes: they fly at the enemy in a knot (Grave
+// Chill's bolt) and strike in a dull burst, thrown out and sinking; his Plague
+// Verse closes on the enemy as a dark smoke turning sickly; his allies'
+// haste is his motes spiralling up round them; Raise Dead opens a black sigil
+// where the ally fell and the motes and pale wisps rise from it; the flare of
+// his book's pages is light (additive), the rest is matter.
 // Never their affinity (affinities are abstract, Jakub, 2026-10-11).
-import { dith, ellipseRing, rampDither } from '../paint.ts';
-import { RGBA } from '../raster.ts';
-import { burst, cut, FxDef, motes, ramps, soundRings, sparks, W } from './kit.ts';
+import { dith, ellipseFill, ellipseRing, rampDither } from '../paint.ts';
+import { Bitmap, hex, RGBA, rng } from '../raster.ts';
+import { burst, cut, FxDef, motes, ramps, ring, soundRings, sparks, W } from './kit.ts';
 
 const DU = ramps.dust;
 /** A dull streak: grey to a pale core, no hue of its own. */
@@ -22,6 +28,22 @@ const BILE = ramps.bile;
 const GAS: RGBA[] = [BILE[0], BILE[1], DU[1], BILE[2]];
 /** the gold of the Bellringer's bell, as light */
 const GOLD = ramps.gold;
+/** the Necromancer's motes: black, a dull violet glint on them */
+const MOTE: RGBA[] = ['#07060a', '#1c1922', '#383341', '#5a4a78', '#a088c8'].map((h) => hex(h));
+/** his plague: dark smoke turning a sickly green */
+const CURSE = ramps.curse;
+/** the light of his book's pages */
+const VIO = ramps.violet;
+
+/** One of his black motes: a dark core, a glint over it; a big one is two pixels wide. */
+function blackMote(b: Bitmap, x: number, y: number, big: boolean, k: number) {
+  b.set(x, y, MOTE[0]);
+  b.set(x, y - 1, MOTE[3 + (k & 1)]);
+  if (big) {
+    b.set(x + 1, y, MOTE[1]);
+    b.set(x + 1, y - 1, MOTE[3]);
+  }
+}
 
 export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
   /** Rusty Hack: a dull cut hacked down through the target, torn where the notches bite, rust flaking off and falling. */
@@ -128,6 +150,135 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
       const fade = i < 2 ? [0.5, 1][i] : i < 6 ? 1 : [0.75, 0.5, 0.3, 0.15][i - 6];
       ellipseRing(b, fx, gy - 46, 17, 46, 1.4, (x, y, a) => (dith(x, y, fade * 0.7 * (0.45 + 0.55 * Math.abs(Math.sin(a * 2 + t * 3)))) ? rampDither(GOLD, 2 + fade * 1.8, x, y) : 0));
       motes(b, fx, gy - 4, 30, 90, 9, t, GOLD, 433);
+    },
+  },
+
+  /** Grave Chill in flight: a knot of black motes at its head, others streaming behind it on a wavering line (drawn pointing right; the battle turns it). */
+  grave_bolt: {
+    w: 26, h: 12, n: 3, ms: 60, ax: 0.8, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      const hx = 21, hy = 6;
+      for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1], [-1, 0], [0, -1], [2, 1]]) b.set(hx + dx, hy + dy, MOTE[(dx + dy + i) & 1 ? 1 : 0]);
+      b.set(hx, hy - 2, MOTE[4]);
+      b.set(hx + 2, hy - 1, MOTE[3]);
+      b.set(hx - 1, hy - 1, MOTE[3]);
+      for (let k = 1; k <= 6; k++) blackMote(b, Math.round(hx - 1 - k * 3), Math.round(hy + Math.sin(i * 2.1 + k * 1.3) * 2.2), k < 3, k);
+    },
+  },
+  /** Grave Chill lands: a dull flash, a ring of cold grey spreading and thinning, the motes thrown out, slowing and sinking. */
+  grave_chill: {
+    w: 52, h: 52, n: 7, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 10, 2],
+    draw: (b, t, i) => {
+      const cx = 26, cy = 26;
+      if (i < 3) burst(b, cx, cy, 8, 1, [6, 10, 8][i], 1.2, DULL, 0.4);
+      if (i >= 1) ring(b, cx, cy, 4 + (i - 1) * 3.4, (4 + (i - 1) * 3.4) * 0.8, Math.max(0.6, 1.6 - (i - 1) * 0.25), DULL, Math.max(0.3, 1.1 - (i - 1) * 0.18));
+      if (i >= 1) {
+        const r = rng(331);
+        const k1 = (i - 1) / 5;
+        for (let k = 0; k < 11; k++) {
+          const a = r() * Math.PI * 2, sp = 0.5 + r() * 0.6;
+          const d = 18 * sp * Math.sqrt(k1);
+          blackMote(b, Math.round(cx + Math.cos(a) * d), Math.round(cy + Math.sin(a) * d + k1 * k1 * 10), k % 3 === 0, k);
+        }
+      }
+    },
+  },
+  /**
+   * Plague Verse reaches the enemy: a dark smoke gathering round it from every
+   * side, turning sickly green as it closes, black motes spiralling in with it,
+   * then rising off it and thinning. Anchored at its feet.
+   */
+  plague_verse: {
+    w: 64, h: 88, n: 10, ms: 60, ax: 0.5, ay: 1, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 32, gy = 86, cy = gy - 34;
+      const close = i < 4 ? i / 4 : 1;
+      const fade = i < 5 ? 1 : 1 - (i - 5) / 5;
+      const lift = i >= 5 ? (i - 5) * 4 : 0;
+      for (let k = 0; k < 14; k++) {
+        const a = (k / 14) * Math.PI * 2 + t * 3;
+        const r = (28 - close * 15) * (0.8 + 0.3 * Math.sin(k * 1.7));
+        const x = cx + Math.cos(a) * r * 0.7, y = cy + Math.sin(a) * r * 1.15 - lift;
+        ellipseFill(b, x, y, 3.4 + close * 1.8, 2.8 + close * 1.2, (px, py, d) => (dith(px, py, fade * (1.5 - d)) ? rampDither(CURSE, 0.5 + close * 2.3 - d * 0.8 + (k % 3 === 0 ? 0.6 : 0), px, py) : 0));
+      }
+      for (let k = 0; k < 8; k++) {
+        const a = (k / 8) * Math.PI * 2 - t * 5;
+        const r = (24 - close * 16) * (0.7 + 0.3 * ((k * 7) % 3));
+        blackMote(b, Math.round(cx + Math.cos(a) * r * 0.8), Math.round(cy + Math.sin(a) * r - lift), k % 3 === 0, k);
+      }
+      if (i >= 3 && i <= 7) sparks(b, cx, cy - lift, 9, 18, (i - 3) / 4, CURSE.slice(2), 341, -12);
+    },
+  },
+  /** The haste Plague Verse gives his allies: his motes spiralling up round each, streaks of pale light rising beside them, a ring at the feet. Anchored at the feet. */
+  grave_haste: {
+    w: 44, h: 78, n: 8, ms: 55, ax: 0.5, ay: 1, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 22, gy = 76;
+      for (let k = 0; k < 9; k++) {
+        const a = (k / 9) * Math.PI * 2 + t * 6;
+        const h = (t * 1.3 + k / 9) % 1;
+        blackMote(b, Math.round(cx + Math.cos(a) * (12 - h * 4)), Math.round(gy - 4 - h * 58), k % 3 === 0, k);
+      }
+      for (const sx of [-14, -6, 8, 15]) {
+        const len = 6 + (i % 3) * 3, top = gy - 20 - ((i * 7 + sx * 3 + 60) % 30);
+        for (let y = top; y < top + len; y++) if (dith(cx + sx, y, 0.6)) b.set(cx + sx, y, VIO[y - top < 2 ? 3 : 2]);
+      }
+      if (i < 6) ellipseRing(b, cx, gy - 2, 10 + i * 1.5, 3 + i * 0.4, 1.2, (x, y, a) => (dith(x, y, 1 - i / 6) ? MOTE[Math.sin(a) > 0 ? 3 : 2] : 0));
+    },
+  },
+  /**
+   * Raise Dead, where the ally fell: a black sigil opening on the ground, two
+   * rings with a violet glint running round them; the motes rising from it in
+   * a column, and pale wisps going up with them as the fallen gets up. Anchored
+   * at its feet.
+   */
+  raise_dead: {
+    w: 76, h: 100, n: 12, ms: 70, ax: 0.5, ay: 1, pad: [2, 2, 12, 2],
+    draw: (b, t, i) => {
+      const cx = 38, gy = 98;
+      const open = Math.min(1, i / 3);
+      const fade = i < 8 ? 1 : 1 - (i - 8) / 4;
+      // the sigil: a dark disc of shadow under two rings, a violet glint running round each
+      ellipseFill(b, cx, gy - 3, 6 + open * 16, 2 + open * 4.4, (x, y, d) => (dith(x, y, fade * 0.55 * (1 - d * 0.6)) ? MOTE[d < 0.5 ? 0 : 1] : 0));
+      ellipseRing(b, cx, gy - 3, 8 + open * 18, 2.4 + open * 5, 1.8, (x, y, a) => (dith(x, y, fade) ? (Math.sin(a * 3 + t * 6) > 0.1 ? VIO[2] : MOTE[1]) : 0));
+      ellipseRing(b, cx, gy - 3, 4 + open * 10, 1.4 + open * 3, 1.2, (x, y, a) => (dith(x, y, fade * 0.9) ? (Math.cos(a * 2 - t * 5) > 0 ? VIO[1] : MOTE[0]) : 0));
+      // the motes rising from it in a column
+      for (let k = 0; k < 24; k++) {
+        const a = (k / 24) * Math.PI * 2 + t * 5;
+        const h = (t * 1.4 + k / 24) % 1;
+        if (h > open * 1.2 || fade <= 0.1) continue;
+        const r = (14 + open * 6) * (1 - h * 0.5);
+        blackMote(b, Math.round(cx + Math.cos(a) * r), Math.round(gy - 4 - h * 82), k % 3 === 0, k);
+      }
+      // pale wisps of what comes back, curling up with them, two pixels wide
+      for (let k = 0; k < 6; k++) {
+        const base = (t * 1.2 + k / 6) % 1;
+        for (let s2 = 0; s2 < 16; s2++) {
+          const hh = base + s2 * 0.02;
+          if (hh > 1) break;
+          const x = Math.round(cx + Math.sin(hh * 9 + k * 1.1) * (12 - hh * 7)), y = Math.round(gy - 8 - hh * 80);
+          const k2 = fade * (1 - s2 / 16);
+          if (!dith(x, y, k2 * 1.1)) continue;
+          b.set(x, y, VIO[s2 < 4 ? 4 : 3]);
+          if (s2 < 8) b.set(x + 1, y, VIO[s2 < 4 ? 3 : 2]);
+        }
+      }
+    },
+  },
+  /**
+   * The flare of his book on Raise Dead's `cast` event: the pages blaze with a
+   * pale violet light, a ring opens round them and motes of it rise (additive).
+   * The scene plays it 8 px ahead of the top of his standing sprite and 8 below
+   * it; the open book stands 17.8 px further ahead and 14.6 lower, where the
+   * flare sits.
+   */
+  tome_flare: {
+    w: 56, h: 56, n: 8, ms: 55, ax: 0.182, ay: 0.239, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      if (i < 4) burst(b, cx, cy, 10, [2, 3, 2, 1][i], [9, 14, 11, 7][i], [1.6, 2, 1.4, 1][i], VIO, 0.3 + i * 0.2);
+      ring(b, cx, cy, 3 + t * 16, 2 + t * 8, Math.max(0.6, 1.8 - t * 1.2), VIO, 1.1 - t * 0.6);
+      motes(b, cx, cy - 2, 24, 26, 8, t, VIO, 351);
     },
   },
 };

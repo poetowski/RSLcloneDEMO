@@ -61,6 +61,8 @@ export type BattleEvent =
   | { kind: 'dispel'; target: string; status: StatusId; hit: number }
   | { kind: 'tm'; target: string; delta: number; hit: number }
   | { kind: 'revive'; target: string; hp: number; hit: number }
+  /** a fallen champion raised by an ally's skill (the Necromancer's Raise Dead) */
+  | { kind: 'raise'; target: string; hp: number; hit: number }
   | { kind: 'passive'; target: string; name: string; hit: number; effect: PassiveDef['kind']; source?: string }
   | { kind: 'death'; target: string; hit: number };
 
@@ -174,6 +176,11 @@ export class Battle {
     return this.alive(u.team);
   }
 
+  /** The unit's allies that have fallen. */
+  fallen(u: Unit): Unit[] {
+    return this.units.filter((x) => x.team === u.team && !x.alive);
+  }
+
   has(u: Unit, s: StatusId): boolean {
     return u.statuses.some((x) => x.id === s);
   }
@@ -268,8 +275,9 @@ export class Battle {
     return events;
   }
 
+  /** Off cooldown, and a skill that raises the fallen has someone to raise. */
   ready(u: Unit, s: SkillDef): boolean {
-    return (u.cooldowns[s.id] ?? 0) <= 0;
+    return (u.cooldowns[s.id] ?? 0) <= 0 && (s.target !== 'fallen' || this.fallen(u).length > 0);
   }
 
   /** Units the actor may click for this skill (taunt is enforced here). */
@@ -295,6 +303,8 @@ export class Battle {
         return this.allies(u);
       case 'self':
         return [u];
+      case 'fallen':
+        return this.fallen(u);
     }
   }
 
@@ -308,6 +318,11 @@ export class Battle {
       // counterattacks ignore taunt: they answer whoever hit them
       const valid = asCounter ? this.foes(actor) : this.validTargets(actor, skill);
       primary = valid.find((v) => v.uid === targetUid) ?? valid[0];
+      targets = primary ? [primary] : [];
+    } else if (skill.target === 'fallen') {
+      // one fallen ally, at random: nobody chooses which (the Necromancer's Raise Dead)
+      const fallen = this.fallen(actor);
+      primary = fallen.length ? this.rng.pick(fallen) : undefined;
       targets = primary ? [primary] : [];
     } else {
       targets = this.validTargets(actor, skill);
@@ -361,6 +376,18 @@ export class Battle {
           t.statuses.splice(t.statuses.indexOf(deb), 1);
           events.push({ kind: 'cleanse', target: t.uid, status: deb.id, hit: last });
         }
+      }
+    }
+    // a fallen ally raised: back with a share of its max HP, nothing on it, an empty turn meter
+    if (skill.revive) {
+      for (const t of targets) {
+        if (t.alive) continue;
+        t.alive = true;
+        t.hp = Math.max(1, Math.round(t.maxHp * skill.revive));
+        t.statuses = [];
+        t.tm = 0;
+        t.pendingTm = 0;
+        events.push({ kind: 'raise', target: t.uid, hp: t.hp, hit: last });
       }
     }
     // a status reaches each unit once per skill: alone, the Walking Bush is his own chosen ally

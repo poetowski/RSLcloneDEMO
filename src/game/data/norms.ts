@@ -38,7 +38,8 @@ export const SKILL_NORMS: Record<1 | 2 | 3, { cooldown: [number, number]; single
   // A2 cooldown 4: Jakub's Bloodhound (2026-10-12), whose Taunt rests a turn longer;
   // 5: his Emissary Handlings' Rallying Standard and Big Ears' Dart Volley (2026-10-17)
   2: { cooldown: [3, 5], single: [1.1, 1.6], aoe: [0.5, 1.1] },
-  3: { cooldown: [4, 5], single: [1.3, 2.6], aoe: [0.7, 1.2] },
+  // A3 cooldown 6: Jakub's Necromancer's Raise Dead (2026-10-18), a revive
+  3: { cooldown: [4, 6], single: [1.3, 2.6], aoe: [0.7, 1.2] },
 };
 
 /** Status application norms: durations in turns. */

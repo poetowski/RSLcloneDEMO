@@ -278,7 +278,7 @@ winner()           checked before choosing and after every action
 2. Cooldown: set to `cooldown + 1`, because `endTurn` of this same turn ticks it once.
 3. Dispel: every buff removed from the targets (events at hit 0).
 4. For each hit `k`, for each living target: roll damage, then apply it (the shield absorbs first and expires at 0; then death, Undying or Overdrive), then, on a critical hit, the target's Rebuke (its statuses land on the actor), then the lifesteal heal, then the per-hit status rolls.
-5. On the last hit: ally heals, the self-heal, cleanse, full cleanse, status applications in the order written in the skill (recipients by `to`), target meter change, ally meter change, the meter of the ally lowest on HP.
+5. On the last hit: ally heals, the self-heal, cleanse, full cleanse, the raise (`revive`: the fallen ally targeted gets up), status applications in the order written in the skill (recipients by `to`), target meter change, ally meter change, the meter of the ally lowest on HP.
 6. The kept meter (`selfTm`) waits for `endTurn`.
 7. Counterattacks: each damaged, living enemy defender that holds Counter and is neither stunned nor frozen answers once with its A1 at the actor. Counters set no cooldown, keep no meter and are never countered.
 
@@ -349,6 +349,7 @@ winner()           checked before choosing and after every action
 | `dispel` | `useSkill`, before the hits | 0 | `status` | `-NAME` and a dispel burst | Buffs, Special Mechanics |
 | `tm` | `useSkill` (`tmTargets`, `tmAllies`, `tmLowestAlly`) | last | `delta` | `+n% TURN` / `-n% TURN` | Turn Meter & Speed, Special Mechanics |
 | `revive` | `applyDamage` (Undying) | hit | `hp` | fall, tomb-light helix, `UNDYING!`, rise | Special Mechanics |
+| `raise` | `useSkill` (`revive`: Raise Dead) | last | `hp` | the skill's effect where the ally fell, its death played backwards, `RAISED!`; the battle waits for it | Skills & Cooldowns, Special Mechanics |
 | `passive` | `applyDamage` (Overdrive; a fallen passive as an ally dies), `endTurn` (a tend), `useSkill` (a ward, a retaliation), `tryApply` (a remedy, as an enemy's debuff lands) | hit; 0 for a tend; the last hit for a ward or a retaliation; the debuff's hit for a remedy | `name`, `effect`, `source` (the holder of a tend, a ward, a retaliation or a remedy; the attacker for a Rebuke) | Overdrive: banner, burst, `OVERDRIVE!` (fixed text, DR-14); a tend, a ward, a retaliation or a remedy: its name over the holder, its `holderFx` on the holder and its `fx` on whom it reaches (no banner: they act often); fallen: banner, the stat it gains, the undergrowth at the holder's feet | Special Mechanics |
 | `death` | `applyDamage` | hit | - | death animation, fade | The Basics |
 
@@ -386,6 +387,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C23 | A ward of its holder alone (`self`) answers only blows on its holder; with no chance it answers every one | code (`Battle.ward`); test |
 | INV-C24 | A full cleanse removes every debuff from the skill's living targets on the last hit; a self-heal heals the actor after the damage, and Heal Block stops it | code (`Battle.useSkill`); tests |
 | INV-C20 | A fallen passive adds `value` per fallen ally of its holder, up to `max`, to the stat it names, in battle only; the champion's own stats never change; its event shows only while the bonus grows | code (`Battle.fallenBonus`, `critRate`, `mourn`); test |
+| INV-C25 | A skill aimed at the fallen (`target: 'fallen'`) is ready only while an ally of its user has fallen, and takes one of them at random; with `revive` that ally gets up on the last hit with that share of its max HP (at least 1), no statuses and an empty turn meter, its cooldowns and its spent once-a-battle passives unchanged; it never reaches an enemy | code (`Battle.ready`, `Battle.fallen`, `useSkill`); tests |
 
 ### 6.2 Catalog
 
@@ -461,7 +463,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | Targeting | who may be chosen; Taunt | `Battle.validTargets` |
 | Damage | how much a hit deals | `Battle.rollDamage` |
 | Status rules | apply, refresh, resist, tick, expire | `tryApply`, `addStatus`, `endTurn` |
-| Cooldowns | when a skill is ready | `useSkill`, `endTurn`, `ready` |
+| Cooldowns | when a skill is ready (a skill aimed at the fallen also needs one) | `useSkill`, `endTurn`, `ready` |
 | Death and passives | death, Undying, Overdrive, a fallen passive's growth | `Battle.applyDamage`, `mourn` |
 | Passives that shield | Herder's Ward at the end of its holder's turn, Unbroken Flag after a blow on an ally, Thick Hide after a blow on its holder | `Battle.tend` (from `endTurn`), `Battle.ward` (from `useSkill`) |
 | Passives that answer | Bitter Motes on the attacker after a blow on its holder; Keeper's Balm on an ally as an enemy's debuff lands | `Battle.retaliate` (from `useSkill`), `Battle.remedy` (from `tryApply`) |

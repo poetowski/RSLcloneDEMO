@@ -13,6 +13,8 @@ export interface SkillSlot {
   skill: SkillDef;
   cooldown: number;
   selected: boolean;
+  /** off cooldown but with nothing to do (a skill that raises the fallen while nobody has fallen) */
+  blocked?: boolean;
 }
 
 export interface ResultsInfo {
@@ -190,11 +192,11 @@ export class Hud extends Ui {
       ctx.fillStyle = COLORS.ink;
       ctx.fillRect(x + 3, y + 3, S - 6, S - 6);
       blit(ctx, this.a.ui.img, icon, x + 4, y + 4);
-      const off = sl.cooldown > 0;
+      const off = sl.cooldown > 0 || !!sl.blocked;
       if (off) {
         ctx.fillStyle = 'rgba(6,8,14,0.72)';
         ctx.fillRect(x + 4, y + 4, 40, 40);
-        this.text(ctx, String(sl.cooldown), x + S / 2, y + 16, { color: '#ffffff', variant: 'display', align: 'center' });
+        if (sl.cooldown > 0) this.text(ctx, String(sl.cooldown), x + S / 2, y + 16, { color: '#ffffff', variant: 'display', align: 'center' });
       }
       const hov = this.hot('skill' + i, x, y, S, S);
       blit(ctx, this.a.ui.img, this.part(off ? 'frame_off' : sl.selected ? 'frame_sel' : 'frame_idle'), x, y);
@@ -210,7 +212,7 @@ export class Hud extends Ui {
         click: () => !off && onPick(sl.skill),
         tip: () => ({
           title: sl.skill.name,
-          sub: `${sl.skill.tag}${sl.skill.cooldown ? `  -  Cooldown ${sl.skill.cooldown}` : ''}${off ? `  (ready in ${sl.cooldown})` : ''}`,
+          sub: `${sl.skill.tag}${sl.skill.cooldown ? `  -  Cooldown ${sl.skill.cooldown}` : ''}${sl.cooldown > 0 ? `  (ready in ${sl.cooldown})` : sl.blocked ? '  (no ally has fallen)' : ''}`,
           body: sl.skill.desc,
           color: COLORS.goldHi,
         }),
