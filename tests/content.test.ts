@@ -228,6 +228,18 @@ describe('design decisions', () => {
     expect(e?.passive && [e.passive.kind, e.passive.stat, e.passive.value]).toEqual(['stat', 'crit', 0.1]);
   });
 
+  it("has the Skeleton of his brief: the Ashveil Reign's first champion, a Common, Damage, Tide; an A1 on one enemy and +20 RES, always on", () => {
+    const s = CHAMPIONS.find((c) => c.id === 'skeleton');
+    expect(s && [s.name, s.rarity, s.role, s.faction, s.affinity]).toEqual(['Skeleton', 'common', 'Damage', 'ashveil_reign', 'tide']);
+    expect(s?.skills).toHaveLength(1);
+    const a1 = s?.skills[0];
+    expect(a1 && [a1.slot, a1.target, a1.statuses ?? []]).toEqual([1, 'enemy', []]);
+    expect(a1?.hits.some((h) => h.mult > 0)).toBe(true);
+    expect(s?.passive && [s.passive.kind, s.passive.stat, s.passive.value]).toEqual(['stat', 'res', 20]);
+    // his RES outside battle is his own: the passive is extra (Jakub, 2026-10-12)
+    expect(s?.stats.res).toBe(0);
+  });
+
   it('has the Follower of his brief: a Common of the Court of Root, Damage, Tide; A1 a single-target attack, A2 a single-target attack with a 50% chance of DEF Down for 2 turns, cooldown 4', () => {
     const f = CHAMPIONS.find((c) => c.id === 'follower');
     expect(f && [f.name, f.rarity, f.role, f.faction, f.affinity]).toEqual(['Follower', 'common', 'Damage', 'court_of_root', 'tide']);

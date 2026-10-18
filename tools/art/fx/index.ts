@@ -5,6 +5,7 @@
 import path from 'node:path';
 import { writeJson } from '../io.ts';
 import { Bitmap, hex, packShelves, PackItem } from '../raster.ts';
+import { ASHVEIL_REIGN_FX } from './ashveil_reign.ts';
 import { AZURE_CROWN_FX } from './azure_crown.ts';
 import { COMMON_FX } from './common.ts';
 import { COURT_OF_ROOT_FX } from './court_of_root.ts';
@@ -16,7 +17,7 @@ import { SUNSCAR_FX } from './sunscar.ts';
 export type { FxJson };
 
 /** Every effect by name; names are what SkillDef.hits[].fx / projectile / castFx refer to. */
-export const FX: Record<string, FxDef> = { ...COMMON_FX, ...SUNSCAR_FX, ...NYOTA_FX, ...AZURE_CROWN_FX, ...SANGUINE_DOMINION_FX, ...COURT_OF_ROOT_FX };
+export const FX: Record<string, FxDef> = { ...COMMON_FX, ...SUNSCAR_FX, ...NYOTA_FX, ...AZURE_CROWN_FX, ...SANGUINE_DOMINION_FX, ...COURT_OF_ROOT_FX, ...ASHVEIL_REIGN_FX };
 
 export function buildFx(out: string) {
   const items: PackItem[] = [];

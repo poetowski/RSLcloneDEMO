@@ -99,6 +99,14 @@ export const MAT = {
   /** the Black Rhino's coat: a shaggy black, its sheen a cool grey where the light catches it */
   bullBlack: m('bullBlack', 'fur', ['#060509', '#0e0d13', '#18171f', '#24222c', '#36333f', '#545060']),
 
+  // --- the dead ----------------------------------------------------------
+  /** the Skeleton's bones: old bone dulled grey with ash, ivory where the light falls */
+  ashBone: m('ashBone', 'matte', ['#221e1d', '#4a433f', '#776d66', '#aca292', '#d4cab6', '#f0e8d6']),
+  /** rust eating the Skeleton's sword: orange-brown flakes on the dull iron */
+  rust: m('rust', 'matte', ['#1e0e08', '#46200f', '#743617', '#9c5220', '#c2763a', '#e0a066']),
+  /** the Skeleton's fancy strip at the neck: a plum silk, old but still rich */
+  plum: m('plum', 'cloth', ['#16080f', '#311226', '#53203f', '#7a2e5a', '#a34479', '#c86a9a']),
+
   // --- woods of the living ---------------------------------------------------
   /** the Walking Bush's bark: the grey-brown of a bush's woody stems (his few leaves are `moss`) */
   bark: m('bark', 'matte', ['#14100e', '#2a201b', '#45352a', '#64503c', '#8a7253', '#b39b74']),
@@ -176,6 +184,9 @@ export const ACCENT = {
   smearMagenta: hex('#ff9ad8'),
   /** the Rime Scholar's ice flakes */
   flake: hex('#e8f8ff'),
+  /** the pale light in the Skeleton's eye sockets, and its dim rim */
+  ashEye: hex('#f4ecd6'),
+  ashEyeDim: hex('#8c8472'),
 };
 
 /** Single accent colors used for decals (eyes, mouths, paint). */
@@ -215,6 +226,8 @@ export const FXR = {
   blood: fx(['#3a0a10', '#7a1420', '#c02a30', '#ff6a5a', '#ffd0c0']),
   /** the rose light of the Dominion Medic's potions */
   rose: fx(['#4a1030', '#a03068', '#e0609a', '#ffa8cc', '#fff0f6']),
+  /** rust: the flakes the Skeleton's rusty sword sheds when it bites */
+  rust: fx(['#3a1a0c', '#7a3a18', '#b8622c', '#e09a5a', '#f6dcb8']),
   /** wood: the Walking Bush's chips and roots, his own bark paling to a white core */
   wood: fx(['#2a1f17', '#5e4a30', '#8d7350', '#c4ab80', '#f2e6cc']),
   magenta: fx(['#3a0a2c', '#8a1a64', '#d0409a', '#ff8ad0', '#ffe8f6']),

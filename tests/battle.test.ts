@@ -695,6 +695,20 @@ describe('accuracy and resistance', () => {
     expect(r.events.filter((e) => e.kind === 'status' && e.status === 'spd_up')).toHaveLength(3);
   });
 
+  it("counts a RES stat passive against the placer's ACC (the Skeleton's Bare Bones: +20 RES)", () => {
+    const boned: ChampionDef = { ...striker, id: 'boned', passive: { id: 'bones', name: 'Bones', desc: '', kind: 'stat', stat: 'res', value: 20 } };
+    let landed = 0;
+    for (let seed = 1; seed <= 1000; seed++) {
+      const b = new Battle(combatants([freezer]), combatants([boned]), { seed });
+      expect(b.get('e0').stats.res).toBe(20);
+      const r = b.useSkill(b.get('p0'), skill(freezer, 'freeze_bolt'), 'e0');
+      if (r.events.some((e) => e.kind === 'status' && e.status === 'freeze')) landed++;
+    }
+    // a certain Freeze lands 100 / 120 of the time; an ACC of 20 would take the edge away
+    expect(landed / 1000).toBeCloseTo(landShare(0, 20), 1);
+    expect(landShare(20, 20)).toBe(1);
+  });
+
   it("lets RES resist Cold Rebuke's Freeze too", () => {
     const crit = { ...striker, stats: { ...striker.stats, crit: 1, res: 1e9 } };
     const b = new Battle(combatants([rebuker]), [{ def: crit }], { seed: 2 });

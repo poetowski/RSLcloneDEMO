@@ -62,6 +62,7 @@ Section 7 lists what is not decided.
 | 2026-10-17 | The Grove Keeper, an Elite Support of the Court of Root | 27 |
 | 2026-10-17 | The affinities of the Associate, the Black Rhino and the Grove Keeper: not set | 7, 25-27 |
 | 2026-10-17 | Zone 3, the Moonlit Basin: its name and description; its battle background, "dynamic"; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.6, 7 |
+| 2026-10-18 | The Skeleton, a Common of the Ashveil Reign and its first champion | 3.4, 7, 28 |
 
 ---
 
@@ -271,6 +272,8 @@ and Sanguine Dominion.
 
 **Recast under the premise.** May be connected to *why* the loom broke, or to
 what came through when it did. To be designed.
+
+**Champions.** *(2026-10-18)* Its first, the Skeleton, a Common (section 28).
 
 **Name rationale.** "Reign" puts the faction on the same footing as Crown and
 Dominion — ruling nouns, one set. "Ashveil" gives it a distinctive seat
@@ -749,8 +752,8 @@ open questions.
   Medic's 2026-10-12, sections 14-17, the Follower's, the Walking Bush's and
   the Wild Speaker's 2026-10-13, sections 18-20, and the Jungle Herder's,
   Emissary Handlings', Red Cloak's, Big Ears', the Associate's, the Black
-  Rhino's and the Grove Keeper's 2026-10-17, sections 21-27; their numbers
-  are not)*
+  Rhino's and the Grove Keeper's 2026-10-17, sections 21-27, and the
+  Skeleton's 2026-10-18, section 28; their numbers are not)*
 - The affinities of the Jungle Herder, Emissary Handlings, Red Cloak and Big
   Ears: Jakub, 2026-10-17, "i will optimize affinities for these 4 new heroes
   later" *(the game stands in Bloom, Tide, Bloom and Ember)*
@@ -1880,3 +1883,54 @@ anyone on his side, himself included, and each debuff that lands rolls once,
 so a skill placing two rolls twice; the Regen, placed on the enemy's turn,
 heals at the start of the ally's next turn (15% of its max HP, section 10)
 and then ends.
+
+## 28. The Skeleton (received 2026-10-18)
+
+Jakub's brief, verbatim:
+
+```
+we are going to create first champion in our forth faction, Ashveil Reign if i am correct.
+name = Skeleton
+rarity = common
+affinity = tide
+class = damage
+design = this is skeleton of a shorter human, holding rusty sword. no armor. you can give him some fabric strips around neck bone. be creative, this skeleton should look like basic troop but maybe a little fancy with that fabric around neck
+kit = A1 single attack.
+A2 passive = This champion has permanently increased Resistance by 20.
+```
+
+The Ashveil Reign's first champion: it is the fourth faction (3.4), as he
+said.
+
+**Readings.** "A2 passive" is the champion's passive: the game keeps a
+passive apart from the skill slots and shows it under his A1 on his page. A
+permanent +20 Resistance is a stat passive under his rule of 2026-10-12
+(section 10): extra to the stat budget and applied in combat only, so his RES
+in the collection and on his page stays 0 and the passive's text says the
+rest. Against today's roster (every champion at ACC 0) a debuff placed on him
+lands with 100/120 of its chance, about 83% (`landShare`, section 10).
+
+**As built:** a short skeleton, a little hunched, built bone by bone: a skull
+with a jaw on its own hinge, a crack across the crown and a pale light in its
+socket; the neck's vertebrae; a ribcage that shows its gaps, the spine and the
+pelvis; long bones with knobbed ends, paired bones in the forearms and shins,
+bony hands and feet. Round his neck two strips are wound and knotted at the
+back, a charcoal one and a plum silk, their frayed ends trailing and stirring
+as he moves; at the front of the wraps hangs a small pennant of dark grey with
+a white bone across it, the Reign's standard. In his near hand a short sword,
+its iron eaten by rust, its edge notched twice, its tip worn blunt, the
+leather of its grip rotten. Rusty Hack: the sword goes up over his shoulder
+and hacks down in a dull, pale streak; where it bites, a ragged cut torn by
+the notches and flakes of rust falling. Idle: a slow rattle, the skull
+nodding, the jaw sagging loose; victory: the sword raised and the jaw clacking
+in a laugh; death: his bones give way and fall into a heap, the skull rolling
+off on its own.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Rusty Hack
+and Bare Bones and their texts, A1's multiplier (1.0, a plain attack), his
+stats (on the Common budget), the lore line, the stage that brings him (the
+first clear of 3-1), and the details of his art and effect (the strips'
+colours, the knot and the pennant, the light in the socket, the crack, the
+rust and the notches, the heap). The Ashveil Reign has no zone of its own:
+like every faction but the Court of Root, he stands in the first zone on his
+page and in his demos.
