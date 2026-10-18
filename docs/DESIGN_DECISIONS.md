@@ -65,6 +65,7 @@ Section 7 lists what is not decided.
 | 2026-10-18 | The Skeleton, a Common of the Ashveil Reign and its first champion | 3.4, 7, 28 |
 | 2026-10-18 | The Rot Hulk, a Common Tank of the Ashveil Reign | 3.4, 7, 29 |
 | 2026-10-18 | The Bellringer, a Common Support of the Ashveil Reign | 3.4, 7, 30 |
+| 2026-10-18 | The Bellringer's affinity: Ember (Bloom in the brief) | 30 |
 
 ---
 
@@ -2012,8 +2013,15 @@ kit - A1 - add Shield on target ally for 1 turn, value of shield is 10% of this 
 A2 passive - first time this champion hp drops below 50%, add defense up on this champion for 2 turns.
 ```
 
+and, the same day:
+
+```
+change bellring affinity to ember.
+```
+
 The Ashveil Reign's third champion, after the Skeleton and the Rot Hulk
-(sections 28 and 29).
+(sections 28 and 29). His affinity is Ember *(Bloom in the brief, changed
+the same day)*.
 
 **Readings.** "A2 passive" is his passive, as with the Skeleton. The A1
 places a Shield worth 10% of the Bellringer's max HP on the ally he chooses,

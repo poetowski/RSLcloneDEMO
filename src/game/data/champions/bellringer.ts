@@ -1,7 +1,8 @@
 import { ChampionDef } from '../types';
 
 // The Bellringer (docs/DESIGN_DECISIONS.md section 30, Jakub's brief of
-// 2026-10-18): the Ashveil Reign's third champion, a Common, Support, Bloom. A
+// 2026-10-18): the Ashveil Reign's third champion, a Common, Support, Ember
+// (Bloom in the brief; "change bellring affinity to ember.", the same day). A
 // very tall, slim skeleton with no weapon and no lower jaw, in boots, whose
 // role is to see the enemy coming and ring the big golden bell fixed to his
 // arm. The kit is his: "A1 - add Shield on target ally for 1 turn, value of
@@ -16,7 +17,7 @@ export const bellringer: ChampionDef = {
   name: 'Bellringer',
   role: 'Support',
   rarity: 'common',
-  affinity: 'bloom',
+  affinity: 'ember',
   faction: 'ashveil_reign',
   color: '#ecc04e',
   stats: { hp: 1300, atk: 70, def: 60, spd: 110, crit: 0.025, critDmg: 1, acc: 0, res: 0 },

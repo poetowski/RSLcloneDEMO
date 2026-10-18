@@ -250,9 +250,9 @@ describe('design decisions', () => {
     expect(r?.passive).toBeUndefined();
   });
 
-  it('has the Bellringer of his brief: a Common Support of the Ashveil Reign, Bloom; an A1 that shields one ally by 10% of his max HP for 1 turn and heals him by 10%; a passive of DEF Up for 2 turns the first time he drops below 50% HP', () => {
+  it('has the Bellringer of his brief: a Common Support of the Ashveil Reign, Ember (Bloom in the brief, Ember on his word the same day); an A1 that shields one ally by 10% of his max HP for 1 turn and heals him by 10%; a passive of DEF Up for 2 turns the first time he drops below 50% HP', () => {
     const r = CHAMPIONS.find((c) => c.id === 'bellringer');
-    expect(r && [r.name, r.rarity, r.role, r.faction, r.affinity]).toEqual(['Bellringer', 'common', 'Support', 'ashveil_reign', 'bloom']);
+    expect(r && [r.name, r.rarity, r.role, r.faction, r.affinity]).toEqual(['Bellringer', 'common', 'Support', 'ashveil_reign', 'ember']);
     expect(r?.skills).toHaveLength(1);
     const a1 = r?.skills[0];
     expect(a1 && [a1.slot, a1.target, a1.statuses, a1.healSelf]).toEqual([1, 'ally', [{ status: 'shield', turns: 1, value: 0.1, to: 'targets' }], 0.1]);
