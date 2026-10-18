@@ -15,7 +15,10 @@
 // roots trailing east, the soil pales into silver sand, and the sunken basin
 // lies under its own night, carpeted in glowing twilight-moss round its
 // tide-pools, reeds and motes of light about them; the eastern hills rise in
-// sharp ridges along the east edge.
+// sharp ridges east of it. Beyond their crest (2026-10-18) the night lifts and
+// Earth Scars (Zone 4) begins: the steppe by day, cut by two deep ravines
+// running west to east, yurt camps with their flag poles, wild yaks, kurgans,
+// a salt lake, a zeppelin passing over.
 //
 // Everything is drawn in world pixels, and every random choice is a hash of
 // its position, so the map grows east area by area: widen WORLD_MAP by the new
@@ -90,6 +93,22 @@ const MOONLIT = ramp(['#8c96b8', '#b8c2dc', '#dce4f4', '#ffffff']);
 const HILLN = ramp(['#0b0c16', '#10111e', '#161828', '#1c1e32', '#23263c', '#2c2f48', '#363a56', '#424666', '#505578', '#62668c', '#7a7ea6']);
 const ROOTN = ramp(['#0e0c12', '#17141c', '#221d28', '#2e2836', '#3c3546']);
 const NIGHTLEAF = ramp(['#050a10', '#08101a', '#0c1724', '#111f2e', '#162838', '#1d3242', '#243c4c', '#2c4656', '#355060', '#3e5a6a']);
+// --- Earth Scars: the steppe by day, the ravines' walls, the salt lake, the camps, the yaks, the zeppelin, the hills by day
+const STEPPE = ramp(['#2a2416', '#39301c', '#483d22', '#584a28', '#69592f', '#7a6837', '#8b7740', '#9c874b', '#ad9657', '#bca565', '#cab376', '#d6c089']);
+const STEPPESAGE = ramp(['#262c1c', '#303822', '#3b4428', '#46502e', '#525c35', '#5e683c', '#6a7444', '#77804c', '#848c55', '#92985f', '#a0a46a', '#aeb076']);
+const SCARBUFF = ramp(['#4a3626', '#664c36', '#826448', '#9e7e5c', '#b89872', '#d0b28c']);
+const SCAROCHRE = ramp(['#3e2614', '#5a381c', '#764c26', '#926232', '#ac7a40', '#c49452']);
+const SCARRUST = ramp(['#341810', '#4e2216', '#6a301e', '#863e26', '#a04e30', '#b6623e']);
+const SCARCLAY = ramp(['#2a2230', '#3a3040', '#4c4050', '#5e5262', '#726676', '#887c88']);
+const SCARDEEP = ramp(['#0e0a0c', '#181012', '#22171a', '#2e1f20', '#3c2a28']);
+const SALT = ramp(['#9a9a8c', '#c4c2b4', '#e2e0d4', '#f6f4ec']);
+const FELTM = ramp(['#5a544c', '#8a8478', '#b4ae9e', '#d4cec0', '#ece8dc', '#fbf8f0']);
+const FELTMO = ramp(['#544a3e', '#7c705e', '#a0947e', '#bcb098', '#d2c8b0', '#e2d8c2']);
+const YAKM = ramp(['#120c0a', '#22170f', '#33241a', '#4a3626', '#634a34']);
+const HORNM = hex('#d8ceb4');
+const SKYBLUE = ramp(['#4a8ad0', '#86baf0']);
+const ZEPM = ramp(['#3c4256', '#566078', '#727c94', '#8e98ae', '#aab2c4', '#c6ccd8', '#e2e6ee']);
+const HILLD = ramp(['#2a221c', '#382e26', '#463a30', '#56483c', '#685848', '#7a6956', '#8e7c66', '#a29078', '#b4a28a', '#c6b59e', '#d8c9b4']);
 
 // ---------------------------------------------------------------------------
 // noise and geometry, all in world pixels
@@ -202,7 +221,7 @@ const NODES = LOCATIONS.map((l): P => [l.map.x, l.map.y]);
 
 /** The road: the old road ends at the far lip, takes up again on this side, and runs through every node to the east edge (through the hills' pass). */
 const ROAD_FAR = curve([[-10, 318], [40, 322], [96, 334], [150, 332], [186, 324]]);
-const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [W + 12, 186]]);
+const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [W + 12, 187]]);
 
 /** The river, from the north edge to the south edge between the two areas. */
 const RIVER = polyline(curve([[530, -12], [526, 30], [540, 66], [532, 104], [546, 142], [540, 180], [548, 206], [544, 236], [556, 272], [548, 310], [560, 374]], 2));
@@ -272,6 +291,7 @@ function precompute() {
       riftKind[i] = kind;
     }
   }
+  precomputeScars();
   for (const road of [ROAD_FAR, ROAD_NEAR]) {
     for (const [px, py] of road) {
       for (let y = Math.floor(py - 12); y <= py + 12; y++) {
@@ -459,7 +479,11 @@ function farGround(x: number, y: number, light: number): RGBA {
 
 function groundAt(x: number, y: number): RGBA {
   const g = dayGround(x, y);
-  return x > 850 ? eastGround(x, y, g) : g;
+  if (x <= 850) return g;
+  const e = eastGround(x, y, g);
+  if (x < 1290) return e;
+  const k = steppeK(x, y);
+  return k > 0 && dith(x, y, k) ? steppeGround(x, y) : e;
 }
 
 function dayGround(x: number, y: number): RGBA {
@@ -1236,7 +1260,7 @@ function frame(b: Bitmap) {
 // ---------------------------------------------------------------------------
 
 /** How far into the basin's night a point is: 0 by day, 1 under the moon; the edge wavers like a veil. */
-const nightK = (x: number, y: number) => smooth(912, 1004, x + (vnoise(x, y, 38, 1101) - 0.5) * 64 + (vnoise(x, y, 9, 1100) - 0.5) * 10);
+const nightK = (x: number, y: number) => smooth(912, 1004, x + (vnoise(x, y, 38, 1101) - 0.5) * 64 + (vnoise(x, y, 9, 1100) - 0.5) * 10) * (1 - dayK(x, y));
 /** How far the grove's soil has paled into silver sand. */
 const paleK = (x: number, y: number) => smooth(868, 930, x + (vnoise(x, y, 24, 1102) - 0.5) * 50);
 /** The basin's rims: how far down from the north edge and up from the south edge the high ground reaches at x. */
@@ -1277,6 +1301,8 @@ const basinClear = (x: number, y: number) => clearing(x, y, NODES[2], 64, 36);
 /** The eastern hills' stony ground between their peaks: dark, rising, the moon on its faces toward the top-left. */
 function hillGround(x: number, y: number): RGBA {
   const up = clamp((x - hillFoot(y)) / 60);
+  // beyond the crest, by day: dry grass on the slopes between the rocks
+  if (dith(x, y, dayK(x, y))) return rampDither(hash2(x >> 1, y, 1281) > 0.82 ? HILLD : STEPPE, 4.2 + relief(x, y) * 1.4 + (vnoise(x, y, 4, 1282) - 0.5) * 1.4, x, y);
   return rampDither(HILLN, 2.6 + up * 0.8 + relief(x, y) * 0.9 + (vnoise(x, y, 3, 1122) - 0.5) * 1.3 + (vnoise(x, y, 11, 1123) - 0.5) * 0.8, x, y);
 }
 
@@ -1287,7 +1313,6 @@ function hillGround(x: number, y: number): RGBA {
  * south one catching the moon; clear pools with pale shallows and shores.
  */
 function basinGround(x: number, y: number): RGBA {
-  if (x > hillFoot(y) - 2 && dith(x, y, clamp((x - hillFoot(y) + 2) / 10))) return hillGround(x, y);
   const pool = poolAt(x, y);
   if (pool.k > 0) {
     const [px, py] = BASIN_POOLS[pool.i];
@@ -1344,6 +1369,8 @@ function basinGround(x: number, y: number): RGBA {
 
 /** The ground east of the grove: the soil paling into sand by day, the basin by night, dithered into each other. */
 function eastGround(x: number, y: number, day: RGBA): RGBA {
+  // the eastern hills, under the basin's night up to their crest and in the day beyond it
+  if (x > hillFoot(y) - 2 && dith(x, y, clamp((x - hillFoot(y) + 2) / 10))) return hillGround(x, y);
   const n = nightK(x, y), p = paleK(x, y);
   if (n > 0 && dith(x, y, n)) return basinGround(x, y);
   if (p <= 0) return day;
@@ -1453,32 +1480,38 @@ function eastPeak(b: Bitmap, x: number, y: number, h: number, w: number, seed: n
       const strata = Math.floor((py + (lit ? px * 0.3 : -px * 0.35)) * 0.45 + hash2(seed, 9, 1164) * 3) % 3 === 0 ? -0.8 : 0;
       const tone = hash2(seed, 4, 1170) * 1.2;
       const v = lit ? 6.4 + tone - down * 3 + strata - (gully ? 1.4 : 0) - (px > ridge - 2 ? -0.6 : 0) : 2.2 + tone * 0.5 - down * 0.9 + strata * 0.5 + (gully ? 0.7 : 0);
-      return rampDither(HILLN, clamp(v + (hash2(gx, gy, 1165) - 0.5) * 0.7, 0, HILLN.length - 1), gx, gy);
+      return rampDither(hillRamp(gx, gy), clamp(v + (hash2(gx, gy, 1165) - 0.5) * 0.7, 0, HILLN.length - 1), gx, gy);
     });
-    // the moon catches the crest and the left flank
+    // the moon catches the crest and the left flank (the sun, beyond the crest)
     for (let k = 0; k < N; k++) {
       const [ax, ay] = pts[k], [bx, by] = pts[k + 1];
       const n = Math.ceil(Math.hypot(bx - ax, by - ay) * 2);
       for (let t = 0; t <= n; t++) {
         const px = Math.round(ax + ((bx - ax) * t) / n), py = Math.round(ay + ((by - ay) * t) / n) + 1;
-        if (A(s.get(px, py))) s.set(px, py, HILLN[k > N - 3 ? 10 : 9]);
+        if (A(s.get(px, py))) s.set(px, py, hillRamp(px + ox, py + oy)[k > N - 3 ? 10 : 9]);
       }
     }
-  }, HILLN[0]);
+  }, dayK(x, y) > 0.5 ? HILLD[0] : HILLN[0]);
 }
 
-/** The eastern hills: peaks along the east edge, the great ones furthest east, foothills in front, a low pass where the road goes through. */
+/** The rock of the hills: by night under the basin's moon, by day beyond their crest. */
+const hillRamp = (x: number, y: number) => (dith(x, y, dayK(x, y)) ? HILLD : HILLN);
+
+/** The eastern hills: a range east of the basin, the great peaks along its crest, foothills on both sides, a low pass where the road goes through. */
 function eastHills(things: Thing[]) {
   for (let gy = -16; gy < H + 34; gy += 12) {
-    for (let gx = 1150; gx < W + 40; gx += 15) {
+    for (let gx = 1150; gx < Math.min(W + 40, 1390); gx += 15) {
       const x = gx + (hash2(gx, gy, 1171) - 0.5) * 16 + (Math.floor(gy / 12) % 2) * 7, y = gy + (hash2(gx, gy, 1172) - 0.5) * 10;
       const into = (x - hillFoot(y)) / 100;
-      if (into < -0.02 || hash2(gx, gy, 1173) < 0.3 + Math.max(0, 0.25 - into) * 0.8) continue;
+      // east of the crest the range falls away to its foot, where the steppe begins
+      const out = (hillEast(y) - x) / 100;
+      if (into < -0.02 || out < 0.02 || hash2(gx, gy, 1173) < 0.3 + Math.max(0, 0.25 - into) * 0.8 + Math.max(0, 0.22 - out) * 1.2) continue;
       const pass = Math.abs(y - 187) < 15 && x < W - 26;
-      const k = clamp(into);
+      const east = clamp(out / 0.7);
+      const k = Math.min(clamp(into), Math.pow(east, 1.4));
       // the great peaks stand in massifs; between them lower crags
       const massif = vnoise(x, y, 46, 1176);
-      const h = pass ? 6 + k * 6 + hash2(gx, gy, 1174) * 4 : 8 + k * 22 + massif * k * 26 + hash2(gx, gy, 1174) * (6 + k * 12);
+      const h = pass ? 6 + k * 6 + hash2(gx, gy, 1174) * 4 : 4 + 4 * east + k * 22 + massif * k * 26 + hash2(gx, gy, 1174) * (6 + k * 12);
       const w = h * (0.48 + hash2(gx, gy, 1175) * 0.4) + 3;
       const seed = gx * 13 + gy;
       things.push({ y, draw: () => eastPeak(b0, x, y, h, w, seed) });
@@ -1497,6 +1530,354 @@ function basinStones(things: Thing[]) {
     if (side >= 0.8 && x < hillFoot(y) - 30) continue;
     things.push({ y, draw: () => boulder(b0, x, y, 1.3 + hash2(k, 3, 1184) * 2.2, HILLN.slice(3, 10)) });
   }
+}
+
+// ---------------------------------------------------------------------------
+// Earth Scars (Zone 4, named and described by Jakub, 2026-10-18): the
+// easternmost land, beyond the basin and its eastern hills, where the night
+// lifts along the hills' crest. The steppe by day: golden grass combed by the
+// wind from the west, sage in the hollows; two deep ravines running across it
+// from west to east, natural and unlike each other: the northern one a long,
+// even trench with a stream and a few trees on its floor, the southern one
+// younger, winding, widening east and branching, a fork of it running off the
+// south edge. Yurt camps with their flag poles, wild yaks roaming in small
+// herds, kurgans and a cairn of stones by the road, a salt lake, and a
+// zeppelin passing over, its shadow on the grass.
+// ---------------------------------------------------------------------------
+
+/** How far into the day beyond the eastern hills' crest a point is: the basin's night lifts along the crest. */
+const dayK = (x: number, y: number) => smooth(1262, 1300, x + (vnoise(x, y, 34, 1201) - 0.5) * 34 + (vnoise(x, y, 9, 1202) - 0.5) * 8);
+/** The eastern hills' east foot at y: where the steppe begins. */
+const hillEast = (y: number) => 1322 + 16 * vnoise(0, y, 40, 1203) + 6 * vnoise(0, y, 11, 1204);
+/** How far onto the steppe a point is: 0 in the hills, 1 out on the grass. */
+const steppeK = (x: number, y: number) => smooth(hillEast(y) - 24, hillEast(y) + 4, x + (vnoise(x, y, 7, 1205) - 0.5) * 10);
+
+/** The two ravines: their centre lines from the hills' foot to the east edge. */
+const SCAR_N = curve([[1314, 98], [1340, 101], [1366, 93], [1392, 99], [1420, 89], [1450, 85], [1478, 93], [1506, 87], [1534, 75], [1562, 79], [1590, 71], [W + 14, 73]], 1);
+const SCAR_S = curve([[1352, 259], [1376, 265], [1398, 258], [1422, 267], [1446, 281], [1470, 276], [1494, 285], [1520, 279], [1546, 285], [1572, 288], [W + 14, 286]], 1);
+/** Where a ravine's centre line runs at x, how far along it that is (0 its head, 1 the edge), or null east or west of it. */
+function scarAt(pts: P[], x: number): { y: number; t: number } | null {
+  if (x < pts[0][0] || x > pts[pts.length - 1][0]) return null;
+  let lo = 0, hi = pts.length - 1;
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1;
+    if (pts[mid][0] <= x) lo = mid;
+    else hi = mid;
+  }
+  const [ax, ay] = pts[lo], [bx, by] = pts[hi];
+  const k = bx > ax ? (x - ax) / (bx - ax) : 0;
+  return { y: ay + (by - ay) * k, t: (x - pts[0][0]) / (pts[pts.length - 1][0] - pts[0][0]) };
+}
+/** Half the width of each ravine at x: the northern one opens fast and stays even; the southern one widens all the way east. */
+const halfN = (x: number, t: number) => Math.max(0.6, 0.8 + 8.4 * smooth(0, 0.2, t) - 1.2 * smooth(0.8, 1, t) + (vnoise(x, 0, 21, 1211) - 0.5) * 2.2 + jag(x, 4, 1212) * 1.2);
+const halfS = (x: number, t: number) => Math.max(0.5, 0.6 + 9.2 * Math.pow(t, 0.8) + (vnoise(x, 0, 15, 1213) - 0.5) * 2.4 + jag(x, 3, 1214) * 1.4);
+/** Side gullies cut into the steppe from the ravines, and the southern ravine's fork: polyline, half width at its mouth and at its head. */
+const GULLIES: { line: Line; w: [number, number] }[] = [
+  { pts: [[1421, 88], [1417, 76], [1409, 64], [1412, 52]] as P[], w: [2.2, 0.5] as [number, number] },
+  { pts: [[1534, 76], [1541, 61], [1549, 49], [1546, 33], [1553, 20]] as P[], w: [2.8, 0.5] as [number, number] },
+  { pts: [[1366, 96], [1361, 82], [1366, 70]] as P[], w: [1.7, 0.4] as [number, number] },
+  { pts: [[1479, 95], [1485, 106], [1495, 116]] as P[], w: [1.9, 0.5] as [number, number] },
+  { pts: [[1495, 287], [1501, 302], [1495, 318], [1503, 336], [1498, 352], [1505, 372]] as P[], w: [4.2, 1.8] as [number, number] },
+  { pts: [[1446, 283], [1439, 296], [1444, 309]] as P[], w: [2.2, 0.5] as [number, number] },
+  { pts: [[1572, 291], [1583, 303], [1597, 309]] as P[], w: [2.4, 0.6] as [number, number] },
+  { pts: [[1423, 265], [1427, 253], [1420, 245]] as P[], w: [1.6, 0.4] as [number, number] },
+].map((g) => ({ line: polyline(curve(g.pts, 1)), w: g.w }));
+const gullyHalf = (g: { line: Line; w: [number, number] }, s: number) => Math.max(0.35, (g.w[0] + (g.w[1] - g.w[0]) * (s / g.line.total)) * (0.8 + 0.4 * vnoise(s, 0, 7, 1215)) + jag(s, 3, 1216) * 0.6);
+
+/** A ravine's floor, wall and lips, precomputed per pixel east of the hills: 1 the northern ravine, 2 the southern, 3 a gully. */
+const scarKind = new Uint8Array(W * H);
+/** across a ravine from its north lip (0) to its south lip (1); for a gully, how far in from its edge (1 the middle) */
+const scarAcross = new Float32Array(W * H);
+/** a gully's side: > 0 the wall that faces the sun (its east or south side) */
+const scarSide = new Float32Array(W * H);
+/** the half width there, for the layers of the wall */
+const scarHalf = new Float32Array(W * H);
+
+function precomputeScars() {
+  for (let x = 1296; x < W; x++) {
+    for (const [pts, half, kind] of [[SCAR_N, halfN, 1], [SCAR_S, halfS, 2]] as [P[], (x: number, t: number) => number, number][]) {
+      const c = scarAt(pts, x);
+      if (!c) continue;
+      const h = half(x, c.t);
+      // the lips waver on their own
+      const top = c.y - h + jag(x, 3, 1217 + kind) * 0.9, bot = c.y + h + jag(x, 4, 1219 + kind) * 0.9;
+      for (let y = Math.floor(top); y <= Math.ceil(bot); y++) {
+        if (y < 0 || y >= H || y < top || y > bot) continue;
+        const i = idx(x, y);
+        scarKind[i] = kind;
+        scarAcross[i] = (y - top) / Math.max(1, bot - top);
+        scarHalf[i] = h;
+      }
+    }
+  }
+  for (const g of GULLIES) {
+    const xs = g.line.pts.map((p) => p[0]), ys = g.line.pts.map((p) => p[1]);
+    for (let y = Math.floor(Math.min(...ys) - 6); y <= Math.max(...ys) + 6; y++) {
+      for (let x = Math.floor(Math.min(...xs) - 6); x <= Math.max(...xs) + 6; x++) {
+        if (!inBounds(x, y) || scarKind[idx(x, y)] === 1 || scarKind[idx(x, y)] === 2) continue;
+        const n = nearest(g.line, x, y);
+        const h = gullyHalf(g, n.s);
+        if (n.d > h) continue;
+        const { dir } = pointAt(g.line, n.s);
+        const i = idx(x, y);
+        if (scarKind[i] === 3 && scarAcross[i] > 1 - n.d / h) continue;
+        scarKind[i] = 3;
+        scarAcross[i] = 1 - n.d / h;
+        // the wall on this side faces back toward the line: lit when it faces the sun (west and north of it)
+        const ox = -dir[1] * n.side, oy = dir[0] * n.side;
+        scarSide[i] = 0.6 * ox + 0.8 * oy;
+        scarHalf[i] = h;
+      }
+    }
+  }
+}
+
+/** The salt lake on the steppe south of the southern ravine: still blue water, a crust of white salt round it. */
+const LAKE = { x: 1408, y: 322, rx: 17, ry: 6 };
+const lakeK = (x: number, y: number) =>
+  Math.max(1 - Math.hypot((x - LAKE.x) / LAKE.rx, (y - LAKE.y) / LAKE.ry), 0.9 - Math.hypot((x - LAKE.x - 15) / 9, (y - LAKE.y + 4) / 4.4)) + (vnoise(x, y, 6, 1221) - 0.5) * 0.4;
+/** The clearing round the steppe's node, where its medallion and its name stand. */
+const steppeClear = (x: number, y: number) => clearing(x, y, NODES[3], 64, 36);
+/** The camps: where their yurts trod the grass bare. */
+const CAMPS: { x: number; y: number; yurts: [number, number, number, boolean][]; poles: [number, number, number][] }[] = [
+  { x: 1506, y: 152, yurts: [[1499, 155, 11, false], [1516, 149, 9, true], [1526, 160, 8, false]], poles: [[1488, 153, 18], [1534, 152, 14]] },
+  { x: 1376, y: 150, yurts: [[1371, 153, 10, false], [1386, 147, 8, true]], poles: [[1360, 151, 15]] },
+];
+const campK = (x: number, y: number) => Math.max(...CAMPS.map((c) => 1 - Math.hypot((x - c.x) / 30, (y - c.y) / 13))) + (vnoise(x, y, 5, 1222) - 0.5) * 0.4;
+
+/**
+ * Inside a ravine. The northern wall faces us across the gap and is in its own
+ * shade (the sun stands in the north-west): strata of buff, ochre, rust and
+ * grey clay dropping away, fluted by the rains, its lip lit; the floor beyond
+ * it dark, a stream winding along the northern one; the southern wall hidden
+ * under our lip, only its edge showing. A gully: a dark cleft, its sunward
+ * wall lit.
+ */
+function scarInside(x: number, y: number, i: number): RGBA {
+  const kind = scarKind[i], a = scarAcross[i], h = scarHalf[i];
+  if (kind === 3) {
+    const lit = scarSide[i] > 0.1;
+    // the rim: bare earth breaking from the turf
+    if (a < 0.25) return rampDither(SCARBUFF, (lit ? 4.6 : 3.2) + (hash2(x, y, 1231) - 0.5) * 0.6, x, y);
+    // the core, deep and narrow
+    if (a > 0.7 && h > 1.2) return rampDither(SCARDEEP, 2.6 + (hash2(x, y, 1232) - 0.5), x, y);
+    return rampDither(lit ? SCAROCHRE : SCARRUST, (lit ? 4.2 : 2.6) - a * 1.8 + (hash2(x, y, 1233) - 0.5) * 0.6, x, y);
+  }
+  const wall = 0.58 + Math.min(0.08, h * 0.008);
+  if (a < 0.07) return rampDither(SCARBUFF, 4.6 + (hash2(x, y, 1233) - 0.5) * 0.6, x, y);
+  if (a < wall) {
+    const d = (a - 0.07) / (wall - 0.07);
+    // the layers by depth, level; flutes and clefts down the face every few pixels
+    const band = Math.floor((d * h * 2.2 + jag(x, 6, 1234) * 1.4) / 2.2);
+    const R = [SCARBUFF, SCAROCHRE, SCARRUST, SCAROCHRE, SCARCLAY, SCARRUST, SCARCLAY][Math.max(0, band) % 7];
+    const flute = Math.cos(x * 1.25 + n1v(y, 1235) * 3) > 0.55 ? 0.7 : 0;
+    const cleft = hash2(Math.floor(x / 3), 0, 1236 + kind) > 0.84 ? -1.2 : 0;
+    return rampDither(R, clamp(3 - d * 2.4 + flute + cleft + (hash2(x, y, 1237) - 0.5) * 0.6, 0, R.length - 1), x, y);
+  }
+  // the floor: in shade, a stream along the northern ravine, gravel and scrub along the southern
+  const f = (a - wall) / (1 - wall);
+  if (f > 0.84) return rampDither(STEPPE, 7.2 + (hash2(x, y, 1238) - 0.5), x, y);
+  if (f > 0.7) return SCARDEEP[0];
+  if (kind === 1 && Math.abs(f - 0.38 - 0.14 * Math.sin(x * 0.11)) < 0.12 && hash2(x, 0, 1239) > 0.2) return WATER[hash2(x, y, 1240) > 0.85 ? 7 : 5];
+  if (hash2(x, y, 1241) > 0.9) return kind === 1 ? LEAF[4] : SCARBUFF[2];
+  return rampDither(SCARDEEP, 2.2 - f * 1.4 + (vnoise(x, y, 3, 1242) - 0.5) * 1.2, x, y);
+}
+/** A 1D noise in y for the flutes. */
+const n1v = (y: number, seed: number) => vnoise(0, y, 4, seed);
+
+/**
+ * The steppe: golden grass in long waves combed by the west wind, lighter on
+ * the slopes toward the sun, sage in the hollows, tufts and bare patches;
+ * trodden earth round the camps; the salt lake and its crust; the ravines cut
+ * into it.
+ */
+function steppeGround(x: number, y: number): RGBA {
+  const i = idx(x, y);
+  if (scarKind[i]) return scarInside(x, y, i);
+  const lk = lakeK(x, y);
+  if (lk > 0.22) return rampDither(WATER, 6.2 + (lk - 0.22) * 1.2 + (vnoise(x * 0.4, y * 2, 4, 1243) > 0.7 ? 1.2 : 0) - (y > LAKE.y + 2 ? 0.6 : 0), x, y);
+  if (lk > 0) return SALT[lk > 0.12 ? 3 : hash2(x, y, 1244) > 0.4 ? 2 : 1];
+  const light = relief(x, y);
+  const camp = campK(x, y);
+  if (camp > 0.55) return rampDither(ROAD, 3.6 + light + (vnoise(x, y, 3, 1245) - 0.5), x, y);
+  // sage in the hollows, where the ground lies low and keeps its damp
+  const sage = height[i] + (vnoise(x, y * 1.4, 9, 1247) - 0.5) * 0.12 < 0.43;
+  // the wind's combing: long light streaks running east
+  const comb = vnoise(x * 0.12, y * 1.6, 6, 1248);
+  let v = 5.4 + light * 1.9 + (vnoise(x, y, 5, 1249) - 0.5) * 1.1 + (vnoise(x, y, 21, 1250) - 0.5) * 0.9 + (comb > 0.68 ? 1.1 : comb < 0.25 ? -0.6 : 0);
+  // patches in flower: a tint of thyme purple, here and there yellow
+  const bloom = vnoise(x, y, 13, 1258);
+  const bloomy = bloom > 0.8 && dith(x, y, (bloom - 0.8) * 2.4) && hash2(x, y, 1259) > 0.55;
+  const tuft = hash2(x >> 1, y >> 1, 1251);
+  if (tuft > 0.95) v += 0.9;
+  else if (tuft < 0.04) v -= 0.9;
+  if (camp > 0.3 && dith(x, y, (camp - 0.3) / 0.25)) v -= 0.8;
+  const c = rampDither(sage ? STEPPESAGE : STEPPE, clamp(sage ? v - 0.6 : v, 0, STEPPE.length - 1), x, y);
+  return bloomy ? mix(c, hash2(x >> 3, y >> 3, 1260) > 0.25 ? NEBULA[6] : GOLD[3], 0.5) : c;
+}
+
+/** A yurt from above at a slant: a dome of white felt lit from the top-left, its crown a dark ring, the door a dot of orange, its shadow to the bottom-right. */
+function yurtMap(b: Bitmap, x: number, y: number, w: number, old: boolean) {
+  shadow(b, x + w * 0.4, y + 0.6, w * 0.62, w * 0.24, 0.5);
+  const hh = Math.ceil(w * 0.62) + 3;
+  stamp(b, Math.round(x - w / 2) - 1, Math.round(y - hh) + 1, w + 3, hh + 1, (s, ox, oy) => {
+    const cx = w / 2 + 1, base = hh - 1;
+    const F = old ? FELTMO : FELTM;
+    // the wall: a short band of felt at the front
+    for (let px = 1; px <= w; px++) {
+      for (let py = base - 2; py <= base; py++) s.set(px, py, rampDither(F, 3.4 - (px - 1) / w * 2 - (py === base ? 0.6 : 0), px + ox, py + oy));
+      if (px % 3 === 0) s.set(px, base - 1, F[1]);
+    }
+    // the roof: a low dome over it
+    ellipseFill(s, cx, base - 2.6, w / 2, w * 0.36, (px, py, d) => rampDither(F, 4.8 - (px - cx) / w * 2.6 - (py - (base - 2.6)) / (w * 0.36) * 0.8 - d * 0.5, px + ox, py + oy));
+    s.set(Math.round(cx), Math.round(base - 2.6 - w * 0.12), TIMBER[1]);
+    s.set(Math.round(cx), base, ORANGE[5]);
+  }, old ? FELTMO[0] : FELTM[0]);
+}
+
+/** A very long pole by a camp, its chain of small flags streaming east in five colours, a gilt tip. */
+function flagPoleMap(b: Bitmap, x: number, y: number, h: number) {
+  for (let k = 1; k < 5; k++) b.set(x + k, y + 1, mix(b.get(x + k, y + 1), SHADOW, 0.45));
+  for (let k = 0; k < h; k++) b.set(x, y - k, k > h - 2 ? GOLD[3] : TIMBER[3]);
+  const cols = [AZURE[3], WOOL[3], RED[6], LEAF[6], GOLD[2]];
+  for (let k = 0; k < h - 4; k++) {
+    const fy = y - h + 3 + k;
+    if (k % 2 === 0) b.set(x + 1, fy, cols[(k >> 1) % 5]);
+    if (k % 4 === 0) b.set(x + 2, fy, cols[(k >> 1) % 5]);
+  }
+}
+
+/** A wild yak grazing: a shaggy dark body, its head down at one end, a pale horn; a tuft of shadow. */
+function yakMap(b: Bitmap, x: number, y: number, left: boolean, seed: number) {
+  for (const [dx, dy] of [[1, 1], [2, 1], [3, 1]]) b.set(x + dx, y + dy, mix(b.get(x + dx, y + dy), SHADOW, 0.5));
+  b.set(x, y - 1, YAKM[3]);
+  b.set(x + 1, y - 1, YAKM[4]);
+  b.set(x + 2, y - 1, YAKM[3]);
+  b.set(x, y, YAKM[1]);
+  b.set(x + 1, y, YAKM[2]);
+  b.set(x + 2, y, YAKM[1]);
+  const hx = left ? x - 1 : x + 3;
+  b.set(hx, y, YAKM[0]);
+  b.set(hx, y - 1, hash2(seed, 0, 1252) > 0.5 ? HORNM : YAKM[0]);
+}
+
+/** A kurgan: an old burial mound, grassed over, lit on its top-left, a ring of stones at its foot and a stone figure standing by it. */
+function kurgan(b: Bitmap, x: number, y: number, r: number, seed: number) {
+  shadow(b, x + r * 0.5, y + r * 0.3, r * 1.15, r * 0.55, 0.45);
+  ellipseFill(b, x, y, r, r * 0.6, (px, py, d) => rampDither(STEPPE, 6.4 - (px - x) / r * 1.6 - (py - y) / (r * 0.6) * 1.4 - d * 0.6 + (hash2(px, py, 1253) - 0.5) * 0.6, px, py));
+  for (let k = 0; k < 14; k++) {
+    const a = (k / 14) * Math.PI * 2;
+    if (hash2(seed, k, 1254) < 0.3) continue;
+    b.set(Math.round(x + Math.cos(a) * (r + 1.5)), Math.round(y + Math.sin(a) * (r * 0.6 + 1)), STONE[k % 2 ? 5 : 4]);
+  }
+  // the stone figure (a balbal) on its west side
+  const sx = Math.round(x - r - 3), sy = Math.round(y + 1);
+  b.set(sx + 1, sy + 1, mix(b.get(sx + 1, sy + 1), SHADOW, 0.5));
+  b.set(sx, sy, STONE[3]);
+  b.set(sx, sy - 1, STONE[5]);
+  b.set(sx, sy - 2, STONE[6]);
+}
+
+/** The cairn where the road comes down out of the hills: a heap of stones, a pole, blue scarves on it. */
+function cairnMap(b: Bitmap, x: number, y: number) {
+  shadow(b, x + 2, y + 1, 4, 1.6, 0.5);
+  stamp(b, x - 3, y - 7, 8, 9, (s, ox, oy) => {
+    polyFill(s, [[0.5, 8], [3.5, 3.5], [6.5, 8]], (px, py) => rampDither(STONE, 5.6 - px * 0.5 + (hash2(px + ox, py + oy, 1255) - 0.5), px + ox, py + oy));
+    for (let k = 0; k < 4; k++) s.set(3, 3 - k, TIMBER[3]);
+  });
+  b.set(x + 1, y - 6, SKYBLUE[1]);
+  b.set(x + 2, y - 5, SKYBLUE[0]);
+  b.set(x + 1, y - 4, SKYBLUE[1]);
+  b.set(x - 1, y - 5, RED[6]);
+}
+
+/** The trails worn into the grass: polylines for footpath(). */
+const TRAILS: P[][] = [
+  [[1520, 160], [1528, 140], [1524, 122], [1530, 104], [1528, 96]],
+  [[1376, 146], [1372, 130], [1380, 116], [1376, 104]],
+  [[1528, 104], [1550, 108], [1572, 100], [1594, 94]],
+  [[1470, 196], [1488, 214], [1500, 236], [1516, 252], [1522, 268]],
+  [[1556, 236], [1574, 226], [1582, 214]],
+];
+
+/** One of the old stone figures of the steppe, standing in a row. */
+function balbal(b: Bitmap, x: number, y: number) {
+  b.set(x + 1, y + 1, mix(b.get(x + 1, y + 1), SHADOW, 0.5));
+  b.set(x, y, STONE[3]);
+  b.set(x, y - 1, STONE[5]);
+}
+
+/** A crouching shrub of the steppe: a dark green cushion lit on its top-left. */
+function shrub(b: Bitmap, x: number, y: number, seed: number) {
+  b.set(x + 1, y + 1, mix(b.get(x + 1, y + 1), SHADOW, 0.45));
+  b.set(x, y, LEAF[hash2(seed, 0, 1293) > 0.5 ? 4 : 3]);
+  b.set(x + 1, y, LEAF[2]);
+  b.set(x, y - 1, LEAF[6]);
+  if (hash2(seed, 1, 1293) > 0.5) b.set(x - 1, y, LEAF[3]);
+}
+
+/** A corral of posts and a rail by the camp, the grass inside it trodden. */
+function corral(b: Bitmap, x: number, y: number) {
+  ellipseFill(b, x, y, 7, 3.6, (px, py, d) => (d > 0.8 ? 0 : mix(b.get(px, py), ROAD[3], 0.5)));
+  for (let k = 0; k < 18; k++) {
+    const a = (k / 18) * Math.PI * 2;
+    const px = Math.round(x + Math.cos(a) * 7), py = Math.round(y + Math.sin(a) * 3.6);
+    b.set(px, py, k % 2 ? TIMBER[3] : TIMBER[2]);
+  }
+  b.set(x - 1, y, YAKM[1]);
+  b.set(x, y, YAKM[2]);
+  b.set(x, y - 1, YAKM[4]);
+}
+
+/** A two-wheeled cart standing by the camp. */
+function cartMap(b: Bitmap, x: number, y: number) {
+  for (const [dx, dy] of [[1, 1], [2, 1], [3, 1], [4, 1]]) b.set(x + dx, y + dy, mix(b.get(x + dx, y + dy), SHADOW, 0.45));
+  for (let k = 0; k < 4; k++) b.set(x + k, y - 1, TIMBER[3]);
+  b.set(x + 1, y, TIMBER[1]);
+  b.set(x + 2, y, TIMBER[1]);
+  b.set(x - 1, y - 1, TIMBER[2]);
+  b.set(x - 2, y, TIMBER[2]);
+}
+
+/** A stone in the grass, lit on its top-left, its shadow a pixel to the bottom-right. */
+function pebbleMap(b: Bitmap, x: number, y: number, big: boolean) {
+  b.set(x + 1, y + 1, mix(b.get(x + 1, y + 1), SHADOW, 0.45));
+  b.set(x, y, STONE[6]);
+  b.set(x + 1, y, STONE[4]);
+  if (big) {
+    b.set(x, y - 1, STONE[7]);
+    b.set(x + 1, y - 1, STONE[5]);
+    b.set(x + 2, y, STONE[3]);
+    b.set(x + 2, y + 1, mix(b.get(x + 2, y + 1), SHADOW, 0.45));
+  }
+}
+
+/** A small tree on a ravine's floor, out of the wind. */
+function scarTree(b: Bitmap, x: number, y: number, seed: number) {
+  broadleaf(b, x, y, 1.8 + hash2(seed, 0, 1256) * 1.2, LEAF, 2.4 + hash2(seed, 1, 1257) * 1.2, seed, false);
+}
+
+/** The zeppelin passing over the steppe, high up: its shadow on the grass far below, to the bottom-right. */
+function zeppelinShadow(b: Bitmap, x: number, y: number) {
+  ellipseFill(b, x + 17, y + 22, 11, 3, (px, py, d) => (dith(px, py, (1 - d) * 2.2) ? mix(b.get(px, py), SHADOW, 0.55) : 0));
+}
+function zeppelinMap(b: Bitmap, x: number, y: number) {
+  stamp(b, x - 12, y - 5, 26, 11, (s, ox, oy) => {
+    // tail fins at its east end (it heads west), the envelope over them
+    polyFill(s, [[18, 4], [23, 0.5], [25, 1], [23, 4.5]], (px) => ZEPM[px < 21 ? 4 : 3]);
+    polyFill(s, [[18, 5.5], [23, 9.5], [25, 9], [23, 5.5]], () => ZEPM[1]);
+    // the envelope, full at its nose (west), tapering east
+    for (let py = 0; py < 11; py++) {
+      for (let px = 0; px < 26; px++) {
+        const u = (px + 0.5 - 11) / 10.5, ry = 3.4 * (u > 0 ? 1 - 0.45 * u * u : 1 - 0.08 * u * u);
+        const v = (py + 0.5 - 4.6) / ry;
+        if (u * u + v * v > 1) continue;
+        s.set(px, py, rampDither(ZEPM, 5.6 - u * 1.2 - v * 2.2 - (px % 4 === 0 ? 0.5 : 0), px + ox, py + oy));
+      }
+    }
+    // the gondola slung under it
+    for (let px = 8; px <= 12; px++) s.set(px, 8, ZEPM[px === 8 ? 2 : 0]);
+  }, ZEPM[0]);
 }
 
 // ---------------------------------------------------------------------------
@@ -1527,6 +1908,62 @@ const BURNT: House[] = [
   { x: 247, y: 160, w: 10, roof: 'thatch', gable: 'front', burnt: true },
 ];
 const CHAPEL: P = [350, 114];
+/** where the zeppelin passes over the steppe */
+const ZEPPELIN: P = [1386, 50];
+
+/** The steppe's camps and herds, kurgans, the cairn by the road, trees on the northern ravine's floor, stones. */
+function steppeThings(things: Thing[]) {
+  for (const c of CAMPS) {
+    for (const [x, y, w, old] of c.yurts) things.push({ y, draw: () => yurtMap(b0, x, y, w, old) });
+    for (const [x, y, h] of c.poles) things.push({ y, draw: () => flagPoleMap(b0, x, y, h) });
+  }
+  // wild yaks in small herds, some heads one way, some the other
+  const herds: [number, number, number][] = [[1452, 44, 6], [1556, 112, 5], [1466, 336, 6], [1560, 240, 4], [1348, 226, 4], [1586, 30, 3], [1396, 296, 5], [1520, 16, 4], [1344, 334, 3]];
+  herds.forEach(([hx, hy, n], h) => {
+    for (let k = 0; k < n; k++) {
+      const x = Math.round(hx + (hash2(h, k, 1271) - 0.5) * 22), y = Math.round(hy + (hash2(h, k, 1272) - 0.5) * 9);
+      if (!inBounds(x, y) || scarKind[idx(x, y)] || steppeClear(x, y) || roadDist[idx(x, y)] < 3) continue;
+      things.push({ y, draw: () => yakMap(b0, x, y, hash2(h, k, 1273) < 0.5, h * 10 + k) });
+    }
+  });
+  things.push({ y: 212, draw: () => kurgan(b0, 1574, 212, 7, 1) });
+  things.push({ y: 124, draw: () => kurgan(b0, 1440, 124, 5.5, 2) });
+  // an alley of stone figures leading east from the eastern kurgan
+  for (let k = 0; k < 5; k++) things.push({ y: 213 + k, draw: () => balbal(b0, 1584 + k * 3, 213 + k) });
+  // a lone old tree by the eastern kurgan
+  things.push({ y: 204, draw: () => broadleaf(b0, 1588, 204, 4.2, LEAF, 2.6, 1291, true) });
+  // the main camp's corral, a ring of posts, and a cart by the western camp
+  things.push({ y: 166, draw: () => corral(b0, 1536, 166) });
+  things.push({ y: 158, draw: () => cartMap(b0, 1394, 158) });
+  // shrubs crouching along the ravines' rims, where the wind cannot reach the hollows
+  for (let k = 0; k < 70; k++) {
+    const north = k % 2 === 0;
+    const pts = north ? SCAR_N : SCAR_S;
+    const x = Math.round(1340 + hash2(k, 0, 1292) * 255);
+    const c = scarAt(pts, x);
+    if (!c) continue;
+    const h = (north ? halfN : halfS)(x, c.t);
+    const y = Math.round(c.y + (hash2(k, 1, 1292) < 0.5 ? -h - 1.5 - hash2(k, 2, 1292) * 3 : h + 1.5 + hash2(k, 2, 1292) * 3));
+    if (!inBounds(x, y) || scarKind[idx(x, y)] || steppeClear(x, y) || roadDist[idx(x, y)] < 3) continue;
+    things.push({ y, draw: () => shrub(b0, x, y, k) });
+  }
+  things.push({ y: 182, draw: () => cairnMap(b0, 1328, 182) });
+  // trees along the northern ravine's floor, out of the wind
+  for (let k = 0; k < 14; k++) {
+    const x = 1396 + k * 14 + Math.round((hash2(k, 0, 1274) - 0.5) * 8);
+    const c = scarAt(SCAR_N, x);
+    if (!c || hash2(k, 1, 1274) < 0.35) continue;
+    const y = Math.round(c.y + halfN(x, c.t) * 0.42);
+    if (scarKind[idx(x, y)] === 1) things.push({ y, draw: () => scarTree(b0, x, y, k) });
+  }
+  // stones out on the grass
+  for (let k = 0; k < 44; k++) {
+    const x = 1330 + hash2(k, 0, 1275) * 266, y = 6 + hash2(k, 1, 1275) * 348;
+    const xi = Math.round(x), yi = Math.round(y);
+    if (steppeK(x, y) < 1 || scarKind[idx(xi, yi)] || lakeK(x, y) > -0.3 || steppeClear(x, y) || campK(x, y) > 0.1 || roadDist[idx(xi, yi)] < 4) continue;
+    things.push({ y, draw: () => pebbleMap(b0, xi, yi, hash2(k, 2, 1275) > 0.7) });
+  }
+}
 const WINDMILL: P = [432, 120];
 const HAYFIRE: P = [236, 222];
 const CART: P = [392, 226];
@@ -1557,6 +1994,15 @@ function renderWorld(): Bitmap {
       b.set(x, y, FLOWERS[Math.floor(hash2(gx, gy, 903) * FLOWERS.length)]);
     }
   }
+  // the steppe's own flowers, sparse: purple, yellow, white
+  for (let gy = 0; gy < H; gy += 5) {
+    for (let gx = 1300; gx < W; gx += 5) {
+      if (hash2(gx, gy, 1261) > 0.1) continue;
+      const x = gx + Math.floor(hash2(gx, gy, 1262) * 5), y = gy + Math.floor(hash2(gx, gy, 1263) * 5);
+      if (!inBounds(x, y) || steppeK(x, y) < 1 || scarKind[idx(x, y)] || lakeK(x, y) > -0.2 || roadDist[idx(x, y)] < 3 || campK(x, y) > 0.2 || steppeClear(x, y)) continue;
+      b.set(x, y, [NEBULA[6], GOLD[2], FLOWERS[1], NEBULA[5], GOLD[2], WOOL[2]][Math.floor(hash2(gx, gy, 1264) * 6)]);
+    }
+  }
   hairlines(b);
   trailingRoots(b);
   basinReeds(b);
@@ -1569,6 +2015,11 @@ function renderWorld(): Bitmap {
   footpath(b, [GREEN, [380, 140], [410, 130], WINDMILL]);
   footpath(b, [GREEN, [270, 150], [240, 154]]);
   footpath(b, [[300, 226], [272, 210], [250, 214], HAYFIRE]);
+  // paths from the steppe's camps to the road
+  footpath(b, [[1500, 162], [1488, 174], [1476, 186]]);
+  footpath(b, [[1378, 158], [1384, 174], [1392, 190], [1396, 197]]);
+  // the herders' and the yaks' trails: down to the water in the northern ravine, along its rim, out across the grass
+  for (const t of TRAILS) footpath(b, t);
   fence(b, 252, 182, 268, 190);
   fence(b, 372, 182, 390, 190);
   fence(b, 286, 164, 296, 170);
@@ -1605,6 +2056,7 @@ function renderWorld(): Bitmap {
   farmThings(things);
   eastHills(things);
   basinStones(things);
+  steppeThings(things);
   for (const h of [...VILLAGE, ...BURNT]) things.push({ y: h.y, draw: () => house(b, h, smokes) });
   things.push({ y: CHAPEL[1], draw: () => chapel(b, CHAPEL[0], CHAPEL[1]) });
   things.push({ y: WINDMILL[1], draw: () => windmill(b, WINDMILL[0], WINDMILL[1]) });
@@ -1641,6 +2093,10 @@ function renderWorld(): Bitmap {
   glow(b, [HAYFIRE, [236, 150]]);
   sparks(b, [HAYFIRE]);
   basinMotes(b);
+  // smoke from the yurts' stovepipes, and the zeppelin passing over, its shadow on the grass far below
+  CAMPS.forEach((c, i) => c.yurts.forEach(([x, y, w], k) => k === 0 && plume(b, x - 1, Math.round(y - w * 0.62) - 1, 4, 20 + i)));
+  zeppelinShadow(b, ZEPPELIN[0], ZEPPELIN[1]);
+  zeppelinMap(b, ZEPPELIN[0], ZEPPELIN[1]);
   compass(b, W - 40, H - 44);
   frame(b);
   return b;
@@ -1663,19 +2119,26 @@ function hexagon(s: Bitmap, x: number, y: number) {
   s.set(x + 1, y + 2, BLOOD[0]);
 }
 
-/** Halves a bitmap by averaging each 2x2 block, for the overview. */
-function half(src: Bitmap): Bitmap {
-  const out = new Bitmap(src.w / 2, src.h / 2);
+/** Shrinks a bitmap k times (k may be fractional) by averaging the source pixels under each overview pixel, weighted by how much of each it covers. */
+function shrink(src: Bitmap, k: number): Bitmap {
+  const out = new Bitmap(Math.round(src.w / k), Math.round(src.h / k));
   for (let y = 0; y < out.h; y++) {
+    const y0 = y * k, y1 = y0 + k;
     for (let x = 0; x < out.w; x++) {
-      let r = 0, g = 0, bl = 0;
-      for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
-        const c = src.get(x * 2 + dx, y * 2 + dy);
-        r += R(c);
-        g += G(c);
-        bl += B(c);
+      const x0 = x * k, x1 = x0 + k;
+      let r = 0, g = 0, bl = 0, wsum = 0;
+      for (let sy = Math.floor(y0); sy < Math.ceil(y1); sy++) {
+        const wy = Math.min(y1, sy + 1) - Math.max(y0, sy);
+        for (let sx = Math.floor(x0); sx < Math.ceil(x1); sx++) {
+          const wx = Math.min(x1, sx + 1) - Math.max(x0, sx);
+          const c = src.get(sx, sy), w = wx * wy;
+          r += R(c) * w;
+          g += G(c) * w;
+          bl += B(c) * w;
+          wsum += w;
+        }
       }
-      out.set(x, y, rgba(Math.round(r / 4), Math.round(g / 4), Math.round(bl / 4)));
+      out.set(x, y, rgba(Math.round(r / wsum), Math.round(g / wsum), Math.round(bl / wsum)));
     }
   }
   return out;
@@ -1686,7 +2149,7 @@ export function buildMap(out: string) {
   const world = renderWorld();
   world.save(path.join(out, 'map', 'world.png'));
   world.save(path.join('docs', 'images', 'world_map.png'));
-  const overview = WORLD_MAP.overview === 2 ? half(world) : world;
+  const overview = shrink(world, WORLD_MAP.overview);
   overview.save(path.join(out, 'map', 'overview.png'));
   console.log(`  map: world ${world.w}x${world.h}, overview ${overview.w}x${overview.h}, ${LOCATIONS.length} campaign nodes`);
 }

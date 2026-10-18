@@ -20,7 +20,12 @@
 // description from the grove's roots to the eastern hills, their enemies are
 // copies of the roster, their powers are tuned stand-ins; 3-1, 3-2 and 3-3
 // bring the Skeleton, the Rot Hulk and the Bellringer, the Ashveil Reign's first
-// champions (stand-ins).
+// champions (stand-ins). Zone 4, Earth Scars, named and described by Jakub
+// (2026-10-18), the easternmost place, has ten placeholder stages he asked for
+// "like in the past": their texts walk his description, from the steppe and its
+// two ravines to the camp, the yaks, the mountains and the zeppelin; their
+// enemies are copies of the roster and their powers tuned stand-ins; no
+// champion joins there.
 import { LocationDef, StageDef } from './types';
 
 /**
@@ -31,7 +36,7 @@ import { LocationDef, StageDef } from './types';
  * smaller one). The map grows east area by area: a new area widens it by its stretch,
  * and everything west of the stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 1280, h: 360, overview: 2 };
+export const WORLD_MAP = { w: 1600, h: 360, overview: 2.5 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];
@@ -50,6 +55,13 @@ const REEDS = 'Pale, glass-like reeds sway softly without a breeze, catching the
 const MOTES = 'Small, airborne dust-motes of bioluminescent flora drift across the sunken landscape.';
 const POOLS = 'Soft, pearlescent halos over quiet, crystal-clear tide-pools.';
 const SWELL = 'The ground begins its gentle swell toward the sharp silhouette of the eastern hills.';
+// Zone 4: Jakub's description of Earth Scars (2026-10-18), from the steppe to the zeppelin in its sky
+const STEPPE = 'A steppe under the day sky, the land furthest to the east.';
+const RAVINES = 'Two deep ravines run across it from west to east, neither like the other.';
+const YURTS = 'Yurts stand on the steppe, small colourful flags running like a chain up very long poles.';
+const YAKS = 'A few wild yaks roam nearby.';
+const PEAKS = 'Far off, a little to the left, a very big mountain with a snowy peak; on its right a twin, a little lower.';
+const ZEPPELIN = 'Far off in the sky, a zeppelin flies.';
 
 export const LOCATIONS: LocationDef[] = [
   {
@@ -304,6 +316,79 @@ export const LOCATIONS: LocationDef[] = [
         blurb: `${SWELL} The last stage of the area.`,
         enemies: [{ champion: 'black_rhino', boss: true }, { champion: 'grove_keeper' }, { champion: 'big_ears' }],
         power: 0.76,
+      },
+    ],
+  },
+  {
+    // Zone 4, named and described by Jakub (2026-10-18, DESIGN_DECISIONS.md 5.7); its ten stages are placeholders
+    // like the areas' before it ("create also 10 placehold levels like in the past"): enemies, powers and texts are stand-ins
+    id: 'zone4',
+    chapter: 'IV',
+    name: 'Earth Scars',
+    zone: 'zone4',
+    blurb: 'The easternmost land, beyond the Moonlit Basin and its eastern hills: a steppe under the day sky, cut by two deep ravines.',
+    requires: '3-10',
+    map: { x: 1452, y: 190 },
+    stages: [
+      {
+        id: '4-1',
+        blurb: STEPPE,
+        enemies: [{ champion: 'skeleton' }, { champion: 'follower' }, { champion: 'wild_speaker' }],
+        power: 0.83,
+      },
+      {
+        id: '4-2',
+        blurb: RAVINES,
+        enemies: [{ champion: 'rot_hulk' }, { champion: 'skirmisher' }, { champion: 'enforcer' }],
+        power: 0.84,
+      },
+      {
+        id: '4-3',
+        blurb: RAVINES,
+        enemies: [{ champion: 'skeleton' }, { champion: 'skeleton' }, { champion: 'big_ears' }],
+        power: 0.81,
+      },
+      {
+        id: '4-4',
+        blurb: YURTS,
+        enemies: [{ champion: 'black_rhino' }, { champion: 'red_cloak' }, { champion: 'grove_keeper' }],
+        power: 0.66,
+      },
+      {
+        id: '4-5',
+        blurb: YURTS,
+        enemies: [{ champion: 'rot_hulk' }, { champion: 'associate' }, { champion: 'bloodhound' }],
+        power: 0.95,
+      },
+      {
+        id: '4-6',
+        blurb: YAKS,
+        enemies: [{ champion: 'jungle_herder' }, { champion: 'skeleton' }, { champion: 'rime_scholar' }],
+        power: 0.82,
+      },
+      {
+        id: '4-7',
+        blurb: YAKS,
+        enemies: [{ champion: 'emissary_handlings' }, { champion: 'red_cloak' }, { champion: 'follower' }],
+        power: 0.71,
+      },
+      {
+        id: '4-8',
+        blurb: PEAKS,
+        enemies: [{ champion: 'lineholder' }, { champion: 'big_ears' }, { champion: 'associate' }],
+        power: 0.87,
+      },
+      {
+        id: '4-9',
+        blurb: PEAKS,
+        enemies: [{ champion: 'rot_hulk' }, { champion: 'captain_gareth' }, { champion: 'grove_keeper' }],
+        power: 0.84,
+      },
+      {
+        id: '4-10',
+        blurb: `${ZEPPELIN} The last stage of the area.`,
+        enemies: [{ champion: 'red_cloak', boss: true }, { champion: 'skeleton' }, { champion: 'rot_hulk' }],
+        power: 0.81,
       },
     ],
   },

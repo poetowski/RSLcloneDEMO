@@ -4,8 +4,9 @@ import { buildZone, ZoneArt } from './shared.ts';
 import { zone1 } from './zone1.ts';
 import { zone2 } from './zone2.ts';
 import { zone3 } from './zone3.ts';
+import { zone4 } from './zone4.ts';
 
-export const ZONE_ART: Record<string, ZoneArt> = { zone1, zone2, zone3 };
+export const ZONE_ART: Record<string, ZoneArt> = { zone1, zone2, zone3, zone4 };
 
 export function buildZones(out: string, only?: string) {
   for (const z of Object.values(ZONE_ART)) if (!only || only === z.id) buildZone(z, out);

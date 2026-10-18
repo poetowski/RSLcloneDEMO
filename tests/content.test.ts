@@ -385,6 +385,18 @@ describe('design decisions', () => {
   it('opens with a ten-stage first zone', () => {
     expect(LOCATIONS[0].stages).toHaveLength(10);
   });
+
+  it('names the areas as Jakub did, Earth Scars the easternmost with ten placeholder stages after 3-10', () => {
+    expect(LOCATIONS.map((l) => [l.chapter, l.name, l.zone])).toEqual([
+      ['I', 'Fracture Reach', 'zone1'],
+      ['II', 'Verdant Grove', 'zone2'],
+      ['III', 'Moonlit Basin', 'zone3'],
+      ['IV', 'Earth Scars', 'zone4'],
+    ]);
+    const scars = LOCATIONS[3];
+    expect([scars.requires, scars.stages.map((s) => s.id)]).toEqual(['3-10', ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6', '4-7', '4-8', '4-9', '4-10']]);
+    expect(scars.stages.some((s) => s.recruit)).toBe(false);
+  });
 });
 
 describe('zones', () => {
@@ -401,6 +413,11 @@ describe('zones', () => {
         if (k.mode === 'pulse') expect(k.frames, `${z.id} ${p.kind} pulse needs 2 frames`).toBeGreaterThanOrEqual(2);
         if (k.fire && k.fire.flame !== false) expect(zj.kinds.flame, `${z.id} fire props need flame frames`).toBeTruthy();
         if (p.layer === 'far') expect(k.fire, `${z.id} ${p.kind}: nothing burns in the far layer`).toBeFalsy();
+        // an animal that roams has its walk cycle and its grazing, and walks calmly
+        if (k.roam) {
+          expect(k.frames, `${z.id} ${p.kind} walk and graze frames`).toBeGreaterThan(k.roam.walk);
+          expect(k.roam.speed > 0 && k.roam.speed <= 12 && k.roam.pause >= 2000, `${z.id} ${p.kind} roams calmly`).toBe(true);
+        }
       }
       // spark emitters run along lines inside the screen
       for (const e of zj.sparks ?? []) {

@@ -3,8 +3,8 @@
 // spark emitters, pre-baked tile layers, props driven by their kind (static,
 // looping, pulsing, burning), the ambience of the zone (falling snow, blowing
 // sand, drifting star-dust with shooting stars, autumn leaves tumbling in the
-// wind, pollen drifting in the sunlight, or glowing spores drifting in their
-// halos; circling birds, butterflies, heat haze, now and then a flash of
+// wind, pollen drifting in the sunlight, glowing spores drifting in their
+// halos, or feather-grass seeds sailing on the wind; circling birds, butterflies, heat haze, now and then a flash of
 // strange light across the sky or a shooting star), light pools, a mood tint
 // and the vignette. Everything zone-specific
 // comes from the zone's JSON (art) and ZoneDef (behaviour), so a new zone
@@ -124,7 +124,7 @@ export class ZoneView {
     this.tilesLayer = this.bakeTiles();
     this.light = makeGlow(64, 40, def.glow);
     this.vignette = makeVignette();
-    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'spores' ? 0 : 70;
+    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'seeds' ? SEEDS : def.ambient === 'spores' ? 0 : 70;
     for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
     if (def.ambient === 'spores') {
       this.sporeHalos = SPORE_HALO.map((c) => [makeHalo(6, c), makeHalo(9, c)]);
@@ -201,6 +201,23 @@ export class ZoneView {
   }
 
   private spawnAmbient(x = -4, y = -4) {
+    if (this.def.ambient === 'seeds') {
+      // feather-grass seeds sailing across the steppe on the wind from the left: silky awns, a few close to the camera
+      const respawn = x < 0;
+      const near = Math.random() < 0.25;
+      this.ambient.add({
+        x: respawn ? -4 : x,
+        y: respawn ? 40 + Math.random() * 310 : y,
+        vx: near ? 26 + Math.random() * 14 : 11 + Math.random() * 12,
+        vy: (Math.random() - 0.6) * 4,
+        life: Infinity,
+        w: near ? 3 : 2,
+        h: 1,
+        color: near ? '#fbf6e4' : Math.random() < 0.5 ? '#e8e0c6' : '#d8cfb0',
+        sway: near ? 9 : 5,
+      });
+      return;
+    }
     if (this.def.ambient === 'pollen') {
       // pollen and seed down drifting slowly through the sunlight
       const respawn = x < 0;
@@ -375,7 +392,7 @@ export class ZoneView {
     amb.update(dt * speedUp);
     for (const p of amb.list) if (p.y > H + 4 || p.y < -6 || p.x > W + 8 || p.x < -60) p.life = 0;
     // the spores are their own system (spawnSpore), not particles
-    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
+    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'seeds' ? SEEDS : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
     while (amb.list.length < target) this.spawnAmbient();
     if (this.def.ambient === 'sand') {
       // every few seconds a gust sweeps a veil of sand across the arena
@@ -502,7 +519,27 @@ export class ZoneView {
       px = ((((left + w + (this.t / 1000) * k.drift.speed) % span) + span) % span) - w + w * k.anchor[0];
     }
     const place = (r: Rect4) => [px - r[2] * k.anchor[0], p.y + bob - r[3] * k.anchor[1]] as const;
-    if (k.mode === 'loop') {
+    if (k.roam) {
+      // out along its row, a graze, back, a graze: each placement on its own phase, facing the way it walks
+      const { span, speed, pause, walk } = k.roam;
+      const leg = (span / speed) * 1000, cycle = 2 * (leg + pause);
+      const t = (((this.t + p.x * 97) % cycle) + cycle) % cycle;
+      const out = t < leg + pause;
+      const u = out ? t : t - leg - pause;
+      const walking = u < leg;
+      const off = out ? (walking ? (u / leg) * span : span) : walking ? span - (u / leg) * span : 0;
+      const step = Math.floor(this.t / (k.ms ?? 150));
+      const r = this.frame(p.kind, walking ? step % walk : walk + (step % Math.max(1, k.frames - walk)));
+      const [x, y] = place(r);
+      if (out) blit(ctx, img, r, x + off, y);
+      else {
+        ctx.save();
+        ctx.translate(Math.round(x + off) + r[2], Math.round(y));
+        ctx.scale(-1, 1);
+        ctx.drawImage(img, r[0], r[1], r[2], r[3], 0, 0, r[2], r[3]);
+        ctx.restore();
+      }
+    } else if (k.mode === 'loop') {
       // each placement runs on its own phase (props left of the screen edge included)
       const f = ((Math.floor(this.t / (k.ms ?? 150) + p.x * 0.01) % k.frames) + k.frames) % k.frames;
       const r = this.frame(p.kind, f);
@@ -617,6 +654,8 @@ export class ZoneView {
 
 /** How many spores drift in the air at once (ambient 'spores'). */
 const SPORES = 30;
+/** How many feather-grass seeds sail on the wind at once (ambient 'seeds'). */
+const SEEDS = 24;
 
 /** A spore's halo: a small soft disc of light, dithered into four bands so it reads as pixel art. */
 function makeHalo(r: number, color: string): HTMLCanvasElement {

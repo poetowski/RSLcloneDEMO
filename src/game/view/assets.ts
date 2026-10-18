@@ -33,6 +33,8 @@ export interface PropKind {
   bob?: { amp: number; ms: number };
   /** drifts sideways across the screen at `speed` px a second, coming round again from the other side (clouds) */
   drift?: { speed: number };
+  /** walks to and fro along its row (an animal grazing): see tools/art/zones/shared.ts */
+  roam?: { span: number; speed: number; pause: number; walk: number };
   frames: number;
 }
 

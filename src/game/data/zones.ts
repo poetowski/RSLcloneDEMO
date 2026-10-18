@@ -53,6 +53,23 @@ export const ZONES: ZoneDef[] = [
     // a first take: now and then a shooting star, rarely
     shootingStars: [14000, 32000],
   },
+  {
+    // Zone 4, named and described by Jakub (2026-10-18): Earth Scars, the easternmost place, a steppe by day cut by
+    // deep ravines; yurts with small colourful flags like a vertical chain on very long poles, a few wild yaks
+    // roaming nearby, a very big mountain with a snowy peak and its lower twin far off, a distant zeppelin in the
+    // sky, "some parts moving"; feather-grass seeds sailing on the wind
+    id: 'zone4',
+    name: 'Earth Scars',
+    ambient: 'seeds',
+    // nothing burns here; the colour a light pool would take
+    glow: [255, 226, 168],
+    // the sun stands high in the upper left: short shadows thrown to the right
+    shadow: { dx: 3, stretch: 1.15 },
+    tint: { color: '#ffe6b0', alpha: 0.04, op: 'soft-light' },
+    // a first take: steppe eagles circling over the ravine and the far steppe
+    birds: 3,
+    birdsAt: [[150, 86], [520, 64]],
+  },
 ];
 
 const byId = new Map(ZONES.map((z) => [z.id, z]));

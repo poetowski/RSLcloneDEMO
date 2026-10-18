@@ -51,6 +51,14 @@ export interface PropKind {
   bob?: { amp: number; ms: number };
   /** drifts sideways across the screen at `speed` px a second, coming round again from the other side (clouds) */
   drift?: { speed: number };
+  /**
+   * walks to and fro along its row (an animal grazing): out to `span` px right
+   * of where it is placed at `speed` px a second, grazes there `pause` ms, walks
+   * back and grazes again; the first `walk` frames are its walk cycle and the
+   * rest its grazing, each frame `ms` long; it faces the way it walks (the
+   * sprites face right). The preview shows frame 0 where it is placed.
+   */
+  roam?: { span: number; speed: number; pause: number; walk: number };
 }
 
 export interface PropPlacement {

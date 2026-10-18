@@ -66,6 +66,7 @@ Section 7 lists what is not decided.
 | 2026-10-18 | The Rot Hulk, a Common Tank of the Ashveil Reign | 3.4, 7, 29 |
 | 2026-10-18 | The Bellringer, a Common Support of the Ashveil Reign | 3.4, 7, 30 |
 | 2026-10-18 | The Bellringer's affinity: Ember (Bloom in the brief) | 30 |
+| 2026-10-18 | Zone 4, Earth Scars: its name and description; its battle background; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.7, 7 |
 
 ---
 
@@ -606,6 +607,33 @@ basin, goes on east through a low pass between them. The night over the basin
 on a map drawn by day is my reading of "moonlit" (5.6); its details are first
 takes.
 
+**Extended east again (2026-10-18)** for Zone 4, on Jakub's word "agent must
+extend map on the east, east from the moonlit basin" and "on extension of
+world screen put attention to details as well" (5.7, verbatim there). As
+built: the map is 1600 pixels wide, two screens and a half, so the whole-map
+overview is drawn two and a half times smaller (640 x 144) to fill the
+screen's width; everything west of x 1224 kept its pixels. The eastern hills
+became a range between the basin and the steppe: west of their crest they
+stand in the basin's night as before; along the crest the night lifts, and
+their eastern faces stand in the day, warm grey rock lit on the sun's side,
+dry grass on the slopes between, falling to foothills at the steppe's edge.
+Beyond them lies Earth Scars, the steppe by day: golden grass combed into long
+streaks by the west wind, sage green in the hollows, patches in flower. Two
+ravines run across it from west to east, each of its own shape. The northern
+one is a long, even trench from the hills' foot to the east edge, its north
+wall in view banded in buff, ochre, rust and grey clay, a stream winding along
+its floor among a few trees, side gullies cutting back into the steppe. The
+southern one is younger: it starts small, winds as it widens east, and a fork
+of it runs off to the south edge. The node stands on the steppe between them,
+on the road, which comes down out of the hills past a cairn hung with blue
+scarves. Two yurt camps of white felt, smoke from their crowns, very long
+poles flying chains of small flags, a corral and a cart; small herds of wild
+yaks; two kurgans, the eastern one with a row of stone figures and a lone tree
+beside it; a salt lake in the south with a crust of salt round it; the
+herders' and the yaks' trails down to the water and across the grass; shrubs
+along the ravines' rims; and a zeppelin passing over, its shadow on the grass
+below. Its details are first takes.
+
 ### 5.4b Zone 2's battle background (2026-10-12)
 
 Jakub's brief, verbatim:
@@ -662,6 +690,9 @@ Zone 1 and Zone 2 should contrast clearly so the horizontal scroll reads as
 - Zone 3 *(2026-10-17, 5.6)*: the Moonlit Basin, open and still under the
   moon, beyond the forest: silver sand, glowing moss, glass reeds, quiet
   tide-pools, the eastern hills ahead.
+- Zone 4 *(2026-10-18, 5.7)*: Earth Scars, beyond the eastern hills, the open
+  steppe by day cut deep by ravines, its yurt camps and wild yaks, great snowy
+  mountains far off, a zeppelin in its sky.
 
 ### 5.6 Zone 3 — the Moonlit Basin (2026-10-17)
 
@@ -717,6 +748,101 @@ my addition for the same reason, since without stages its background cannot
 be seen in the game. Their texts walk his description from the grove's roots
 to the eastern hills, the area's blurb is its first sentence; their enemies are
 copies of the roster's champions, 3-10 a boss Black Rhino; their powers are
+tuned stand-ins; no champion joins there. Stages, enemies and story wait for
+him.
+
+### 5.7 Zone 4 — Earth Scars (2026-10-18)
+
+Jakub's message, verbatim:
+
+```
+create area 4. name of area = earth scars. it is place most on the east. agent must extend map on the east, east from the moonlit basin. this new 4th area contains on the world map two horizonal but not symetrical but instead very natural ravines. deep. biom is like stepps. time is daytime. in the background are yurts with small colorful flags like vertical chain on very long pole. few wild yaks roaming nearby. in even further background, slightly on the left side is siluethe of very big mountain with snowy peak and on the right side from him a second twin similar peak a bit lower. extend map to the east and create also 10 placehold levels like in the past. based on the description above. be creative, but very consistent to design. make some parts moving on combat sceen. on extension of world screen put attention to details as well. i also want a flying distant zepellin on the background sky somewhere.
+```
+
+**Readings.** The name is written Earth Scars. "Place most on the east": the
+easternmost area so far, beyond the Moonlit Basin and its eastern hills, which
+now stand between the two areas. "Time is daytime" holds on the battle
+background and on the world map: the basin's night (5.6) lifts along the crest
+of the eastern hills, and the steppe lies in the day like the west of the map.
+The two ravines are the world map's: "horizontal" read as running west to east
+across the area, "not symmetrical but very natural" as each of its own shape,
+neither of them straight. On the battle background the battle is fought on the
+steppe between them, so one crosses the scene from the left and the other
+shows far off on the right. "Yurts with small colorful flags like vertical
+chain on very long pole": beside the yurts stand very long poles, each with
+small flags tied one above the other along a cord, a chain from the top down,
+in five colours, streaming in the wind. "Slightly on the left side ... very big
+mountain with snowy peak and on the right side from him a second twin similar
+peak a bit lower": the great mountain stands a little left of the middle, the
+highest point of the scene, and its twin on its right is of the same shape,
+about four fifths of its height above the plain, joined to it by a saddle;
+both are far off and hazy blue, so they read as silhouettes with their snow.
+"Make some parts moving" was read with his calm motion (5.3a): each moving
+thing at its own pace. "A flying distant zepellin": high and far off, it
+crosses the sky slowly from east to west, against the wind the clouds drift
+with; it carries no mark, as who flies it is not decided.
+
+**The battle background, as built** (`tools/art/zones/zone4.ts`): the steppe
+at midday. The sun stands high in the upper left, the key light, in a
+white-gold glare; the sky is deep blue overhead, paling to haze over the
+horizon, with high streaks of cirrus and heaps of cumulus low on both sides.
+Far off, a little left of the middle, the great mountain fills the horizon: a
+broad cone with a long western shoulder, snow on its upper third running down
+the gullies between ribs of rock in tongues and streaks, white on the sun's
+side and blue in its own shade, a banner of cloud streaming from its summit;
+on its right, joined by a saddle, its twin. Low foothills lie at their feet.
+The steppe runs out to them, golden grass in long swells with sage in the
+hollows and cloud shadows lying on it, paling into the haze. A ravine comes
+in from the left edge across the middle distance and closes in a dry wash by
+the camp: its far wall banded in buff, ochre, rust and grey clay, fluted and
+cut by rain gullies, in its own shade since the sun stands beyond it, its lip
+lit and hung with grass, a thread of water on its floor where it is widest.
+Far off on the right the second ravine shows as a dark seam; short of it a
+herd of yaks grazes, and beyond them a far camp stands with its pole. The camp
+is on the near steppe in the middle: a great yurt of white felt with a blue
+band and a smaller old one of patched beige felt with a red band, girth ropes
+round them and ropes down their roofs, painted orange doors toward us under
+rolled felt, stovepipes out of their crowns; a very long pole beside each with
+a gilt tip and a chain of small flags in blue, white, red, green and yellow,
+two guy ropes; a hitching rail with a saddle cloth and a coil of rope, dung
+bricks stacked for the fires. Three wild yaks are on the near steppe,
+long-haired and dark, humped, their horns pale with dark tips. On the right a
+cairn of stones stands on a rise, poles out of it hung with blue scarves and
+rags of colour. The arena is the steppe itself: sun-dried grass in tufts that
+grow as they come near, sage, a cart track worn into two ruts from the camp
+toward us between the two lines, stones half sunk in the grass, a few small
+flowers; feather grass at the arena's edges and in the near corners, a yak's
+skull bleached in the grass on the left.
+
+Alive, each at its own pace: three small clouds drift east, and the zeppelin
+crawls west against the wind high above the summits, its two propellers
+turning; the flags stream and flutter, a ripple running down each chain; the
+scarves on the cairn stream; smoke leans away from the stovepipes; two yaks
+graze, tearing at the grass, lifting their heads to chew and swishing their
+tails, and the third walks to and fro along the near steppe, grazing at each
+end; gusts run through the grass on the far steppe and now and then over the
+arena; the feather grass sways; three steppe eagles circle over the ravine and
+the far steppe; feather-grass seeds sail by on the wind.
+
+The world map's part is in 5.4a.
+
+Everything the description did not name is a first take: the ravine through
+the scene and its colours, the far camp, the far herd, the camp's details (the
+yurts' bands, doors and patched felt, the hitching rail, the saddle cloth, the
+dung bricks), the cairn and its scarves, the cart ruts, the skull, the feather
+grass and its seeds, the gusts, the eagles, the clouds and the banner of cloud
+on the summit, the zeppelin's look and course, the layout and the palette; on
+the world map the hills by day, the camps' corral and cart, the kurgans and
+the stone figures, the lone tree, the salt lake, the trails, the shrubs, the
+trees and the stream in the northern ravine, the flowers and the zeppelin's
+shadow.
+
+**Stages.** Ten placeholder stages, 4-1 to 4-10, opened by 3-10, as he asked
+("create also 10 placehold levels like in the past"). Their texts walk his
+description, from the steppe and its two ravines to the camp, the yaks, the
+mountains and the zeppelin; the area's blurb places it. Their enemies are
+copies of the roster's champions, the Ashveil Reign's Skeleton and Rot Hulk
+among them for the first time, and 4-10 is a boss Red Cloak; their powers are
 tuned stand-ins; no champion joins there. Stages, enemies and story wait for
 him.
 
@@ -789,6 +915,8 @@ open questions.
 - Campaign count of zones
 - Zone 3's stages, enemies and story *(the game stands in ten placeholder
   stages, 5.6)*
+- Zone 4's stages, enemies and story *(the game stands in ten placeholder
+  stages, 5.7)*
 - Whether the Archivist appears as a character or as a presence
 - The relationship of Ashveil Reign to the loom's breaking
 - Whether Court of Root wants the loom repaired
@@ -796,8 +924,9 @@ open questions.
 
 Decided since the first export: the names of the starter pair, and that
 champions are fragments, the first one with the Archivist from the start
-(section 8); the zone names, the Fracture Reach, the Verdant Grove and the
-Moonlit Basin (5.3, 5.4, 5.6), and Zone 3's description (5.6); that the
+(section 8); the zone names, the Fracture Reach, the Verdant Grove, the
+Moonlit Basin and Earth Scars (5.3, 5.4, 5.6, 5.7), and the descriptions of
+Zones 3 and 4 (5.6, 5.7); that the
 interface keeps its affinity marks and the cuts made before
 the affinity rule are plain (2.1).
 

@@ -18,7 +18,7 @@ export interface Particle {
   sway: number;
   phase: number;
   additive?: boolean;
-  /** tumbling (leaves): alternates between a w x h rect in `color` and an h x w rect in `alt`, about `spin` times per second */
+  /** tumbling (leaves): alternates between a w x h rect in `color` and an h x w rect in `alt`, about `spin` times per second; without `spin` a w x h streak */
   spin?: number;
   alt?: string;
   w?: number;
@@ -98,7 +98,8 @@ export class Particles {
         continue;
       }
       ctx.fillStyle = c;
-      ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
+      // a streak (w x h) that does not tumble, or a square of `size`
+      ctx.fillRect(Math.round(p.x), Math.round(p.y), p.w ?? p.size, p.h ?? p.size);
     }
     ctx.globalCompositeOperation = 'source-over';
   }
