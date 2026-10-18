@@ -440,6 +440,13 @@ const RH_WIND = pose({
   armN: { up: 128, lo: 154 }, armF: { up: -66, lo: -30 },
   p: { sword: 150, jaw: 14, wave: 1, wind: 0.2 },
 });
+/** The sword over his head on its way down: an authored frame, since a blend of the two poses turns the forearm back the short way round. */
+const RH_OVER = pose({
+  x: 1, y: -2, torso: 86, head: 86,
+  legN: { ik: v(-10, 3) }, legF: { ik: v(9, 3) },
+  armN: { up: 86, lo: 60 }, armF: { up: -100, lo: -78 },
+  p: { sword: 56, jaw: 16, wave: 1.7, wind: 0.4 },
+});
 const RH_HACK = pose({
   x: 7, y: -4, torso: 64, head: 72,
   legN: { ik: v(-9, 3) }, legF: { ik: v(12, 3) },
@@ -488,7 +495,7 @@ const char: CharDef = {
         ...tween(D, IDLE, RH_WIND, 1, 70),
         ...keys([
           [RH_WIND, 150],
-          [mid(RH_WIND, RH_HACK, 0.45), 40],
+          [RH_OVER, 40],
           [RH_HACK, 70, { smear: true, hit: true }],
           [RH_FOLLOW, 190],
         ]),
