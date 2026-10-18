@@ -94,6 +94,11 @@ export const sheltering = fixture('sheltering', {
   skills: [undefined, skill('shelter', 2, { target: 'ally', approach: 'none', hits: [{ mult: 0 }], statuses: [{ status: 'def_up', turns: 1, to: 'targets' }, { status: 'def_up', turns: 1, to: 'self' }] })],
 });
 
+/** A1 aimed at one ally: a Shield of 10% of its own max HP on that ally for 1 turn and a heal of 10% of its max HP for itself; no attack. */
+export const toller = fixture('toller', {
+  skills: [skill('toll', 1, { target: 'ally', approach: 'none', hits: [{ mult: 0 }], statuses: [{ status: 'shield', turns: 1, value: 0.1, to: 'targets' }], healSelf: 0.1 })],
+});
+
 /** Two-hit A1 rolling Poison on every hit; A3 ends the turn with 25% turn meter. */
 export const stalker = fixture('stalker', {
   stats: { spd: 118 },

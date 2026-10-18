@@ -18,8 +18,9 @@
 // Basin, named and described by Jakub (2026-10-17), has ten placeholder stages
 // like Zone 2's, so it can be played and seen in game: their texts walk his
 // description from the grove's roots to the eastern hills, their enemies are
-// copies of the roster, their powers are tuned stand-ins; 3-1 and 3-2 bring
-// the Skeleton and the Rot Hulk, the Ashveil Reign's first champions (stand-ins).
+// copies of the roster, their powers are tuned stand-ins; 3-1, 3-2 and 3-3
+// bring the Skeleton, the Rot Hulk and the Bellringer, the Ashveil Reign's first
+// champions (stand-ins).
 import { LocationDef, StageDef } from './types';
 
 /**
@@ -259,6 +260,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: REEDS,
         enemies: [{ champion: 'jungle_herder' }, { champion: 'big_ears' }, { champion: 'follower' }],
         power: 0.75,
+        // a stand-in: the stage that brings the Bellringer is not Jakub's
+        recruit: 'bellringer',
       },
       {
         id: '3-4',
@@ -294,7 +297,7 @@ export const LOCATIONS: LocationDef[] = [
         id: '3-9',
         blurb: SWELL,
         enemies: [{ champion: 'black_rhino' }, { champion: 'red_cloak' }, { champion: 'dominion_medic' }],
-        power: 0.81,
+        power: 0.8,
       },
       {
         id: '3-10',

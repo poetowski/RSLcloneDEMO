@@ -373,12 +373,12 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C9 | Heal Block stops every heal (skills, Regen, lifesteal) and says so | code; test for skill heals only |
 | INV-C10 | Each damaged, living enemy defender with Counter and no control answers once with A1; counters are never countered | code; test |
 | INV-C11 | Undying fires once, leaves `value` x max HP, removes debuffs, keeps buffs | code; test |
-| INV-C12 | Overdrive fires once, only on a non-lethal hit that ends below `value` | code; tests |
+| INV-C12 | Overdrive fires once, only on non-lethal damage, a hit or a tick, that ends below `value` | code; tests |
 | INV-C13 | A dead unit has no statuses and is never a target | code; test |
 | INV-C14 | A battle ends when one side has no living unit; it always ends | code; test (40 seeded auto battles); termination relies on every A1 dealing damage |
 | INV-C15 | A Rebuke answers only a critical, non-lethal hit by an enemy that leaves its holder below `value`; then it rests for `cooldown` of the holder's turns | code; tests |
 | INV-C16 | A debuff placed on an enemy lands with at most its chance: all of it while the placer's ACC is at least the target's RES, cut by `landShare` above; buffs and effects on allies never meet RES; when ACC is at least RES the random draws are the same as without the rule | code (`tryApply`); tests |
-| INV-C17 | A skill aimed at one ally that also gives its user a status is aimed at another ally while one stands (alone, the user is its own target); a status reaches each unit once per skill | code (`validTargets`, `useSkill`); test |
+| INV-C17 | A skill aimed at one ally that also helps its user (a status on it, or `healSelf`) is aimed at another ally while one stands (alone, the user is its own target); a status reaches each unit once per skill | code (`validTargets`, `useSkill`); test |
 | INV-C18 | A tend acts at the end of each of its holder's turns, skipped ones too, while it is ready: the living ally with the lowest max HP, the holder included (ties: the lower HP share, then the front), gets its statuses worth `value` x the holder's max HP; then it rests `cooldown` of the holder's turns | code (`Battle.tend`); tests |
 | INV-C19 | A ward answers each ally an enemy skill damaged and left standing, the holder included, once per skill, after the skill's last hit, with its chance; its own side's skills never trigger it | code (`Battle.ward`); tests |
 | INV-C21 | A retaliation answers an enemy skill that damaged its holder and left it standing, once per skill, after the skill's last hit, with its chance, while the attacker stands; the debuff meets the attacker's RES; its own side's skills never trigger it | code (`Battle.retaliate`); tests |

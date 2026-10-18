@@ -4,11 +4,14 @@
 // heavy dull flash where his fists land, gobbets of rot splashing out and
 // falling, a puff of rot gas spreading. Drawn as matter, not light (neither is
 // in the additive set of src/game/view/scene.ts): an old blade does not shine,
-// and neither does rot. Never their affinity (affinities are abstract, Jakub,
-// 2026-10-11).
-import { dith } from '../paint.ts';
+// and neither does rot. The Bellringer's Warning Toll: rings of sound opening
+// from his bell in its gold, and on the ally he warns the toll arriving and a
+// shell of the same gold closing round it; his Last Peal: the bell tolling by
+// itself and the gold closing round him. The bell's gold is light (additive).
+// Never their affinity (affinities are abstract, Jakub, 2026-10-11).
+import { dith, ellipseRing, rampDither } from '../paint.ts';
 import { RGBA } from '../raster.ts';
-import { burst, cut, FxDef, ramps, sparks, W } from './kit.ts';
+import { burst, cut, FxDef, motes, ramps, soundRings, sparks, W } from './kit.ts';
 
 const DU = ramps.dust;
 /** A dull streak: grey to a pale core, no hue of its own. */
@@ -17,6 +20,8 @@ const RUST = ramps.rust;
 const BILE = ramps.bile;
 /** the rot's gas: bile green and bruise grey */
 const GAS: RGBA[] = [BILE[0], BILE[1], DU[1], BILE[2]];
+/** the gold of the Bellringer's bell, as light */
+const GOLD = ramps.gold;
 
 export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
   /** Rusty Hack: a dull cut hacked down through the target, torn where the notches bite, rust flaking off and falling. */
@@ -71,6 +76,58 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
       }
       // gobbets of rot: they fly out, then fall
       if (i >= 1) sparks(b, cx, cy, 26, 30, (i - 1) / 6, BILE, 419, 80);
+    },
+  },
+  /**
+   * Warning Toll at the bell: rings of sound opening from the bell's mouth as
+   * the clapper strikes. Played on the skill's `cast` event at the actor's
+   * head point (8 px ahead of his feet and 8 below the top of his idle
+   * sprite, 80 px up); in the toll frame the bell's mouth is 39 px further on
+   * and 27 px lower, where the rings start.
+   */
+  toll_rings: {
+    w: 84, h: 72, n: 9, ms: 60, ax: 0.107, ay: 0.125, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 48, cy = 36;
+      soundRings(b, cx, cy, i, 3, 1.6, 4.2, 6, GOLD);
+      if (i < 3) burst(b, cx, cy, 8, 1, [7, 11, 8][i], 1.1, GOLD, 0.4);
+    },
+  },
+  /**
+   * Warning Toll reaches an ally: the rings of the toll closing in on it, then
+   * a shell of the bell's gold closing round it for a moment (its Shield) and
+   * a ring settling at its feet, motes of gold rising. Anchored at its feet.
+   */
+  warning_toll: {
+    w: 72, h: 96, n: 10, ms: 60, ax: 0.5, ay: 1, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 36, gy = 94, cy = gy - 40;
+      // the toll arriving: rings shrinking onto the ally's chest
+      if (i < 4) {
+        const r = [30, 22, 14, 8][i];
+        ellipseRing(b, cx, cy, r, r * 0.92, 1.6, (x, y, a) => (dith(x, y, 0.5 + i * 0.12) ? rampDither(GOLD, 2.2 + i * 0.5 + Math.abs(Math.cos(a)) * 0.6, x, y) : 0));
+      }
+      // the shell closing round it, then fading
+      const fade = i < 3 ? [0, 0.6, 1][i] : i < 6 ? 1 : [0.75, 0.5, 0.3, 0.15][i - 6];
+      if (fade > 0) ellipseRing(b, cx, cy, 20, 38, 1.4, (x, y, a) => (dith(x, y, fade * 0.75 * (0.45 + 0.55 * Math.abs(Math.sin(a + t * 2)))) ? rampDither(GOLD, 2 + fade * 1.8, x, y) : 0));
+      if (i >= 2) ellipseRing(b, cx, gy - 2, 10 + fade * 10, 3 + fade * 2, 1.2, (x, y, a) => (dith(x, y, fade) ? rampDither(GOLD, 2.4 + Math.sin(a) * 0.6, x, y) : 0));
+      if (i >= 2) motes(b, cx, gy - 6, 34, 64, 8, (i - 2) / 8, GOLD, 431);
+    },
+  },
+  /**
+   * Last Peal: the bell tolls by itself the first time he falls below half
+   * his HP, and the gold closes round him (his DEF Up). Anchored at his feet;
+   * as he takes the blow his arm is thrown back and the bell hangs 25 px
+   * behind his feet and 28 up, where the rings start.
+   */
+  last_peal: {
+    w: 124, h: 112, n: 10, ms: 60, ax: 0.5, ay: 1, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const fx = 62, gy = 110;
+      soundRings(b, fx - 25, gy - 28, i, 3, 1.8, 4.0, 6, GOLD);
+      const fade = i < 2 ? [0.5, 1][i] : i < 6 ? 1 : [0.75, 0.5, 0.3, 0.15][i - 6];
+      ellipseRing(b, fx, gy - 46, 17, 46, 1.4, (x, y, a) => (dith(x, y, fade * 0.7 * (0.45 + 0.55 * Math.abs(Math.sin(a * 2 + t * 3)))) ? rampDither(GOLD, 2 + fade * 1.8, x, y) : 0));
+      motes(b, fx, gy - 4, 30, 90, 9, t, GOLD, 433);
     },
   },
 };

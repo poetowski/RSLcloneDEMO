@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, guard, hide, inAffinity, keen, medic, mender, mourner, overdrive, provisioner, rebuker, sheltering, stalker, stinger, striker, tender, twin, undying, warden } from './fixtures';
+import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, guard, hide, inAffinity, keen, medic, mender, mourner, overdrive, provisioner, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -292,6 +292,21 @@ describe('statuses', () => {
     expect(solo.useSkill(solo.get('p0'), shelter, 'p0').events.filter((e) => e.kind === 'status')).toHaveLength(1);
   });
 
+  it("aims a skill that heals its user at another ally while one stands, and shields it by a share of the caster's max HP", () => {
+    const toll = skill(toller, 'toll');
+    const b = new Battle(combatants([toller, guard, twin]), ENEMY, { seed: 3 });
+    const me = b.get('p0'), g = b.get('p1');
+    me.hp = Math.round(me.maxHp * 0.5);
+    expect(b.validTargets(me, toll).map((u) => u.uid)).toEqual(['p1', 'p2']);
+    b.useSkill(me, toll, 'p1');
+    expect(g.statuses.find((s) => s.id === 'shield')?.value).toBe(Math.round(me.maxHp * 0.1));
+    expect(me.hp).toBe(Math.round(me.maxHp * 0.5) + Math.round(me.maxHp * 0.1));
+    expect(b.has(me, 'shield')).toBe(false);
+    // alone, it shields itself
+    const solo = new Battle(combatants([toller]), ENEMY, { seed: 3 });
+    expect(solo.validTargets(solo.get('p0'), toll).map((u) => u.uid)).toEqual(['p0']);
+  });
+
   it('places a status on every enemy with an AoE skill', () => {
     const b = new Battle(combatants([mender]), combatants([guard, twin, striker]), { seed: 9 });
     b.useSkill(b.get('p0'), skill(mender, 'scorch'));
@@ -342,6 +357,17 @@ describe('statuses', () => {
     g.hp = 100;
     b.useSkill(q, skill(provisioner, 'rations'));
     expect(g.tm).toBe(100);
+  });
+
+  it('overloads on a tick of Poison too: any drop below the threshold', () => {
+    const b = new Battle(combatants([twin]), combatants([overdrive]), { seed: 5 });
+    const c = b.get('e0');
+    c.hp = Math.round(c.maxHp * 0.52);
+    b.addStatus(c, 'poison', 2, 0, 'test');
+    const { events } = b.startTurn(c);
+    expect(c.alive && c.overdriven).toBe(true);
+    expect(events.some((e) => e.kind === 'passive')).toBe(true);
+    expect(b.has(c, 'def_up')).toBe(true);
   });
 
   it('overloads once below the Overdrive threshold', () => {
@@ -738,9 +764,22 @@ describe('full auto battles', () => {
   it('runs every champion of the roster through battles without errors', () => {
     const all = CHAMPIONS;
     const at = (i: number) => all[i % all.length];
+    // a side left only with champions that never strike can neither win nor lose (the Bellringer alone
+    // shields and heals himself every turn): such a battle runs to the cap, a stalemate the rules do not
+    // settle yet (docs/DESIGN_DECISIONS.md 7); every other battle ends
+    const strikes = (c: ChampionDef) => c.skills.some((s) => s.hits.some((h) => h.mult > 0));
     for (let i = 0; i < all.length; i++) {
-      const r = simulate(combatants([at(i), at(i + 1), at(i + 2)]), combatants([at(i + 1), at(i + 2), at(i + 3)]), { seed: i + 1 });
-      expect(r.winner).not.toBeNull();
+      const b = new Battle(combatants([at(i), at(i + 1), at(i + 2)]), combatants([at(i + 1), at(i + 2), at(i + 3)]), { seed: i + 1 });
+      for (let turns = 0; !b.winner() && turns < 400; turns++) {
+        const a = b.advance();
+        const st = b.startTurn(a);
+        if (a.alive && !st.skip && !b.winner()) {
+          const d = decide(b, a);
+          b.useSkill(a, d.skill, d.target);
+        }
+        b.endTurn(a);
+      }
+      if (!b.winner()) expect((['player', 'enemy'] as const).some((t) => b.alive(t).every((u) => !strikes(u.champion)))).toBe(true);
     }
   });
 });

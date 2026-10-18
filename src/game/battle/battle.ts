@@ -283,10 +283,11 @@ export class Battle {
       case 'enemies':
         return this.foes(u);
       case 'ally': {
-        // a skill that gives its user the effect too is aimed at someone else while anyone else
-        // stands (the Walking Bush's Thicket: himself and one chosen ally)
+        // a skill that also helps its user is aimed at someone else while anyone else stands (the
+        // Walking Bush's Thicket: himself and one chosen ally; the Bellringer's Warning Toll: a Shield
+        // on one ally and a heal for himself)
         const all = this.allies(u);
-        if (!s.statuses?.some((x) => x.to === 'self')) return all;
+        if (!s.statuses?.some((x) => x.to === 'self') && !s.healSelf) return all;
         const others = all.filter((a) => a !== u);
         return others.length ? others : all;
       }

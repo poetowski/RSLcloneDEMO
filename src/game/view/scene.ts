@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -534,7 +534,8 @@ export class BattleScene {
       }
       // a skill aimed at one ally that gives its user the effect too shows it on the user as well (the Walking Bush's Thicket)
       if (skill.target === 'ally' && !targets.includes(actor) && skill.statuses?.some((x) => x.to === 'self')) this.spawnHitFx(fxName, actor, flip);
-      applyWhere((e) => e.hit === k && e.target === actor.uid && e.kind === 'status' && STATUSES[e.status].buff && !targets.includes(actor));
+      // and a heal a skill aimed at an ally gives its user shows as it lands too (the Bellringer's Warning Toll heals him as the bell tolls)
+      applyWhere((e) => e.hit === k && e.target === actor.uid && !targets.includes(actor) && ((e.kind === 'status' && STATUSES[e.status].buff) || (e.kind === 'heal' && skill.target === 'ally')));
       landed++;
       if (skill.shake) this.shake(skill.shake);
     };
@@ -592,7 +593,7 @@ export class BattleScene {
       await Promise.all(ws);
     }
     // a heal the blow returns to its user (the Grove Keeper's Thornburst): the sap drifts back to him before it shows
-    if (skill.healSelf && primary && primary !== actor && res.events.some((e) => e.kind === 'heal' && e.target === actor.uid)) {
+    if (skill.healSelf && skill.target === 'enemy' && primary && primary !== actor && res.events.some((e) => e.kind === 'heal' && e.target === actor.uid)) {
       const ws: Promise<void>[] = [];
       for (let n = 0; n < 3; n++) {
         ws.push(
@@ -822,7 +823,14 @@ export class BattleScene {
           }
           break;
         }
-        // a passive wakes mid-fight (Overdrive): banner, the burst on the body, its name over the head
+        // a passive wakes once mid-fight (Overdrive): the banner, then the passive's own effect on its holder where
+        // its data names one (the Bellringer's Last Peal: his bell tolls by itself), else the core-flare and OVERDRIVE!
+        const od = v.champion.passive;
+        if (od?.holderFx) {
+          this.spawnHitFx(od.holderFx, v, v.facing === 'L');
+          this.shake(2);
+          break;
+        }
         void this.fx.spawn('overdrive', v.x, v.y + 1, { layer: 'top', additive: true });
         this.fx.text(v.uid, v.x, top() - 6, 'OVERDRIVE!', { color: '#ffd860', variant: 'display', outline: '#3a1a06' });
         this.flash = Math.max(this.flash, 0.12);

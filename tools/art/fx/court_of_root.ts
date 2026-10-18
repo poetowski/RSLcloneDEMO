@@ -23,7 +23,7 @@
 // Jakub, 2026-10-11). Light effects are additive in src/game/view/scene.ts.
 import { disc, dith, ellipseRing, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng, withAlpha } from '../raster.ts';
-import { burst, crescent, cut, FxDef, motes, ramps, ring, sparks, W } from './kit.ts';
+import { burst, crescent, cut, FxDef, motes, ramps, ring, soundRings, sparks, W } from './kit.ts';
 
 const DU = ramps.dust;
 /** A dull flash: grey to white, no hue of its own. */
@@ -33,17 +33,6 @@ const DULL: RGBA[] = [DU[0], DU[2], DU[3], DU[4], W];
 const AM = ramps.amber;
 /** The green of the poison on Big Ears' darts, and of the undergrowth he hides in. */
 const GN = ramps.green;
-
-/** Rings of sound opening from (cx, cy): `n` rings, each `gap` frames after the last, growing `grow` px a frame and fading over `life` frames. */
-function soundRings(b: Bitmap, cx: number, cy: number, i: number, n: number, gap: number, grow: number, life: number, ramp: RGBA[]) {
-  for (let k = 0; k < n; k++) {
-    const age = i - k * gap;
-    if (age < 0 || age > life) continue;
-    const r = 3 + age * grow;
-    const fade = 1 - age / (life + 0.5);
-    ellipseRing(b, cx, cy, r, r * 0.92, 1.8, (x, y, a) => (dith(x, y, Math.min(1, fade * 1.5) * (0.65 + 0.35 * Math.abs(Math.cos(a)))) ? rampDither(ramp, Math.min(4, 1.6 + fade * 2.6), x, y) : 0));
-  }
-}
 
 /**
  * One jaw seen from the side: a line `len` px long from the hinge (hx, hy)

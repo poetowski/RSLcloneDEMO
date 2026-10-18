@@ -64,6 +64,7 @@ Section 7 lists what is not decided.
 | 2026-10-17 | Zone 3, the Moonlit Basin: its name and description; its battle background, "dynamic"; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.6, 7 |
 | 2026-10-18 | The Skeleton, a Common of the Ashveil Reign and its first champion | 3.4, 7, 28 |
 | 2026-10-18 | The Rot Hulk, a Common Tank of the Ashveil Reign | 3.4, 7, 29 |
+| 2026-10-18 | The Bellringer, a Common Support of the Ashveil Reign | 3.4, 7, 30 |
 
 ---
 
@@ -275,7 +276,8 @@ and Sanguine Dominion.
 what came through when it did. To be designed.
 
 **Champions.** *(2026-10-18)* Its first, the Skeleton, a Common (section 28),
-and its second, the Rot Hulk, a Common Tank (section 29).
+its second, the Rot Hulk, a Common Tank (section 29), and its third, the
+Bellringer, a Common Support (section 30).
 
 **Name rationale.** "Reign" puts the faction on the same footing as Crown and
 Dominion — ruling nouns, one set. "Ashveil" gives it a distinctive seat
@@ -755,8 +757,8 @@ open questions.
   the Wild Speaker's 2026-10-13, sections 18-20, and the Jungle Herder's,
   Emissary Handlings', Red Cloak's, Big Ears', the Associate's, the Black
   Rhino's and the Grove Keeper's 2026-10-17, sections 21-27, and the
-  Skeleton's and the Rot Hulk's 2026-10-18, sections 28 and 29; their
-  numbers are not)*
+  Skeleton's, the Rot Hulk's and the Bellringer's 2026-10-18, sections
+  28-30; their numbers are not)*
 - The affinities of the Jungle Herder, Emissary Handlings, Red Cloak and Big
   Ears: Jakub, 2026-10-17, "i will optimize affinities for these 4 new heroes
   later" *(the game stands in Bloom, Tide, Bloom and Ember)*
@@ -776,6 +778,11 @@ open questions.
   stage powers, recruiting stages and enemies are stand-ins)*
 - Where crit is taught, at or before the point Cold Rebuke first fires
   meaningfully (section 8, the Rime Scholar's notes)
+- A battle that cannot end: a side left only with champions that never
+  strike can neither win nor lose (the Bellringer alone shields and heals
+  himself every turn, section 30; a lone Dominion Medic heals) *(the game has
+  no turn limit: such a battle runs until the player retreats, and the
+  balance tool counts one that reaches 400 turns as a loss)*
 - Team size *(the game uses 3)* and how champions are acquired *(one recruit
   per first clear)*
 - Campaign count of zones
@@ -1988,3 +1995,71 @@ the details of his art and effect (the patches' colours and places, the
 stitches and staples, the hook and its chain, the arms, the head and the
 flies, the rag, the gas). Like the Skeleton, he stands in the first zone on
 his page and in his demos.
+
+## 30. The Bellringer (received 2026-10-18)
+
+Jakub's brief, verbatim:
+
+```
+i want new champion.
+name = Bellringer
+faction Ashveil Reign
+class support
+affinity bloom
+rarity common
+design - this is very tall skeleton without any weapons, but his role is to see enemies in advance and then ring his big bell which is attached directly to his one arm. ringbell is of golden color. this skeleton is slim, tall and lacks lower jaw. you can also give him boots so he is not barefooted.
+kit - A1 - add Shield on target ally for 1 turn, value of shield is 10% of this champion max hp. Also, heal this champion for 10% of his max hp.
+A2 passive - first time this champion hp drops below 50%, add defense up on this champion for 2 turns.
+```
+
+The Ashveil Reign's third champion, after the Skeleton and the Rot Hulk
+(sections 28 and 29).
+
+**Readings.** "A2 passive" is his passive, as with the Skeleton. The A1
+places a Shield worth 10% of the Bellringer's max HP on the ally he chooses,
+for 1 turn, and heals him by 10% of his max HP; it strikes nobody. "Target
+ally" is read with the rule of the Walking Bush's Thicket (section 19): a
+skill that also helps its user is aimed at another ally while anyone else
+stands, so he shields the others and heals himself; alone, he shields
+himself. The passive is the game's Overdrive (MECHANICS_GUIDE 8): "drops
+below 50%" counts any damage, a blow or a tick of Poison or Burn, and it
+fires once in a battle; DEF Up lasts through his next two turns. "His role is
+to see enemies in advance" is read as who he is, not as a rule: he peers
+ahead as he stands and points the enemy out as he tolls. "Attached directly
+to his one arm": the bell is fixed to one of his arms in place of the hand,
+hung from an iron collar clamped round the bones, so it swings.
+
+**As built:** the tallest champion of the roster (88 px), a long, thin
+skeleton built bone by bone like the Skeleton (the bones are shared, in
+tools/art/bones.ts): a narrow ribcage of five ribs on a long spine, a long
+neck of five vertebrae, long arms and legs; a gaunt, high skull with no lower
+jaw, its upper teeth hanging over nothing, an empty hinge where the jaw was, a
+pale light in its socket. Old boots of dark leather, too wide for the bones in
+them, their tops turned down in a paler cuff, a strap and an iron buckle over
+the instep. In place of his near hand an iron collar is riveted round the
+bones, and the bell hangs from it on its crown: a big bell of gold with bands
+at its shoulder and a sound bow at its lip, the dark of its mouth and an iron
+clapper inside, swinging on its own. He stands tall with his head craned
+forward, peering ahead, the bell held out before him like a lantern and
+swaying slowly. Warning Toll: he points the enemy out with his free hand and
+swings the bell out before him twice, tolling it; rings of the bell's gold
+open from it, and round the ally he warns a shell of the same gold closes, a
+ring settling at its feet. Last Peal: the bell tolls by itself as he is struck
+below half his HP, and the gold closes round him. Run: long strides, the bell
+carried before him and swinging. Victory: the bell held up at the height of
+his head and pealing. Death: his bones give way and fall into a long heap,
+the bell dropping on its side beside them.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Warning
+Toll and Last Peal and their texts, his stats (on the Common budget, a little
+under it for his passive; ATK at the floor of the norms, as he never
+strikes), the lore line, the stage that brings him (the first clear of 3-3),
+and the details of his art and effects (the bell's gold, size, bands and
+collar, the boots, the light in the socket, the pointing and the lantern
+hold, the shell of gold, the heap). Like the Skeleton, he stands in the first
+zone on his page and in his demos.
+
+Left open by the rules: a battle in which one side has only champions that
+never strike left can be neither won nor lost by that side. The Bellringer
+alone, shielding and healing himself every turn, outlasts a lone enemy that
+hits softly and never beats it (section 7).

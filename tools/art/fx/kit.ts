@@ -302,3 +302,14 @@ export function cut(b: Bitmap, x0: number, y0: number, x1: number, y1: number, b
     }
   }
 }
+
+/** Rings of sound opening from (cx, cy): `n` rings, each `gap` frames after the last, growing `grow` px a frame and fading over `life` frames. */
+export function soundRings(b: Bitmap, cx: number, cy: number, i: number, n: number, gap: number, grow: number, life: number, ramp: RGBA[]) {
+  for (let k = 0; k < n; k++) {
+    const age = i - k * gap;
+    if (age < 0 || age > life) continue;
+    const r = 3 + age * grow;
+    const fade = 1 - age / (life + 0.5);
+    ellipseRing(b, cx, cy, r, r * 0.92, 1.8, (x, y, a) => (dith(x, y, Math.min(1, fade * 1.5) * (0.65 + 0.35 * Math.abs(Math.cos(a)))) ? rampDither(ramp, Math.min(4, 1.6 + fade * 2.6), x, y) : 0));
+  }
+}
