@@ -104,6 +104,13 @@ export const MAT = {
   ashBone: m('ashBone', 'matte', ['#221e1d', '#4a433f', '#776d66', '#aca292', '#d4cab6', '#f0e8d6']),
   /** rust eating the Skeleton's sword: orange-brown flakes on the dull iron */
   rust: m('rust', 'matte', ['#1e0e08', '#46200f', '#743617', '#9c5220', '#c2763a', '#e0a066']),
+  /** the Rot Hulk's patchwork of dead flesh: rotted grey-green, corpse pale, a purple bruise, a jaundiced yellow */
+  rotGreen: m('rotGreen', 'skin', ['#141a12', '#2a3324', '#45503a', '#627052', '#818f6c', '#a2ae88']),
+  rotPale: m('rotPale', 'skin', ['#241c20', '#4d3f44', '#7d6a6c', '#ab9792', '#cdbdb2', '#e8dccf']),
+  bruise: m('bruise', 'skin', ['#160f1c', '#2e2238', '#4a3a58', '#6a5878', '#8c7a98', '#b0a2ba']),
+  jaundice: m('jaundice', 'skin', ['#1e180c', '#3e3418', '#665828', '#8e7e3c', '#b2a258', '#d4c67e']),
+  /** the rot that oozes out of him: a bilious green */
+  bile: m('bile', 'matte', ['#1a2408', '#344a10', '#567818', '#80a828', '#aed048', '#d8f080']),
   /** the Skeleton's fancy strip at the neck: a plum silk, old but still rich */
   plum: m('plum', 'cloth', ['#16080f', '#311226', '#53203f', '#7a2e5a', '#a34479', '#c86a9a']),
 
@@ -226,6 +233,8 @@ export const FXR = {
   blood: fx(['#3a0a10', '#7a1420', '#c02a30', '#ff6a5a', '#ffd0c0']),
   /** the rose light of the Dominion Medic's potions */
   rose: fx(['#4a1030', '#a03068', '#e0609a', '#ffa8cc', '#fff0f6']),
+  /** bile: the rot the Rot Hulk's fists splash about */
+  bile: fx(['#2a3a08', '#4e6e12', '#80a828', '#b8d850', '#eef8b0']),
   /** rust: the flakes the Skeleton's rusty sword sheds when it bites */
   rust: fx(['#3a1a0c', '#7a3a18', '#b8622c', '#e09a5a', '#f6dcb8']),
   /** wood: the Walking Bush's chips and roots, his own bark paling to a white core */

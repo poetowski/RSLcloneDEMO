@@ -63,6 +63,7 @@ Section 7 lists what is not decided.
 | 2026-10-17 | The affinities of the Associate, the Black Rhino and the Grove Keeper: not set | 7, 25-27 |
 | 2026-10-17 | Zone 3, the Moonlit Basin: its name and description; its battle background, "dynamic"; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.6, 7 |
 | 2026-10-18 | The Skeleton, a Common of the Ashveil Reign and its first champion | 3.4, 7, 28 |
+| 2026-10-18 | The Rot Hulk, a Common Tank of the Ashveil Reign | 3.4, 7, 29 |
 
 ---
 
@@ -273,7 +274,8 @@ and Sanguine Dominion.
 **Recast under the premise.** May be connected to *why* the loom broke, or to
 what came through when it did. To be designed.
 
-**Champions.** *(2026-10-18)* Its first, the Skeleton, a Common (section 28).
+**Champions.** *(2026-10-18)* Its first, the Skeleton, a Common (section 28),
+and its second, the Rot Hulk, a Common Tank (section 29).
 
 **Name rationale.** "Reign" puts the faction on the same footing as Crown and
 Dominion — ruling nouns, one set. "Ashveil" gives it a distinctive seat
@@ -753,7 +755,8 @@ open questions.
   the Wild Speaker's 2026-10-13, sections 18-20, and the Jungle Herder's,
   Emissary Handlings', Red Cloak's, Big Ears', the Associate's, the Black
   Rhino's and the Grove Keeper's 2026-10-17, sections 21-27, and the
-  Skeleton's 2026-10-18, section 28; their numbers are not)*
+  Skeleton's and the Rot Hulk's 2026-10-18, sections 28 and 29; their
+  numbers are not)*
 - The affinities of the Jungle Herder, Emissary Handlings, Red Cloak and Big
   Ears: Jakub, 2026-10-17, "i will optimize affinities for these 4 new heroes
   later" *(the game stands in Bloom, Tide, Bloom and Ember)*
@@ -1934,3 +1937,54 @@ colours, the knot and the pennant, the light in the socket, the crack, the
 rust and the notches, the heap). The Ashveil Reign has no zone of its own:
 like every faction but the Court of Root, he stands in the first zone on his
 page and in his demos.
+
+## 29. The Rot Hulk (received 2026-10-18)
+
+Jakub's brief, verbatim:
+
+```
+i want new champion. name = Rot Hulk. faction ashveil reign class tank affinity ember rarity common design - big and fatty abomination, be creative, use several patchworked colors, remember this is not any legendary hero just a rot bulk of entry level resistance. kit A1 - attack single target. has 25% chance to inflict Poison for 2 turns.
+```
+
+The Ashveil Reign's second champion, after the Skeleton (section 28).
+
+**Readings.** "Not any legendary hero just a rot bulk of entry level
+resistance" is read as one thing: a Common, an entry-level Tank whose
+toughness is no more than that, and who looks it, as Commons do on his word
+(sections 12 and 15): a dull lump of patched flesh with nothing grand about
+him. "Resistance" is not read as the RES stat: his kit names no passive, so
+his RES is 0 like every champion's but the Skeleton's. "Attack single target"
+is an A1 on one enemy. The Poison is the game's (MECHANICS_GUIDE 7: 5% of the
+target's max HP at the start of each of its turns, through shields), placed
+after the hit with a 25% chance, for 2 turns, and met by the target's RES like
+any debuff. With no Taunt, the AI aims elsewhere until his allies are low, as
+with the Lineholder and the Walking Bush (MDA T20).
+
+**As built:** a great, hunched, bloated hulk, as wide as he is tall, sewn
+together out of the dead flesh of many: a body of rotted grey-green, a
+corpse-pale belly hanging forward, a bruised purple chest and a jaundiced hip
+behind, stitched on in crude black thread with cross-stitches, a square of
+old leather sewn over his hump, iron staples where the seams gave and drips
+of rot from a long cut across his belly; mismatched arms ending in great
+mitts, the near one grey-green with a bruised forearm and a pale hand, the
+far one bruised and bound in dirty bandages; stumpy legs, the near shin
+jaundiced and wound in rags; a small, pale, stitched head sunk low between
+his shoulders, a milky eye and a small dark one, a slack mouth of crooked
+teeth that drools; a rusty meat hook stuck in his hump with a length of
+chain; three flies that never leave him; round his near arm a dark grey rag
+with a white bone, the Reign's standard. Putrid Slam: his fists swing back
+and up over his head, come over and down on one enemy, and he hangs over the
+blow; where they land, a dull flash, gobbets of rot splashing out and falling
+and a puff of rot gas. Idle: a slow, heavy breath that swells his belly, the
+head lolling, a drop of drool falling, the flies circling; victory: he pounds
+his belly with both fists, roaring; death: he staggers back, sits down hard
+and falls on his back, rot puffing off him.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the skill's name
+Putrid Slam and its text, A1's multiplier (1.0, a plain attack), his stats
+(on the Common budget: the most HP of the Commons, 1500, and the slowest, SPD
+90), the lore line, the stage that brings him (the first clear of 3-2), and
+the details of his art and effect (the patches' colours and places, the
+stitches and staples, the hook and its chain, the arms, the head and the
+flies, the rag, the gas). Like the Skeleton, he stands in the first zone on
+his page and in his demos.

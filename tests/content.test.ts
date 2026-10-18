@@ -240,6 +240,16 @@ describe('design decisions', () => {
     expect(s?.stats.res).toBe(0);
   });
 
+  it('has the Rot Hulk of his brief: a Common Tank of the Ashveil Reign, Ember; one skill, an A1 on one enemy with a 25% chance of Poison for 2 turns, nothing else', () => {
+    const r = CHAMPIONS.find((c) => c.id === 'rot_hulk');
+    expect(r && [r.name, r.rarity, r.role, r.faction, r.affinity]).toEqual(['Rot Hulk', 'common', 'Tank', 'ashveil_reign', 'ember']);
+    expect(r?.skills).toHaveLength(1);
+    const a1 = r?.skills[0];
+    expect(a1 && [a1.slot, a1.target, a1.statuses]).toEqual([1, 'enemy', [{ status: 'poison', turns: 2, chance: 0.25, to: 'targets' }]]);
+    expect(a1?.hits.some((h) => h.mult > 0)).toBe(true);
+    expect(r?.passive).toBeUndefined();
+  });
+
   it('has the Follower of his brief: a Common of the Court of Root, Damage, Tide; A1 a single-target attack, A2 a single-target attack with a 50% chance of DEF Down for 2 turns, cooldown 4', () => {
     const f = CHAMPIONS.find((c) => c.id === 'follower');
     expect(f && [f.name, f.rarity, f.role, f.faction, f.affinity]).toEqual(['Follower', 'common', 'Damage', 'court_of_root', 'tide']);

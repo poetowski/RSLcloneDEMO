@@ -15,6 +15,7 @@ import { lineholder } from './lineholder.ts';
 import { quartermaster } from './quartermaster.ts';
 import { redCloak } from './red_cloak.ts';
 import { rimeScholar } from './rime_scholar.ts';
+import { rotHulk } from './rot_hulk.ts';
 import { skeleton } from './skeleton.ts';
 import { skirmisher } from './skirmisher.ts';
 import { walkingBush } from './walking_bush.ts';
@@ -22,7 +23,7 @@ import { wildSpeaker } from './wild_speaker.ts';
 
 export const CHAMPION_ART: Record<string, ChampionArt> = {
   captain_gareth: captainGareth, rime_scholar: rimeScholar, follower, skirmisher, dominion_medic: dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walking_bush: walkingBush, wild_speaker: wildSpeaker, jungle_herder: jungleHerder, associate, emissary_handlings: emissaryHandlings, black_rhino: blackRhino, red_cloak: redCloak, grove_keeper: groveKeeper, big_ears: bigEars, skeleton,
+  walking_bush: walkingBush, wild_speaker: wildSpeaker, jungle_herder: jungleHerder, associate, emissary_handlings: emissaryHandlings, black_rhino: blackRhino, red_cloak: redCloak, grove_keeper: groveKeeper, big_ears: bigEars, skeleton, rot_hulk: rotHulk,
 };
 
 /** Rig + animations by champion id (what the frame tools work with). */

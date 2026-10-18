@@ -18,8 +18,8 @@
 // Basin, named and described by Jakub (2026-10-17), has ten placeholder stages
 // like Zone 2's, so it can be played and seen in game: their texts walk his
 // description from the grove's roots to the eastern hills, their enemies are
-// copies of the roster, their powers are tuned stand-ins; 3-1 brings the
-// Skeleton, the Ashveil Reign's first champion (a stand-in).
+// copies of the roster, their powers are tuned stand-ins; 3-1 and 3-2 bring
+// the Skeleton and the Rot Hulk, the Ashveil Reign's first champions (stand-ins).
 import { LocationDef, StageDef } from './types';
 
 /**
@@ -251,6 +251,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: BASIN,
         enemies: [{ champion: 'grove_keeper' }, { champion: 'wild_speaker' }, { champion: 'follower' }],
         power: 0.84,
+        // a stand-in: the stage that brings the Rot Hulk is not Jakub's
+        recruit: 'rot_hulk',
       },
       {
         id: '3-3',
