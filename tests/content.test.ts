@@ -282,6 +282,16 @@ describe('design decisions', () => {
     expect(a?.passive).toBeUndefined();
   });
 
+  it('has Irving Wellbington of his brief: an Elite Tank of the Ashveil Reign, Bloom; an A1 with a 35% chance of Slow for 1 turn; an A2 that places DEF Up for 2 turns and Counterattack for 1 on himself, cooldown 4; a passive that answers a critical hit on him with Taunt for 1 turn and a heal of 20% of his max HP', () => {
+    const w = CHAMPIONS.find((c) => c.id === 'irving_wellbington');
+    expect(w && [w.name, w.rarity, w.role, w.faction, w.affinity]).toEqual(['Irving Wellbington', 'elite', 'Tank', 'ashveil_reign', 'bloom']);
+    expect(w?.skills).toHaveLength(2);
+    const [a1, a2] = w?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, a1.statuses, totalMult(a1) > 0]).toEqual([1, 'enemy', [{ status: 'spd_down', turns: 1, chance: 0.35, to: 'targets' }], true]);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses, totalMult(a2) > 0]).toEqual([2, 'enemy', 4, [{ status: 'def_up', turns: 2, to: 'self' }, { status: 'counter', turns: 1, to: 'self' }], true]);
+    expect(w?.passive && [w.passive.kind, w.passive.value, w.passive.statuses]).toEqual(['defy', 0.2, [{ status: 'taunt', turns: 1 }]]);
+  });
+
   it('has the Follower of his brief: a Common of the Court of Root, Damage, Tide; A1 a single-target attack, A2 a single-target attack with a 50% chance of DEF Down for 2 turns, cooldown 4', () => {
     const f = CHAMPIONS.find((c) => c.id === 'follower');
     expect(f && [f.name, f.rarity, f.role, f.faction, f.affinity]).toEqual(['Follower', 'common', 'Damage', 'court_of_root', 'tide']);

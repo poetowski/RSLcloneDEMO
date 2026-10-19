@@ -357,6 +357,8 @@ export class Battle {
 
     const last = skill.hits.length - 1;
     const damaged = new Set<Unit>();
+    /** the targets a critical hit of this skill landed on */
+    const critOn = new Set<Unit>();
     skill.hits.forEach((h, hi) => {
       if (h.mult <= 0) return;
       for (const t of targets) {
@@ -364,6 +366,7 @@ export class Battle {
         const dmg = this.rollDamage(actor, t, skill, h.mult);
         const dealt = this.applyDamage(t, dmg.amount, dmg.crit, dmg.edge, hi, events);
         damaged.add(t);
+        if (dmg.crit) critOn.add(t);
         if (dmg.crit) this.rebuke(t, actor, hi, events);
         if (skill.lifesteal && dealt > 0 && actor.alive) this.heal(actor, Math.round(dealt * skill.lifesteal), hi, events);
         for (const app of skill.statuses ?? []) {
@@ -436,6 +439,7 @@ export class Battle {
     if (skill.selfTm && !asCounter) actor.pendingTm = skill.selfTm;
     // a passive answering the blow on each ally it struck comes after the hit, then one answering the attacker
     this.ward(actor, damaged, last, events);
+    this.defy(actor, critOn, last, events);
     this.retaliate(actor, damaged, last, events);
 
     const result: SkillResult = { actor: actor.uid, skill, target: primary?.uid, targets: targets.map((t) => t.uid), events, counter: asCounter, counters: [] };
@@ -590,6 +594,22 @@ export class Battle {
         events.push({ kind: 'passive', target: d.uid, name: p.name, hit, effect: 'ward', source: h.uid });
         for (const st of p.statuses ?? []) this.tryApply(h, d, st.status, st.turns, undefined, p.value, hit, events);
       }
+    }
+  }
+
+  /**
+   * Defy (passive): an enemy skill whose hit on the holder was critical and left
+   * it standing wakes it after the skill's last hit, once per skill: the holder
+   * takes the passive's statuses and heals by `value` of its max HP (Irving
+   * Wellbington's Old Grudge: Taunt for 1 turn and 20%). Heal Block stops the heal.
+   */
+  private defy(actor: Unit, critOn: Set<Unit>, hit: number, events: BattleEvent[]) {
+    for (const d of critOn) {
+      const p = d.champion.passive;
+      if (p?.kind !== 'defy' || !d.alive || d.team === actor.team) continue;
+      events.push({ kind: 'passive', target: d.uid, name: p.name, hit, effect: 'defy', source: d.uid });
+      for (const st of p.statuses ?? []) this.tryApply(d, d, st.status, st.turns, undefined, undefined, hit, events);
+      if (p.value) this.heal(d, Math.round(d.maxHp * p.value), hit, events);
     }
   }
 

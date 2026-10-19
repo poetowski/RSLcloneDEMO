@@ -157,8 +157,12 @@ export interface PassiveDef {
    * remedy:    when an enemy places a debuff on an ally (the champion included), `chance` to
    *            give that ally `statuses` (the Grove Keeper's Keeper's Balm: Regen for 1 turn,
    *            2026-10-17)
+   * defy:      when an enemy skill lands a critical hit on the champion and leaves it
+   *            standing, after the skill's last hit, once per skill: the champion takes
+   *            `statuses` and heals by `value` x its max HP (Irving Wellbington's Old Grudge:
+   *            Taunt for 1 turn and 20%, 2026-10-19)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
   /** rebuke and tend: the champion's own turns the passive rests after it acts */

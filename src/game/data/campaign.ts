@@ -25,8 +25,8 @@
 // "like in the past": their texts walk his description, from the steppe and its
 // two ravines to the camp, the yaks, the mountains and the zeppelin; their
 // enemies are copies of the roster and their powers tuned stand-ins; 4-1 brings
-// the Necromancer, the Ashveil Reign's first Elite, and 4-2 the Automated Soul,
-// its second (stand-ins).
+// the Necromancer, the Ashveil Reign's first Elite, 4-2 the Automated Soul, its
+// second, and 4-3 Irving Wellbington, its third (stand-ins).
 import { LocationDef, StageDef } from './types';
 
 /**
@@ -352,6 +352,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: RAVINES,
         enemies: [{ champion: 'skeleton' }, { champion: 'skeleton' }, { champion: 'big_ears' }],
         power: 0.81,
+        // a stand-in: the stage that brings Irving Wellbington is not Jakub's
+        recruit: 'irving_wellbington',
       },
       {
         id: '4-4',

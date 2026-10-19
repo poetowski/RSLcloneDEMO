@@ -129,6 +129,12 @@ export const brute = fixture('brute', {
   skills: [undefined, skill('brute_blow', 2, { hits: [{ mult: 1.5 }], statuses: [{ status: 'atk_up', turns: 2, to: 'self' }] })],
 });
 
+/** Defy: a critical hit on it that leaves it standing gives it Taunt for 1 turn and heals it by 20% of its max HP. */
+export const grudger = fixture('grudger', {
+  stats: { hp: 2000 },
+  passive: { id: 'grudge', name: 'Grudge', desc: '', kind: 'defy', value: 0.2, statuses: [{ status: 'taunt', turns: 1 }] },
+});
+
 /** A3 places ATK Up on itself before its shot, then Stun on the target after it. */
 export const marksman = fixture('marksman', {
   skills: [undefined, undefined, skill('steady_shot', 3, { approach: 'none', hits: [{ mult: 1.5 }], statuses: [{ status: 'atk_up', turns: 2, to: 'self', before: true }, { status: 'stun', turns: 1, to: 'targets' }] })],

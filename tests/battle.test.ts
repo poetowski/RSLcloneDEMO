@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, guard, hide, inAffinity, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
+import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, grudger, guard, hide, inAffinity, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -437,6 +437,37 @@ describe('statuses', () => {
       b.endTurn(k);
     }
     expect(b.has(k, 'atk_up')).toBe(false);
+  });
+
+  it('answers a critical hit on its holder with Defy: Taunt on itself and a heal of a share of its max HP, once per skill, while it stands', () => {
+    const always = (c: ChampionDef): ChampionDef => ({ ...c, stats: { ...c.stats, crit: 1 } });
+    const never = (c: ChampionDef): ChampionDef => ({ ...c, stats: { ...c.stats, crit: 0 } });
+    // a critical hit it survives: Taunt for 1 turn and 20% of its max HP back, after the hit
+    let b = new Battle(combatants([grudger]), combatants([always(striker)]), { seed: 3 });
+    let g = b.get('p0');
+    g.hp = Math.round(g.maxHp / 2);
+    let r = b.useSkill(b.get('e0'), striker.skills[0], 'p0');
+    const answers = r.events.filter((e) => e.kind === 'passive');
+    expect(answers.length === 1 && answers[0].kind === 'passive' && answers[0].effect === 'defy').toBe(true);
+    expect(b.has(g, 'taunt')).toBe(true);
+    const heal = r.events.find((e) => e.kind === 'heal' && e.target === 'p0');
+    expect(heal?.kind === 'heal' && heal.amount).toBe(Math.round(g.maxHp * 0.2));
+    expect(r.events.findIndex((e) => e.kind === 'passive')).toBeGreaterThan(r.events.findIndex((e) => e.kind === 'damage'));
+    // two critical hits in one skill: one answer
+    b = new Battle(combatants([grudger]), combatants([always(twin)]), { seed: 3 });
+    r = b.useSkill(b.get('e0'), skill(twin, 'twin_chop'), 'p0');
+    expect(r.events.filter((e) => e.kind === 'passive').length).toBe(1);
+    // a hit that is not critical leaves it be
+    b = new Battle(combatants([grudger]), combatants([never(striker)]), { seed: 3 });
+    r = b.useSkill(b.get('e0'), striker.skills[0], 'p0');
+    expect(r.events.some((e) => e.kind === 'passive') || b.has(b.get('p0'), 'taunt')).toBe(false);
+    // and a critical hit that fells it never wakes it
+    b = new Battle(combatants([grudger]), combatants([always(striker)]), { seed: 3 });
+    g = b.get('p0');
+    g.hp = 1;
+    r = b.useSkill(b.get('e0'), striker.skills[0], 'p0');
+    expect(g.alive).toBe(false);
+    expect(r.events.some((e) => e.kind === 'passive')).toBe(false);
   });
 
   it('places a status marked before ahead of the first hit, so the skill itself carries it', () => {

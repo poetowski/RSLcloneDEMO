@@ -69,6 +69,7 @@ Section 7 lists what is not decided.
 | 2026-10-18 | Zone 4, Earth Scars: its name and description; its battle background; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.7, 7 |
 | 2026-10-18 | The Necromancer, an Elite Support of the Ashveil Reign; the first skill that raises a fallen ally | 3.4, 5.7, 7, 31 |
 | 2026-10-18 | The Automated Soul, an Elite Damage of the Ashveil Reign; the first status a skill places before its hit | 3.4, 5.7, 7, 32 |
+| 2026-10-19 | Irving Wellbington, an Elite Tank of the Ashveil Reign; the first passive that answers a critical hit on its holder; his shield much bigger | 3.4, 5.7, 7, 33 |
 
 ---
 
@@ -282,8 +283,9 @@ what came through when it did. To be designed.
 **Champions.** *(2026-10-18)* Its first, the Skeleton, a Common (section 28),
 its second, the Rot Hulk, a Common Tank (section 29), its third, the
 Bellringer, a Common Support (section 30), its fourth, the Necromancer, a
-Support and its first Elite (section 31), and its fifth, the Automated Soul,
-an Elite of the Damage role (section 32).
+Support and its first Elite (section 31), its fifth, the Automated Soul, an
+Elite of the Damage role (section 32), and its sixth, Irving Wellbington, an
+Elite Tank (section 33).
 
 **Name rationale.** "Reign" puts the faction on the same footing as Crown and
 Dominion — ruling nouns, one set. "Ashveil" gives it a distinctive seat
@@ -848,9 +850,9 @@ description, from the steppe and its two ravines to the camp, the yaks, the
 mountains and the zeppelin; the area's blurb places it. Their enemies are
 copies of the roster's champions, the Ashveil Reign's Skeleton and Rot Hulk
 among them for the first time, and 4-10 is a boss Red Cloak; their powers are
-tuned stand-ins. The first clears of 4-1 and 4-2 bring the Necromancer and
-the Automated Soul (sections 31 and 32; the stages are stand-ins). Stages,
-enemies and story wait for him.
+tuned stand-ins. The first clears of 4-1, 4-2 and 4-3 bring the Necromancer,
+the Automated Soul and Irving Wellbington (sections 31-33; the stages are
+stand-ins). Stages, enemies and story wait for him.
 
 ---
 
@@ -891,7 +893,8 @@ open questions.
   Emissary Handlings', Red Cloak's, Big Ears', the Associate's, the Black
   Rhino's and the Grove Keeper's 2026-10-17, sections 21-27, and the
   Skeleton's, the Rot Hulk's, the Bellringer's, the Necromancer's and the
-  Automated Soul's 2026-10-18, sections 28-32; their numbers are not)*
+  Automated Soul's 2026-10-18, sections 28-32, and Irving Wellbington's
+  2026-10-19, section 33; their numbers are not)*
 - The affinities of the Jungle Herder, Emissary Handlings, Red Cloak and Big
   Ears: Jakub, 2026-10-17, "i will optimize affinities for these 4 new heroes
   later" *(the game stands in Bloom, Tide, Bloom and Ember)*
@@ -2362,3 +2365,79 @@ plate and its gold trim, the bones showing between the plates, the bow's
 leather grip and horn tips, the quiver and its strap, the azure fletching, the
 volley standing in the ground, the pale light of Pinning Shot). Like the
 Skeleton, he stands in the first zone on his page and in his demos.
+
+## 33. Irving Wellbington (received 2026-10-19)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion.
+affinity bloom.
+rarity elite.
+class tank.
+faction ashveil reign
+name = Irving Wellbington
+
+design = this is a dwarf skeleton with big horned helmet and robust round shield with ancient runs on it.
+kit = A1 - attack single target, has 35% chance to debuff target enemy with SLOW DOWN for 1 turn.
+A2 - attack single target, buff this champion with defense up for 2 turns and counter for 1 turn. CD 4 turns.
+A3 passive - When enemy lands critical hit on this champion, buff this champion with TAUNT for 1 turn. Also, heal this champion by 20% of his MAX HP.
+```
+
+and, while he was being built:
+
+```
+make his round shield much bigger
+```
+
+The Ashveil Reign's sixth champion and its third Elite, after the Necromancer
+and the Automated Soul (sections 31 and 32).
+
+**Readings.** SLOW DOWN is the game's Slow, "defense up" its DEF Up and
+"counter" its Counterattack (MECHANICS_GUIDE 7). "A3 passive" is his passive,
+as with the Skeleton and the Bellringer: he has an A1, an A2 and the passive.
+The A2's buffs come after its hit; placed on his own turn, DEF Up lasts
+through his next two turns and Counterattack through his next one. The passive
+is a new rule (MECHANICS_GUIDE 8, Defy): it answers an enemy skill that landed
+a critical hit on him and left him standing, after the skill's last hit and
+once per skill, however many of its hits were critical; a crit that fells him
+never wakes it. Taunt then holds through his next turn, and the heal is 20% of
+his max HP, which Heal Block stops like any heal. "Ancient runs" is read as
+ancient runes. No weapon is named, so he fights with his shield: Shield Bash
+drives its face into the enemy, Bulwark Slam brings its rim down, and
+Counterattack answers with the bash.
+
+**As built:** a dwarf's skeleton, built bone by bone like the Reign's others
+(tools/art/bones.ts): short-legged and broad, the bones thick, a barrel of a
+ribcage over a broad pelvis. His skull, its jaw on its own hinge and a pale
+light in its socket, sits under a big iron helmet with a ridge along its crown
+and a brow band of rivets, and two great ivory horns curve up from it, the
+near one forward, the far one back, their roots ridged and their tips dark. A
+braided beard of grey hair still hangs from his jaw down his chest, an iron
+ring near its end (a dwarf's mark the brief does not name). On his far
+forearm, before him, the robust round shield, much bigger on Jakub's word: it
+covers him from the knees to the chin, old planks in an iron rim with rivets
+and an iron boss, and round the boss a ring of eight ancient runes cut into
+the wood, a pale light in the cuts waxing and waning. Idle: he stands his
+ground behind the shield, heavy, his jaw slack. Shield Bash: he runs in, draws
+the shield back and drives its face into the enemy; a round dull flash, the
+ring of the rim pressed out, a few pale sparks of the runes. Bulwark Slam: he
+lifts the shield in both hands, brings its rim down on the enemy in a dull
+streak and a heavy flash, then plants it before him, crouched behind it, as
+DEF Up and Counterattack land on him. Old Grudge: its name over him and the
+runes on his shield blazing with the pale light, a ring of it running round
+them and opening out; then Taunt and the heal. Run: short, heavy steps, the
+shield held before him. Victory: the shield held out before him, the near fist
+raised, the jaw clacking in a laugh, the runes ablaze. Death: his bones give
+way and fall into a heap, the skull rolling off in its helmet, the beard lying
+along the ground, the shield falling flat.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Shield
+Bash, Bulwark Slam and Old Grudge and their texts, A1's multiplier (1.0) and
+A2's (1.2), his stats (on the Elite budget, a little under it for the passive:
+HP 1460, ATK 82, DEF 76, SPD 90), the lore line, the stage that brings him
+(the first clear of 4-3), and the details of his art and effects (fighting
+with the shield, the beard and its ring, the helmet's band and ridge, the
+horns' sweep, the planks, rim and boss, the eight runes and their pale light,
+the effects). Like the Skeleton, he stands in the first zone on his page and
+in his demos.

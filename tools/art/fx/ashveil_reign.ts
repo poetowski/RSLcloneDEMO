@@ -18,7 +18,12 @@
 // Unerring Shot bites in a short dull flash and splinters; Sundering Volley
 // drives arrows into the ground about the enemy's feet, each with a puff of
 // dust; Pinning Shot's arrow trails the pale light of his gorget and lands
-// heavy, a ring of that light jarring out from it. All matter.
+// heavy, a ring of that light jarring out from it. All matter. Irving
+// Wellbington's shield: Shield Bash lands in a round dull flash and the ring
+// of its rim pressed out, dust and a few pale sparks of its runes; Bulwark
+// Slam brings the rim down in a dull streak and a heavy flash, dust thrown out
+// low; when Old Grudge wakes, the runes on the shield blaze with the pale light
+// (additive).
 // Never their affinity (affinities are abstract, Jakub, 2026-10-11).
 import { ACCENT, MAT } from '../palette.ts';
 import { dith, ellipseFill, ellipseRing, line, polyFill, rampDither } from '../paint.ts';
@@ -356,6 +361,57 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
         // the dust it kicks up as it drives in
         if (age < 3) ellipseFill(b, x, y0, 2.5 + age * 1.6, 1 + age * 0.5, (px, py, d) => (dith(px, py, (1 - age / 3) * (1 - d)) ? DU[2 + (d < 0.4 ? 1 : 0)] : 0));
       }
+    },
+  },
+  /** Shield Bash lands: a round dull flash the size of the shield's face, the ring of its rim pressed out, dust and a few pale sparks of its runes thrown off. */
+  shield_bash: {
+    w: 56, h: 56, n: 7, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      if (i < 3) burst(b, cx, cy, 8, 1.5, [8, 12, 9][i], 1.3, DULL, 0.25);
+      if (i >= 1) {
+        const r = 6 + (i - 1) * 3.2;
+        ellipseRing(b, cx, cy, r * 0.8, r, Math.max(0.6, 1.8 - (i - 1) * 0.25), (x, y) => (dith(x, y, Math.max(0.2, 1 - (i - 1) / 6)) ? DULL[2] : 0));
+        sparks(b, cx, cy, 8, 16, (i - 1) / 5, DU, 711, 8);
+      }
+      if (i >= 2 && i <= 5) sparks(b, cx, cy, 5, 12, (i - 2) / 3, SOUL, 719, -2);
+    },
+  },
+  /** Bulwark Slam lands: the rim comes down in a dull streak through the enemy, a heavy flash where it bites, dust thrown out low. */
+  bulwark_slam: {
+    w: 64, h: 64, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 10, 2],
+    draw: (b, t, i) => {
+      const cx = 32, cy = 28;
+      if (i < 3) cut(b, cx - 9, cy - 20, cx + 5, cy + 12, 6, 3 - i * 0.7, DULL, 1 - i * 0.2);
+      if (i >= 1 && i < 5) burst(b, cx, cy + 2, 9, 2, [13, 17, 12, 8][i - 1], 1.5, DULL, 0.4);
+      if (i >= 2) {
+        const r = 6 + (i - 2) * 4;
+        ring(b, cx, cy + 4, r, r * 0.5, Math.max(0.6, 1.6 - (i - 2) * 0.2), DU, Math.max(0.3, 1.1 - (i - 2) * 0.15));
+        sparks(b, cx, cy + 6, 12, 24, (i - 2) / 6, DU, 727, 12);
+      }
+    },
+  },
+  /**
+   * Old Grudge wakes: the runes on Irving Wellbington's shield blaze with the
+   * pale light, a ring of it running round them and opening out, motes of it
+   * rising (additive). The scene plays it at his chest; his shield stands
+   * 15.3 px ahead of that point and 13 px lower, where the flare sits.
+   */
+  grudge_runes: {
+    w: 64, h: 64, n: 9, ms: 60, ax: 0.261, ay: 0.297, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 32, cy = 32;
+      const fade = i < 5 ? 1 : 1 - (i - 4) / 5;
+      // the eight runes, blazing where they sit on the shield's face
+      for (let k = 0; k < 8; k++) {
+        const a = (k / 8) * Math.PI * 2 + 0.35;
+        const x = Math.round(cx + Math.sin(a) * 7.7), y = Math.round(cy - Math.cos(a) * 9.6);
+        for (const [dx, dy] of [[0, -1], [0, 0], [0, 1], [1, -1]] as const) if (dith(x + dx, y + dy, fade)) b.set(x + dx, y + dy, SOUL[dy === 0 ? 4 : 3]);
+      }
+      const r = 10 + t * 10;
+      ring(b, cx, cy, r * 0.8, r, Math.max(0.6, 1.6 - t), SOUL, fade);
+      if (i < 3) burst(b, cx, cy, 8, 1, [6, 10, 7][i], 1.0, SOUL, 0.2);
+      motes(b, cx, cy - 4, 26, 30, 8, t, SOUL, 733);
     },
   },
   /** Pinning Shot lands: a heavy dull flash, a ring of the pale light jarring out from it, splinters and pale sparks thrown off. */

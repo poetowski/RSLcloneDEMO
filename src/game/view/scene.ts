@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare', 'grudge_runes']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -824,7 +824,7 @@ export class BattleScene {
         break;
       case 'passive': {
         const src = e.source ? this.views.get(e.source) : undefined;
-        if (e.effect === 'tend' || e.effect === 'ward' || e.effect === 'retaliate' || e.effect === 'remedy') {
+        if (e.effect === 'tend' || e.effect === 'ward' || e.effect === 'retaliate' || e.effect === 'remedy' || e.effect === 'defy') {
           // a passive acting in the flow of the fight acts often: no banner, its name over its holder, then its
           // effects as its data names them, on the holder (the Jungle Herder's bell) and on whom it reaches
           // (the ally it shields or soothes, the enemy it answers)
