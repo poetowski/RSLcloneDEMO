@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, guard, hide, inAffinity, keen, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
+import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, guard, hide, inAffinity, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -431,6 +431,35 @@ describe('statuses', () => {
     expect(r.events.findIndex((e) => e.kind === 'status')).toBeGreaterThan(r.events.findIndex((e) => e.kind === 'damage'));
     b.endTurn(k);
     // it powers the next two turns, then expires
+    for (let turn = 0; turn < 2; turn++) {
+      b.startTurn(k);
+      expect(b.has(k, 'atk_up')).toBe(true);
+      b.endTurn(k);
+    }
+    expect(b.has(k, 'atk_up')).toBe(false);
+  });
+
+  it('places a status marked before ahead of the first hit, so the skill itself carries it', () => {
+    const b = new Battle(combatants([marksman]), combatants([guard]), { seed: 4 });
+    const k = b.get('p0');
+    b.startTurn(k);
+    const r = b.useSkill(k, skill(marksman, 'steady_shot'), 'e0');
+    const up = r.events.findIndex((e) => e.kind === 'status' && e.status === 'atk_up');
+    const hit = r.events.findIndex((e) => e.kind === 'damage');
+    const stun = r.events.findIndex((e) => e.kind === 'status' && e.status === 'stun');
+    // the buff first, before any hit (hit -1); the Stun after the hit, on the last one
+    expect(up >= 0 && up < hit && r.events[up].hit === -1).toBe(true);
+    expect(stun).toBeGreaterThan(hit);
+    // the same shot with the buff placed after it: the same rolls, a quarter less damage
+    const plain = new Battle(combatants([marksman]), combatants([guard]), { seed: 4 });
+    const pk = plain.get('p0');
+    plain.startTurn(pk);
+    const after = { ...skill(marksman, 'steady_shot'), statuses: [{ status: 'atk_up' as const, turns: 2, to: 'self' as const }, { status: 'stun' as const, turns: 1, to: 'targets' as const }] };
+    const pr = plain.useSkill(pk, after, 'e0');
+    const dealt = (events: typeof r.events) => events.reduce((n, e) => n + (e.kind === 'damage' ? e.amount : 0), 0);
+    expect(dealt(r.events) / dealt(pr.events)).toBeCloseTo(1.25, 1);
+    // it counts like any status placed on its holder's own turn: through the next two turns
+    b.endTurn(k);
     for (let turn = 0; turn < 2; turn++) {
       b.startTurn(k);
       expect(b.has(k, 'atk_up')).toBe(true);

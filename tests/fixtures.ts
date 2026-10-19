@@ -129,6 +129,11 @@ export const brute = fixture('brute', {
   skills: [undefined, skill('brute_blow', 2, { hits: [{ mult: 1.5 }], statuses: [{ status: 'atk_up', turns: 2, to: 'self' }] })],
 });
 
+/** A3 places ATK Up on itself before its shot, then Stun on the target after it. */
+export const marksman = fixture('marksman', {
+  skills: [undefined, undefined, skill('steady_shot', 3, { approach: 'none', hits: [{ mult: 1.5 }], statuses: [{ status: 'atk_up', turns: 2, to: 'self', before: true }, { status: 'stun', turns: 1, to: 'targets' }] })],
+});
+
 /** Two skills only; Rebuke: below 35% HP a critical hit on it freezes the attacker for 1 turn, then it rests 3 turns. */
 export const rebuker = (() => {
   const c = fixture('rebuker', { passive: { id: 'rebuke', name: 'Rebuke', desc: '', kind: 'rebuke', value: 0.35, statuses: [{ status: 'freeze', turns: 1 }], cooldown: 3 } });

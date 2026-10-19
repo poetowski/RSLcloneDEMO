@@ -479,8 +479,8 @@ export class BattleScene {
         this.applyEvent(e, skill);
       }
     };
-    // buffs stripped before the first hit land first
-    applyWhere((e) => e.kind === 'dispel');
+    // buffs stripped before the first hit land first, and statuses placed before it (hit -1: the Automated Soul's ATK Up)
+    applyWhere((e) => e.kind === 'dispel' || e.hit < 0);
     const pendings: Promise<unknown>[] = [];
     let landed = 0;
     const hitCount = skill.hits.length;
@@ -503,14 +503,16 @@ export class BattleScene {
           })(),
         );
 
-      if (skill.id === 'arrow_rain') {
+      if (skill.volley) {
+        // the volley loosed into the sky comes down on every target, a few arrows apiece, slanting the way it flew
+        const fall = skill.volley;
         targets.forEach((t, i) => {
           pendings.push(
             (async () => {
               await this.clock.wait(260 + i * 90);
               for (let n = 0; n < 4; n++) {
                 const ox = (n - 1.5) * 9 + (Math.random() - 0.5) * 4;
-                const p = this.fx.projectile('arrow_fall', { x: t.x + ox - 30 * dir, y: -20 }, { x: t.x + ox, y: t.chest().y + 6 - n * 3 }, { speed: 720, rotate: false });
+                const p = this.fx.projectile(fall, { x: t.x + ox - 30 * dir, y: -20 }, { x: t.x + ox, y: t.chest().y + 6 - n * 3 }, { speed: 720 });
                 if (n === 0) await p.then(() => groupFx(t));
                 await this.clock.wait(40);
               }
@@ -533,8 +535,10 @@ export class BattleScene {
           mote_bolt: ['#ffffff', '#cfe9ff', '#8fc0ff'],
           // the Necromancer's black motes, a dull violet glint on them as they fly
           grave_bolt: ['#a088c8', '#383341', '#07060a'],
+          // the Automated Soul's Pinning Shot: the pale light of his gorget streaming off the arrow
+          pinning_arrow: ['#f4ecd6', '#aca292', '#4a433f'],
         };
-        const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10, dart: 4, mote_bolt: 6, grave_bolt: 8 };
+        const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10, dart: 4, mote_bolt: 6, grave_bolt: 8, soul_arrow: 8, pinning_arrow: 3 };
         const slow = skill.projectile === 'ice_shard' || skill.projectile === 'grave_orb' || skill.projectile === 'sound_ring';
         for (const t of targets) {
           pendings.push(this.fx.projectile(skill.projectile, from, t.chest(), { speed: slow ? 440 : 620, arc: skill.projectile.startsWith('arrow') ? 8 : arcs[skill.projectile] ?? 0, trail: trails[skill.projectile], rotate: skill.projectile !== 'sun_orb' }).then(() => groupFx(t)));
@@ -578,10 +582,10 @@ export class BattleScene {
           this.fx.spawn('dust', actor.x, actor.y, { layer: 'ground' });
         })();
         moved = true;
-      } else if (e === 'shoot' && skill.id === 'arrow_rain') {
+      } else if (e === 'shoot' && skill.volley) {
         const m = muzzle();
         for (let n = 0; n < 3; n++) {
-          void this.fx.projectile('arrow', { x: m.x, y: m.y - 6 }, { x: actor.x + dir * (60 + n * 14), y: -30 }, { speed: 900 });
+          void this.fx.projectile(skill.projectile ?? skill.volley, { x: m.x, y: m.y - 6 }, { x: actor.x + dir * (60 + n * 14), y: -30 }, { speed: 900 });
         }
       } else if (e === 'cast' && skill.actorFx) {
         const hd = actor.head();

@@ -25,7 +25,8 @@
 // "like in the past": their texts walk his description, from the steppe and its
 // two ravines to the camp, the yaks, the mountains and the zeppelin; their
 // enemies are copies of the roster and their powers tuned stand-ins; 4-1 brings
-// the Necromancer, the Ashveil Reign's first Elite (a stand-in).
+// the Necromancer, the Ashveil Reign's first Elite, and 4-2 the Automated Soul,
+// its second (stand-ins).
 import { LocationDef, StageDef } from './types';
 
 /**
@@ -343,6 +344,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: RAVINES,
         enemies: [{ champion: 'rot_hulk' }, { champion: 'skirmisher' }, { champion: 'enforcer' }],
         power: 0.84,
+        // a stand-in: the stage that brings the Automated Soul is not Jakub's
+        recruit: 'automated_soul',
       },
       {
         id: '4-3',

@@ -54,6 +54,7 @@ export type BattleEvent =
   | { kind: 'damage'; target: string; amount: number; crit: boolean; absorbed: number; edge: -1 | 0 | 1; hit: number; dot?: StatusId }
   | { kind: 'heal'; target: string; amount: number; hit: number }
   | { kind: 'blocked'; target: string; hit: number }
+  /** `hit` -1: placed before the skill's first hit (`StatusApp.before`) */
   | { kind: 'status'; target: string; status: StatusId; turns: number; hit: number }
   | { kind: 'resist'; target: string; status: StatusId; hit: number }
   | { kind: 'expire'; target: string; status: StatusId; hit: number }
@@ -338,6 +339,22 @@ export class Battle {
       }
     }
 
+    // a status reaches each unit once per skill: alone, the Walking Bush is his own chosen ally
+    const given = new Set<string>();
+    const place = (before: boolean, hit: number) => {
+      for (const app of skill.statuses ?? []) {
+        if (app.perHit || !!app.before !== before) continue;
+        const recipients = app.to === 'self' ? [actor] : app.to === 'allies' ? this.allies(actor) : targets;
+        for (const r of recipients) {
+          if (!r.alive || given.has(r.uid + app.status)) continue;
+          given.add(r.uid + app.status);
+          this.tryApply(actor, r, app.status, app.turns, app.chance, app.value, hit, events);
+        }
+      }
+    };
+    // statuses placed before the first hit (hit -1), so the skill's own hits carry them (the Automated Soul's ATK Up)
+    place(true, -1);
+
     const last = skill.hits.length - 1;
     const damaged = new Set<Unit>();
     skill.hits.forEach((h, hi) => {
@@ -390,17 +407,7 @@ export class Battle {
         events.push({ kind: 'raise', target: t.uid, hp: t.hp, hit: last });
       }
     }
-    // a status reaches each unit once per skill: alone, the Walking Bush is his own chosen ally
-    const given = new Set<string>();
-    for (const app of skill.statuses ?? []) {
-      if (app.perHit) continue;
-      const recipients = app.to === 'self' ? [actor] : app.to === 'allies' ? this.allies(actor) : targets;
-      for (const r of recipients) {
-        if (!r.alive || given.has(r.uid + app.status)) continue;
-        given.add(r.uid + app.status);
-        this.tryApply(actor, r, app.status, app.turns, app.chance, app.value, last, events);
-      }
-    }
+    place(false, last);
     if (skill.tmTargets) {
       for (const t of targets) {
         if (!t.alive) continue;

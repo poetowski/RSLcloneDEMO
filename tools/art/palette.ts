@@ -79,6 +79,8 @@ export const MAT = {
   /** crimson: the Enforcer's armour, the cloth over its plates (`crimsonPlate` is the same red on steel) */
   crimson: m('crimson', 'cloth', ['#1a0510', '#3a0a1e', '#64102c', '#9a1a38', '#c62c48', '#ee6660']),
   crimsonPlate: m('crimsonPlate', 'metal', ['#1a0510', '#3a0a1e', '#64102c', '#9a1a38', '#c62c48', '#ee6660']),
+  /** the Automated Soul's plate: azure enamel on steel, polished to a shine (its trim is `gold`) */
+  azurePlate: m('azurePlate', 'metal', ['#0a1030', '#14245e', '#1e3d98', '#2d62cc', '#5a98ee', '#dcecff']),
   /** black cloth: the Dominion Medic's tunic between its red stripes */
   blackCloth: m('blackCloth', 'cloth', ['#07060a', '#121016', '#1c1922', '#28242f', '#383341', '#4e4858']),
   /** white cloth, cool and crisp: the stripes of the Associate's azure robe */

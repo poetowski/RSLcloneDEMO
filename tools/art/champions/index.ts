@@ -1,6 +1,7 @@
 // Champion art registry. Order matches src/game/data/champions/index.ts.
 import { ChampionArt, CharDef } from '../char.ts';
 import { associate } from './associate.ts';
+import { automatedSoul } from './automated_soul.ts';
 import { bellringer } from './bellringer.ts';
 import { bigEars } from './big_ears.ts';
 import { blackRhino } from './black_rhino.ts';
@@ -25,7 +26,7 @@ import { wildSpeaker } from './wild_speaker.ts';
 
 export const CHAMPION_ART: Record<string, ChampionArt> = {
   captain_gareth: captainGareth, rime_scholar: rimeScholar, follower, skirmisher, dominion_medic: dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walking_bush: walkingBush, wild_speaker: wildSpeaker, jungle_herder: jungleHerder, associate, emissary_handlings: emissaryHandlings, black_rhino: blackRhino, red_cloak: redCloak, grove_keeper: groveKeeper, big_ears: bigEars, skeleton, rot_hulk: rotHulk, bellringer, necromancer,
+  walking_bush: walkingBush, wild_speaker: wildSpeaker, jungle_herder: jungleHerder, associate, emissary_handlings: emissaryHandlings, black_rhino: blackRhino, red_cloak: redCloak, grove_keeper: groveKeeper, big_ears: bigEars, skeleton, rot_hulk: rotHulk, bellringer, necromancer, automated_soul: automatedSoul,
 };
 
 /** Rig + animations by champion id (what the frame tools work with). */

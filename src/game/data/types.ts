@@ -53,6 +53,8 @@ export interface StatusApp {
   value?: number;
   /** roll on every damaging hit instead of once on the last hit (targets only) */
   perHit?: boolean;
+  /** placed before the first hit instead of on the last, so the skill's own hits already carry it (the Automated Soul's Pinning Shot: ATK Up, then the shot) */
+  before?: boolean;
 }
 
 export interface HitDef {
@@ -108,6 +110,12 @@ export interface SkillDef {
   execute?: { below: number; mult: number };
   /** presentation */
   projectile?: string;
+  /**
+   * presentation: on the `shoot` event `projectile` is loosed into the sky, and this one
+   * falls on every target, a few apiece, before the hit shows (the Automated Soul's
+   * Sundering Volley)
+   */
+  volley?: string;
   /** ground circle under the actor while the skill plays */
   castFx?: string;
   /** effect at the actor's head on the animation's `cast` event (a howl, a flare) */

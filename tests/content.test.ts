@@ -271,6 +271,17 @@ describe('design decisions', () => {
     expect(n?.passive).toBeUndefined();
   });
 
+  it('has the Automated Soul of his brief: an Elite of the Ashveil Reign, Damage, Tide; an A1 on one enemy; an A2 on all enemies with DEF Down for 2 turns, cooldown 4; an A3 on one enemy that first places ATK Up on him for 2 turns, then Stun on it for 1 turn, cooldown 4; every skill looses arrows', () => {
+    const a = CHAMPIONS.find((c) => c.id === 'automated_soul');
+    expect(a && [a.name, a.rarity, a.role, a.faction, a.affinity]).toEqual(['Automated Soul', 'elite', 'Damage', 'ashveil_reign', 'tide']);
+    const [a1, a2, a3] = a?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, a1.statuses, totalMult(a1) > 0]).toEqual([1, 'enemy', undefined, true]);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses, totalMult(a2) > 0]).toEqual([2, 'enemies', 4, [{ status: 'def_down', turns: 2, to: 'targets' }], true]);
+    expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.statuses, totalMult(a3) > 0]).toEqual([3, 'enemy', 4, [{ status: 'atk_up', turns: 2, to: 'self', before: true }, { status: 'stun', turns: 1, to: 'targets' }], true]);
+    expect(a?.skills.every((s) => s.projectile)).toBe(true);
+    expect(a?.passive).toBeUndefined();
+  });
+
   it('has the Follower of his brief: a Common of the Court of Root, Damage, Tide; A1 a single-target attack, A2 a single-target attack with a 50% chance of DEF Down for 2 turns, cooldown 4', () => {
     const f = CHAMPIONS.find((c) => c.id === 'follower');
     expect(f && [f.name, f.rarity, f.role, f.faction, f.affinity]).toEqual(['Follower', 'common', 'Damage', 'court_of_root', 'tide']);

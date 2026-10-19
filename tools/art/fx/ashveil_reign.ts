@@ -13,9 +13,15 @@
 // Verse closes on the enemy as a dark smoke turning sickly; his allies'
 // haste is his motes spiralling up round them; Raise Dead opens a black sigil
 // where the ally fell and the motes and pale wisps rise from it; the flare of
-// his book's pages is light (additive), the rest is matter.
+// his book's pages is light (additive), the rest is matter. The Automated
+// Soul's arrows: a wooden shaft, an iron head, azure fletching like his plate;
+// Unerring Shot bites in a short dull flash and splinters; Sundering Volley
+// drives arrows into the ground about the enemy's feet, each with a puff of
+// dust; Pinning Shot's arrow trails the pale light of his gorget and lands
+// heavy, a ring of that light jarring out from it. All matter.
 // Never their affinity (affinities are abstract, Jakub, 2026-10-11).
-import { dith, ellipseFill, ellipseRing, rampDither } from '../paint.ts';
+import { ACCENT, MAT } from '../palette.ts';
+import { dith, ellipseFill, ellipseRing, line, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, hex, RGBA, rng } from '../raster.ts';
 import { burst, cut, FxDef, motes, ramps, ring, soundRings, sparks, W } from './kit.ts';
 
@@ -34,6 +40,21 @@ const MOTE: RGBA[] = ['#07060a', '#1c1922', '#383341', '#5a4a78', '#a088c8'].map
 const CURSE = ramps.curse;
 /** the light of his book's pages */
 const VIO = ramps.violet;
+/** the Automated Soul's arrows: the shaft's wood, the iron head, the azure fletching */
+const WOOD = MAT.wood.ramp, IRON = MAT.iron.ramp, AZF = MAT.blue.ramp;
+/** splinters of the shaft */
+const SPLINTER = ramps.wood;
+/** the pale light in his gorget, which his Pinning Shot carries */
+const SOUL: RGBA[] = [MAT.ashBone.ramp[1], MAT.ashBone.ramp[2], MAT.ashBone.ramp[3], MAT.ashBone.ramp[4], ACCENT.ashEye];
+
+/** One of his arrows pointing right, its point at (x1, y): the shaft from x0, fletching at its tail. */
+function soulArrow(b: Bitmap, x0: number, x1: number, y: number) {
+  line(b, x0 + 1, y, x1 - 5, y, WOOD[4]);
+  b.set(x0, y, WOOD[2]);
+  polyFill(b, [[x1 - 6, y - 3], [x1 + 0.5, y], [x1 - 6, y + 3], [x1 - 4.5, y]], (px, py) => IRON[py < y ? 4 : 3]);
+  b.set(x0 + 1, y - 1, AZF[4]); b.set(x0 + 2, y - 1, AZF[3]); b.set(x0 + 3, y - 1, AZF[3]);
+  b.set(x0 + 1, y + 1, AZF[3]); b.set(x0 + 2, y + 1, AZF[2]); b.set(x0 + 3, y + 1, AZF[2]);
+}
 
 /** One of his black motes: a dark core, a glint over it; a big one is two pixels wide. */
 function blackMote(b: Bitmap, x: number, y: number, big: boolean, k: number) {
@@ -279,6 +300,73 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
       if (i < 4) burst(b, cx, cy, 10, [2, 3, 2, 1][i], [9, 14, 11, 7][i], [1.6, 2, 1.4, 1][i], VIO, 0.3 + i * 0.2);
       ring(b, cx, cy, 3 + t * 16, 2 + t * 8, Math.max(0.6, 1.8 - t * 1.2), VIO, 1.1 - t * 0.6);
       motes(b, cx, cy - 2, 24, 26, 8, t, VIO, 351);
+    },
+  },
+
+  /** The Automated Soul's arrow in flight (drawn pointing right; the battle turns it along its path). */
+  soul_arrow: {
+    w: 26, h: 7, n: 1, ms: 100, ax: 0.8, ay: 0.5, loop: true,
+    draw: (b) => soulArrow(b, 1, 25, 3),
+  },
+  /** Pinning Shot in flight: his arrow at full draw, the pale light of his gorget streaming off it and a gleam on its head. */
+  pinning_arrow: {
+    w: 32, h: 9, n: 2, ms: 60, ax: 0.82, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      for (let x = 0; x < 12; x++) if ((x + i) % 3 !== 0) b.set(x, 4 + ((x + i) % 2 ? 0 : x > 6 ? -1 : 1), SOUL[x > 7 ? 3 : 2]);
+      soulArrow(b, 7, 31, 4);
+      b.set(28, 3, SOUL[4]);
+      if (i === 1) b.set(29, 2, W);
+    },
+  },
+  /** Unerring Shot lands: a short dull flash where the head bites, splinters of the shaft thrown off and falling, a little ring of dust. */
+  arrow_strike: {
+    w: 40, h: 40, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const cx = 20, cy = 20;
+      if (i < 3) burst(b, cx, cy, 6, 1, [6, 9, 6][i], 1.0, DULL, 0.3);
+      if (i >= 1) sparks(b, cx, cy, 7, 13, (i - 1) / 4, SPLINTER, 517, 7);
+      if (i >= 2) ring(b, cx, cy, 3 + (i - 2) * 2.6, (3 + (i - 2) * 2.6) * 0.8, Math.max(0.6, 1.3 - (i - 2) * 0.2), DULL, Math.max(0.3, 1 - (i - 2) * 0.2));
+    },
+  },
+  /**
+   * Sundering Volley comes down round the enemy: arrows driving into the ground
+   * about its feet one after another, each with a puff of dust, standing
+   * slanted the way they fell, then fading. Anchored at its feet; the battle
+   * mirrors it for an archer on the other side.
+   */
+  arrow_volley: {
+    w: 64, h: 40, n: 10, ms: 55, ax: 0.5, ay: 1, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const gy = 37;
+      const fade = i < 7 ? 1 : 1 - (i - 6) / 4;
+      // where each arrow stands, how far back on the ground, when it lands, its slant
+      const spots: [number, number, number, number][] = [[16, 0, 0, -112], [45, 1, 1, -118], [27, 2, 2, -110], [37, 0, 3, -116], [9, 1, 4, -114], [54, 2, 5, -112]];
+      for (const [x, dy, k, deg] of spots) {
+        if (i < k) continue;
+        const age = i - k;
+        const y0 = gy - dy;
+        const a = (deg * Math.PI) / 180, len = 10;
+        const dx = Math.cos(a), dyy = Math.sin(a);
+        for (let s2 = 0; s2 <= len; s2++) {
+          const px = Math.round(x + dx * s2), py = Math.round(y0 + dyy * s2);
+          if (!dith(px, py, fade)) continue;
+          b.set(px, py, s2 > len - 3 ? AZF[s2 === len ? 4 : 3] : WOOD[s2 < 2 ? 2 : 4]);
+          if (s2 > len - 3) b.set(px + 1, py, AZF[2]);
+        }
+        // the dust it kicks up as it drives in
+        if (age < 3) ellipseFill(b, x, y0, 2.5 + age * 1.6, 1 + age * 0.5, (px, py, d) => (dith(px, py, (1 - age / 3) * (1 - d)) ? DU[2 + (d < 0.4 ? 1 : 0)] : 0));
+      }
+    },
+  },
+  /** Pinning Shot lands: a heavy dull flash, a ring of the pale light jarring out from it, splinters and pale sparks thrown off. */
+  pinning_strike: {
+    w: 56, h: 56, n: 7, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 10, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      if (i < 3) burst(b, cx, cy, 8, 1.5, [9, 14, 10][i], 1.4, DULL, 0.2);
+      if (i >= 1) ring(b, cx, cy, 5 + (i - 1) * 3.6, (5 + (i - 1) * 3.6) * 0.75, Math.max(0.6, 1.8 - (i - 1) * 0.25), SOUL, Math.max(0.3, 1.2 - (i - 1) * 0.18));
+      if (i >= 1) sparks(b, cx, cy, 10, 20, (i - 1) / 5, SPLINTER, 613, 8);
+      if (i >= 2) sparks(b, cx, cy, 8, 16, (i - 2) / 4, SOUL, 619, -4);
     },
   },
 };

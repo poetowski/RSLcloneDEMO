@@ -93,6 +93,7 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'p', text: 'Buffs are positive effects, shown with a blue rim. They last a number of the holder\'s turns, counting down at the end of each of its turns. A buff a champion gives itself starts counting at its next turn: the ATK Up from Iron Blow comes after the blow and powers Gareth\'s next two turns. Applying a buff the champion already has refreshes it to the longer duration; buffs never stack.' },
       { kind: 'statuses', ids: ['atk_up', 'def_up', 'spd_up', 'shield', 'taunt', 'regen', 'counter'] },
       { kind: 'tip', text: 'A dispel removes every buff from its target before the hit lands.' },
+      { kind: 'tip', text: "A buff can also come before the blow: the Automated Soul's Pinning Shot raises his ATK first, so the shot itself already hits harder." },
     ],
     demo: { skill: 'iron_blow', label: 'See Iron Blow' },
   },
@@ -111,7 +112,7 @@ export const CHAPTERS: Chapter[] = [
     title: 'Crowd Control',
     icon: 'status_stun',
     blocks: [
-      { kind: 'p', text: 'Control effects take turns away. They are the strongest debuffs in the game, so they always last a single turn, and only an A3, or a passive answering a blow, may place one with certainty.' },
+      { kind: 'p', text: 'Control effects take turns away. They are the strongest debuffs in the game, so they always last a single turn, and only an A3 (the Automated Soul\'s Pinning Shot), or a passive answering a blow, may place one with certainty.' },
       { kind: 'statuses', ids: ['stun', 'freeze'] },
       { kind: 'figure', id: 'duration' },
       { kind: 'p', text: 'A controlled champion still counts down its effects when its turn is skipped, and cannot counterattack. Control on the enemy\'s fastest champion is usually worth more than raw damage.' },

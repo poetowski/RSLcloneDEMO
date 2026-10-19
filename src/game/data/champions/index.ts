@@ -1,6 +1,6 @@
 // Champion registry. Adding a champion = one data module here + one art module
 // in tools/art/champions/ (see .claude/skills/new-champion). The roster is
-// Jakub's (docs/DESIGN_DECISIONS.md sections 4, 8 and 12-31): the starter,
+// Jakub's (docs/DESIGN_DECISIONS.md sections 4, 8 and 12-32): the starter,
 // Captain Gareth; the Rime Scholar, who joins after the first battle; the
 // Skirmisher, the Lineholder and the Quartermaster, Commons of the Azure Crown;
 // the Dominion Medic, the Bloodhound and the Enforcer, Commons of the Sanguine
@@ -9,9 +9,11 @@
 // Ears of the Court of Root, Emissary Handlings and the Associate of the Azure
 // Crown, and Red Cloak and the Black Rhino of the Sanguine Dominion; and the
 // Skeleton, the Rot Hulk and the Bellringer, Commons of the Ashveil Reign, and
-// the Necromancer, its first Elite; everything else waits for his design.
+// the Necromancer and the Automated Soul, its Elites; everything else waits for
+// his design.
 import { ChampionDef } from '../types';
 import { associate } from './associate';
+import { automatedSoul } from './automated_soul';
 import { bellringer } from './bellringer';
 import { bigEars } from './big_ears';
 import { blackRhino } from './black_rhino';
@@ -37,7 +39,7 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul,
 ];
 
 const byId = new Map(CHAMPIONS.map((c) => [c.id, c]));
@@ -48,4 +50,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { associate, bellringer, bigEars, blackRhino, bloodhound, captainGareth, dominionMedic, emissaryHandlings, enforcer, follower, groveKeeper, jungleHerder, lineholder, necromancer, quartermaster, redCloak, rimeScholar, rotHulk, skeleton, skirmisher, walkingBush, wildSpeaker };
+export { associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, dominionMedic, emissaryHandlings, enforcer, follower, groveKeeper, jungleHerder, lineholder, necromancer, quartermaster, redCloak, rimeScholar, rotHulk, skeleton, skirmisher, walkingBush, wildSpeaker };

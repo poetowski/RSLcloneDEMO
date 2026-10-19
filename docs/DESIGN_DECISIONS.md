@@ -68,6 +68,7 @@ Section 7 lists what is not decided.
 | 2026-10-18 | The Bellringer's affinity: Ember (Bloom in the brief) | 30 |
 | 2026-10-18 | Zone 4, Earth Scars: its name and description; its battle background; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.7, 7 |
 | 2026-10-18 | The Necromancer, an Elite Support of the Ashveil Reign; the first skill that raises a fallen ally | 3.4, 5.7, 7, 31 |
+| 2026-10-18 | The Automated Soul, an Elite Damage of the Ashveil Reign; the first status a skill places before its hit | 3.4, 5.7, 7, 32 |
 
 ---
 
@@ -280,8 +281,9 @@ what came through when it did. To be designed.
 
 **Champions.** *(2026-10-18)* Its first, the Skeleton, a Common (section 28),
 its second, the Rot Hulk, a Common Tank (section 29), its third, the
-Bellringer, a Common Support (section 30), and its fourth, the Necromancer,
-a Support and its first Elite (section 31).
+Bellringer, a Common Support (section 30), its fourth, the Necromancer, a
+Support and its first Elite (section 31), and its fifth, the Automated Soul,
+an Elite of the Damage role (section 32).
 
 **Name rationale.** "Reign" puts the faction on the same footing as Crown and
 Dominion — ruling nouns, one set. "Ashveil" gives it a distinctive seat
@@ -846,8 +848,9 @@ description, from the steppe and its two ravines to the camp, the yaks, the
 mountains and the zeppelin; the area's blurb places it. Their enemies are
 copies of the roster's champions, the Ashveil Reign's Skeleton and Rot Hulk
 among them for the first time, and 4-10 is a boss Red Cloak; their powers are
-tuned stand-ins. The first clear of 4-1 brings the Necromancer (section 31;
-the stage is a stand-in). Stages, enemies and story wait for him.
+tuned stand-ins. The first clears of 4-1 and 4-2 bring the Necromancer and
+the Automated Soul (sections 31 and 32; the stages are stand-ins). Stages,
+enemies and story wait for him.
 
 ---
 
@@ -887,8 +890,8 @@ open questions.
   the Wild Speaker's 2026-10-13, sections 18-20, and the Jungle Herder's,
   Emissary Handlings', Red Cloak's, Big Ears', the Associate's, the Black
   Rhino's and the Grove Keeper's 2026-10-17, sections 21-27, and the
-  Skeleton's, the Rot Hulk's, the Bellringer's and the Necromancer's
-  2026-10-18, sections 28-31; their numbers are not)*
+  Skeleton's, the Rot Hulk's, the Bellringer's, the Necromancer's and the
+  Automated Soul's 2026-10-18, sections 28-32; their numbers are not)*
 - The affinities of the Jungle Herder, Emissary Handlings, Red Cloak and Big
   Ears: Jakub, 2026-10-17, "i will optimize affinities for these 4 new heroes
   later" *(the game stands in Bloom, Tide, Bloom and Ember)*
@@ -2287,3 +2290,75 @@ bone, the motes' ring and their violet glint, the knot of motes he throws, the
 smoke of the verse, the sigil and the wisps, the flare of the pages, and the
 raised getting up through their own fall played backwards). Like the Skeleton,
 he stands in the first zone on his page and in his demos.
+
+## 32. The Automated Soul (received 2026-10-18)
+
+Jakub's brief, verbatim:
+
+```
+i want a new champion.
+name = Automated Soul
+class = damage
+rarity ELITE
+affinity tide
+faction ashveil reign.
+design - this is archer skeleton without head but in shiny azure and gold plated armor. his bow is wooden longbow. he fires arrows on attack.
+kit - A1 - attack 1 enemy.
+A2 - attacks all enemies, debuff every enemy with DEFENSE DOWN for 2 turns. CD 4 turns.
+A3 - attacks 1 enemy, before attacks grant ATTACK UP on this champion for 2 turns. Also stun target for 1 turn. CD 4 turns.
+```
+
+The Ashveil Reign's fifth champion and its second Elite, after the Necromancer
+(section 31).
+
+**Readings.** DEFENSE DOWN is the game's DEF Down and ATTACK UP its ATK Up
+(MECHANICS_GUIDE 7). The A2's DEF Down and the A3's Stun are certain, but like
+every debuff they meet the target's RES (section 10); a Stun may be certain
+only on an A3, which is where his is (MECHANICS_GUIDE 10). "Before attacks
+grant ATTACK UP" is a new rule (MECHANICS_GUIDE 3): the ATK Up is placed on
+him before the shot, so the shot itself already hits a quarter harder, and the
+Stun lands after it; like any status placed on its holder's own turn, the ATK
+Up then lasts through his next two turns. "He fires arrows on attack": every
+skill looses arrows, the A1 one at the enemy, the A2 a volley into the sky
+that comes down on every enemy, the A3 one at full draw. "Without head": he
+has no skull at all; the neck's last vertebrae stand broken off in an empty
+gorget. "Shiny azure and gold plated armor": plate of azure enamel polished to
+a shine and trimmed with gold. Azure and gold are also the Azure Crown's
+colours (3.6); nothing in the game ties him to the Crown.
+
+**As built:** a tall, straight skeleton built bone by bone like the Reign's
+others (tools/art/bones.ts), with no skull: out of an empty gorget stand the
+neck's last three vertebrae, the top one broken off ragged, and a pale light
+shows at the gorget's mouth where the head should be. Over the bones, plate of
+azure enamel polished to a shine and trimmed with gold: a breastplate with a
+lit keel down its front, the gorget, small pauldrons, a fauld and short
+tassets, vambraces, greaves and sabatons. Between the plates the bones show:
+the upper arms, the spine and two floating ribs at the waist, the thighs and
+the knees, the bony hands. A wooden longbow nearly as tall as he is, its grip
+wrapped in dark leather, horn at its tips; at his back a quiver of dark
+leather banded in gold, three azure fletchings standing out of it, slung from
+a strap across his chest with a gold buckle. Idle: he stands as he was set to
+stand, the bow upright before him, the light in the gorget waxing and waning.
+Unerring Shot: feet apart, he raises the bow, draws to where his jaw would be,
+holds a beat and looses; the arrow, azure-fletched, bites in a short dull
+flash and splinters. Sundering Volley: he leans back and looses high into the
+sky; the arrows come down on every enemy and stand in the ground about their
+feet, each with a puff of dust. Pinning Shot: ATK Up shows on him first; he
+plants his feet wide, draws long and full, a gleam on the arrowhead, and
+looses with a recoil; the arrow trails the pale light of his gorget and lands
+heavy, a ring of that light jarring out from it. Run: an even stride, the bow
+carried slanting forward. Victory: the bow lifted high in his far hand, the
+light in the gorget flaring. Death: his bones give way and he falls apart into
+a heap, plates and all, the bow beside it, the light going out.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Unerring
+Shot, Sundering Volley and Pinning Shot and their texts, the multipliers (1.0;
+0.6 on each enemy; 1.3, near the floor of the norms, as his kit makes him the
+strongest champion of the roster, MECHANICS_GUIDE 10), his stats (on the Elite
+budget: HP 1100, ATK 120, DEF 64, SPD 104), the lore line, the stage that
+brings him (the first clear of 4-2), and the details of his art and effects
+(the vertebrae standing in the gorget and the light in it, the cut of the
+plate and its gold trim, the bones showing between the plates, the bow's
+leather grip and horn tips, the quiver and its strap, the azure fletching, the
+volley standing in the ground, the pale light of Pinning Shot). Like the
+Skeleton, he stands in the first zone on his page and in his demos.

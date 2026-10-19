@@ -276,7 +276,7 @@ winner()           checked before choosing and after every action
 
 1. Targets: Taunt narrows single-target enemy skills; counterattacks ignore Taunt; a target that is not valid falls back to the first valid one.
 2. Cooldown: set to `cooldown + 1`, because `endTurn` of this same turn ticks it once.
-3. Dispel: every buff removed from the targets (events at hit 0).
+3. Dispel: every buff removed from the targets (events at hit 0); then the statuses marked `before`, placed on their recipients (events at hit -1), so the hits carry them.
 4. For each hit `k`, for each living target: roll damage, then apply it (the shield absorbs first and expires at 0; then death, Undying or Overdrive), then, on a critical hit, the target's Rebuke (its statuses land on the actor), then the lifesteal heal, then the per-hit status rolls.
 5. On the last hit: ally heals, the self-heal, cleanse, full cleanse, the raise (`revive`: the fallen ally targeted gets up), status applications in the order written in the skill (recipients by `to`), target meter change, ally meter change, the meter of the ally lowest on HP.
 6. The kept meter (`selfTm`) waits for `endTurn`.
@@ -342,7 +342,7 @@ winner()           checked before choosing and after every action
 | `damage` | `applyDamage` (skill hits, Poison and Burn ticks) | hit index; 0 for ticks | `amount` after shields, `absorbed`, `crit`, `edge`, `dot` | number (crit: gold, 2x, `CRITICAL`), `STRONG HIT` / `WEAK HIT`, `ABSORB n`, flash, hurt, sparks, hit-stop | Damage & Critical Hits, Affinities |
 | `heal` | `heal` (lifesteal, ally heals, Regen) | hit index, last hit, or 0 | `amount` | green `+n`, sparkles | Buffs (Regen), Special Mechanics (lifesteal) |
 | `blocked` | `heal` under Heal Block | as `heal` | - | `HEAL BLOCKED` and its icon | Debuffs |
-| `status` | `tryApply`, Overdrive | last hit, or the hit for per-hit rolls | `status`, `turns` | the status name, plus a cue (Taunt, Poison, Burn, Counter, or a buff/debuff burst); stun stars and the ice block as overlays | Buffs, Debuffs, Crowd Control |
+| `status` | `tryApply`, Overdrive | last hit, or the hit for per-hit rolls; -1 for one placed before the hits (`before`) | `status`, `turns` | the status name, plus a cue (Taunt, Poison, Burn, Counter, or a buff/debuff burst); stun stars and the ice block as overlays | Buffs, Debuffs, Crowd Control |
 | `resist` | `tryApply` (failed debuff roll; failed buff rolls emit nothing) | as `status` | `status` | `RESIST` | Debuffs |
 | `expire` | `endTurn`; a shield used up in `applyDamage` | 0, or the hit | `status` | the icon disappears; ice shatters | Buffs, Debuffs |
 | `cleanse` | `useSkill` | last | `status` | the debuff's name, `-POISON` | Special Mechanics |
@@ -388,6 +388,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C24 | A full cleanse removes every debuff from the skill's living targets on the last hit; a self-heal heals the actor after the damage, and Heal Block stops it | code (`Battle.useSkill`); tests |
 | INV-C20 | A fallen passive adds `value` per fallen ally of its holder, up to `max`, to the stat it names, in battle only; the champion's own stats never change; its event shows only while the bonus grows | code (`Battle.fallenBonus`, `critRate`, `mourn`); test |
 | INV-C25 | A skill aimed at the fallen (`target: 'fallen'`) is ready only while an ally of its user has fallen, and takes one of them at random; with `revive` that ally gets up on the last hit with that share of its max HP (at least 1), no statuses and an empty turn meter, its cooldowns and its spent once-a-battle passives unchanged; it never reaches an enemy | code (`Battle.ready`, `Battle.fallen`, `useSkill`); tests |
+| INV-C26 | A status marked `before` is placed on its recipients before the skill's first hit (event hit -1), so the skill's own hits carry it; it counts like any status placed on its holder's own turn, and it reaches each unit once per skill like any other | code (`Battle.useSkill`); test |
 
 ### 6.2 Catalog
 
