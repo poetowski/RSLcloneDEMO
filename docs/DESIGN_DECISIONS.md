@@ -70,6 +70,7 @@ Section 7 lists what is not decided.
 | 2026-10-18 | The Necromancer, an Elite Support of the Ashveil Reign; the first skill that raises a fallen ally | 3.4, 5.7, 7, 31 |
 | 2026-10-18 | The Automated Soul, an Elite Damage of the Ashveil Reign; the first status a skill places before its hit | 3.4, 5.7, 7, 32 |
 | 2026-10-19 | Irving Wellbington, an Elite Tank of the Ashveil Reign; the first passive that answers a critical hit on its holder; his shield much bigger | 3.4, 5.7, 7, 33 |
+| 2026-10-19 | Zone 5, the Snowy Mesa: its name and description; its battle background, the arbiter's sword in front of his arm and a dragon's bone at the front left on his word; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.8, 7 |
 
 ---
 
@@ -640,6 +641,28 @@ herders' and the yaks' trails down to the water and across the grass; shrubs
 along the ravines' rims; and a zeppelin passing over, its shadow on the grass
 below. Its details are first takes.
 
+**Extended east once more (2026-10-19)** for Zone 5, on Jakub's word "extend
+world map to the east by adding new area east from earth scars" (5.8, verbatim
+there). As built: the map is 1920 pixels wide, three screens, so the whole-map
+overview is drawn three times smaller (640 x 120) to fill the screen's width;
+everything west of x 1544 kept its pixels (the compass that stood there moved
+with the edge). The steppe of Earth Scars ends at a brink, notched back where
+its two ravines fall over it in waterfalls, and beyond it lies the Snowy Mesa
+in its own light before sunset: a gulf filled with a sea of cloud, its billows
+lit gold on their western flanks and lilac in their hollows, and tabletop
+mountains rising out of it, their tops under snow lit along their western
+lips, their south cliffs banded and fluted, each throwing its long shadow east
+over the clouds. The road crosses from the brink on a bridge of rope to the
+great mesa of the arbiter, where the node stands, the statue north of it among
+a few pines with candles round it, and goes on east over a second bridge into
+the storm. Cables hung with candles join every mesa to its neighbours and to
+the brink. On the mesa to the north-west stands the castle, its wall, its
+snowy towers, keep and hall, its lit windows and its huge chimney, the purple
+dust drifting west from it over the gulf, motes of it sparkling round. From
+the east the snowstorm comes on, heaviest in the north-east corner: dark
+billows over the last mesas, lit rose on their western edges, veils of snow
+trailing before them. Its details are first takes.
+
 ### 5.4b Zone 2's battle background (2026-10-12)
 
 Jakub's brief, verbatim:
@@ -699,6 +722,10 @@ Zone 1 and Zone 2 should contrast clearly so the horizontal scroll reads as
 - Zone 4 *(2026-10-18, 5.7)*: Earth Scars, beyond the eastern hills, the open
   steppe by day cut deep by ravines, its yurt camps and wild yaks, great snowy
   mountains far off, a zeppelin in its sky.
+- Zone 5 *(2026-10-19, 5.8)*: the Snowy Mesa, beyond the brink of Earth Scars,
+  the snowy top of a tabletop mountain before sunset among many more, joined by
+  candles on cables over a sea of cloud; a castle breathing purple dust, the
+  arbiter with his sword, a snowstorm coming on.
 
 ### 5.6 Zone 3 — the Moonlit Basin (2026-10-17)
 
@@ -854,6 +881,122 @@ tuned stand-ins. The first clears of 4-1, 4-2 and 4-3 bring the Necromancer,
 the Automated Soul and Irving Wellbington (sections 31-33; the stages are
 stand-ins). Stages, enemies and story wait for him.
 
+### 5.8 Zone 5 — the Snowy Mesa (2026-10-19)
+
+Jakub's message, verbatim:
+
+```
+i want you to create area 5. extend world map to the east by adding new area east from earth scars.
+name of area 5 = Snowy Mesa
+design = fantasy area called Snowy Mesa. it is on the top of snow capped tabletop mountain. in the background many more tabletop mountains are visible. all connected with many candles. time of day is before sunset. snowstorm approaching from right corner. a castle on left background mesa with huge chimney which produces purple dust and particles. make detailed area. create also combat background and 10 placeholder stages. the combat should be on the top of such mountain with few trees and big arbiter statue similar to budha holding big sword. be creative, consistent and pay attrention to detail.
+```
+
+And while it was being built:
+
+```
+fix the sword of statue as it now looks like it is behind the hand
+```
+
+```
+maybe also put a dragon bone somewhere in front left side of battle area
+```
+
+**Readings.** The area lies east of Earth Scars, the easternmost so far. "It
+is on the top of snow capped tabletop mountain": the battle is fought on a
+mesa's flat top under snow, and the other mesas stand all round it, rising
+out of a sea of cloud that fills the gulfs between them. "All connected with
+many candles" was read as cables strung from mesa to mesa across the gulfs,
+many candles hung along them in small lanterns; two of them run out from our
+own mesa's rim. "Time of day is before sunset" holds on the battle background
+and on the world map: the sun low in the upper left, the key light, golden
+light and long shadows; on the map, drawn by day, the area lies in its own late
+light, as the basin lies in its own night (5.6). "Snowstorm approaching from
+right corner": a wall of storm cloud from the upper right of the battle
+background, veils of snow trailing beneath it over the far mesas, flurries
+blown in ahead of it; on the map it comes from the east, heaviest in the
+north-east corner. "A castle on left background mesa with huge chimney which
+produces purple dust and particles": a castle on the mesa on the left, its
+chimney taller than its towers, the purple dust streaming away to the left on
+the wind from the storm, motes of it drifting off; on the map its mesa stands
+north-west of the area's node. "Few trees": two mountain pines bent by the
+wind at the arena's edges, and a bough reaching into the near corner. "Big
+arbiter statue similar to budha holding big sword": a seated colossus of
+weathered bronze, like a Buddha (curls, a knot on the crown, long earlobes,
+closed eyes, a nimbus, a lotus throne on a plinth of granite), his right hand
+on his knee holding a great sword upright past his head, his left raised palm
+out, read as the arbiter's sign to halt; candles burning on his plinth. "Fix
+the sword of statue": the sword had been drawn behind the arm that holds it;
+it now stands in front of it, its grip through the fist and the guard on top
+of it. "A dragon bone ... in front left side of battle area": a dragon's
+horned skull lying half buried in the snow at the arena's front left, running
+off the edge of the screen, bigger than the frame.
+
+**The battle background, as built** (`tools/art/zones/zone5.ts`): the light
+before sunset. The sun stands low in the upper left in a sky going from indigo
+overhead through violet and rose to gold over the horizon, thin bands of cloud
+lit from beneath. All round, mesas rise out of a sea of cloud far below: the
+nearer ones stand above our eyes, the further ones lower, their snowy tops
+seen from above, small ones in a row along the horizon; their cliffs are fluted
+into buttresses and banded in strata, glowing orange on the faces toward the
+sun and violet on the others, snow on their tops in cornices, along their
+ledges and down their gullies; the clouds heap round their feet and their long
+shadows lie on them. Cables sag from mesa to mesa over the gulfs, candles in
+small lanterns hung along them. On the left mesa stands the castle: a curtain
+wall with merlons and a gatehouse, round towers under snowy cones, a square
+keep and a long hall, windows lit with candles, dark stone lit warm on the
+sun's side; its huge chimney, a stack on two buttresses bound in iron and
+black with soot, rises over all of it, violet glowing in its mouth, the purple
+dust rolling out of it and streaming away to the left. From the upper right
+the storm comes on: billows heaped along its front, lit rose by the low sun,
+slate behind, a shelf of cloud along its base, veils of snow trailing beneath
+it over the far mesas. Our mesa's top runs back to a rim of snow cornices with
+rocks breaking through, and from posts on the rim two cables run out, one to
+the castle's mesa, one into the storm. The arena is the snow of the mesa's top
+(a mid value in the late light, so the champions read on it), combed by the
+wind, cooler under the storm on the right, the long shadows of the arbiter, of
+his blade and of the pines lying on it. Before the plinth the old flagstones of
+a terrace, in a curb of long blocks, show where the wind swept them, the snow
+drifted over the rest, and a trail of footprints leads to the plinth. The
+arbiter sits in the middle at the back on his lotus throne and his plinth of
+two granite steps, candles burning along both steps and in the snow at his
+foot. Two mountain pines stand at the edges, their pads of needles under snow,
+the right one nearer the storm; swords left by the arbiter's challengers stand
+in the snow, ribbons tied under their guards; a stone lantern burns at the
+right edge; the dragon's skull lies half buried at the front left, horned and
+fanged, snow on its brow and its snout; rocks break through with frozen grass
+beside them; a snowy bough reaches into the near right corner.
+
+Alive, each at its own pace: the candles flicker on the plinth, along the
+cables, in the lantern and in the castle's windows; the purple dust rolls up
+out of the chimney and streams away, its motes drifting and twinkling out;
+snow falls in the storm's veils and now and then, every 14 to 30 seconds,
+lightning glows lilac inside the storm; snow streams off the castle mesa's rim;
+the pines and the bough sway; the lanterns on the near cables swing; the
+ribbons on the swords flutter; spindrift snakes over the snow and glints catch
+the sun; choughs ride the wind over the castle; and flurries of snow blow in
+from the right ahead of the storm, thinning out as they cross.
+
+The world map's part is in 5.4a.
+
+Everything the description did not name is a first take: the sea of cloud,
+the mesas' rock and shadows, the lanterns on the cables and the posts on our
+rim, the castle's look, the plume's shades and its lean, the motes, the
+lightning, the flurries and the veils, the arbiter's bronze, nimbus, lotus and
+plinth, his pose (the sword upright in his right hand, the raised palm), the
+terrace and the footprints, the challengers' swords, the stone lantern, the
+dragon skull's look, the rocks, the choughs, the layout and the palette; on the
+world map the brink and its waterfalls, the gulf's clouds, the mesas' shapes
+and places, the bridges, the castle's mesa to the north-west, the pines and
+candles round the statue and the storm's reach.
+
+**Stages.** Ten placeholder stages, 5-1 to 5-10, opened by 4-10, as he asked
+("create also combat background and 10 placeholder stages"). Their texts walk
+his description, from the mesa's top and the mesas round it to the sunset, the
+castle, the storm and the arbiter; the area's blurb places it. Their enemies
+are copies of the roster's champions, the Ashveil Reign's Elites among them,
+and 5-10 is a boss Irving Wellbington; their powers are tuned stand-ins. No
+champion joins there. Stages, enemies and story wait for him.
+
 ---
 
 ## 6. Cross-cutting
@@ -929,6 +1072,8 @@ open questions.
   stages, 5.6)*
 - Zone 4's stages, enemies and story *(the game stands in ten placeholder
   stages, 5.7)*
+- Zone 5's stages, enemies and story *(the game stands in ten placeholder
+  stages, 5.8)*
 - Whether the Archivist appears as a character or as a presence
 - The relationship of Ashveil Reign to the loom's breaking
 - Whether Court of Root wants the loom repaired
@@ -937,8 +1082,8 @@ open questions.
 Decided since the first export: the names of the starter pair, and that
 champions are fragments, the first one with the Archivist from the start
 (section 8); the zone names, the Fracture Reach, the Verdant Grove, the
-Moonlit Basin and Earth Scars (5.3, 5.4, 5.6, 5.7), and the descriptions of
-Zones 3 and 4 (5.6, 5.7); that the
+Moonlit Basin, Earth Scars and the Snowy Mesa (5.3, 5.4, 5.6, 5.7, 5.8), and
+the descriptions of Zones 3, 4 and 5 (5.6, 5.7, 5.8); that the
 interface keeps its affinity marks and the cuts made before
 the affinity rule are plain (2.1).
 

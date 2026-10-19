@@ -26,18 +26,22 @@
 // two ravines to the camp, the yaks, the mountains and the zeppelin; their
 // enemies are copies of the roster and their powers tuned stand-ins; 4-1 brings
 // the Necromancer, the Ashveil Reign's first Elite, 4-2 the Automated Soul, its
-// second, and 4-3 Irving Wellbington, its third (stand-ins).
+// second, and 4-3 Irving Wellbington, its third (stand-ins). Zone 5, the Snowy
+// Mesa, named and described by Jakub (2026-10-19), east of Earth Scars, has ten
+// placeholder stages he asked for: their texts walk his description, from the
+// mesa's top to the arbiter on it; their enemies are copies of the roster and
+// their powers tuned stand-ins; no champion joins there.
 import { LocationDef, StageDef } from './types';
 
 /**
- * The campaign world map in pixels: one screen tall and two screens wide,
+ * The campaign world map in pixels: one screen tall and three screens wide,
  * scrolled sideways. Location `map` positions (the campaign nodes) are in this
  * space; `overview` is how many times smaller the whole-world overview is
- * drawn (at half the size it fills the screen's width, so a wider map needs a
+ * drawn (three times smaller it fills the screen's width, so a wider map needs a
  * smaller one). The map grows east area by area: a new area widens it by its stretch,
  * and everything west of the stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 1600, h: 360, overview: 2.5 };
+export const WORLD_MAP = { w: 1920, h: 360, overview: 3 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];
@@ -63,6 +67,13 @@ const YURTS = 'Yurts stand on the steppe, small colourful flags running like a c
 const YAKS = 'A few wild yaks roam nearby.';
 const PEAKS = 'Far off, a little to the left, a very big mountain with a snowy peak; on its right a twin, a little lower.';
 const ZEPPELIN = 'Far off in the sky, a zeppelin flies.';
+// Zone 5: Jakub's description of the Snowy Mesa (2026-10-19), from the mesa's top to the arbiter on it
+const MESA_TOP = 'The top of a snow-capped tabletop mountain.';
+const MESAS = 'Many more tabletop mountains all round, all connected with many candles.';
+const SUNSET = 'The time before sunset.';
+const CASTLE = 'On the mesa to the left a castle, its huge chimney breathing purple dust and particles.';
+const STORM = 'A snowstorm approaches from the right.';
+const ARBITER = 'A few trees, and a big arbiter statue like a Buddha holding a big sword.';
 
 export const LOCATIONS: LocationDef[] = [
   {
@@ -396,6 +407,79 @@ export const LOCATIONS: LocationDef[] = [
         blurb: `${ZEPPELIN} The last stage of the area.`,
         enemies: [{ champion: 'red_cloak', boss: true }, { champion: 'skeleton' }, { champion: 'rot_hulk' }],
         power: 0.81,
+      },
+    ],
+  },
+  {
+    // Zone 5, named and described by Jakub (2026-10-19, DESIGN_DECISIONS.md 5.8); its ten stages are placeholders
+    // like the areas' before it ("create also combat background and 10 placeholder stages"): enemies, powers and texts are stand-ins
+    id: 'zone5',
+    chapter: 'V',
+    name: 'Snowy Mesa',
+    zone: 'zone5',
+    blurb: 'East of Earth Scars, the top of a snow-capped tabletop mountain, many more all round it, all connected with many candles.',
+    requires: '4-10',
+    map: { x: 1768, y: 194 },
+    stages: [
+      {
+        id: '5-1',
+        blurb: MESA_TOP,
+        enemies: [{ champion: 'skeleton' }, { champion: 'rot_hulk' }, { champion: 'follower' }],
+        power: 0.89,
+      },
+      {
+        id: '5-2',
+        blurb: MESAS,
+        enemies: [{ champion: 'black_rhino' }, { champion: 'associate' }, { champion: 'follower' }],
+        power: 0.7,
+      },
+      {
+        id: '5-3',
+        blurb: MESAS,
+        enemies: [{ champion: 'irving_wellbington' }, { champion: 'skirmisher' }, { champion: 'wild_speaker' }],
+        power: 0.8,
+      },
+      {
+        id: '5-4',
+        blurb: SUNSET,
+        enemies: [{ champion: 'jungle_herder' }, { champion: 'necromancer' }, { champion: 'enforcer' }],
+        power: 0.74,
+      },
+      {
+        id: '5-5',
+        blurb: CASTLE,
+        enemies: [{ champion: 'lineholder' }, { champion: 'automated_soul' }, { champion: 'quartermaster' }],
+        power: 0.81,
+      },
+      {
+        id: '5-6',
+        blurb: CASTLE,
+        enemies: [{ champion: 'emissary_handlings' }, { champion: 'big_ears' }, { champion: 'grove_keeper' }],
+        power: 0.81,
+      },
+      {
+        id: '5-7',
+        blurb: STORM,
+        enemies: [{ champion: 'bloodhound' }, { champion: 'red_cloak' }, { champion: 'dominion_medic' }],
+        power: 0.94,
+      },
+      {
+        id: '5-8',
+        blurb: STORM,
+        enemies: [{ champion: 'rot_hulk' }, { champion: 'automated_soul' }, { champion: 'necromancer' }],
+        power: 0.7,
+      },
+      {
+        id: '5-9',
+        blurb: ARBITER,
+        enemies: [{ champion: 'irving_wellbington' }, { champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
+        power: 0.77,
+      },
+      {
+        id: '5-10',
+        blurb: `${ARBITER} The last stage of the area.`,
+        enemies: [{ champion: 'irving_wellbington', boss: true }, { champion: 'necromancer' }, { champion: 'automated_soul' }],
+        power: 0.67,
       },
     ],
   },

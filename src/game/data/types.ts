@@ -263,9 +263,11 @@ export interface ZoneDef {
    * snow, blowing sand, star-dust with shooting stars, autumn leaves tumbling in
    * the wind, pollen drifting in the sunlight, spores: glowing dust-motes of
    * bioluminescent flora drifting in soft, pearlescent halos (the Moonlit Basin),
-   * or seeds: feather-grass seeds sailing on the steppe wind (Earth Scars)
+   * seeds: feather-grass seeds sailing on the steppe wind (Earth Scars), or
+   * flurries: snow blown in from the right ahead of a storm, thinning out as it
+   * goes (the Snowy Mesa)
    */
-  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen' | 'spores' | 'seeds';
+  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen' | 'spores' | 'seeds' | 'flurries';
   /** color of brazier light pools */
   glow: [number, number, number];
   /** unit shadows: offset away from the key light and horizontal stretch */

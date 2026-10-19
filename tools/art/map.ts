@@ -18,7 +18,11 @@
 // sharp ridges east of it. Beyond their crest (2026-10-18) the night lifts and
 // Earth Scars (Zone 4) begins: the steppe by day, cut by two deep ravines
 // running west to east, yurt camps with their flag poles, wild yaks, kurgans,
-// a salt lake, a zeppelin passing over.
+// a salt lake, a zeppelin passing over. Beyond it (2026-10-19) the steppe ends
+// at the brink of a great gulf and the Snowy Mesa (Zone 5) begins: a sea of
+// cloud in the light before sunset, snow-capped tabletop mountains rising out
+// of it, joined by cables hung with candles; a castle breathing purple dust,
+// the arbiter on his mesa, the storm coming on from the east.
 //
 // Everything is drawn in world pixels, and every random choice is a hash of
 // its position, so the map grows east area by area: widen WORLD_MAP by the new
@@ -221,7 +225,12 @@ const NODES = LOCATIONS.map((l): P => [l.map.x, l.map.y]);
 
 /** The road: the old road ends at the far lip, takes up again on this side, and runs through every node to the east edge (through the hills' pass). */
 const ROAD_FAR = curve([[-10, 318], [40, 322], [96, 334], [150, 332], [186, 324]]);
-const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [W + 12, 187]]);
+const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [W + 12, 184]]);
+/** the road's bridges of rope over the gulf: from the brink to the arbiter's mesa, and on east toward the storm */
+const MESA_BRIDGES: [P, P, number][] = [
+  [[1626, 188], [1714, 197], 5],
+  [[1834, 192], [1890, 186], 4],
+];
 
 /** The river, from the north edge to the south edge between the two areas. */
 const RIVER = polyline(curve([[530, -12], [526, 30], [540, 66], [532, 104], [546, 142], [540, 180], [548, 206], [544, 236], [556, 272], [548, 310], [560, 374]], 2));
@@ -292,6 +301,7 @@ function precompute() {
     }
   }
   precomputeScars();
+  precomputeMesas();
   for (const road of [ROAD_FAR, ROAD_NEAR]) {
     for (const [px, py] of road) {
       for (let y = Math.floor(py - 12); y <= py + 12; y++) {
@@ -478,6 +488,8 @@ function farGround(x: number, y: number, light: number): RGBA {
 }
 
 function groundAt(x: number, y: number): RGBA {
+  // beyond the brink: the gulf and the mesas of the Snowy Mesa
+  if (x >= 1596 && x > brinkX(y)) return mesaGround(x, y);
   const g = dayGround(x, y);
   if (x <= 850) return g;
   const e = eastGround(x, y, g);
@@ -1194,6 +1206,14 @@ function road(b: Bitmap, pts: P[]) {
         if (d > 2.4) continue;
         const X = Math.round(x + dx), Y = Math.round(y + dy);
         if (!inBounds(X, Y) || sdAt(X, Y) < 0 || inRiver(X, Y) > 0) continue;
+        if (X >= 1596 && X > brinkX(Y)) {
+          // over the gulf the bridges carry it; on a mesa's top a path trodden in the snow
+          if (mesaKind[idx(X, Y)] !== 1) continue;
+          if (d > 1.7) {
+            if (dith(X, Y, 0.4)) b.set(X, Y, MSNOW[3]);
+          } else b.set(X, Y, rampDither(MSNOW, 3.6 + (hash2(X, Y, 883) - 0.5) * 1.2 + (d > 0.9 ? -0.6 : 0.4), X, Y));
+          continue;
+        }
         if (X > 860 && (poolAt(X, Y).k > -0.15 || dith(X, Y, nightK(X, Y)))) {
           // in the basin a trail of pale sand, trodden through the moss
           if (poolAt(X, Y).k > -0.15) continue;
@@ -1553,8 +1573,9 @@ const hillEast = (y: number) => 1322 + 16 * vnoise(0, y, 40, 1203) + 6 * vnoise(
 const steppeK = (x: number, y: number) => smooth(hillEast(y) - 24, hillEast(y) + 4, x + (vnoise(x, y, 7, 1205) - 0.5) * 10);
 
 /** The two ravines: their centre lines from the hills' foot to the east edge. */
-const SCAR_N = curve([[1314, 98], [1340, 101], [1366, 93], [1392, 99], [1420, 89], [1450, 85], [1478, 93], [1506, 87], [1534, 75], [1562, 79], [1590, 71], [W + 14, 73]], 1);
-const SCAR_S = curve([[1352, 259], [1376, 265], [1398, 258], [1422, 267], [1446, 281], [1470, 276], [1494, 285], [1520, 279], [1546, 285], [1572, 288], [W + 14, 286]], 1);
+// (they end at x 1614, where the map ended before the Snowy Mesa: the brink of its gulf takes them there)
+const SCAR_N = curve([[1314, 98], [1340, 101], [1366, 93], [1392, 99], [1420, 89], [1450, 85], [1478, 93], [1506, 87], [1534, 75], [1562, 79], [1590, 71], [1614, 73]], 1);
+const SCAR_S = curve([[1352, 259], [1376, 265], [1398, 258], [1422, 267], [1446, 281], [1470, 276], [1494, 285], [1520, 279], [1546, 285], [1572, 288], [1614, 286]], 1);
 /** Where a ravine's centre line runs at x, how far along it that is (0 its head, 1 the edge), or null east or west of it. */
 function scarAt(pts: P[], x: number): { y: number; t: number } | null {
   if (x < pts[0][0] || x > pts[pts.length - 1][0]) return null;
@@ -1881,6 +1902,479 @@ function zeppelinMap(b: Bitmap, x: number, y: number) {
 }
 
 // ---------------------------------------------------------------------------
+// The Snowy Mesa (Zone 5, named and described by Jakub, 2026-10-19): east of
+// Earth Scars the steppe ends at the brink of a great gulf, its two ravines
+// falling over it in waterfalls. The gulf is full of a sea of cloud in the
+// light before sunset, and out of it rise tabletop mountains, their tops under
+// snow, their cliffs banded and glowing on the sun's side, each throwing its
+// long shadow east over the clouds; cables hung with candles join them all,
+// and the road crosses to the arbiter's mesa on bridges of rope. On the mesa
+// to the north-west a castle, its huge chimney breathing purple dust west on
+// the wind; on the arbiter's mesa the statue among a few pines, candles round
+// it; from the east the snowstorm comes on, dark cloud over the last mesas,
+// veils of snow trailing before it.
+// ---------------------------------------------------------------------------
+
+const MSEA = ramp(['#2e2c50', '#3a365e', '#48426c', '#58507a', '#6a5e86', '#7e6c90', '#947a98', '#aa889e', '#c098a2', '#d4aaa4', '#e6bea8', '#f4d2b0']);
+const MSNOW = ramp(['#5a5684', '#6e6898', '#8680aa', '#a096ba', '#bcacc6', '#d6c0cc', '#eacfcc', '#f6dfd2', '#fff0e2']);
+const MROCK = ramp(['#20182a', '#2c2034', '#3a283c', '#4a3044', '#5c3a4a', '#70444e', '#865052', '#9e5e56', '#b66e5a', '#cc805e']);
+const MCASTLE = ramp(['#120f1c', '#1e1828', '#2c2436', '#3c3246', '#504258', '#665468']);
+const MPLUME = ramp(['#3a1c56', '#55287a', '#7038a0', '#9050c0', '#b07ad8', '#d0a8ec', '#ecd2fa']);
+const MSTORM = ramp(['#16172c', '#1e2036', '#272a42', '#31344e', '#3c3e5a', '#4a4a66', '#5a5874', '#6c6882', '#82788e', '#a08a96', '#c09c98']);
+const MVEIL = ramp(['#8a88a8', '#a8a6c0', '#c8c6da', '#e4e2f0']);
+const MPINE = ramp(['#0e1a1a', '#16262a', '#20342e', '#2c4436']);
+const MVERD = ramp(['#16241f', '#2a443a', '#456452', '#6e8a68', '#a29c72']);
+const MCANDLE = ramp(['#b85a1c', '#ff9c3a', '#ffd870', '#fff4c0']);
+const MWAX = hex('#efe2cc');
+
+/** Where the steppe ends at y: its brink, the gulf beyond it, notched back where the ravines fall over it. */
+const brinkX = (y: number) => 1620 + 7 * vnoise(0, y, 26, 1301) + 2.5 * vnoise(0, y, 7, 1302) - 16 * Math.max(0, 1 - Math.abs(y - 73) / 17) - 15 * Math.max(0, 1 - Math.abs(y - 287) / 17);
+
+/** A mesa on the map: the middle of its top, its half sizes, how high its cliff shows below its south edge. */
+interface MapMesa {
+  x: number;
+  y: number;
+  rx: number;
+  ry: number;
+  h: number;
+  seed: number;
+}
+/** the arbiter's mesa (the node's), the castle's, and the others rising out of the gulf */
+const ARBITER_MESA: MapMesa = { x: 1772, y: 194, rx: 64, ry: 40, h: 16, seed: 1 };
+const CASTLE_MAP_MESA: MapMesa = { x: 1696, y: 88, rx: 36, ry: 21, h: 14, seed: 2 };
+const MAP_MESAS: MapMesa[] = [
+  ARBITER_MESA,
+  CASTLE_MAP_MESA,
+  { x: 1664, y: 302, rx: 22, ry: 13, h: 10, seed: 3 },
+  { x: 1848, y: 94, rx: 26, ry: 16, h: 12, seed: 4 },
+  { x: 1876, y: 272, rx: 24, ry: 14, h: 11, seed: 5 },
+  { x: 1726, y: 326, rx: 15, ry: 9, h: 8, seed: 6 },
+  { x: 1654, y: 156, rx: 10, ry: 7, h: 9, seed: 7 },
+  { x: 1798, y: 30, rx: 15, ry: 9, h: 9, seed: 8 },
+  { x: 1904, y: 184, rx: 18, ry: 12, h: 10, seed: 9 },
+  { x: 1748, y: 22, rx: 9, ry: 6, h: 7, seed: 10 },
+  { x: 1830, y: 336, rx: 12, ry: 7, h: 7, seed: 11 },
+  { x: 1890, y: 22, rx: 16, ry: 9, h: 9, seed: 12 },
+].sort((a, b) => b.y - a.y);
+
+/**
+ * Is x,y on a mesa's top? Its outline is a ragged ring, angular in short runs
+ * where the cliffs break off, with bays cut in by gullies and spurs jutting
+ * out, so no two mesas share a shape.
+ */
+function onTop(m: MapMesa, x: number, y: number): boolean {
+  const dx = (x - m.x) / m.rx, dy = (y - m.y) / m.ry;
+  const d = Math.hypot(dx, dy);
+  if (d > 1.5) return false;
+  const a = Math.atan2(dy, dx);
+  // round the rim: broad lobes and bays, then angular breaks every few pixels of rim
+  const ca = Math.cos(a), sa = Math.sin(a);
+  const lobes = (vnoise(ca * 1.6 + 7, sa * 1.6 + 7, 1, 1312 + m.seed) - 0.5) * 0.5;
+  const rim = (Math.max(m.rx, m.ry) * (a + Math.PI));
+  const breaks = jag(rim, 3, 1313 + m.seed) * 0.14 + jag(rim, 9, 1314 + m.seed) * 0.12;
+  return d < 1 + lobes + breaks;
+}
+
+/** what the gulf shows at each pixel east of the brink: 0 cloud, 1 a mesa's top, 2 its cliff; which mesa; how far down its cliff */
+const mesaKind = new Uint8Array(W * H);
+const mesaOf = new Int8Array(W * H).fill(-1);
+const mesaDepth = new Float32Array(W * H);
+/** how deep in the mesas' shadows the clouds lie */
+const mesaShade = new Float32Array(W * H);
+
+function precomputeMesas() {
+  for (let x = 1590; x < W; x++) {
+    // each mesa's south edge in this column, nearest mesa first
+    const south = MAP_MESAS.map((m) => {
+      if (Math.abs(x - m.x) > m.rx * 1.3) return -1;
+      let s = -1;
+      for (let y = Math.floor(m.y - m.ry * 1.4); y <= Math.ceil(m.y + m.ry * 1.4); y++) if (onTop(m, x, y)) s = y;
+      return s;
+    });
+    for (let y = 0; y < H; y++) {
+      if (x <= brinkX(y)) continue;
+      const i = idx(x, y);
+      for (let k = 0; k < MAP_MESAS.length; k++) {
+        const m = MAP_MESAS[k];
+        if (south[k] < 0) continue;
+        if (onTop(m, x, y)) {
+          mesaKind[i] = 1;
+          mesaOf[i] = k;
+          break;
+        }
+        // its cliff below the south edge, ragged at its foot where the clouds take it
+        const d = y - south[k];
+        if (d > 0 && d <= m.h + (vnoise(x, 0, 4, 1320 + m.seed) - 0.5) * 4) {
+          mesaKind[i] = 2;
+          mesaOf[i] = k;
+          mesaDepth[i] = d / m.h;
+          break;
+        }
+      }
+    }
+  }
+  // the long shadows the low sun throws east over the clouds, a little to the south
+  for (let x = 1590; x < W; x++) {
+    for (let y = 0; y < H; y++) {
+      const i = idx(x, y);
+      if (x <= brinkX(y) || mesaKind[i]) continue;
+      for (let s = 1; s < 60; s++) {
+        const sx = Math.round(x - s), sy = Math.round(y - s * 0.22);
+        if (!inBounds(sx, sy)) break;
+        const j = idx(sx, sy);
+        if (sx <= brinkX(sy)) {
+          // the brink's own shadow, short
+          if (s < 7) mesaShade[i] = Math.max(mesaShade[i], 1 - s / 7);
+          break;
+        }
+        if (mesaKind[j]) {
+          const m = MAP_MESAS[mesaOf[j]];
+          const len = m.h * 2.8 + 8;
+          if (s < len) mesaShade[i] = Math.max(mesaShade[i], 1 - (s / len) * 0.7);
+          break;
+        }
+      }
+    }
+  }
+}
+
+/** How far the storm has come over the land at x,y: 0 none, 1 under its dark; heaviest toward the north-east corner. */
+const stormMapK = (x: number, y: number) => smooth(1846, 1898, x + y * 0.14 - 20 + (vnoise(x, y, 24, 1330) - 0.5) * 30 + (vnoise(x, y, 8, 1331) - 0.5) * 8);
+
+/**
+ * The gulf: the sea of cloud in billows lit gold and rose on their western
+ * flanks, lilac in the hollows, dimming toward the storm, the mesas' long
+ * shadows lying on it; the brink's face in its own shade; the mesas' tops
+ * under snow, lit along their western edges, a bright cornice on the south;
+ * their cliffs banded and fluted, glowing on the sun's side, wisps of cloud
+ * at their feet.
+ */
+function mesaGround(x: number, y: number): RGBA {
+  const i = idx(x, y);
+  const kind = mesaKind[i];
+  const st = stormMapK(x, y);
+  if (kind === 1) {
+    const m = MAP_MESAS[mesaOf[i]];
+    // lit along its western and southern lips by the low sun, shaded along its northern and eastern; drifts combed across it by the wind
+    const westLip = !onTop(m, x - 2, y) || !onTop(m, x - 1, y - 1);
+    const southLip = !onTop(m, x, y + 1);
+    const eastLip = !onTop(m, x + 2, y) || !onTop(m, x, y - 2);
+    const comb = Math.sin(x * 0.55 - y * 1.3 + vnoise(x, y, 7, 1340 + m.seed) * 5);
+    const drift = vnoise(x * 0.6, y * 1.8, 5, 1342 + m.seed);
+    let v = 4.8 - ((x - m.x) / m.rx) * 1.1 - ((y - m.y) / m.ry) * 0.3 + (comb > 0.75 ? 0.9 : comb < -0.8 ? -0.6 : 0) + (drift - 0.5) * 0.8;
+    if (westLip) v += 2;
+    else if (southLip) v += 1.4;
+    else if (eastLip) v -= 1.4;
+    v -= st * 2.4;
+    if (hash2(x, y, 1341) > 0.988) v += 1.4;
+    return rampDither(MSNOW, clamp(v, 0, MSNOW.length - 1), x, y);
+  }
+  if (kind === 2) {
+    const m = MAP_MESAS[mesaOf[i]];
+    const d = mesaDepth[i];
+    // the cliff: banded strata, fluted, lit toward the west, snow along a ledge, the foot lost in cloud
+    const flute = Math.cos(x * 1.1 + vnoise(x, y, 5, 1350 + m.seed) * 3) > 0.5 ? 0.8 : 0;
+    const band = Math.floor(d * m.h * 0.5 + (vnoise(x, 0, 6, 1351 + m.seed) - 0.5) * 1.6) % 3 === 0 ? -0.7 : 0;
+    const side = clamp(1 - (x - (m.x - m.rx)) / (m.rx * 2), 0, 1);
+    let v = 3 + side * 4.4 + flute + band - d * 2.4 - st * 2.6;
+    if (d < 0.12) return rampDither(MSNOW, clamp(3.4 + side * 3 - st * 2, 0, MSNOW.length - 1), x, y);
+    if (Math.abs(d - 0.45) < 0.06 && hash2(x >> 1, 0, 1352 + m.seed) > 0.45) return MSNOW[Math.round(clamp(2 + side * 3 - st * 2, 0, 8))];
+    const wisp = d > 0.7 && vnoise(x, y, 3, 1353) > 0.5 + (1 - d) * 1.2;
+    if (wisp) v = 6 + side * 2;
+    return wisp ? rampDither(MSEA, clamp(v, 0, MSEA.length - 1), x, y) : rampDither(MROCK, clamp(v, 0, MROCK.length - 1), x, y);
+  }
+  // the brink's face: the steppe's edge falling away in its own shade
+  const face = x - brinkX(y);
+  if (face < 3 + vnoise(0, y, 5, 1360) * 2.4) return rampDither(MROCK, 2.2 - face * 0.3 + (Math.floor(y * 0.6 + vnoise(x, 0, 3, 1361) * 2) % 3 === 0 ? -0.6 : 0.3), x, y);
+  // the sea of cloud: heaped billows melting into each other, lit gold on their flanks toward the sun, lilac in their hollows
+  const lit = cloudLit(x, y, 11, 7, 1362) + cloudLit(x, y, 5, 3.4, 1363) * 0.45;
+  const hgt = puffH(x, y, 11, 7, 1362);
+  const deep = Math.max(0, 1 - face / 26);
+  const warm = clamp((1780 - x) / 180, 0, 1);
+  const v = 4.2 + lit * 5.2 + hgt * 1.6 - mesaShade[i] * 3.6 - st * 3.4 - deep * 2.4 + warm * 1.2;
+  return rampDither(MSEA, clamp(v, 0, MSEA.length - 1), x, y);
+}
+
+/**
+ * The height of a field of cloud billows at x,y: a dome over each of a
+ * jittered grid of centres (cells `cw` x `ch` px, the domes of different
+ * sizes), the domes melted into each other by a smooth maximum, so the
+ * billows heap without seams.
+ */
+function puffH(x: number, y: number, cw: number, ch: number, seed: number): number {
+  const gx = Math.floor(x / cw), gy = Math.floor(y / ch);
+  let sum = 0;
+  for (let j = gy - 1; j <= gy + 1; j++) {
+    for (let i = gx - 1; i <= gx + 1; i++) {
+      const cx = (i + 0.2 + hash2(i, j, seed) * 0.6) * cw, cy = (j + 0.2 + hash2(i, j, seed + 1) * 0.6) * ch;
+      const r = 0.7 + hash2(i, j, seed + 2) * 0.75;
+      const d2 = ((x - cx) / cw) ** 2 + ((y - cy) / ch) ** 2;
+      const h = r * Math.sqrt(Math.max(0, 1 - d2 / (r * r)));
+      sum += Math.exp(h * 7);
+    }
+  }
+  return Math.log(sum) / 7;
+}
+
+/** How the cloud's surface at x,y takes the low sun from the west and a little north (its slope), -1..1. */
+function cloudLit(x: number, y: number, cw: number, ch: number, seed: number): number {
+  const gxs = puffH(x - 1, y, cw, ch, seed) - puffH(x + 1, y, cw, ch, seed);
+  const gys = puffH(x, y - 1, cw, ch, seed) - puffH(x, y + 1, cw, ch, seed);
+  return clamp(gxs * cw * 0.55 + gys * ch * 0.5, -1, 1);
+}
+
+/**
+ * A billow of cloud seen from above at a slant: the nearest of a jittered
+ * grid of centres (cells `cw` x `ch` px), a dome round it; how it takes the
+ * low sun from the west (its normal), how high it heaps, and whether x,y lies
+ * in the seam between two billows.
+ */
+function billow(x: number, y: number, cw: number, ch: number, seed: number): { lit: number; h: number; seam: boolean } {
+  const gx = Math.floor(x / cw), gy = Math.floor(y / ch);
+  let d1 = 9, d2 = 9, bx = 0, by = 0, br = 1;
+  for (let j = gy - 1; j <= gy + 1; j++) {
+    for (let i = gx - 1; i <= gx + 1; i++) {
+      const cx = (i + 0.15 + hash2(i, j, seed) * 0.7) * cw, cy = (j + 0.15 + hash2(i, j, seed + 1) * 0.7) * ch;
+      const r = 0.75 + hash2(i, j, seed + 2) * 0.6;
+      const d = Math.hypot((x - cx) / cw, (y - cy) / ch) / r;
+      if (d < d1) {
+        d2 = d1;
+        d1 = d;
+        bx = (x - cx) / cw / r;
+        by = (y - cy) / ch / r;
+        br = r;
+      } else if (d < d2) d2 = d;
+    }
+  }
+  const h = Math.max(0, 1 - d1 * d1);
+  // the light from the west and a little from the north (the upper left)
+  const lit = clamp(-bx * 1.1 - by * 0.6, -1, 1) * (0.4 + 0.6 * Math.sqrt(1 - Math.min(1, d1)));
+  return { lit, h: h * br, seam: d2 - d1 < 0.09 };
+}
+
+/** The clearing round the arbiter's mesa's node, where its medallion and its name stand. */
+const mesaClear = (x: number, y: number) => clearing(x, y, NODES[4], 64, 36);
+
+/** A mountain pine on a mesa's top: a dark cone of needles, snow on its west side, a shadow east. */
+function mesaPine(b: Bitmap, x: number, y: number, h: number) {
+  for (let k = 1; k <= 3; k++) b.set(x + k, y + 1, mix(b.get(x + k, y + 1), SHADOW, 0.4));
+  for (let t = 0; t < h; t++) {
+    const half = Math.round((h - t) * 0.4);
+    for (let dx = -half; dx <= half; dx++) b.set(x + dx, y - t, dx < 0 && (t + dx) % 2 === 0 ? MSNOW[7] : MPINE[dx > 0 ? 0 : t % 2 ? 2 : 1]);
+  }
+  b.set(x, y - h, MSNOW[8]);
+  b.set(x, y + 1, TIMBER[1]);
+}
+
+/**
+ * The arbiter on its mesa: a seated figure of green bronze on a grey plinth,
+ * a darker nimbus behind its head, its sword upright beside it catching the
+ * sun; candles burning in a ring round the plinth; its long shadow east.
+ */
+function arbiterMap(b: Bitmap, x: number, y: number) {
+  for (let k = 1; k < 14; k++) b.set(x + 3 + k, y + 1 + Math.round(k * 0.2), mix(b.get(x + 3 + k, y + 1 + Math.round(k * 0.2)), SHADOW, 0.45 - k * 0.025));
+  stamp(b, x - 6, y - 12, 13, 14, (s) => {
+    // the plinth
+    for (let px = 1; px <= 11; px++) for (let py = 11; py <= 13; py++) s.set(px, py, px < 4 ? STONE[5] : STONE[3 + (py === 11 ? 1 : 0)]);
+    // the nimbus, the lap, the body, the head
+    for (const [px, py] of [[5, 2], [6, 1], [7, 1], [8, 2], [5, 3], [8, 3]]) s.set(px, py, MVERD[0]);
+    for (let px = 3; px <= 9; px++) s.set(px, 10, MVERD[px < 6 ? 3 : 1]);
+    for (let px = 2; px <= 10; px++) s.set(px, 9, MVERD[px < 5 ? 3 : 2]);
+    for (let py = 5; py <= 8; py++) for (let px = 4; px <= 8; px++) s.set(px, py, MVERD[px < 6 ? 3 : 1]);
+    s.set(6, 3, MVERD[3]);
+    s.set(7, 3, MVERD[2]);
+    s.set(6, 4, MVERD[3]);
+    s.set(7, 4, MVERD[1]);
+    // the raised palm, the sword upright on the left
+    s.set(9, 6, MCANDLE[1]);
+    for (let py = 0; py <= 8; py++) s.set(2, py, py === 7 ? MCANDLE[1] : MVEIL[py < 3 ? 3 : 2]);
+    s.set(1, 7, MCANDLE[0]);
+    s.set(3, 7, MCANDLE[0]);
+    // snow on the head and the shoulders
+    s.set(6, 2, MSNOW[8]);
+    s.set(4, 5, MSNOW[7]);
+  }, MVERD[0]);
+  // the candles round the plinth
+  for (let k = 0; k < 12; k++) {
+    const a = (k / 12) * Math.PI * 2;
+    const cx = Math.round(x + Math.cos(a) * 9), cy = Math.round(y + 1 + Math.sin(a) * 4);
+    b.set(cx, cy, MCANDLE[k % 3 === 0 ? 3 : 2]);
+  }
+}
+
+/**
+ * The castle on its mesa, seen from above at a slant: a ring of wall with
+ * merlons, round towers at its corners under snowy cones, the keep and the
+ * great hall under snow, lit windows; its huge chimney rising over all of it,
+ * dark, bound with iron, its mouth glowing violet.
+ */
+function castleMap(b: Bitmap, x: number, y: number) {
+  shadowAt(b, x + 10, y + 2, 26, 6);
+  stamp(b, x - 26, y - 34, 54, 40, (s) => {
+    const cx = 26, cy = 34;
+    // the curtain wall: a ring, its front face toward us, merlons along its top
+    for (let px = cx - 22; px <= cx + 22; px++) {
+      const u = (px - cx) / 22;
+      const fy = Math.round(cy - 2 + Math.sqrt(Math.max(0, 1 - u * u)) * 4);
+      const by = Math.round(cy - 12 - Math.sqrt(Math.max(0, 1 - u * u)) * 2);
+      for (let py = fy - 3; py <= fy; py++) s.set(px, py, MCASTLE[u < -0.2 ? 4 : u < 0.4 ? 3 : 2]);
+      s.set(px, fy - 4, px % 2 ? MSNOW[6] : MCASTLE[3]);
+      s.set(px, by, MCASTLE[2]);
+      s.set(px, by - 1, px % 2 ? MSNOW[5] : MCASTLE[2]);
+      // the court inside, under snow
+      for (let py = by + 1; py < fy - 4; py++) s.set(px, py, MSNOW[u < 0 ? 5 : 4]);
+    }
+    // the great hall: a long roof under snow
+    for (let px = cx - 14; px <= cx + 6; px++) for (let py = cy - 13; py <= cy - 8; py++) s.set(px, py, py < cy - 11 ? MSNOW[px < cx - 4 ? 8 : 6] : MCASTLE[px < cx - 4 ? 4 : 3]);
+    // the keep: a tall block over the hall's west end, its roof
+    for (let px = cx - 12; px <= cx - 5; px++) for (let py = cy - 22; py <= cy - 9; py++) s.set(px, py, MCASTLE[px < cx - 9 ? 4 : 2]);
+    for (let py = cy - 27; py < cy - 22; py++) for (let px = cx - 12 + (py - (cy - 27)) * 0; px <= cx - 5; px++) if (Math.abs(px - (cx - 8.5)) <= (py - (cy - 27)) * 0.9 + 0.5) s.set(px, py, px < cx - 8 ? MSNOW[8] : MSNOW[5]);
+    // the round towers at its corners under snowy cones
+    for (const [tx, ty, th] of [[cx - 22, cy - 4, 9], [cx + 22, cy - 4, 8], [cx - 18, cy - 13, 7], [cx + 16, cy - 13, 7]] as [number, number, number][]) {
+      for (let py = ty - th; py <= ty; py++) for (let px = tx - 2; px <= tx + 2; px++) s.set(px, py, MCASTLE[px < tx ? 4 : px === tx ? 3 : 1]);
+      for (let k = 0; k < 4; k++) for (let px = tx - (3 - k); px <= tx + (3 - k); px++) s.set(px, ty - th - 1 - k, px <= tx ? MSNOW[8] : MSNOW[5]);
+    }
+    // lit windows
+    for (const [wx, wy] of [[cx - 10, cy - 18], [cx - 7, cy - 18], [cx - 10, cy - 14], [cx - 2, cy - 10], [cx + 2, cy - 10], [cx - 22, cy - 8], [cx + 22, cy - 7]] as [number, number][]) s.set(wx, wy, MCANDLE[2]);
+    // the huge chimney: a tall dark stack at the east end, iron bands, the violet in its mouth
+    for (let py = cy - 32; py <= cy - 6; py++) for (let px = cx + 6; px <= cx + 10; px++) s.set(px, py, (py - (cy - 32)) % 7 === 3 ? MCASTLE[5] : MCASTLE[px === cx + 6 ? 4 : px < cx + 9 ? 2 : 1]);
+    for (let px = cx + 5; px <= cx + 11; px++) s.set(px, cy - 33, MCASTLE[3]);
+    for (let px = cx + 7; px <= cx + 9; px++) s.set(px, cy - 34, MPLUME[6]);
+  }, MCASTLE[0]);
+}
+
+/** A soft shadow on the map, cast to the east. */
+function shadowAt(b: Bitmap, cx: number, cy: number, rx: number, ry: number) {
+  ellipseFill(b, cx, cy, rx, ry, (px, py, d) => (dith(px, py, (1 - d) * 1.4) ? mix(b.get(px, py), SHADOW, 0.4) : 0));
+}
+
+/** The purple dust from the castle's chimney, drifting west on the wind from the storm, thinning out; motes of it sparkling round it. */
+function plumeMap(b: Bitmap, x: number, y: number) {
+  for (let k = 0; k < 26; k++) {
+    const t = k / 25;
+    const px = x - t * 78 - Math.sin(t * 5) * 2, py = y - 2 - t * 8 + Math.sin(t * 7) * 2;
+    const r = 2 + t * 6;
+    ellipseFill(b, px, py, r * 1.3, r * 0.8, (qx, qy, d) => {
+      if (!dith(qx, qy, (1 - t * 0.85) * (1.1 - d * d))) return 0;
+      const lit = (px - qx) / r * 0.6 + (py - qy) / r * 0.4;
+      return MPLUME[Math.round(clamp(3 + lit * 2.4 + (1 - t) * 0.8, 0, MPLUME.length - 1))];
+    });
+  }
+  for (let k = 0; k < 40; k++) {
+    const t = hash2(k, 0, 1371);
+    const mx = Math.round(x - t * 96 + (hash2(k, 1, 1371) - 0.5) * 18), my = Math.round(y - 4 - t * 10 + (hash2(k, 2, 1371) - 0.5) * 22);
+    if (inBounds(mx, my)) b.set(mx, my, MPLUME[hash2(k, 3, 1371) > 0.6 ? 6 : 5]);
+  }
+}
+
+/** The cables between the mesas (and to the brink), hung with candles: [from, to, sag]. */
+const MAP_CABLES: [P, P, number][] = [
+  [[1724, 94], [1738, 172], 4],
+  [[1676, 98], [1622, 128], 3],
+  [[1718, 80], [1786, 32], 3],
+  [[1806, 186], [1836, 104], 4],
+  [[1830, 214], [1862, 268], 3],
+  [[1712, 222], [1676, 296], 4],
+  [[1760, 232], [1728, 320], 3],
+  [[1662, 156], [1700, 102], 2],
+  [[1660, 160], [1712, 184], 3],
+  [[1818, 228], [1828, 332], 3],
+  [[1870, 90], [1888, 26], 2],
+  [[1756, 26], [1786, 30], 1.5],
+  [[1622, 238], [1648, 296], 3],
+];
+
+/** A cable over the gulf: a thin dark line sagging between its ends, candles hung along it at even steps. */
+function cableMap(b: Bitmap, [ax, ay]: P, [bx, by]: P, sag: number) {
+  const n = Math.ceil(Math.hypot(bx - ax, by - ay));
+  for (let k = 0; k <= n; k++) {
+    const t = k / n;
+    const x = Math.round(ax + (bx - ax) * t), y = Math.round(ay + (by - ay) * t + Math.sin(t * Math.PI) * sag);
+    if (!inBounds(x, y)) continue;
+    b.set(x, y, MCASTLE[1]);
+    if (k > 1 && k < n - 1 && k % 4 === 2) b.set(x, y + 1, MCANDLE[(k >> 2) % 3 === 0 ? 3 : 2]);
+  }
+}
+
+/**
+ * A bridge of rope the road crosses the gulf on: two rails sagging between
+ * the brinks, planks between them, lanterns on the rails, its shadow on the
+ * clouds below.
+ */
+function bridgeMap(b: Bitmap, [ax, ay]: P, [bx, by]: P, sag: number) {
+  const n = Math.ceil(Math.hypot(bx - ax, by - ay));
+  for (let k = 0; k <= n; k++) {
+    const t = k / n;
+    const x = Math.round(ax + (bx - ax) * t), y = Math.round(ay + (by - ay) * t + Math.sin(t * Math.PI) * sag);
+    // its shadow on the clouds far below
+    for (const [dx, dy] of [[5, 7], [6, 8]]) if (inBounds(x + dx, y + dy) && !mesaKind[idx(x + dx, y + dy)]) b.set(x + dx, y + dy, mix(b.get(x + dx, y + dy), SHADOW, 0.35));
+    b.set(x, y - 1, TIMBER[1]);
+    b.set(x, y, k % 2 ? TIMBER[3] : TIMBER[2]);
+    b.set(x, y + 1, TIMBER[1]);
+    if (k % 6 === 3) {
+      b.set(x, y - 2, TIMBER[0]);
+      b.set(x, y - 3, MCANDLE[2]);
+    }
+  }
+}
+
+/** A waterfall where a ravine falls over the brink: white water down the face, a cloud of spray at its foot. */
+function waterfallMap(b: Bitmap, x: number, y: number, w: number) {
+  for (let k = 0; k < 9; k++) for (let dx = 0; dx < w; dx++) b.set(x + dx + Math.round(k * 0.15), y + k, k % 3 === 0 && dx === w - 1 ? WATER[6] : MVEIL[k > 6 ? 2 : 3]);
+  ellipseFill(b, x + w / 2 + 2, y + 10, w + 3, 3, (px, py, d) => (dith(px, py, (1 - d) * 1.3) ? MVEIL[d < 0.5 ? 3 : 2] : 0));
+}
+
+/**
+ * The storm coming on from the east, heaviest in the north-east corner: dark
+ * billows over the last mesas, lit rose along their western edges by the low
+ * sun; before them veils of snow trailing west over the clouds and the mesas,
+ * whitening them.
+ */
+function stormMap(b: Bitmap) {
+  for (let y = 0; y < H; y++) {
+    for (let x = 1800; x < W; x++) {
+      const k = stormMapK(x, y);
+      if (k <= 0.02) continue;
+      if (k < 0.55) {
+        // the veils before it: thin streaks of falling snow slanting west, sparser the further out
+        const s = x + y * 0.5;
+        const streak = Math.sin(s * 0.75 + vnoise(s, 0, 9, 1381) * 5) > 0.72 && vnoise(x, y * 0.3, 3, 1385) > 0.35;
+        if (streak && dith(x, y, (k / 0.55) * 0.55)) b.set(x, y, MVEIL[hash2(x, y, 1382) > 0.7 ? 2 : 1]);
+        continue;
+      }
+      // the storm's billows, seen from above: great heaped domes, lit rose on their western flanks at its front, slate behind
+      const lit = cloudLit(x, y, 18, 12, 1383) + cloudLit(x, y, 7, 4.6, 1384) * 0.4;
+      const front = 1 - smooth(0.55, 0.8, k);
+      const v = 2.6 + lit * (2.6 + front * 3.4) + puffH(x, y, 18, 12, 1383) * 1.4 + front * 2.4 - (k - 0.55) * 2.4;
+      b.set(x, y, rampDither(MSTORM, clamp(v, 0, MSTORM.length - 1), x, y));
+    }
+  }
+}
+
+/** The mesas' things that stand: the castle, the arbiter, the pines. */
+function mesaThings(things: Thing[]) {
+  things.push({ y: CASTLE_MAP_MESA.y + 2, draw: () => castleMap(b0, CASTLE_MAP_MESA.x, CASTLE_MAP_MESA.y + 2) });
+  things.push({ y: ARBITER.y, draw: () => arbiterMap(b0, ARBITER.x, ARBITER.y) });
+  for (const [x, y, h] of [[1748, 168, 6], [1792, 166, 7], [1806, 176, 5], [1734, 180, 5], [1820, 192, 6], [1716, 76, 4], [1854, 90, 4], [1880, 268, 4], [1668, 300, 4], [1720, 202, 4]] as [number, number, number][]) {
+    if (!inBounds(x, y) || mesaClear(x, y) || roadDist[idx(x, y)] < 3 || mesaKind[idx(x, y)] !== 1) continue;
+    things.push({ y, draw: () => mesaPine(b0, x, y, h) });
+  }
+}
+
+/** where the arbiter sits on its mesa: north of the node, clear of its medallion */
+const ARBITER = { x: 1770, y: 172 };
+
+/** Everything over the gulf after the things: the waterfalls, the plume, the cables and bridges, the storm. */
+function mesaOverlays(b: Bitmap) {
+  waterfallMap(b, Math.round(brinkX(73)) + 1, 72, 3);
+  waterfallMap(b, Math.round(brinkX(287)) + 1, 286, 2);
+  plumeMap(b, CASTLE_MAP_MESA.x + 9, CASTLE_MAP_MESA.y + 2 - 33);
+  for (const [a, c, sag] of MAP_CABLES) cableMap(b, a, c, sag);
+  for (const [a, c, sag] of MESA_BRIDGES) bridgeMap(b, a, c, sag);
+  stormMap(b);
+}
+
+// ---------------------------------------------------------------------------
 // the whole world
 // ---------------------------------------------------------------------------
 
@@ -1999,7 +2493,7 @@ function renderWorld(): Bitmap {
     for (let gx = 1300; gx < W; gx += 5) {
       if (hash2(gx, gy, 1261) > 0.1) continue;
       const x = gx + Math.floor(hash2(gx, gy, 1262) * 5), y = gy + Math.floor(hash2(gx, gy, 1263) * 5);
-      if (!inBounds(x, y) || steppeK(x, y) < 1 || scarKind[idx(x, y)] || lakeK(x, y) > -0.2 || roadDist[idx(x, y)] < 3 || campK(x, y) > 0.2 || steppeClear(x, y)) continue;
+      if (!inBounds(x, y) || steppeK(x, y) < 1 || scarKind[idx(x, y)] || lakeK(x, y) > -0.2 || roadDist[idx(x, y)] < 3 || campK(x, y) > 0.2 || steppeClear(x, y) || x > brinkX(y) - 2) continue;
       b.set(x, y, [NEBULA[6], GOLD[2], FLOWERS[1], NEBULA[5], GOLD[2], WOOL[2]][Math.floor(hash2(gx, gy, 1264) * 6)]);
     }
   }
@@ -2057,6 +2551,7 @@ function renderWorld(): Bitmap {
   eastHills(things);
   basinStones(things);
   steppeThings(things);
+  mesaThings(things);
   for (const h of [...VILLAGE, ...BURNT]) things.push({ y: h.y, draw: () => house(b, h, smokes) });
   things.push({ y: CHAPEL[1], draw: () => chapel(b, CHAPEL[0], CHAPEL[1]) });
   things.push({ y: WINDMILL[1], draw: () => windmill(b, WINDMILL[0], WINDMILL[1]) });
@@ -2079,7 +2574,7 @@ function renderWorld(): Bitmap {
     const gx = (k % Math.ceil(W / 24)) * 24, gy = Math.floor(k / Math.ceil(W / 24)) * 24;
     if (hash2(gx, gy, 930) > 0.1) continue;
     const x = gx + Math.round(hash2(gx, gy, 931) * 24), y = gy + Math.round(hash2(gx, gy, 932) * 24);
-    if (!inBounds(x, y) || sdAt(x, y) < 6 || forestAt(x, y) > 0.3 || parcelAt(x, y) || roadDist[idx(x, y)] < 5 || inRiver(x, y) > -3 || core(x, y) || nodeClear(x, y) || glade(x, y)) continue;
+    if (!inBounds(x, y) || sdAt(x, y) < 6 || forestAt(x, y) > 0.3 || parcelAt(x, y) || roadDist[idx(x, y)] < 5 || inRiver(x, y) > -3 || core(x, y) || nodeClear(x, y) || glade(x, y) || x > brinkX(y) - 4) continue;
     if (x > 850 && paleK(x, y) > 0.1) continue;
     const beyond = x <= 330 && far[idx(x, y)] === 1;
     things.push({ y, draw: () => boulder(b, x, y, 1.6 + hash2(gx, gy, 933) * 2, beyond ? ROCK : STONE) });
@@ -2097,6 +2592,8 @@ function renderWorld(): Bitmap {
   CAMPS.forEach((c, i) => c.yurts.forEach(([x, y, w], k) => k === 0 && plume(b, x - 1, Math.round(y - w * 0.62) - 1, 4, 20 + i)));
   zeppelinShadow(b, ZEPPELIN[0], ZEPPELIN[1]);
   zeppelinMap(b, ZEPPELIN[0], ZEPPELIN[1]);
+  // the Snowy Mesa's waterfalls, plume, cables and bridges, and the storm over it all
+  mesaOverlays(b);
   compass(b, W - 40, H - 44);
   frame(b);
   return b;

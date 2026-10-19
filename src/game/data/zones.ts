@@ -70,6 +70,25 @@ export const ZONES: ZoneDef[] = [
     birds: 3,
     birdsAt: [[150, 86], [520, 64]],
   },
+  {
+    // Zone 5, named and described by Jakub (2026-10-19): the Snowy Mesa, the top of a snow-capped tabletop mountain
+    // before sunset, many more tabletop mountains round it all connected with many candles, a snowstorm approaching
+    // from the right corner, a castle on the left mesa with a huge chimney breathing purple dust and particles, a few
+    // trees and a big arbiter statue like a Buddha holding a big sword; flurries blown in ahead of the storm
+    id: 'zone5',
+    name: 'Snowy Mesa',
+    ambient: 'flurries',
+    // the candles' light
+    glow: [255, 196, 128],
+    // the sun is low in the upper left: long shadows thrown far to the right
+    shadow: { dx: 6, stretch: 1.35 },
+    tint: { color: '#ffb47e', alpha: 0.05, op: 'soft-light' },
+    // a first take: choughs riding the wind over the castle
+    birds: 3,
+    birdsAt: [[186, 54]],
+    // a first take: now and then lightning glows inside the storm, white and lilac, rarely
+    flash: { at: [566, 40], every: [14000, 30000], ms: 1200, colors: ['#dfe2ff', '#cbbcff', '#eceaff'] },
+  },
 ];
 
 const byId = new Map(ZONES.map((z) => [z.id, z]));

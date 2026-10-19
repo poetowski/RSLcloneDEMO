@@ -4,7 +4,8 @@
 // looping, pulsing, burning), the ambience of the zone (falling snow, blowing
 // sand, drifting star-dust with shooting stars, autumn leaves tumbling in the
 // wind, pollen drifting in the sunlight, glowing spores drifting in their
-// halos, or feather-grass seeds sailing on the wind; circling birds, butterflies, heat haze, now and then a flash of
+// halos, feather-grass seeds sailing on the wind, or snow flurries blown in
+// ahead of a storm; circling birds, butterflies, heat haze, now and then a flash of
 // strange light across the sky or a shooting star), light pools, a mood tint
 // and the vignette. Everything zone-specific
 // comes from the zone's JSON (art) and ZoneDef (behaviour), so a new zone
@@ -124,7 +125,7 @@ export class ZoneView {
     this.tilesLayer = this.bakeTiles();
     this.light = makeGlow(64, 40, def.glow);
     this.vignette = makeVignette();
-    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'seeds' ? SEEDS : def.ambient === 'spores' ? 0 : 70;
+    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'seeds' ? SEEDS : def.ambient === 'flurries' ? FLURRIES : def.ambient === 'spores' ? 0 : 70;
     for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
     if (def.ambient === 'spores') {
       this.sporeHalos = SPORE_HALO.map((c) => [makeHalo(6, c), makeHalo(9, c)]);
@@ -201,6 +202,26 @@ export class ZoneView {
   }
 
   private spawnAmbient(x = -4, y = -4) {
+    if (this.def.ambient === 'flurries') {
+      // flurries blown in from the right ahead of the storm: flakes driven left and down, melting away as they go
+      // (so they thin out toward the left), a few close to the camera
+      const respawn = x < 0;
+      const near = Math.random() < 0.22;
+      const life = 6000 + Math.random() * 8000;
+      this.ambient.add({
+        x: respawn ? W + 4 : x,
+        y: respawn ? -20 + Math.random() * 300 : y,
+        vx: -(near ? 36 + Math.random() * 18 : 18 + Math.random() * 16),
+        vy: near ? 13 + Math.random() * 8 : 6 + Math.random() * 7,
+        life: respawn ? life : Math.random() * life,
+        max: life,
+        size: near ? 2 : 1,
+        color: near ? '#f6f2ff' : '#d4cce8',
+        fade: near ? ['#f6f2ff', '#f6f2ff', '#f6f2ff', '#e2dcf2'] : ['#d4cce8', '#d4cce8', '#bcb4d6', '#a49cc2'],
+        sway: near ? 10 : 6,
+      });
+      return;
+    }
     if (this.def.ambient === 'seeds') {
       // feather-grass seeds sailing across the steppe on the wind from the left: silky awns, a few close to the camera
       const respawn = x < 0;
@@ -392,7 +413,7 @@ export class ZoneView {
     amb.update(dt * speedUp);
     for (const p of amb.list) if (p.y > H + 4 || p.y < -6 || p.x > W + 8 || p.x < -60) p.life = 0;
     // the spores are their own system (spawnSpore), not particles
-    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'seeds' ? SEEDS : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
+    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'seeds' ? SEEDS : this.def.ambient === 'flurries' ? FLURRIES : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
     while (amb.list.length < target) this.spawnAmbient();
     if (this.def.ambient === 'sand') {
       // every few seconds a gust sweeps a veil of sand across the arena
@@ -656,6 +677,8 @@ export class ZoneView {
 const SPORES = 30;
 /** How many feather-grass seeds sail on the wind at once (ambient 'seeds'). */
 const SEEDS = 24;
+/** How many snowflakes blow in ahead of the storm at once (ambient 'flurries'). */
+const FLURRIES = 44;
 
 /** A spore's halo: a small soft disc of light, dithered into four bands so it reads as pixel art. */
 function makeHalo(r: number, color: string): HTMLCanvasElement {

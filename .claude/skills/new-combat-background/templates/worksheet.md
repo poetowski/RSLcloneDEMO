@@ -40,7 +40,7 @@ Budget: backdrop at most 220 colors, tileset at most 160 (`npm run audit`).
 
 | Field | Value | Options |
 | --- | --- | --- |
-| ambient | | `snow` (falling flakes), `sand` (blowing grains and gusts), `motes` (star-dust), `leaves` (autumn leaves), `pollen` (pollen in sunlight), `spores` (glowing motes in pearl halos) or `seeds` (feather-grass seeds on the wind); a new kind needs code in `src/game/view/zone.ts` |
+| ambient | | `snow` (falling flakes), `sand` (blowing grains and gusts), `motes` (star-dust), `leaves` (autumn leaves), `pollen` (pollen in sunlight), `spores` (glowing motes in pearl halos), `seeds` (feather-grass seeds on the wind) or `flurries` (snow blown in ahead of a storm); a new kind needs code in `src/game/view/zone.ts` |
 | glow | | RGB of fire light pools |
 | shadow | | `{ dx, stretch }`: 1/1 for a high light, 6/1.35 for a low sun |
 | tint | | optional `{ color, alpha, op }` mood overlay |
