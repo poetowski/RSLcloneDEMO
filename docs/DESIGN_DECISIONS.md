@@ -76,6 +76,7 @@ Section 7 lists what is not decided.
 | 2026-10-24 | The main menu redesigned: a diorama of its own, static, its places clicked instead of buttons, only the champions changing each time it opens; "very epic", "celestial or planetar", "full creativity" | 10 |
 | 2026-10-24 | The Paladin, a Heroic Tank of the Azure Crown and the roster's first Heroic; the reward of a quest line Jakub designs later | 5.8, 7, 34 |
 | 2026-10-24 | The Paladin's affinity: Ember (Tide in the brief) | 34 |
+| 2026-10-24 | Challenges: a new place on the main menu leading to a screen of quests in three tabs, Daily and Persistent (placeholders) and the Journey (a horizontal pathway of quests unlocked one after another: Finish Tutorial, then a placeholder); a short tutorial for new accounts, made with driver.js | 7, 11, 35 |
 
 ---
 
@@ -1086,7 +1087,14 @@ open questions.
 - The quest line whose reward is the Paladin: Jakub, 2026-10-24, "this will
   be reward for quest line later, i will specify later the whole quest
   concept" *(until it exists, the first clear of 5-10, the campaign's last
-  stage, brings him, section 34)*
+  stage, brings him, section 34; the Journey, section 35, holds no link to
+  him yet)*
+- The Daily and Persistent challenges: "for now in daily and persistent tabs
+  those ar ejust placeholders" (2026-10-24) *(the tabs show empty rows and
+  "not designed yet", section 35)*
+- The Journey after its first quest, and what quests give: "second quest is
+  placeholder" (2026-10-24) *(the game stands in Weave a Spool, and a spool
+  for each quest claimed, section 35)*
 - Campaign count of zones
 - Zone 3's stages, enemies and story *(the game stands in ten placeholder
   stages, 5.6)*
@@ -1451,7 +1459,10 @@ holds a seventh jewel at its centre, round which the six lobes stand.
   the Weaver Matrix (a champion's gear), a Thread Spool (one piece of gear), a
   Weave Pattern (a set bonus), Weaving (the main-menu section that stores the
   spools, 9.4). The Spindle of Fate: a seventh, central piece of gear, a
-  placeholder until its system is made (Jakub, 2026-10-24, 9.5).
+  placeholder until its system is made (Jakub, 2026-10-24, 9.5). Challenges
+  (the main-menu place of quests: Daily, Persistent and the Journey, a
+  pathway of quests unlocked one after another) and the tutorial (Jakub,
+  2026-10-24, section 35).
 
 ---
 
@@ -2746,3 +2757,77 @@ shape and places, the shield's azure field, white cross and gold studs, the
 hilt, the face and the hair, the flames, the light round the blade and the
 embers, the effects). Like the Crown's other champions, he stands in the
 first zone on his page and in his demos.
+
+## 35. Challenges and the tutorial (received 2026-10-24)
+
+Jakub's brief, verbatim:
+
+```
+i want new object in main menu, clickable which will directs user to new screen. call it Challenges. It is a list of quests to accomplish. it has three parts. first part is Daily. second tab is Persistent. third tab is Journey. for now in daily and persistent tabs those ar ejust placeholders. but in Journey, we need to design a horizonal pathway of quests, these are unlocked sequentialy. first quest is "Finish Tutorial". second quest is placeholder. i want you to also create Tutorial. this is for new accounts. use driver.js to highlight spots and teach new plahyer basics. design and be creative. highlight where to click. tutorial should cobver basics and should be short.
+```
+
+**Readings.** The "new object in main menu" is a place of the Sanctum
+(section 10), drawn and clicked like the others; its label reads CHALLENGES.
+Daily, Persistent and Journey are three tabs in that order; while the first
+two are placeholders, the screen opens on the Journey. "Unlocked
+sequentialy": a quest opens once the one before it is claimed; its goal is
+read from the save as it stands, so a goal met before the quest opens counts
+the moment it does; claiming gives the quest's reward and opens the next.
+"Finish Tutorial" is done when the tutorial is finished: the first battle won
+while it runs. "Second quest is placeholder": a quest of my own stands in so
+the pathway can be walked. He named no rewards; each quest gives a spool. "For
+new accounts": the tutorial starts on its own on a save with no stage
+cleared, unless it was finished or skipped; anyone can play it from the
+Journey. "Use driver.js": driver.js (1.9.0) draws the overlay and its
+cutout and places the cards; the game being one canvas, the cutout lies over
+the spot on the canvas and follows it, and only the spot takes clicks.
+"Highlight where to click": gold corners breathing round the spot and a
+gloved hand pointing at it. "Basics" and "short": the Sanctum, the campaign
+map, a stage, the team, the turn meter, a skill, a target, a cooldown, the
+victory and its stars, a recruit, the Challenges and a claim; one battle and
+some fifteen short cards, most of them a single click.
+
+**As built.** *The place:* the Herald's Board, on a rock drifting off the
+island's west end as the astrolabe's drifts off its east: a notice board of
+dark timber under a little slate roof edged in gold with a gold diamond star
+for its finial; notes pinned to its planks, a letter sealed in red wax, one
+pinned with gold, a scroll tied with a red ribbon and one stamped with a gold
+star that glows; a lantern hung at its side, a pennant of the Loom's blue
+cloth fluttering on a pole. Its label hangs at the foot of the screen on the
+left, as OPTIONS does on the right, with the number of quests ready to claim
+and the NEW badge. *The screen:* the tabs DAILY, PERSISTENT and JOURNEY over
+the frontier's battle background. The Journey is a band of night sky that the
+Loom's thread crosses through a knot for every quest, a medallion with the
+Loom's rose on it (dim gold while the quest is open, lit while its reward
+waits, gold once claimed, stone and locked before it opens): woven gold up to
+the quest the Journey stands at, a dotted line of starlight beyond it, on past
+faint knots still to come ("The Journey goes on."). Above each knot its
+reward, below it its name and how it stands; the knot the Journey stands at
+glows. The panel under the band reads the chosen quest out: what to do, how
+it stands, its reward, and CLAIM, or the way to its goal (START TUTORIAL, OPEN
+WEAVING), and REPLAY TUTORIAL once the tutorial is done. Claiming throws
+sparks off the knot, and the thread weaves on to the next one, which flares as
+the thread reaches it. A longer Journey will scroll sideways. Daily and
+Persistent show faint empty rows and "Daily challenges are not designed yet."
+*The tutorial:* a card painted in the game's own font and gold panel, beside
+the spot; it asks for a click on the spot (the hand points there) or has a
+button where it teaches; pips along its foot show the way through; a link
+skips it, asking first ("You can play it again from Challenges"). The steps:
+a welcome in the Sanctum; the Starbridge Gate; area I on the world map; stage
+1-1 and PREPARE; the team and FIGHT!; in the battle the turn meter, a
+stronger skill (Iron Blow for Captain Gareth) and a target, then the battle
+is the player's, with a word on the cooldown at the next turn; the victory
+and its stars (the tutorial is finished here); the recruit; BACK; the
+Herald's Board; CLAIM on the Journey; a farewell pointing at the next quest.
+It asks where the player is every moment instead of following a script, so a
+retreat, a defeat (RETRY) or a reload never loses it.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the place (the
+Herald's Board: its name, look and where it floats); every text of the
+Challenges and the tutorial but "Finish Tutorial"; the Daily and Persistent
+placeholders; the second quest, Weave a Spool (a spool woven into any
+champion's Weaver Matrix); the rewards, a Silver Vigor spool and a Gilded
+Sunder spool; the Journey's look (the band, the thread, the knots); the
+tutorial's steps, order and look (the cards, the corners, the hand); that the
+first victory finishes it, that it starts on its own only on a save with no
+stage cleared, and that it can be skipped and played again.

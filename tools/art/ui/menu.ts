@@ -1,6 +1,6 @@
 // Menu and meta-game art: the logo (THE LOOM and its rose window), big buttons, rarity card
 // frames, affinity gems, faction emblems, role icons, stars, locks, crowns,
-// campaign map nodes, tabs and menu glyphs. Same rules as the battle art:
+// campaign map nodes, the Journey's quest knots, the tutorial's hand, tabs and menu glyphs. Same rules as the battle art:
 // light from the top-left, 1px dark outlines, ramps from palette.ts (UIR).
 // Layout and usage of every part: docs/UI_GUIDE.md.
 import { MAT, UIR } from '../palette.ts';
@@ -458,6 +458,92 @@ export function campGlow(phase: number): Bitmap {
   const b = new Bitmap(47, 47);
   ellipseRing(b, 23.5, 23.5, 22.5, 22.5, 2, (x, y, a) => (Math.floor(((a + Math.PI) / (Math.PI * 2)) * 24 + phase) % 2 === 0 ? G[4] : G[2]));
   return b;
+}
+
+// ---------------------------------------------------------------------------
+// The Journey and the tutorial
+// ---------------------------------------------------------------------------
+
+export type KnotKind = 'open' | 'ready' | 'done' | 'locked';
+
+/**
+ * A quest on the Journey's pathway (33x33): a knot of the Loom's thread, a
+ * medallion like an area's with the Loom's rose on its face, six lobes round a
+ * jewel: tied in gold once claimed, lit white-gold while its reward waits,
+ * drawn in dim gold while it is open, stone and locked until the quest before
+ * it is claimed.
+ */
+export function questKnot(kind: KnotKind): Bitmap {
+  const b = new Bitmap(33, 33);
+  const c = 16.5;
+  const rim = kind === 'locked' ? UIR.stone : G;
+  const core = kind === 'done' ? [G[0], G[1], G[2]] : kind === 'locked' ? [UIR.fill[1], UIR.stone[1], UIR.stone[2]] : kind === 'ready' ? [UIR.fill[2], UIR.navy[1], UIR.navy[2]] : [UIR.fill[1], UIR.fill[3], UIR.navy[2]];
+  const lobes = Array.from({ length: 6 }, (_, i) => {
+    const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+    return [c + Math.cos(a) * 5.6, c + Math.sin(a) * 5.6] as const;
+  });
+  ellipseFill(b, c, c, 15.6, 15.6, (x, y, d) => {
+    if (d > 0.8) return rampDither(rim, 3.7 - ((x + y) / 33) * 2.4 - (d > 0.94 ? 0.7 : 0), x, y);
+    if (d > 0.73) return DARK;
+    const px = x + 0.5, py = y + 0.5;
+    if (kind !== 'locked') {
+      const jewel = Math.hypot(px - c, py - c);
+      if (jewel < 1.8) return kind === 'open' ? UIR.arcane[2] : UIR.arcane[4];
+      if (jewel < 2.6) return kind === 'done' ? G[0] : DARK;
+      const near = Math.min(...lobes.map(([lx, ly]) => Math.hypot(px - lx, py - ly)));
+      const lit = (px - c + (py - c)) / 16;
+      if (kind === 'open' && Math.abs(near - 2.4) < 0.55) return G[2];
+      if (kind === 'done' && near < 2.9) return near > 2.2 ? G[0] : rampDither(G, 4.3 - lit * 1.6 - near * 0.25, x, y);
+      if (kind === 'ready' && near < 2.9) return near > 2.2 ? G[3] : near < 1.2 ? G[4] : rampDither(G, 4.4 - lit * 1.4, x, y);
+    }
+    return rampDither(core, 2.3 - d * 1.2 - ((x + y) / 33) * 0.8, x, y);
+  });
+  for (const [sx, sy] of [[16, 1], [16, 31], [1, 16], [31, 16]]) {
+    b.set(sx, sy, rim[4]);
+    b.set(sx + 1, sy, rim[2]);
+  }
+  if (kind === 'locked') b.blit(lock(), 11, 10);
+  return outline(b, DARK);
+}
+
+/**
+ * The tutorial's pointer (15x18): a hand in an ivory glove with a gold cuff,
+ * its index finger raised toward what to click; lit from the top-left, the
+ * curled fingers parted by shade. The runtime turns it to point any way.
+ */
+export function tutHand(): Bitmap {
+  const b = new Bitmap(15, 18);
+  const IV = UIR.parchment;
+  const rows = [
+    '.....##......',
+    '....####.....',
+    '....####.....',
+    '....####.....',
+    '....####.....',
+    '....#######..',
+    '....#########',
+    '.##.#########',
+    '#############',
+    '#############',
+    '.############',
+    '..###########',
+    '..##########.',
+    '...#########.',
+    '...#########.',
+    '...#########.',
+  ];
+  rows.forEach((row, y) => {
+    [...row].forEach((ch, x) => {
+      if (ch !== '#') return;
+      const cuff = y >= 13;
+      const lit = 4.3 - x * 0.16 - y * 0.05;
+      b.set(x + 1, y + 1, cuff ? (y === 13 ? G[2] : x < 6 ? G[4] : G[3]) : rampDither(IV, lit, x, y));
+    });
+  });
+  // the curled fingers, parted; the thumb's crease; the index finger's nail lit
+  for (const [x, y] of [[8, 6], [8, 7], [10, 7], [10, 8], [4, 8], [4, 9]]) b.set(x + 1, y + 1, IV[2]);
+  b.set(5 + 1, 0 + 1, IV[4]);
+  return outline(b, DARK);
 }
 
 // ---------------------------------------------------------------------------

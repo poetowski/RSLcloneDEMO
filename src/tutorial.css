@@ -1,0 +1,70 @@
+/* The tutorial's layers over the game (src/game/tutorial.ts). driver.js draws
+   the overlay and places the popover; the popover shows only the card the
+   game paints, and inside the overlay's cutout the canvas takes the click. */
+
+.driver-active canvas.screen {
+  pointer-events: auto;
+}
+
+/* what driver.js highlights: laid over the spot, letting clicks through to the canvas */
+.tut-hole {
+  position: fixed;
+  pointer-events: none;
+}
+
+/* over the overlay, under the card: the corners round the spot and the hand */
+.tut-fx {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 10001;
+  image-rendering: pixelated;
+}
+
+.driver-popover.tut-pop {
+  all: unset;
+  position: fixed;
+  z-index: 1000000000;
+  display: block;
+  box-sizing: border-box;
+}
+
+.driver-fade .driver-popover.tut-pop {
+  animation: animate-fade-in var(--driver-animation-duration, 0.4s);
+}
+
+/* the words stay for screen readers; the card shows them */
+.driver-popover.tut-pop .driver-popover-title,
+.driver-popover.tut-pop .driver-popover-description {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.driver-popover.tut-pop .driver-popover-footer,
+.driver-popover.tut-pop .driver-popover-close-btn,
+.driver-popover.tut-pop .driver-popover-arrow {
+  display: none !important;
+}
+
+.tut-card {
+  position: relative;
+  display: block;
+  line-height: 0;
+}
+
+.tut-card canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+
+.tut-card .tut-btn {
+  all: unset;
+  position: absolute;
+  cursor: pointer;
+}

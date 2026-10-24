@@ -21,6 +21,8 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 - **A Weaver Matrix** for every champion: six named slots in two triangles holding Thread Spools, each with a main stat and strands, and eight Weave Patterns that two spools of a kind weave, on the champion page's MATRIX tab.
 - **Weaving**, the storage of every spool: spools drop from every campaign stage, each area holding two Weave Patterns, and wait here as cards in groups by pattern, one grade per row, filtered by slot and by state; choose one to read it, weave it into a champion (the champion, then the slot, with a preview of the stats it changes and the patterns it completes), take it out or unravel it. New finds wear the NEW badge.
 - **A main menu that is a place**: the Sanctum, an island adrift under the broken celestial Loom, its golden rim cracked open over a ringed planet, threads of starlight hanging from it and its cloth streaming from the break; you go on by clicking its places (the Starbridge Gate, the Reliquary, the Weaver's Spire, the Observatory, an astrolabe), and a different few of your champions stand on its plaza each time.
+- **Challenges**: the Herald's Board on its own drifting rock leads to quests in three tabs, Daily, Persistent and the **Journey**, a pathway across the screen where the Loom's thread runs through a knot for every quest, woven gold as each is claimed: claim one to open the next.
+- **A tutorial for new accounts**, made with driver.js: the screen dims round the spot to click, gold corners breathe round it and a gloved hand points at it, while a card in the game's own pixel font says why; it leads from the Sanctum through the campaign and a first battle (the turn meter, a skill, a target, a cooldown) to the Challenges, where finishing it is the Journey's first quest. It can be skipped, and played again from the Journey.
 - **A collection** of champions in groups by faction, the rarest first and one rarity per row, filtered by affinity and by class, with locked silhouettes, and a detail page with every animation and skill.
 - **The Academy**: an in-game codex that teaches combat, the turn meter, damage, affinities, all buffs, debuffs and special mechanics, with live demonstrations.
 - **Real mechanics**: turn meter, A1/A2/A3 cooldowns, 15 statuses, the affinity cycle (Ember beats Bloom, Bloom beats Tide, Tide beats Ember), accuracy against resistance for debuffs, counterattacks, dispels, lifesteal, execute, turn meter boosts, passives (Undying, Overdrive, Rebuke, which answers a critical hit, stat passives that raise a stat in every battle, Shields given to the frailest at the end of a turn, to an ally just struck or to the struck one himself, a crit that grows as allies fall, Poison answering a blow, Regen answering a debuff, and Taunt with a heal answering a critical hit that leaves its holder standing), a cleanse, a blow that heals its user, a buff placed before the blow, a fallen ally raised, bosses, stars, auto battle and speed controls.
@@ -33,6 +35,7 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 | ![Collection](docs/images/screen_collection.png) | ![Champion](docs/images/screen_champion.png) |
 | ![Weaving](docs/images/screen_weaving.png) | ![Weave](docs/images/screen_weave.png) |
 | ![Academy](docs/images/screen_academy.png) | ![Recruit](docs/images/screen_recruit.png) |
+| ![Challenges](docs/images/screen_challenges.png) | ![Tutorial](docs/images/screen_tutorial.png) |
 
 ## Run it
 
@@ -51,7 +54,7 @@ Open http://localhost:5173. The sprite gallery (every animation, effect and icon
 | campaign map | drag to move; arrows jump between areas; `W` `A` `S` `D` or `Shift` + arrows slide the map; `M` shows the whole world |
 | arrows + `Enter` in menus | move between buttons, activate |
 
-Deep links: `?screen=campaign|team|battle|collection|champion|weaving|academy|options|recruit`, `&stage=1-5`, `&team=captain_gareth,rime_scholar`, `&champion=rime_scholar`, `&chapter=buffs`; `?demo=<skill_id>` loops one skill; `&zone=zone5` (a battle or team select on another area's background), `&hp=0.1` (scales the enemies' max HP); `?unlockall=1`, `?progress=1-4` (clear up to a stage), `?reset=1`, `?spools=1` (a sample stock of Thread Spools, added once), `?skyflash=1` (a zone's rare flash in its sky every few seconds).
+Deep links: `?screen=campaign|team|battle|collection|champion|weaving|academy|challenges|options|recruit`, `&tab=daily`, `?tutorial=1` (start the tutorial; `0` keeps it away from a fresh game), `&stage=1-5`, `&team=captain_gareth,rime_scholar`, `&champion=rime_scholar`, `&chapter=buffs`; `?demo=<skill_id>` loops one skill; `&zone=zone5` (a battle or team select on another area's background), `&hp=0.1` (scales the enemies' max HP); `?unlockall=1`, `?progress=1-4` (clear up to a stage), `?reset=1`, `?spools=1` (a sample stock of Thread Spools, added once), `?skyflash=1` (a zone's rare flash in its sky every few seconds).
 
 ## The champions
 

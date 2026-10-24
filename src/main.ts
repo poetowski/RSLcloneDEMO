@@ -1,13 +1,15 @@
 import './style.css';
 import { H, Screen as Canvas, W } from './engine/screen';
 import { App } from './game/app';
-import { newArchivist, recordClear, saveArchivist, stockSample, unlockEverything } from './game/archivist';
+import { newArchivist, recordClear, saveArchivist, stockSample, tutorialDue, unlockEverything } from './game/archivist';
+import { ChallengeTab } from './game/data/challenges';
 import { CHAMPIONS } from './game/data/champions';
 import { allStages, STARTERS } from './game/data/campaign';
 import { ZONES } from './game/data/zones';
 import { AcademyScreen } from './game/screens/academy';
 import { BattleScreen } from './game/screens/battle';
 import { CampaignScreen } from './game/screens/campaign';
+import { ChallengesScreen } from './game/screens/challenges';
 import { ChampionScreen } from './game/screens/champion';
 import { CollectionScreen } from './game/screens/collection';
 import { MainMenu } from './game/screens/menu';
@@ -15,6 +17,7 @@ import { OptionsScreen } from './game/screens/options';
 import { RecruitScreen } from './game/screens/recruit';
 import { TeamScreen } from './game/screens/team';
 import { WeavingScreen } from './game/screens/weaving';
+import { Tutorial } from './game/tutorial';
 import { loadAssets } from './game/view/assets';
 
 async function boot() {
@@ -74,13 +77,14 @@ async function boot() {
     champion: (id, list, at) => app.go(() => new ChampionScreen(app, id, list, at)),
     weaving: (at) => app.go(() => new WeavingScreen(app, at)),
     academy: (chapter) => app.go(() => new AcademyScreen(app, chapter)),
+    challenges: (tab) => app.go(() => new ChallengesScreen(app, tab)),
     options: () => app.go(() => new OptionsScreen(app)),
     recruit: (id) => app.go(() => new RecruitScreen(app, id, () => app.router.campaign())),
     demo: (skill, back) => app.go(() => new BattleScreen(app, { demo: skill, back })),
   };
 
-  // deep links: ?screen=campaign|team|battle|collection|champion|weaving|academy|options|recruit
-  //   &stage=1-2 &team=captain_gareth,rime_scholar &champion=captain_gareth &chapter=buffs   ?demo=<skill id>
+  // deep links: ?screen=campaign|team|battle|collection|champion|weaving|academy|challenges|options|recruit
+  //   &stage=1-2 &team=captain_gareth,rime_scholar &champion=captain_gareth &chapter=buffs &tab=daily   ?demo=<skill id>
   //   &zone=zone2 (battle, team: the stage on another background)
   const r = app.router;
   const demo = params.get('demo');
@@ -110,6 +114,9 @@ async function boot() {
     case 'academy':
       r.academy(params.get('chapter') ?? undefined);
       break;
+    case 'challenges':
+      r.challenges((params.get('tab') as ChallengeTab | null) ?? undefined);
+      break;
     case 'options':
       r.options();
       break;
@@ -119,6 +126,15 @@ async function boot() {
     default:
       r.menu();
   }
+
+  // the tutorial: on its own for a new account, which opens on the main menu; ?tutorial=1 starts it
+  // on whatever screen the link opens, ?tutorial=epilogue at its steps after the first victory,
+  // ?tutorial=0 keeps it away (screenshots of a fresh game)
+  const tutorial = new Tutorial(app, canvas);
+  app.tutorial = tutorial;
+  const tut = params.get('tutorial');
+  if (tut === 'epilogue') tutorial.startEpilogue();
+  else if (tut === '1' || (tut !== '0' && !demo && !params.get('screen') && tutorialDue(app.archivist))) tutorial.start(true);
 
   const pos = (e: PointerEvent | WheelEvent) => canvas.toVirtual(e.clientX, e.clientY);
   // on screens that can be dragged (the campaign map) a press becomes a click on
@@ -163,6 +179,7 @@ async function boot() {
     app.scene?.wheel?.(e.deltaY * k, e.deltaX * k);
   }, { passive: false });
   window.addEventListener('keydown', (e) => {
+    if (tutorial.key(e)) return;
     if (e.key.startsWith('Arrow') || e.key === ' ' || e.key === 'PageUp' || e.key === 'PageDown' || e.key === 'Backspace') e.preventDefault();
     app.scene?.key(e.key.length === 1 ? e.key.toLowerCase() : e.key, { shift: e.shiftKey });
   });
@@ -170,6 +187,7 @@ async function boot() {
   const loop = (now: number) => {
     app.frame(now);
     canvas.present();
+    tutorial.frame(now);
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);

@@ -49,6 +49,17 @@ export class Screen {
     d.drawImage(this.buf, this.ox, this.oy, W * this.scale, H * this.scale);
   }
 
+  /** Buffer coordinates -> CSS client coordinates (the inverse of `toVirtual`). */
+  toClient(x: number, y: number): { x: number; y: number } {
+    const r = this.display.getBoundingClientRect();
+    return { x: r.left + (this.ox + x * this.scale) / this.dpr, y: r.top + (this.oy + y * this.scale) / this.dpr };
+  }
+
+  /** Where the buffer lies on the display canvas: its offset and scale in device pixels, and the device pixel ratio. */
+  get grid(): { ox: number; oy: number; scale: number; dpr: number } {
+    return { ox: this.ox, oy: this.oy, scale: this.scale, dpr: this.dpr };
+  }
+
   /** CSS client coordinates -> buffer coordinates. */
   toVirtual(cx: number, cy: number): { x: number; y: number } {
     const r = this.display.getBoundingClientRect();

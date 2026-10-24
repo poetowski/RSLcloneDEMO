@@ -168,6 +168,19 @@ export class Ui {
     ctx.drawImage(this.a.ui.img, r[0] + r[2] - ends, r[1], ends, r[3], x + w - ends, y, ends, r[3]);
   }
 
+  /** Four corners round a rect, each an arm of `arm` px in gold outlined in ink: what is chosen (a Journey knot) or what to click (the tutorial). */
+  corners(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, arm = 5, color = COLORS.goldHi) {
+    for (const [cx, cy, dx, dy] of [[x, y, 1, 1], [x + w - 1, y, -1, 1], [x, y + h - 1, 1, -1], [x + w - 1, y + h - 1, -1, -1]]) {
+      const hx = dx > 0 ? cx : cx - arm + 1, vy = dy > 0 ? cy : cy - arm + 1;
+      ctx.fillStyle = COLORS.ink;
+      ctx.fillRect(hx - 1, cy - 1, arm + 2, 3);
+      ctx.fillRect(cx - 1, vy - 1, 3, arm + 2);
+      ctx.fillStyle = color;
+      ctx.fillRect(hx, cy, arm, 1);
+      ctx.fillRect(cx, vy, 1, arm);
+    }
+  }
+
   /** Horizontal bar with an outline, fill and a light top row. */
   bar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, k: number, fill: string, light: string, back = '#1a2238') {
     ctx.fillStyle = COLORS.ink;

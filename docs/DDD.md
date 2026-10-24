@@ -103,7 +103,10 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Frontier | the newest playable stage | `frontier()` |
 | World map, overview | the campaign map in world pixels (1920x360, growing east area by area), scrolled sideways under a camera: the campaign is a line of areas crossed from left to right; the overview draws the same world on one screen | `WORLD_MAP`, `CampaignScreen` |
 | Stars | 3, 2 or 1 by champions lost; the best is kept | `starsFor`, `MasterArchivist.stars` |
-| Master Archivist | the player and their save: stars, last team, Academy chapters read, settings, and the Reliquary | `MasterArchivist`, `loadArchivist`, `saveArchivist`, `readSave`, `writeSave` |
+| Master Archivist | the player and their save: stars, last team, Academy chapters read, settings, the tutorial's state, the Journey's claims, and the Reliquary | `MasterArchivist`, `loadArchivist`, `saveArchivist`, `readSave`, `writeSave` |
+| Challenges | the main-menu place of quests, in three tabs: Daily and Persistent (placeholders) and the Journey | `ChallengesScreen`, `CHALLENGE_TABS` |
+| Journey, quest | quests in an order, each opened by claiming the one before it; a quest has a goal read from the save and a reward; its state is locked, open, ready or claimed | `JOURNEY`, `QuestDef`, `questState`, `claimQuest`, `MasterArchivist.claimed` |
+| Tutorial | the guided first visit of a new account: the Sanctum, the campaign, stage 1-1 and its rewards, the Challenges; finished by its first victory (the Journey's first quest), or skipped | `Tutorial`, `tutorialDue`, `MasterArchivist.tutorial` |
 | Fresh (NEW) | recruited, not yet opened on the champion page | `HeroSoulFile.fresh`, `isFresh`, `Reliquary.markSeen` |
 
 ### 2.4 World, presentation and art
@@ -434,6 +437,8 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-P8 | The save has version 3 under `tlrol.save.v3`; an older save (version 2 under `tlrol.save.v2`, version 1 under `oathbound.profile.v1`) gives only its settings and Academy reading to a new game, once, and is left in place; missing fields take defaults; another version starts a new game | test |
 | INV-P10 | Every cleared stage's champion has its soul file (a save survives a stage that changes what it brings) | test (`readSave`) |
 | INV-P11 | Every area with stages holds exactly two different Weave Patterns, both in the catalog, and every pattern drops in some area (Jakub, 2026-10-24) | test |
+| INV-P12 | The Journey is claimed in order: a quest opens only when the one before it is claimed, is claimed at most once, and a save keeps only the claims up to the first gap | test |
+| INV-P13 | The tutorial starts on its own only for a save with no stage cleared whose tutorial is neither finished nor skipped; skipping never undoes a finish | test (`tutorialDue`); `Tutorial.stop` |
 
 ### 6.4 Presentation and art
 

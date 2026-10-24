@@ -4,6 +4,7 @@
 // the bottom so every route (and every URL deep link) goes through one place.
 import { H, Screen as Canvas, W } from '../engine/screen';
 import { loadArchivist, MasterArchivist, saveArchivist } from './archivist';
+import type { ChallengeTab } from './data/challenges';
 import type { ChampionAt } from './screens/champion';
 import type { WeavingAt } from './screens/weaving';
 import { Assets } from './view/assets';
@@ -28,6 +29,14 @@ export interface KeyMods {
   shift: boolean;
 }
 
+/** What the screens may ask of the tutorial (src/game/tutorial.ts). */
+export interface TutorialControl {
+  /** while it runs, its steps show where they belong */
+  readonly running: boolean;
+  /** from the start, in the Sanctum (a new account, or the Journey's START TUTORIAL) */
+  start(): void;
+}
+
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 
 export class App {
@@ -39,6 +48,8 @@ export class App {
   private lastNow = 0;
   /** registered by main.ts: builds screens by route name */
   router!: Router;
+  /** registered by main.ts once the page can show it */
+  tutorial: TutorialControl | null = null;
 
   constructor(
     readonly canvas: Canvas,
@@ -108,6 +119,11 @@ export class App {
   get busy() {
     return this.trans > 0;
   }
+
+  /** No dissolve under way: the screen shown is the current one, fully revealed. */
+  get settled() {
+    return this.trans === 0;
+  }
 }
 
 export interface Router {
@@ -121,6 +137,8 @@ export interface Router {
   /** the spool storage; `at` sets its filter, the champion a weave goes to first, the spool shown and where BACK goes */
   weaving(at?: WeavingAt): void;
   academy(chapter?: string): void;
+  /** the quests: Daily, Persistent and the Journey (opens on the Journey) */
+  challenges(tab?: ChallengeTab): void;
   options(): void;
   recruit(id: string): void;
   demo(skillId: string, back: () => void): void;

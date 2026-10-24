@@ -1370,6 +1370,167 @@ function astroFrame(frame: number, frames: number): Bitmap {
 }
 
 /**
+ * The Herald's Board (the challenges): a rock drifting off the island's west
+ * end, as the astrolabe's drifts off its east, carrying a notice board under a
+ * little slate roof with a star for its finial; notes pinned to its planks, a
+ * scroll tied with a red ribbon, a note stamped with a gold star that glows;
+ * a lantern hung at its side and a pennant of the Loom's cloth on a pole.
+ */
+export const HERALD = { cx: 30, rockY: 308 };
+
+const WOOD = H(['#1c1018', '#2c1a1c', '#40261f', '#563425', '#6e452c', '#885a36', '#a47244', '#c08c58']);
+const PARCH = H(['#3e3230', '#5e4e44', '#86725e', '#ac977a', '#cdb994', '#e6d7b2', '#f6ecd2']);
+const WAX = H(['#3a0a10', '#7a1418', '#b42a24', '#e0573e', '#f8946c']);
+
+/** The board's rock: a chunk of the island's stone, grass and a few glowing flowers on top, crystals under it. */
+function heraldRock(): Bitmap {
+  const b = new Bitmap(W, HT);
+  const { cx, rockY } = HERALD;
+  const R = 25;
+  for (let x = cx - R; x <= cx + R; x++) {
+    const u = (x - cx) / R;
+    const top = rockY + Math.round((n1(x, 7, 491) - 0.5) * 2), bot = rockY + Math.round(25 * Math.pow(1 - u * u, 1.2) + (vnoise(x, 0, 4, 492) - 0.5) * 5);
+    for (let y = top; y <= bot; y++) {
+      const depth = (y - top) / Math.max(1, bot - top);
+      if (y - top < 2) b.set(x, y, GRASS[y === top ? 7 : 4]);
+      else put(b, x, y, ROCK, 7.4 - depth * 4.6 - u * 1.6 + (hash2(x, Math.floor(y / 3), 493) - 0.5) * 0.8);
+    }
+    if (Math.abs(u) < 0.9 && hash2(x, 0, 494) > 0.82) b.set(x, top - 1, GRASS[8]);
+    if (Math.abs(u) < 0.8 && hash2(x, 1, 495) > 0.9) b.set(x, top, FLOWER[hash2(x, 2, 496) > 0.5 ? 1 : 3]);
+  }
+  crystal(b, cx - 4, rockY + 20, Math.PI / 2 + 0.1, 10, 2.2);
+  crystal(b, cx + 9, rockY + 15, Math.PI / 2 - 0.25, 6, 1.6);
+  crystal(b, cx - 15, rockY + 11, Math.PI / 2 + 0.35, 5, 1.4);
+  return b;
+}
+
+/** A note pinned to the planks: parchment, darker at its right and lower edges, lines of writing. */
+function note(b: Bitmap, nx: number, ny: number, w: number, h: number, seed: number) {
+  for (let y = ny; y < ny + h; y++) {
+    for (let x = nx; x < nx + w; x++) {
+      const edge = x === nx + w - 1 || y === ny + h - 1;
+      put(b, x, y, PARCH, (edge ? 3.3 : 5.3) - ((x - nx) / w) * 0.9 + (hash2(x, y, seed) - 0.5) * 0.6);
+    }
+  }
+  for (let y = ny + 2; y < ny + h - 2; y += 2) {
+    const end = nx + w - 2 - (y + 4 >= ny + h ? Math.floor(w / 3) : 0);
+    for (let x = nx + 1; x < end; x++) if (hash2(x, y, seed + 1) > 0.25) b.set(x, y, PARCH[2]);
+  }
+}
+
+/** The board: two posts, planks in a frame, a rail under them, the roof and its star, the notes, the lantern's iron, the pennant's pole; the lantern's glass and the star stamp also lit in `glow`. */
+function heraldBoard(): { body: Bitmap; glow: Bitmap } {
+  const b = new Bitmap(W, HT), glow = new Bitmap(W, HT);
+  const { cx, rockY: g } = HERALD;
+  // the posts: squared timbers, lit on their west faces
+  for (const px of [cx - 15, cx + 13]) {
+    for (let y = g - 46; y < g; y++) {
+      for (let x = px; x < px + 3; x++) put(b, x, y, WOOD, (x === px ? 5.4 : x === px + 1 ? 3.8 : 2.2) + (hash2(x, Math.floor(y / 4), 501) - 0.5) * 0.6 - (y > g - 4 ? 0.8 : 0));
+    }
+  }
+  // the pole for the pennant, rising out of the west post, a gold knob on it
+  for (let y = g - 60; y < g - 46; y++) b.set(cx - 14, y, WOOD[y < g - 56 ? 6 : 5]);
+  b.set(cx - 14, g - 61, GOLD[5]);
+  b.set(cx - 15, g - 60, GOLD[3]);
+  b.set(cx - 13, g - 60, GOLD[2]);
+  // the planks in their frame
+  const x0 = cx - 12, x1 = cx + 12, y0 = g - 38, y1 = g - 15;
+  for (let y = y0; y <= y1; y++) {
+    for (let x = x0; x <= x1; x++) {
+      const frame = x === x0 || x === x1 || y === y0 || y === y1;
+      const seam = (y - y0) % 5 === 0;
+      const across = (x - x0) / (x1 - x0);
+      put(b, x, y, WOOD, frame ? 2.6 - across * 0.8 : seam ? 2.4 : 4.9 - across * 1.5 + (vnoise(x * 0.5, y * 3, 3, 502) - 0.5) * 1.2);
+    }
+  }
+  for (let x = x0 + 1; x < x1; x++) b.set(x, y0 + 1, WOOD[2]);
+  // a rail under the board
+  for (let x = cx - 13; x <= cx + 13; x++) {
+    b.set(x, g - 11, WOOD[x < cx ? 5 : 4]);
+    b.set(x, g - 10, WOOD[2]);
+  }
+  // the roof: a gable of slate, lit on its west slope, edged in gold
+  const ey = g - 43, ay = g - 53, half0 = 19;
+  for (let y = ay; y <= ey; y++) {
+    const half = 1 + (half0 - 1) * ((y - ay) / (ey - ay));
+    for (let x = Math.round(cx - half); x <= Math.round(cx + half); x++) {
+      const off = x + 0.5 - cx;
+      const edge = Math.abs(off) > half - 1.2 || y === ey;
+      if (edge) b.set(x, y, y === ey ? GOLD[off < 0 ? 3 : 2] : GOLD[off < 0 ? 5 : 3]);
+      else put(b, x, y, SLATE, (off < 0 ? 6.6 : 3.4) + ((y - ay) % 3 === 2 ? -0.9 : 0) + (hash2(Math.floor(x / 2), y, 503) - 0.5) * 0.5);
+    }
+  }
+  for (let x = cx - half0 + 1; x <= cx + half0 - 1; x++) b.set(x, ey + 1, SLATE[1]);
+  // the finial: a gold diamond with a white heart on a short spike, a star of its own
+  const sy = ay - 4;
+  for (let y = sy + 2; y < ay; y++) b.set(cx, y, GOLD[3]);
+  for (const [dx, dy, c] of [[0, -2, 5], [-1, -1, 5], [0, -1, 4], [1, -1, 3], [-2, 0, 4], [-1, 0, 5], [1, 0, 3], [2, 0, 2], [-1, 1, 4], [0, 1, 3], [1, 1, 2], [0, 2, 3]] as const) b.set(cx + dx, sy + dy, GOLD[c]);
+  b.set(cx, sy, STAR[4]);
+  for (const [dx, dy] of [[0, 0], [0, -1], [-1, 0]] as const) put(glow, cx + dx, sy + dy, GTHREAD, dx || dy ? 3 : 4);
+  // the notes: a sealed letter, a pinned one, a scroll tied with a ribbon, one stamped with a gold star
+  note(b, cx - 11, g - 36, 9, 11, 511);
+  for (const [dx, dy, c] of [[0, 0, 2], [1, 0, 3], [0, 1, 1], [1, 1, 2], [0, 2, 1]] as const) b.set(cx - 8 + dx, g - 27 + dy, WAX[c]);
+  note(b, cx, g - 37, 9, 8, 512);
+  b.set(cx + 4, g - 37, GOLD[5]);
+  b.set(cx + 4, g - 36, GOLD[2]);
+  for (let y = g - 27; y <= g - 18; y++) {
+    for (let x = cx + 4; x <= cx + 9; x++) {
+      const roll = y === g - 27 || y === g - 18;
+      if (roll) b.set(x, y, PARCH[x === cx + 4 ? 5 : x === cx + 9 ? 2 : 4]);
+      else put(b, x, y, PARCH, 5 - ((x - cx - 4) / 6) * 1.2 + (hash2(x, y, 513) - 0.5) * 0.5);
+    }
+  }
+  for (let x = cx + 3; x <= cx + 10; x++) b.set(x, g - 23, WAX[x === cx + 3 ? 3 : 2]);
+  b.set(cx + 10, g - 22, WAX[1]);
+  b.set(cx + 10, g - 21, WAX[1]);
+  note(b, cx - 6, g - 23, 8, 6, 514);
+  const tx = cx - 3, ty = g - 21;
+  for (const [dx, dy, v] of [[0, 0, 5], [-1, 0, 3], [1, 0, 3], [0, -1, 3], [0, 1, 3]] as const) {
+    b.set(tx + dx, ty + dy, GOLD[v]);
+    put(glow, tx + dx, ty + dy, GTHREAD, v === 5 ? 4 : 3);
+  }
+  // the lantern: an iron arm out of the east post, the lantern hung on it, its glass warm
+  const lx = cx + 20;
+  for (let x = cx + 16; x <= lx; x++) b.set(x, g - 38, MAT.iron.ramp[x < lx ? 3 : 2]);
+  b.set(lx, g - 37, MAT.iron.ramp[2]);
+  for (let y = g - 36; y <= g - 30; y++) {
+    for (let x = lx - 2; x <= lx + 2; x++) {
+      const edge = x === lx - 2 || x === lx + 2 || y === g - 36 || y === g - 30;
+      if (edge) b.set(x, y, MAT.iron.ramp[x < lx ? 3 : 1]);
+      else {
+        put(b, x, y, WARM, 3.4 - (x - lx) * 0.4);
+        put(glow, x, y, WARM, 5);
+      }
+    }
+  }
+  b.set(lx, g - 29, MAT.iron.ramp[2]);
+  return { body: b, glow };
+}
+
+/** The pennant of the Loom's cloth, one frame of its slow flutter: a wave runs to its swallowtail, a whole cycle per loop. */
+function pennantFrame(frame: number, frames: number): Bitmap {
+  const b = new Bitmap(W, HT);
+  const { cx, rockY: g } = HERALD;
+  const ph = (frame / frames) * TAU;
+  const hx = cx - 15, hy = g - 59;
+  const len = 13;
+  for (let i = 0; i < len; i++) {
+    const t = i / (len - 1);
+    const x = hx - i;
+    const wave = Math.sin(t * 2.6 - ph) * 1.3 * t;
+    const slope = Math.cos(t * 2.6 - ph) * t;
+    const h = 5 - t * 1.6;
+    const top = hy + wave + (5 - h) / 2;
+    for (let y = Math.round(top); y < Math.round(top + h); y++) {
+      const mid = top + h / 2;
+      if (t > 0.7 && Math.abs(y + 0.5 - mid) < (t - 0.7) * 5) continue;
+      put(b, x, y, VEIL, 3.4 + slope * 1.4 + (y === Math.round(top) ? 1.6 : 0) - (y === Math.round(top + h) - 1 ? 1 : 0));
+    }
+  }
+  return b;
+}
+
+/**
  * A star-willow between the Gate and the Reliquary: a dark twisted trunk, and
  * from its crown long strands falling in arcs like a fountain, hung with
  * pale leaves that catch the starlight, glowing at their tips.
@@ -1509,7 +1670,7 @@ function veilFrame(v: (typeof VEILS)[number], frame: number, frames: number): Bi
 /** Rocks drifting round the island: a chunk of its stone with grass on top. */
 export const ROCKS: [number, number, number][] = [
   // x, y, radius
-  [22, 238, 7],
+  [24, 204, 7],
   [138, 318, 5],
   [478, 334, 6],
   [628, 214, 5],
@@ -1580,7 +1741,7 @@ export interface MenuSprite {
 
 /** A place to click: the sprites that make it (their pixels are what the pointer hits), its hover outline, where its label hangs. */
 export interface MenuHotspot {
-  id: 'campaign' | 'champions' | 'weaving' | 'academy' | 'options';
+  id: 'campaign' | 'champions' | 'weaving' | 'academy' | 'options' | 'challenges';
   /** the place's name in the sanctum (a first take) */
   name: string;
   sprites: string[];
@@ -1675,6 +1836,13 @@ export function buildSanctum(out: string) {
   const astroBob = { amp: 2, ms: 6400, phase: 0.6 };
   add('astro_rock', [astroRock()], 'front', 'static', undefined, astroBob);
   add('astro', loopFrames(12, astroFrame), 'front', 'loop', 230, astroBob);
+  // the Herald's Board drifts on its own pace
+  const heraldBob = { amp: 2, ms: 7400, phase: 0.15 };
+  add('herald_rock', [heraldRock()], 'front', 'static', undefined, heraldBob);
+  const board = heraldBoard();
+  add('herald', [board.body], 'front', 'static', undefined, heraldBob);
+  add('herald_glow', [board.glow], 'front', 'pulse', 3000, heraldBob);
+  add('herald_flag', loopFrames(10, pennantFrame), 'front', 'loop', 220, heraldBob);
 
   const items: { key: string; bmp: Bitmap }[] = [];
   const sprites: Record<string, MenuSprite> = {};
@@ -1700,11 +1868,12 @@ export function buildSanctum(out: string) {
   // the labels hang on the island's face just under its lip, below their places (and below the champions on the plaza)
   const lip = (x: number): [number, number] => [x, Math.round(frontY(x)) + 3];
   const spotsDef: { id: MenuHotspot['id']; name: string; sprites: string[]; label: [number, number] }[] = [
-    { id: 'campaign', name: 'The Starbridge Gate', sprites: ['gate', 'portal'], label: lip(GATE.cx + 4) },
+    { id: 'campaign', name: 'The Starbridge Gate', sprites: ['gate', 'portal'], label: lip(GATE.cx + 16) },
     { id: 'champions', name: 'The Reliquary', sprites: ['reliquary'], label: lip(REL.cx) },
     { id: 'weaving', name: "The Weaver's Spire", sprites: ['spire', 'spool'], label: lip(SPIRE.cx - 10) },
     { id: 'academy', name: 'The Observatory', sprites: ['observatory'], label: lip(OBS.cx + 8) },
     { id: 'options', name: 'The Astrolabe', sprites: ['astro_rock', 'astro'], label: [ASTRO.cx, 342] },
+    { id: 'challenges', name: "The Herald's Board", sprites: ['herald_rock', 'herald', 'herald_flag'], label: [HERALD.cx, 342] },
   ];
   const hotspots: MenuHotspot[] = [];
   for (const h of spotsDef) {

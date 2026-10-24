@@ -12,7 +12,8 @@ import { drawChampion, frameAt } from '../view/unit';
 import { BaseScreen } from './base';
 
 export class RecruitScreen extends BaseScreen {
-  private c: ChampionDef;
+  /** the champion recruited (the tutorial names it) */
+  readonly c: ChampionDef;
   private burst: HTMLCanvasElement;
   private sparks = new Particles();
   private landed = false;

@@ -101,20 +101,26 @@ The Master Archivist (`src/game/archivist.ts`) is the player and their save, sto
 | `read` | Academy chapters read |
 | `settings` | default battle speed and auto |
 | `reliquary` | the champions owned, starters included |
+| `tutorial` | `todo` (never finished), `skipped` or `done`; a save without it reads `todo` |
+| `claimed` | the Journey's quests claimed, in order (only a prefix of the Journey is kept on load) |
 
 The Reliquary (`src/game/reliquary/`) holds one Hero Soul File per owned champion, with its NEW badge (recruited, not yet opened on the champion page) and its Weaver Matrix of six slots, and the loose Thread Spools. The Weaver Matrix has its approved slots (named by Jakub: Zenith, East Meridian, East Horizon, Nadir, West Horizon, West Meridian), grades, strands, attunement and his eight core Weave Patterns ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14) and shows on the champion page's MATRIX tab. Spools drop from every campaign stage, of the two Weave Patterns its area holds ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14), and are kept in Weaving; a new find keeps its NEW badge in the save until it is looked at. `?spools=1` adds a sample for development, once however often the link is opened.
 
 Loading drops champion and stage ids the catalog no longer has, and gives every cleared stage's champion its soul file (so a save survives a stage that changes what it brings). An older save (`tlrol.save.v2` from before Jakub's content, or the proof of concept's `oathbound.profile.v1`) holds champions and stages that no longer exist: only its settings and the Academy chapters read carry over, once, into a new game, and the old entry is left in place.
+
+A new account (`tutorial` still `todo` and no stage cleared, `tutorialDue`) meets the tutorial on the main menu ([UI_GUIDE.md](UI_GUIDE.md) 4); it is finished by its first victory, which is the Journey's first quest ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 15).
 
 Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `recordVictory` (stars, first-clear recruit and the spools found), `recordClear` (stars and recruit without spools: `?progress=`), `spoolsHeld`, `stockSample` (`?spools=1`), `isFresh`, `unlockEverything` (Options, demo use).
 
 ## 5. Screens and flow
 
 ```
-            ┌─────────────────────── Main menu ───────────────────────┐
-            │            │               │              │             │
-        Campaign     Champions        Weaving        Academy       Options
+            ┌─────────────────────────── Main menu ───────────────────────────────────┐
+            │            │               │              │             │             │
+        Campaign     Champions        Weaving        Academy       Options     Challenges
         (world map)  (collection)     (spools)       (chapters) ─── See it ──> skill demo in the arena
+                                         ^                                       Daily, Persistent,
+                                         └──── OPEN WEAVING (a quest's way) ──── Journey: CLAIM
             │            │               │
        stage list    champion page <─────┘  a woven spool's champion; the MATRIX
             │                               tab's "+N more" opens Weaving on its slot
@@ -137,6 +143,7 @@ Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `r
 | Weaving | `screens/weaving.ts` | `?screen=weaving` |
 | Academy | `screens/academy.ts` | `?screen=academy&chapter=debuffs` |
 | Options | `screens/options.ts` | `?screen=options` |
+| Challenges | `screens/challenges.ts` | `?screen=challenges&tab=daily` (opens on the Journey) |
 | Recruit ceremony | `screens/recruit.ts` | `?screen=recruit&champion=rime_scholar` |
 | Skill demo | `screens/battle.ts` (demo mode) | `?demo=iron_blow` |
 

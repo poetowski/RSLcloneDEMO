@@ -389,3 +389,22 @@ The last column is how the game reads his values (a stand-in until he confirms i
 Every pattern drops in some area; Sunder and Pulse in two. Spools change every balance band: the stage powers and `npm run balance` still measure champions without spools ([MDA.md](MDA.md) T11).
 
 **Critical damage, Accuracy and Resistance.** Every champion starts at C.DMG 100%, so a critical hit deals double damage as before (section 5); the matrix raises it. ACC and RES decide whether a debuff lands (section 7).
+
+## 15. Challenges and the Journey (`src/game/challenges.ts`, `src/game/data/challenges.ts`)
+
+The Challenges are quests to accomplish, in three tabs (Jakub, 2026-10-24, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 35): Daily and Persistent are placeholders; the Journey holds quests in an order.
+
+**Rules.**
+1. A quest is *locked* until the one before it is claimed, *open* while its goal is not met, *ready* once it is, and *claimed* after its reward was taken. The first quest is never locked.
+2. Goals are read from the save as it stands: a goal met before its quest opens counts the moment it opens.
+3. Claiming a ready quest gives its reward and opens the next; a quest is claimed once. Claims are kept in order: a save that names a quest the Journey no longer has, or one past a quest not claimed, keeps only the claims up to the first gap.
+4. The menu's CHALLENGES label counts the quests ready to claim, with the NEW badge while there is one.
+
+| Quest | Goal | Reward |
+| --- | --- | --- |
+| Finish Tutorial (his) | the tutorial finished: its first victory | a Silver Vigor spool |
+| Weave a Spool (stand-in for his placeholder) | any spool woven into any champion's Weaver Matrix | a Gilded Sunder spool |
+
+A reward spool has its quest's pattern and grade; its main stat is drawn by slot and its strands rolled as a found spool's are (section 14), and it comes into storage as a new find. The rewards are stand-ins.
+
+**The tutorial** (`src/game/tutorial.ts`) starts on its own on a save whose tutorial was neither finished nor skipped and that has no stage cleared; from the Journey anyone can start it (START TUTORIAL) or play it again (REPLAY TUTORIAL). Skipping it marks it skipped (the quest stays open); its first victory marks it finished, after which its cards only lead to the Challenges, and closing them changes nothing. Its battle is an ordinary stage 1-1.

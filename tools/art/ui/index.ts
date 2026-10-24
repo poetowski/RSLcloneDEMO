@@ -10,7 +10,7 @@ import { rampDither } from '../paint.ts';
 import { Bitmap, hex } from '../raster.ts';
 import { solve } from '../rig.ts';
 import { banner, button, chevron, footRing, GLYPHS, panel, skillFrame, smallGlyph } from './kit.ts';
-import { arrow, bigButton, campGlow, campNode, cardFrame, check, crown, divider, emblem, gem, lock, logo, mapNode, MENU_ICONS, newBadge, nodeGlow, podium, roleIcon, star, tab, well } from './menu.ts';
+import { arrow, bigButton, campGlow, campNode, cardFrame, check, crown, divider, emblem, gem, lock, logo, mapNode, MENU_ICONS, newBadge, nodeGlow, podium, questKnot, roleIcon, star, tab, tutHand, well } from './menu.ts';
 import { matrixParts } from './matrix.ts';
 import { STATUS_ICONS, statusIcon } from './status.ts';
 
@@ -80,6 +80,7 @@ export function allParts(): Record<string, Bitmap> {
     star_l_off: star(25, false),
     podium: podium(),
     divider: divider(),
+    tut_hand: tutHand(),
   };
   for (const [r, ramp] of Object.entries(UIR.rarity)) parts['card_' + r] = cardFrame(ramp);
   for (const a of Object.keys(UIR.affinity) as (keyof typeof UIR.affinity)[]) parts['gem_' + a] = gem(a);
@@ -87,6 +88,7 @@ export function allParts(): Record<string, Bitmap> {
   for (const r of Object.keys(UIR.role) as (keyof typeof UIR.role)[]) parts['role_' + r] = roleIcon(r);
   for (const k of ['open', 'cleared', 'locked', 'boss'] as const) parts['node_' + k] = mapNode(k);
   for (const k of ['open', 'cleared', 'locked'] as const) parts['camp_' + k] = campNode(k);
+  for (const k of ['open', 'ready', 'done', 'locked'] as const) parts['quest_' + k] = questKnot(k);
   for (let i = 0; i < 3; i++) {
     parts['ring_active_' + i] = footRing(['#3a2a06', '#c09020', '#ffe070'], true, i * 0.13);
     parts['ring_target_' + i] = footRing(['#3a0a0a', '#e03a2a', '#ffb090'], true, i * 0.13);

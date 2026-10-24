@@ -58,6 +58,24 @@ export class CampaignScreen extends BaseScreen {
     if (stageId) this.openList(loc, s);
   }
 
+  /** The area whose stage list is open, and the stage chosen in it (the tutorial asks). */
+  get openArea(): LocationDef | null {
+    return this.open;
+  }
+
+  get selectedStage(): StageDef | null {
+    return this.selected;
+  }
+
+  /** Glides the map to an area and focuses its node (the tutorial shows a returning Archivist the first area). */
+  showArea(id: string) {
+    const loc = LOCATIONS.find((l) => l.id === id);
+    if (!loc || this.open) return;
+    this.overview = false;
+    this.centerOn(loc);
+    this.ui.focusId = this.followed = 'loc_' + loc.id;
+  }
+
   protected back() {
     if (this.overview) this.overview = false;
     else if (this.open) this.closeList();

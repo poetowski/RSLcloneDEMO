@@ -1,9 +1,11 @@
 // The Master Archivist: the player, and the save that remembers them. Stage
-// stars, the last team, Academy chapters read and settings live here; the
-// champions owned, with their Weaver Matrices, live in the Reliquary. Stored
+// stars, the last team, Academy chapters read, settings, the tutorial and the
+// Journey's claimed quests live here; the champions owned, with their Weaver
+// Matrices, live in the Reliquary. Stored
 // in localStorage; every access is guarded because storage can be missing
 // (private windows) and the game must still run.
 import { LOCATIONS, STARTERS, allStages, stage } from './data/campaign';
+import { JOURNEY } from './data/challenges';
 import { champion, CHAMPIONS } from './data/champions';
 import { MATRIX_LAYOUT, PATTERN_IDS, SPOOL_STATS } from './data/matrix';
 import { LocationDef, Stats } from './data/types';
@@ -21,7 +23,13 @@ export interface MasterArchivist {
   settings: { speed: 1 | 2 | 3; auto: boolean };
   /** the champions owned (starters included) and their Weaver Matrices */
   reliquary: Reliquary;
+  /** the tutorial: not played to its end yet, skipped, or done (the Journey's first quest) */
+  tutorial: TutorialState;
+  /** the Journey's quests claimed, in order */
+  claimed: string[];
 }
+
+export type TutorialState = 'todo' | 'skipped' | 'done';
 
 /** The save as stored under `KEY`. */
 interface SaveJson {
@@ -31,6 +39,9 @@ interface SaveJson {
   read: string[];
   settings: MasterArchivist['settings'];
   reliquary: ReliquaryJson;
+  /** since the tutorial and the Journey (2026-10-24); a save without them reads 'todo' and none claimed */
+  tutorial?: TutorialState;
+  claimed?: string[];
 }
 
 /**
@@ -52,7 +63,7 @@ const OLD_KEYS = ['tlrol.save.v2', 'oathbound.profile.v1'];
 export function newArchivist(): MasterArchivist {
   const reliquary = new Reliquary(MATRIX_LAYOUT);
   for (const id of STARTERS) reliquary.recruit(id, false);
-  return { stars: {}, team: [...STARTERS], read: [], settings: { speed: 1, auto: false }, reliquary };
+  return { stars: {}, team: [...STARTERS], read: [], settings: { speed: 1, auto: false }, reliquary, tutorial: 'todo', claimed: [] };
 }
 
 /**
@@ -70,6 +81,8 @@ export function readSave(raw: string | null, rawOld: string | null = null): Mast
       a.reliquary = Reliquary.fromJSON(s.reliquary ?? {}, MATRIX_LAYOUT, PATTERN_IDS);
       a.stars = { ...s.stars };
       if (Array.isArray(s.team)) a.team = [...s.team];
+      if (s.tutorial === 'skipped' || s.tutorial === 'done') a.tutorial = s.tutorial;
+      if (Array.isArray(s.claimed)) a.claimed = s.claimed.filter((id) => typeof id === 'string');
       keepHabits(a, s);
     } else if (rawOld) {
       const s = JSON.parse(rawOld) as Partial<OldSaveJson>;
@@ -103,6 +116,10 @@ function validated(a: MasterArchivist): MasterArchivist {
   a.team = a.team.filter((id) => a.reliquary.has(id));
   // a save whose team is gone (champions renamed or removed) starts from the starters
   if (!a.team.length) a.team = [...STARTERS];
+  // the Journey is claimed in order: its quests up to the first one not claimed (removed quests drop out)
+  const claimed = new Set(a.claimed);
+  const upTo = JOURNEY.findIndex((q) => !claimed.has(q.id));
+  a.claimed = JOURNEY.slice(0, upTo < 0 ? JOURNEY.length : upTo).map((q) => q.id);
   return a;
 }
 
@@ -123,7 +140,7 @@ export function loadArchivist(): MasterArchivist {
 
 /** The archivist as stored text. */
 export function writeSave(a: MasterArchivist): string {
-  const s: SaveJson = { version: 3, stars: a.stars, team: a.team, read: a.read, settings: a.settings, reliquary: a.reliquary.toJSON() };
+  const s: SaveJson = { version: 3, stars: a.stars, team: a.team, read: a.read, settings: a.settings, reliquary: a.reliquary.toJSON(), tutorial: a.tutorial, claimed: a.claimed };
   return JSON.stringify(s);
 }
 
@@ -247,6 +264,11 @@ export function stockSample(a: MasterArchivist) {
 
 export function totalStars(a: MasterArchivist): number {
   return Object.values(a.stars).reduce((x, y) => x + y, 0);
+}
+
+/** A new account: the tutorial starts on its own while it was neither finished nor skipped and no stage is cleared yet. */
+export function tutorialDue(a: MasterArchivist): boolean {
+  return a.tutorial === 'todo' && totalStars(a) === 0;
 }
 
 /** Demo helper: everything recruited and every stage cleared with one star. */

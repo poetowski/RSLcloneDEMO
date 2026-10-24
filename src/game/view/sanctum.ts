@@ -201,13 +201,19 @@ export class SanctumView {
     this.drawLayer(ctx, 'island');
     this.drawLayer(ctx, 'building');
     this.lights(ctx);
-    if (hover) this.drawOutline(ctx, hover);
+    if (hover && !this.inFront(hover)) this.drawOutline(ctx, hover);
   }
 
-  /** In front of the champions: the drifting astrolabe, the star-dust and spray, the vignette. */
+  /** Whether a place drifts in front of the champions (the astrolabe, the Herald's Board): its ring of light is drawn with the front. */
+  inFront(id: MenuPlace): boolean {
+    const h = this.json.hotspots.find((x) => x.id === id);
+    return !!h && this.json.sprites[h.sprites[0]].layer === 'front';
+  }
+
+  /** In front of the champions: the drifting astrolabe and Herald's Board, the star-dust and spray, the vignette. */
   drawFront(ctx: CanvasRenderingContext2D, hover: MenuPlace | null) {
     this.drawLayer(ctx, 'front');
-    if (hover === 'options') this.drawOutline(ctx, hover);
+    if (hover && this.inFront(hover)) this.drawOutline(ctx, hover);
     this.spray.draw(ctx);
     this.dust.draw(ctx);
     ctx.drawImage(this.vignette, 0, 0);

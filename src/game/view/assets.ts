@@ -85,7 +85,7 @@ export interface MenuSprite {
   bob?: { amp: number; ms: number; phase: number };
 }
 
-export type MenuPlace = 'campaign' | 'champions' | 'weaving' | 'academy' | 'options';
+export type MenuPlace = 'campaign' | 'champions' | 'weaving' | 'academy' | 'options' | 'challenges';
 
 export interface MenuJson {
   sprites: Record<string, MenuSprite>;

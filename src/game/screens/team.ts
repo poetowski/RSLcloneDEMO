@@ -31,6 +31,11 @@ export class TeamScreen extends BaseScreen {
     this.ui.focusId = 'fight';
   }
 
+  /** The champions picked, in formation order (the tutorial names them). */
+  get picked(): readonly string[] {
+    return this.team;
+  }
+
   protected back() {
     this.app.router.campaign(this.s.id);
   }

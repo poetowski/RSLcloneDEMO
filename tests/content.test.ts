@@ -12,8 +12,11 @@ import { auditChampion, totalMult } from '../src/game/data/norms';
 import { STATUSES } from '../src/game/data/statuses';
 import { ChampionDef, StatusId } from '../src/game/data/types';
 import { ZONES } from '../src/game/data/zones';
-import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, recordVictory, spoolsHeld, stageOpen, stockSample, writeSave } from '../src/game/archivist';
+import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, recordVictory, spoolsHeld, stageOpen, stockSample, tutorialDue, writeSave } from '../src/game/archivist';
+import { claimQuest, currentQuest, questState, readyCount } from '../src/game/challenges';
+import { CHALLENGE_TABS, JOURNEY } from '../src/game/data/challenges';
 import { PATTERN_IDS, SPOOL_STATS } from '../src/game/data/matrix';
+import { TUTORIAL, TUTORIAL_PATH, TUTORIAL_SKIP } from '../src/game/data/tutorial';
 import { threadSpool } from '../src/game/reliquary/matrix';
 import { roseMark } from '../src/game/ui/spools';
 
@@ -528,6 +531,15 @@ describe('font', () => {
       ...LOCATIONS.flatMap((l) => [l.chapter, l.name, l.blurb, ...l.stages.flatMap((s) => [s.id, s.blurb])]),
       ...ZONES.map((z) => z.name),
       ...CHAPTERS.flatMap((ch) => [ch.title, ch.demo?.label ?? '', ...ch.blocks.flatMap((b) => ('text' in b ? [b.text] : b.kind === 'list' ? b.items : []))]),
+      // the Challenges and the tutorial (its {braces} are filled with names the rest of this list holds)
+      ...CHALLENGE_TABS.flatMap((t) => [t.name, t.placeholder ?? '']),
+      ...JOURNEY.flatMap((q) => [q.title, q.text]),
+      ...Object.values(TUTORIAL).flatMap((t) => [t.title, t.text, t.act ?? '', t.next ?? ''].map((x) => x.replace(/\{\w+\}/g, ''))),
+      ...Object.values(TUTORIAL_SKIP),
+      "CHALLENGES Journey: 0 of 2 claimed Quest 1 of 2 REWARD TAKEN Silver Gilded Ashen spool Found: in Weaving now. Taken, into Weaving. Its main stat is drawn when you claim it.",
+      'Done! Claim the reward. Opens once "Finish Tutorial" is claimed. The tutorial was skipped: play it to the end. The tutorial is not finished yet. No spool is woven into a matrix yet.',
+      'CLAIM CLAIMED LOCKED START TUTORIAL REPLAY TUTORIAL OPEN WEAVING TO THE JOURNEY Claimed Ready to claim In progress Locked The Journey goes on. Claim a quest to open the next.',
+      "Your quests wait on the Journey meanwhile. The Herald's Board 1 ready",
     ];
     expect(missing('regular', texts)).toEqual([]);
     expect(missing('bold', texts)).toEqual([]);
@@ -564,7 +576,7 @@ describe('main menu sanctum', () => {
   };
 
   it('has a place for every way on from the menu, each made of sprites that exist, with its outline and label', () => {
-    expect(menu.hotspots.map((h) => h.id).sort()).toEqual(['academy', 'campaign', 'champions', 'options', 'weaving']);
+    expect(menu.hotspots.map((h) => h.id).sort()).toEqual(['academy', 'campaign', 'challenges', 'champions', 'options', 'weaving']);
     for (const h of menu.hotspots) {
       expect(h.sprites.length, h.id).toBeGreaterThan(0);
       for (const s of h.sprites) expect(menu.sprites[s], `${h.id} -> ${s}`).toBeTruthy();
@@ -589,6 +601,86 @@ describe('main menu sanctum', () => {
     expect(menu.warp.length).toBeGreaterThan(0);
     expect(menu.thread.length).toBeGreaterThan(1);
     expect(menu.lights.length).toBeGreaterThan(0);
+  });
+});
+
+// Jakub, 2026-10-24: Challenges (Daily, Persistent, the Journey of quests unlocked one after another) and a tutorial for new accounts
+describe('challenges and the tutorial', () => {
+  const weave = (p: ReturnType<typeof newArchivist>) => {
+    const s = threadSpool('pattern_ward', 0, 'atk', [['hpPct', 1]]);
+    p.reliquary.addSpool(s);
+    p.reliquary.equip(STARTERS[0], 0, s);
+  };
+
+  it("has the Journey's knots, the tutorial's hand and the Herald's Board", () => {
+    for (const k of ['open', 'ready', 'done', 'locked']) expect(ui.parts['quest_' + k], 'quest_' + k).toBeTruthy();
+    expect(ui.parts.tut_hand).toBeTruthy();
+    for (const q of JOURNEY) expect(ui.parts[`spool_${q.reward.pattern}_${q.reward.grade}`], q.id).toBeTruthy();
+    expect(CHALLENGE_TABS.map((t) => t.id)).toEqual(['daily', 'persistent', 'journey']);
+    expect(JOURNEY[0].title).toBe('Finish Tutorial');
+  });
+
+  it('opens the Journey one quest at a time, and a claim gives its spool once', () => {
+    const p = newArchivist();
+    const [first, second] = JOURNEY;
+    expect([questState(p, first), questState(p, second)]).toEqual(['open', 'locked']);
+    // a goal met before its quest opens waits for it
+    weave(p);
+    expect(questState(p, second)).toBe('locked');
+    expect(claimQuest(p, first.id)).toBeNull();
+    p.tutorial = 'done';
+    expect(questState(p, first)).toBe('ready');
+    expect(readyCount(p)).toBe(1);
+    expect(claimQuest(p, second.id)).toBeNull();
+    const before = p.reliquary.spools().length;
+    const spool = claimQuest(p, first.id)!;
+    expect(spool.pattern).toBe(first.reward.pattern);
+    expect(spool.grade).toBe(first.reward.grade);
+    expect(p.reliquary.spools()).toHaveLength(before + 1);
+    expect(p.reliquary.freshCount()).toBe(1);
+    expect(claimQuest(p, first.id)).toBeNull();
+    expect([questState(p, first), questState(p, second)]).toEqual(['claimed', 'ready']);
+    expect(currentQuest(p)).toBe(second);
+    claimQuest(p, second.id);
+    expect(p.claimed).toEqual(JOURNEY.slice(0, 2).map((q) => q.id));
+    expect(readyCount(p)).toBe(0);
+  });
+
+  it('keeps the tutorial and the claims through a save; an older save reads them as never done, and claims stay in order', () => {
+    const p = newArchivist();
+    p.tutorial = 'done';
+    claimQuest(p, JOURNEY[0].id);
+    const q = readSave(writeSave(p));
+    expect([q.tutorial, q.claimed]).toEqual(['done', [JOURNEY[0].id]]);
+    const save = JSON.parse(writeSave(newArchivist())) as Record<string, unknown>;
+    delete save.tutorial;
+    delete save.claimed;
+    const old = readSave(JSON.stringify(save));
+    expect([old.tutorial, old.claimed]).toEqual(['todo', []]);
+    // a quest no longer in the Journey, or claimed past one that is not, drops out
+    const odd = readSave(JSON.stringify({ ...save, tutorial: 'skipped', claimed: ['gone', JOURNEY[1].id] }));
+    expect([odd.tutorial, odd.claimed]).toEqual(['skipped', []]);
+    expect(readSave(JSON.stringify({ ...save, tutorial: 'maybe' })).tutorial).toBe('todo');
+  });
+
+  it('starts the tutorial on its own for a new account only', () => {
+    const p = newArchivist();
+    expect(tutorialDue(p)).toBe(true);
+    recordClear(p, allStages()[0].id, 1);
+    expect(tutorialDue(p)).toBe(false);
+    for (const t of ['skipped', 'done'] as const) {
+      const q = newArchivist();
+      q.tutorial = t;
+      expect(tutorialDue(q), t).toBe(false);
+    }
+  });
+
+  it('has words for every step, each leading on by a click or a button', () => {
+    for (const [id, t] of Object.entries(TUTORIAL)) {
+      expect(t.title && t.text, id).toBeTruthy();
+      expect(!!t.act !== !!t.next, `${id}: a click or a button`).toBe(true);
+    }
+    for (const id of TUTORIAL_PATH) expect(TUTORIAL[id], id).toBeTruthy();
   });
 });
 
