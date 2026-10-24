@@ -1,15 +1,18 @@
 // Weaver Matrix art (approved 2026-10-10): the matrix rose with its two
 // triangles, the slot rings, and the spool icons: crystal capsules holding a
 // spiral thread of light, the cap metal showing the grade and the thread's
-// colour its pattern. Same rules as the rest of the interface art: light from
-// the top-left, 1px dark outlines, ramps from palette.ts. Used by the MATRIX tab
-// (src/game/screens/champion.ts); layout in docs/UI_GUIDE.md.
+// colour its pattern. Weaving (2026-10-24) adds the large spools of its cards
+// and panel, the card frames of the three grades, the small roses that light
+// the slots a spool fits, and its menu glyph. Same rules as the rest of the
+// interface art: light from the top-left, 1px dark outlines, ramps from
+// palette.ts. Used by the MATRIX tab (src/game/screens/champion.ts) and Weaving
+// (src/game/screens/weaving.ts); layout in docs/UI_GUIDE.md.
 import { PATTERN_IDS } from '../../../src/game/data/matrix.ts';
 import { FXR, MAT, UIR } from '../palette.ts';
-import { dith, outline, rampDither } from '../paint.ts';
+import { dith, ellipseFill, outline, rampDither } from '../paint.ts';
 import { Bitmap, RGBA } from '../raster.ts';
 import { v, V } from '../rig.ts';
-import { arc, castMetal, Stroke } from './menu.ts';
+import { arc, cardFrame, castMetal, Stroke } from './menu.ts';
 
 /**
  * The thread colour of each core Weave Pattern (src/game/data/matrix.ts), one
@@ -126,11 +129,136 @@ function ring(r0: number, r1: number, solid: boolean): Bitmap {
   return b;
 }
 
+/**
+ * A large spool (22x35): a finial, a domed cap over a studded rim, a crystal
+ * holding two turns of its pattern's thread (the far turn dim behind the
+ * glass, the near one bright), a rim and a foot. The cap metal shows the
+ * grade, and so does the work on it: Ashen plain ebony, Silver an engraved
+ * band and studs, Gilded studs, filigree and a jewel of the thread's colour
+ * on the finial.
+ */
+export function bigSpool(p: string, grade: number): Bitmap {
+  const b = new Bitmap(22, 35);
+  const M = METAL[grade];
+  const T = THREAD[p];
+  const fine = grade > 0;
+  // metal lit from the top-left; the foot sits a step darker, in the crystal's shadow
+  const lit = (x: number, y: number, y0: number, y1: number, bias = 0) => rampDither(M, 3.3 + bias - ((x - 3) / 15) * 1.7 - ((y - y0) / Math.max(1, y1 - y0)) * 0.7, x, y);
+  const row = (y: number, x0: number, x1: number, c: (x: number) => RGBA) => {
+    for (let x = x0; x <= x1; x++) b.set(x, y, c(x));
+  };
+  // the cap: a dome from the finial out to the rim
+  const cap: [number, number][] = [[7, 14], [5, 16], [4, 17], [3, 18], [3, 18]];
+  cap.forEach(([x0, x1], i) => row(3 + i, x0, x1, (x) => lit(x, 3 + i, 3, 7)));
+  // the foot, mirrored and darker
+  const foot: [number, number][] = [[3, 18], [4, 17], [5, 16], [7, 14], [9, 12]];
+  foot.forEach(([x0, x1], i) => row(28 + i, x0, x1, (x) => lit(x, 28 + i, 28, 32, -0.6)));
+  row(33, 10, 11, (x) => lit(x, 33, 28, 33, -0.6));
+  // rims over and under the crystal, studded on the finer grades
+  for (const y of [8, 27]) {
+    row(y, 2, 19, (x) => (x < 7 ? M[3] : x < 15 ? M[2] : M[1]));
+    if (fine) for (const x of [4, 8, 13, 17]) b.set(x, y, M[4]);
+  }
+  // the crystal: dark glass, a glow of the thread's light in its heart, its rims in shadow under the metal
+  for (let y = 9; y <= 26; y++) {
+    for (let x = 5; x <= 16; x++) {
+      const mid = 1 - Math.abs(x + 0.5 - 11) / 6;
+      const shade = y === 9 || y === 26 ? -0.7 : 0;
+      b.set(x, y, x === 5 || x === 16 ? T[0] : rampDither([T[0], T[1], T[2]], 0.15 + mid * 1.05 - ((x - 5) / 11) * 0.35 + shade, x, y));
+    }
+  }
+  // the thread: two turns of a helix, the far half dim behind the glass, the near half bright over it
+  const helix = (near: boolean) => {
+    for (let k = 0; k <= 600; k++) {
+      const t = k / 600, ph = t * Math.PI * 4 + 0.6;
+      const depth = Math.cos(ph);
+      if (near !== depth >= 0) continue;
+      const x = Math.floor(11 + Math.sin(ph) * 4.3), y = Math.round(10.5 + t * 15);
+      b.set(x, y, near ? (depth > 0.7 ? T[4] : T[3]) : dith(x, y, 0.5) ? T[3] : T[2]);
+    }
+  };
+  helix(false);
+  helix(true);
+  // a sheen on the glass, after the small spools
+  for (const [y, c] of [[11, UIR.navy[4]], [12, UIR.navy[4]], [13, UIR.navy[3]], [14, UIR.navy[3]]] as const) b.set(6, y, c);
+  // the finial: a jewel of the thread's colour on Gilded, a metal knob otherwise
+  if (grade === 2) {
+    row(1, 10, 11, (x) => (x === 10 ? T[4] : T[3]));
+    row(2, 9, 12, (x) => (x === 9 ? T[3] : x === 12 ? T[1] : T[2]));
+    for (const [x, y] of [[6, 5], [10, 4], [15, 5]]) b.set(x, y, M[4]);
+  } else {
+    row(1, 10, 11, (x) => lit(x, 1, 1, 2, 0.4));
+    row(2, 9, 12, (x) => lit(x, 2, 1, 2, 0.4));
+  }
+  // Silver: an engraved band round the cap and the foot
+  if (grade === 1) {
+    row(5, 5, 16, (x) => (x === 5 ? M[2] : M[1]));
+    row(30, 6, 15, () => M[1]);
+  }
+  return outline(b, UIR.ink[0]);
+}
+
+/** Lobe centres of the small rose (13x13), slot 0 at the top and clockwise, as on the matrix rose. */
+const MINI_LOBES: [number, number][] = [[6, 2], [9, 4], [9, 8], [6, 10], [3, 8], [3, 4]];
+
+/**
+ * A small rose (13x13) that lights the slots a spool fits: six lobes in a dark
+ * disc ringed in gold, as on the matrix rose; a lit lobe glows (gold for a fixed
+ * slot, arcane for a choice slot), the others stay dim. Weaving's slot filters
+ * and the corner of its spool cards.
+ */
+export function miniRose(lit: readonly number[]): Bitmap {
+  const b = new Bitmap(13, 13);
+  ellipseFill(b, 6.5, 6.5, 6.4, 6.4, (x, y, d) => (d > 0.86 ? rampDither(G, 3.1 - (x + y - 12) / 8, x, y) : UIR.fill[1]));
+  MINI_LOBES.forEach(([cx, cy], i) => {
+    const on = lit.includes(i);
+    const R = i % 2 === 0 ? G : ARC;
+    for (const [dx, dy] of [[0, -1], [-1, 0], [1, 0], [0, 1]]) b.set(cx + dx, cy + dy, on ? R[3] : UIR.navy[1]);
+    b.set(cx, cy, on ? R[4] : UIR.navy[2]);
+  });
+  return outline(b, UIR.ink[0]);
+}
+
+/** Weaving's menu glyph (16x16): a spool standing on its foot, a thread of light unwinding from it to a spark. */
+export function weavingGlyph(): Bitmap {
+  const b = new Bitmap(16, 16);
+  const M = MAT.gold.ramp;
+  const L = ARC;
+  const row = (y: number, x0: number, x1: number, c: (x: number) => RGBA) => {
+    for (let x = x0; x <= x1; x++) b.set(x, y, c(x));
+  };
+  // gold lit from the top-left
+  const metal = (x: number, y: number) => rampDither([M[2], M[3], M[4], M[5]], 3.2 - (x - 1) / 3.2 - (y % 4) * 0.25, x, y);
+  row(1, 3, 7, (x) => metal(x, 1));
+  row(2, 2, 8, (x) => metal(x, 2));
+  row(3, 1, 9, (x) => (x < 4 ? M[4] : x < 7 ? M[3] : M[2]));
+  // the glass, its spiral of light
+  for (let y = 4; y <= 11; y++) row(y, 2, 8, (x) => (x === 2 || x === 8 ? L[0] : dith(x, y, 0.45) ? L[2] : L[1]));
+  for (const [x, y, k] of [[3, 4, 3], [4, 5, 4], [5, 5, 4], [6, 6, 3], [7, 7, 2], [6, 8, 2], [5, 8, 3], [4, 9, 4], [5, 10, 4], [6, 10, 3], [7, 11, 2]] as const) b.set(x, y, L[k]);
+  b.set(3, 6, UIR.navy[4]);
+  b.set(3, 7, UIR.navy[3]);
+  row(12, 1, 9, (x) => (x < 4 ? M[3] : x < 7 ? M[2] : M[1]));
+  row(13, 2, 8, (x) => (x < 5 ? M[3] : M[1]));
+  row(14, 3, 7, () => M[1]);
+  // the thread: out of the glass, up to a spark at the top right
+  for (const [x, y, k] of [[9, 7, 3], [10, 7, 4], [11, 6, 3], [12, 5, 4], [12, 4, 3]] as const) b.set(x, y, L[k]);
+  for (const [x, y, k] of [[13, 1, 3], [12, 2, 3], [13, 2, 4], [14, 2, 3], [13, 3, 3]] as const) b.set(x, y, L[k]);
+  return outline(b, UIR.ink[0]);
+}
+
 export function matrixParts(): Record<string, Bitmap> {
-  const out: Record<string, Bitmap> = { matrix_rose: matrixRose(), lobe_sel: ring(20.2, 22.4, true), lobe_attune: ring(20.4, 21.6, false) };
+  const out: Record<string, Bitmap> = { matrix_rose: matrixRose(), lobe_sel: ring(20.2, 22.4, true), lobe_attune: ring(20.4, 21.6, false), mi_weaving: weavingGlyph() };
   for (const p of PATTERN_IDS) {
     if (!THREAD[p]) throw new Error(`no thread colour for weave pattern ${p}`);
-    for (const g of [0, 1, 2]) out[`spool_${p}_${g}`] = spool(p, g);
+    for (const g of [0, 1, 2]) {
+      out[`spool_${p}_${g}`] = spool(p, g);
+      out[`bigspool_${p}_${g}`] = bigSpool(p, g);
+    }
   }
+  // the card frames of the three grades
+  for (const [g, ramp] of Object.entries(UIR.grade)) out['card_' + g] = cardFrame(ramp);
+  // a rose for each slot alone, and one for the three choice slots (a base stat in % fits any of them)
+  for (let i = 0; i < 6; i++) out['rose_' + i] = miniRose([i]);
+  out.rose_135 = miniRose([1, 3, 5]);
   return out;
 }

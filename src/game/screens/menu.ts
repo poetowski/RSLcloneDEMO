@@ -2,7 +2,7 @@
 // last team on the left, the next stage's enemies waiting on the right.
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
-import { anyFresh, cleared, frontier, isUnlocked } from '../archivist';
+import { anyFresh, cleared, frontier, isUnlocked, spoolsHeld } from '../archivist';
 import { stage, STARTERS, zoneOf } from '../data/campaign';
 import { CHAMPIONS } from '../data/champions';
 import { CHAPTERS } from '../data/codex';
@@ -65,6 +65,9 @@ export class MainMenu extends BaseScreen {
     };
     row('m_campaign', 'CAMPAIGN', 'mi_campaign', () => this.app.router.campaign(), cleared(this.archivist, fr) ? 'replay' : fr);
     row('m_champions', 'CHAMPIONS', 'mi_champions', () => this.app.router.collection(), `${owned}/${CHAMPIONS.length}`, anyFresh(this.archivist));
+    // the spool storage (Jakub, 2026-10-24: "Weaving Storage", then just WEAVING): how many spools, NEW while new finds wait
+    const held = spoolsHeld(this.archivist);
+    row('m_weaving', 'WEAVING', 'mi_weaving', () => this.app.router.weaving(), held ? String(held) : undefined, this.archivist.reliquary.freshCount() > 0);
     row('m_academy', 'ACADEMY', 'mi_academy', () => this.app.router.academy(), unread ? `${unread} new` : undefined);
     row('m_options', 'OPTIONS', 'mi_options', () => this.app.router.options());
     ui.text(ctx, 'Mouse, or arrows + Enter.  Esc goes back.', W / 2, H - 14, { color: COLORS.faint, align: 'center' });

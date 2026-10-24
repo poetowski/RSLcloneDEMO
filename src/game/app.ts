@@ -4,6 +4,8 @@
 // the bottom so every route (and every URL deep link) goes through one place.
 import { H, Screen as Canvas, W } from '../engine/screen';
 import { loadArchivist, MasterArchivist, saveArchivist } from './archivist';
+import type { ChampionAt } from './screens/champion';
+import type { WeavingAt } from './screens/weaving';
 import { Assets } from './view/assets';
 
 /** One full-screen state of the game (menu, map, battle...). */
@@ -114,7 +116,10 @@ export interface Router {
   team(stageId: string): void;
   battle(stageId: string, team: string[]): void;
   collection(): void;
-  champion(id: string, list?: string[]): void;
+  /** `at` opens a tab (the MATRIX tab on a slot) and says where BACK goes */
+  champion(id: string, list?: string[], at?: ChampionAt): void;
+  /** the spool storage; `at` sets its filter, the champion a weave goes to first, the spool shown and where BACK goes */
+  weaving(at?: WeavingAt): void;
   academy(chapter?: string): void;
   options(): void;
   recruit(id: string): void;

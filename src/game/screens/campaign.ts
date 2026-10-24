@@ -1,7 +1,8 @@
 // Campaign: the world map with one node per area (a location). Choosing a node
 // opens the area's stage list in a panel over the map: every stage with its
-// stars, its lock or the boss crown, and for the selected stage its story, the
-// enemy line-up, the reward and the way into team select. Stages have no place
+// stars, its lock or the boss crown, the spools the area's stages find, and for
+// the selected stage its story, the enemy line-up, the reward and the way into
+// team select. Stages have no place
 // on the map of their own. The world is wider than the screen and scrolls sideways:
 // a camera follows the keyboard focus from node to node, the map can be dragged
 // or slid with W A S D (or Shift + arrows), and M shows the whole world at once.
@@ -10,9 +11,12 @@ import { App, KeyMods } from '../app';
 import { cleared, frontier, isUnlocked, locationOpen, stageOpen } from '../archivist';
 import { LOCATIONS, locationOf, stage } from '../data/campaign';
 import { champion } from '../data/champions';
+import { GRADES, pattern, patternBonusText } from '../data/matrix';
 import { AFFINITIES, RARITIES } from '../data/meta';
 import { LocationDef, StageDef } from '../data/types';
+import { gradeOdds } from '../reliquary/drops';
 import { Scroller } from '../ui/scroll';
+import { GRADE_TINT, PATTERN_TINT, patternName } from '../ui/spools';
 import { COLORS } from '../ui/ui';
 import { blit, Rect4 } from '../view/assets';
 import { BaseScreen } from './base';
@@ -212,7 +216,7 @@ export class CampaignScreen extends BaseScreen {
     ui.regions.push({
       id, x: x - 60, y: y - 20, w: 120, h: 72, clip: VIEW,
       click: () => this.openList(loc),
-      tip: () => ({ title: `${loc.chapter}. ${loc.name}`, sub: status, body: loc.blurb, color: COLORS.goldHi }),
+      tip: () => ({ title: `${loc.chapter}. ${loc.name}`, sub: status, body: loc.patterns ? `${loc.blurb} Its stages find ${loc.patterns.map(patternName).join(' and ')} spools.` : loc.blurb, color: COLORS.goldHi }),
     });
   }
 
@@ -276,6 +280,7 @@ export class CampaignScreen extends BaseScreen {
     const rows = Math.ceil(loc.stages.length / 5);
     if (!open) ui.text(ctx, `The area opens after stage ${loc.requires}.`, gx, cy + rows * CELL.h + 6, { color: COLORS.bad });
     else ui.text(ctx, 'Clear a stage to open the next.', gx, cy + rows * CELL.h + 6, { color: COLORS.faint });
+    if (loc.patterns) this.spoolsHere(ctx, loc, loc.patterns, gx, cy + rows * CELL.h + 22);
     // right: the selected stage
     const dx = PX + 14 + 5 * CELL.w + 16;
     ctx.fillStyle = '#a8701e';
@@ -284,6 +289,41 @@ export class CampaignScreen extends BaseScreen {
     ui.button(ctx, 'p_close', PX + PW - 14 - 2 * bw - 8, PY + PH - 36, bw, 24, 'CLOSE', { click: () => this.closeList(), kind: 'small' });
     const go = this.selected && stageOpen(p, this.selected.id) ? this.selected : null;
     ui.button(ctx, 'p_go', PX + PW - 14 - bw, PY + PH - 36, bw, 24, 'PREPARE', { click: () => go && this.prepare(go), icon: 'mi_fight', disabled: !go });
+  }
+
+  /**
+   * What the area's stages find (Jakub, 2026-10-24: spools drop from every
+   * stage, two Weave Patterns per area): its two patterns, the odds of each
+   * grade on the selected stage, and how many a victory finds.
+   */
+  private spoolsHere(ctx: CanvasRenderingContext2D, loc: LocationDef, patterns: readonly string[], x: number, y: number) {
+    const ui = this.ui;
+    ui.text(ctx, 'SPOOLS FOUND HERE', x, y, { color: COLORS.dim, variant: 'bold' });
+    y += 12;
+    patterns.forEach((id, i) => {
+      const p = pattern(id);
+      if (!p) return;
+      const px = x + i * 113;
+      ui.blit(ctx, `spool_${id}_1`, px, y);
+      ui.text(ctx, p.name, px + 21, y, { color: PATTERN_TINT[id] });
+      ui.text(ctx, `${p.pieces} spools: ${patternBonusText(p)}`, px + 21, y + 10, { color: COLORS.faint });
+      ui.regions.push({ x: px, y, w: 108, h: 19, tip: () => ({ title: `${p.name} spools`, body: `Every stage of ${loc.name} finds ${patterns.map(patternName).join(' or ')} spools. Every ${p.pieces} ${p.name} spools in a matrix weave ${patternBonusText(p)}.`, color: PATTERN_TINT[id] }) });
+    });
+    y += 25;
+    const s = this.selected;
+    if (s && loc.stages.includes(s)) {
+      const odds = gradeOdds(s.id);
+      let ox = x;
+      ui.text(ctx, `${s.id}:`, ox, y, { color: COLORS.faint });
+      ox += ui.measure(`${s.id}:`) + 6;
+      for (const g of [0, 1, 2]) {
+        const label = `${GRADES[g]} ${Math.round(odds[g] * 100)}%`;
+        ui.text(ctx, label, ox, y, { color: GRADE_TINT[g] });
+        ox += ui.measure(label) + 8;
+      }
+      y += 11;
+    }
+    ui.text(ctx, 'A spool a victory, two when nobody falls.', x, y, { color: COLORS.faint });
   }
 
   /** One stage in the list: its node, its id, its stars; click to select it. */

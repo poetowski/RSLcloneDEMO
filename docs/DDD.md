@@ -169,10 +169,14 @@ The language of the final game (approved 2026-10-08). Heroes keep the word *cham
 | Strand | an additional stat on a spool, rolled once in its grade's range | `ThreadSpool.strands`, `STRAND_RANGE` |
 | Attunement | a choice slot's bond to the fixed stats beside it; a strand of that stat gains +1 there | `attunedStats`, `strandValue`, `ATTUNE_BONUS` |
 | Woven stats | a champion's stats with its matrix, the stats it brings to battle | `wovenStats`, `matrixBonus`, `battleStats` |
-| Stock | the spools in the Reliquary that sit in no slot | `Reliquary.spools()` |
+| Stock | the spools in the Reliquary that sit in no slot | `Reliquary.spools()`, `Reliquary.entries()` |
+| Weaving | the main-menu section that stores the spools (Jakub, 2026-10-24; first called Weaving Storage): every spool held, loose or woven, as cards in groups by pattern; choosing, weaving, taking out, unravelling | `WeavingScreen` (`screens/weaving.ts`) |
+| New find | a spool a victory found that nobody has looked at yet: its NEW badge in Weaving and on Weaving's menu button | `StockEntry.fresh`, `markSpoolSeen`, `markStockSeen`, `freshCount` |
+| Drop | the spools a campaign victory finds: each of one of its area's two Weave Patterns, its grade by the stage, its main stat by slot | `rollDrops`, `gradeOdds`, `rollMainStat`, `DROPS`, `LocationDef.patterns`, `recordVictory` |
+| Unravel | to remove a loose spool for good | `Reliquary.unravel` |
 | Weave Pattern | a set bonus woven by 2 or 4 spools of one pattern, wherever they sit: Jakub's eight core patterns, each 2-piece and adding one stat (Pulse SPD, Sunder ATK, Ward DEF, Vigor HP, Needle C.RATE, Apex C.DMG, Focus ACC, Tranquility RES) | `WeavePatternDef`, `CORE_WEAVE_PATTERNS` |
 | Woven | a pattern complete in a matrix, and how many times (6 spools of a 2-piece pattern: 3 times) | `WovenPattern`, `WeavePatternEvaluator` |
-| Spindle of Fate | named in the brief as what the archivist works; a placeholder with no meaning or code yet | - |
+| Spindle of Fate | a seventh, central piece of gear (Jakub, 2026-10-24); a placeholder until its system is made, with no code yet | - |
 
 ### 2.7 The world (Jakub's premise)
 
@@ -325,13 +329,14 @@ winner()           checked before choosing and after every action
 
 ### 4.7 Reliquary (C10)
 
-- **Aggregate root: `Reliquary`.** It holds the soul files and the stock and is their only writer: `recruit`, `markSeen`, `keepOnly`, `addSpool`, `equip`, `unequip`. A spool moves between the stock and a slot in one step, so it is never lost or copied.
+- **Aggregate root: `Reliquary`.** It holds the soul files and the stock and is their only writer: `recruit`, `markSeen`, `keepOnly`, `addSpool` (a new find with its NEW badge), `equip`, `unequip`, `unravel`, `markSpoolSeen`, `markStockSeen`. A spool moves between the stock and a slot in one step, so it is never lost or copied; only unravelling removes one, and only from the stock.
 - **Entity: `HeroSoulFile`.** Identity: the champion id, one file per champion. Frozen; the Reliquary replaces it on every change.
-- **Value objects:** `ThreadSpool` and `StatBonus` (frozen, equal when their fields are equal: `sameSpool`), `MatrixSlot`, `WeaverMatrix` (every change returns a new matrix), `WovenPattern`.
+- **Value objects:** `ThreadSpool` and `StatBonus` (frozen, equal when their fields are equal: `sameSpool`), `StockEntry` (a loose spool and its NEW badge), `MatrixSlot`, `WeaverMatrix` (every change returns a new matrix), `WovenPattern`. Weaving shows identical loose spools as one card with their count; a woven spool is told apart by the slot it sits in.
 - **Domain service: `WeavePatternEvaluator`.** Counts spools per pattern over the whole matrix, never by slot; a pattern is woven `floor(count / pieces)` times; results follow catalog order; an unknown pattern throws.
+- **Domain service: the drops (`reliquary/drops.ts`).** `rollDrops` makes what a victory on a stage finds: `dropCount` spools, each of one of the area's two patterns, its grade by `gradeOdds`, its main stat by `rollMainStat`, its strands by `rollSpool`. The archivist's `recordVictory` records the clear and puts the finds into the stock as new.
 - **Spool rules:** `threadSpool` enforces them (main value from the grade, strand count by grade, no repeats, values in range, SPD strands +1); `rollSpool` draws a valid spool. `attunedStats`, `strandValue`, `matrixBonus` (SPD strands capped at +4) and `wovenStats` turn a matrix into stats; the archivist's `battleStats` hands them to `Combatant.stats`.
-- **Persistence:** `toJSON` and `fromJSON` (`ReliquaryJson`) keep spools by slot index. Loading puts a spool back into its slot when the slot still takes it, otherwise into the stock, and drops malformed entries and spools of a pattern the catalog no longer has.
-- **Built (2026-10-10, 2026-10-11):** the layout, grades, strands, attunement, the bridge into combat and the MATRIX tab; Jakub's slot names and his eight core Weave Patterns, whose bonuses `wovenStats` adds once per weave. **Not defined yet:** where spools and materials come from; the stage powers are measured again once sources exist.
+- **Persistence:** `toJSON` and `fromJSON` (`ReliquaryJson`) keep spools by slot index; a new find in the stock is saved with `fresh: true`. Loading puts a spool back into its slot when the slot still takes it, otherwise into the stock, and drops malformed entries and spools of a pattern the catalog no longer has.
+- **Built (2026-10-10, 2026-10-11, 2026-10-24):** the layout, grades, strands, attunement, the bridge into combat and the MATRIX tab; Jakub's slot names and his eight core Weave Patterns, whose bonuses `wovenStats` adds once per weave; spools dropping from every stage, two patterns per area, and Weaving, the section that stores them. **Not defined yet:** materials; improving spools; the Spindle of Fate's system; the drop numbers (stand-ins); the stage powers are measured again with spools in mind (MDA T11).
 
 ## 5. Domain events
 
@@ -426,6 +431,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-P7 | A team holds 1-3 different owned champions | the team screen only |
 | INV-P8 | The save has version 3 under `tlrol.save.v3`; an older save (version 2 under `tlrol.save.v2`, version 1 under `oathbound.profile.v1`) gives only its settings and Academy reading to a new game, once, and is left in place; missing fields take defaults; another version starts a new game | test |
 | INV-P10 | Every cleared stage's champion has its soul file (a save survives a stage that changes what it brings) | test (`readSave`) |
+| INV-P11 | Every area with stages holds exactly two different Weave Patterns, both in the catalog, and every pattern drops in some area (Jakub, 2026-10-24) | test |
 
 ### 6.4 Presentation and art
 
@@ -456,6 +462,10 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-R7 | A spool's main value follows its grade; it has one strand per grade step, none repeating a stat, each in its grade's range, SPD strands +1; a save cannot raise a stored value | code (`threadSpool`, `readSpool`), test |
 | INV-R8 | Strands add at most +4 SPD to a matrix; attunement adds +1 only on choice slots, for the fixed stats beside them | code (`matrixBonus`), test |
 | INV-R9 | The matrix reaches battle only as the stats a combatant brings; without them a unit fights with its base stats | code (`Battle`), test |
+| INV-R10 | A victory on a stage finds only spools of its area's two Weave Patterns: one, and a second when nobody fell, each within the spool rules; a defeat finds none | code (`rollDrops`, `BattleScreen`), test |
+| INV-R11 | A new find wears the NEW badge, through a save, until it is chosen in Weaving or Weaving is left; a spool coming back from a slot is never new | code, test |
+| INV-R12 | Only a loose spool is unravelled, and it leaves the Reliquary for good | code (`unravel`), test |
+| INV-R13 | `?spools=1` adds its sample once: a sample spool already held, loose or woven, is not added again | test (`stockSample`) |
 
 ## 7. Policies: where decisions live
 

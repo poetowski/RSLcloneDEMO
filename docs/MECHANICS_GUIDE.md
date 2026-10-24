@@ -310,7 +310,7 @@ URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|o
 
 ## 14. The Weaver Matrix (`src/game/reliquary/`, `src/game/data/matrix.ts`)
 
-Every owned champion has a Weaver Matrix: six slots in two triangles that hold Thread Spools. What the matrix adds reaches battle as the champion's stats (`Combatant.stats`, built by `battleStats`); enemies wear no spools. The slot names, what each slot takes and the eight core Weave Patterns are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 9, 2026-10-11); the spool values, the strands, attunement and the way the pattern values are read below are stand-ins. Spools have no sources yet: the stock stays empty in play (`?spools=1` adds a sample for development).
+Every owned champion has a Weaver Matrix: six slots in two triangles that hold Thread Spools. What the matrix adds reaches battle as the champion's stats (`Combatant.stats`, built by `battleStats`); enemies wear no spools. The slot names, what each slot takes and the eight core Weave Patterns are Jakub's ([DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 9, 2026-10-11); the spool values, the strands, attunement and the way the pattern values are read below are stand-ins. Spools drop from every campaign stage, of the two Weave Patterns its area holds (Jakub, 2026-10-24, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 9.4; the drop numbers below are stand-ins too), and wait in Weaving, the main-menu section that stores them (`?spools=1` adds a sample for development, once however often it is opened).
 
 | Slot | Name | Kind | Takes a spool whose main stat is |
 | --- | --- | --- | --- |
@@ -362,7 +362,29 @@ The last column is how the game reads his values (a stand-in until he confirms i
 3. A matrix's strands add at most +4 SPD together.
 4. **Attunement:** each fixed slot attunes the two choice slots beside it. A strand on a choice slot gains +1 when its stat belongs to a neighbouring fixed slot (an ATK % strand counts as ATK): East Meridian is attuned to ATK and DEF, Nadir to DEF and HP, West Meridian to HP and ATK.
 5. Weaving a spool into a slot and taking it out are free; a spool you take out returns to the stock.
+6. A spool a victory finds is new (the NEW badge) until it is chosen in Weaving or Weaving is left; one taken out of a slot is never new.
+7. **Unravelling** (in Weaving) removes a loose spool for good; a woven one must be taken out first. Nothing comes back from it yet: spools are not improved or traded in for now (Jakub, 2026-10-24: "We do not have to improve spools as of now"). The action itself is a stand-in.
 
-**Stats with the matrix:** ATK, HP and DEF = base x (1 + the summed % + the woven fractions) + the flat sum, rounded; SPD = base + the summed SPD + base x the woven fraction, rounded; C.RATE and C.DMG rise by the summed points; ACC and RES by the flat sum. The MATRIX tab on the champion page shows the result and the woven patterns.
+**Stats with the matrix:** ATK, HP and DEF = base x (1 + the summed % + the woven fractions) + the flat sum, rounded; SPD = base + the summed SPD + base x the woven fraction, rounded; C.RATE and C.DMG rise by the summed points; ACC and RES by the flat sum. The MATRIX tab on the champion page shows the result and the woven patterns; Weaving's weave dialog previews it, and the patterns a spool completes or breaks, before the spool goes in.
+
+**Drops** (`reliquary/drops.ts`, the numbers in `DROPS`, `data/matrix.ts`). Every victory on a campaign stage finds spools, each of one of the two Weave Patterns its area holds (`LocationDef.patterns`); they come into the stock as new finds and the results panel shows them. Which two each area holds and every number below are stand-ins (Jakub: "regarding numbers, i would like to tune them, but for now just work with placeholder proposals").
+
+| Area | Its two patterns |
+| --- | --- |
+| I. Fracture Reach | Sunder, Vigor |
+| II. Verdant Grove | Pulse, Ward |
+| III. Moonlit Basin | Focus, Tranquility |
+| IV. Earth Scars | Needle, Sunder |
+| V. Snowy Mesa | Apex, Pulse |
+
+| | |
+| --- | --- |
+| Spools a victory finds | 1, and a second when nobody fell (three stars); a defeat finds none, and `?progress=` clears stages without finding any |
+| Pattern | either of the area's two, alike |
+| Grade (Ashen / Silver / Gilded) | 70 / 25 / 5% at an area's first stage, 30 / 45 / 25% at its last, stepping evenly between; the same in every area, so every pattern can be found in every grade |
+| Main stat | drawn by slot: a slot at random, then one of the stats it takes, alike. Flat ATK, DEF and HP a sixth each; SPD a 24th; C.RATE, C.DMG, ACC and RES a 30th each; ATK, HP and DEF % about a ninth each |
+| Strands | rolled as for any spool (above) |
+
+Every pattern drops in some area; Sunder and Pulse in two. Spools change every balance band: the stage powers and `npm run balance` still measure champions without spools ([MDA.md](MDA.md) T11).
 
 **Critical damage, Accuracy and Resistance.** Every champion starts at C.DMG 100%, so a critical hit deals double damage as before (section 5); the matrix raises it. ACC and RES decide whether a debuff lands (section 7).

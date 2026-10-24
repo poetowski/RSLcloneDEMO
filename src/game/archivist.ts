@@ -5,9 +5,10 @@
 // (private windows) and the game must still run.
 import { LOCATIONS, STARTERS, allStages, stage } from './data/campaign';
 import { champion, CHAMPIONS } from './data/champions';
-import { MATRIX_LAYOUT, PATTERN_IDS } from './data/matrix';
+import { MATRIX_LAYOUT, PATTERN_IDS, SPOOL_STATS } from './data/matrix';
 import { LocationDef, Stats } from './data/types';
-import { wovenStats } from './reliquary/matrix';
+import { rollDrops } from './reliquary/drops';
+import { Grade, rollSpool, sameSpool, ThreadSpool, wovenStats } from './reliquary/matrix';
 import { Reliquary, ReliquaryJson } from './reliquary/reliquary';
 
 export interface MasterArchivist {
@@ -184,18 +185,64 @@ export function frontier(a: MasterArchivist): string {
   return (uncleared[0] ?? open[open.length - 1]).id;
 }
 
-/** Records a victory. Returns the champion recruited by a first clear, if any. */
+/** Records a clear without finding spools (the ?progress deep link). Returns the champion recruited by a first clear, if any. */
 export function recordClear(a: MasterArchivist, stageId: string, stars: number): string | undefined {
+  const recruited = clear(a, stageId, stars);
+  saveArchivist(a);
+  return recruited;
+}
+
+/** What a campaign victory brought: the champion a first clear recruits, and the spools it found. */
+export interface VictoryReward {
+  recruited?: string;
+  spools: ThreadSpool[];
+}
+
+/**
+ * Records a campaign victory: its stars, the champion of a first clear, and
+ * the spools it finds (spools drop from every stage, Jakub, 2026-10-24), which
+ * come into the stock with the NEW badge.
+ */
+export function recordVictory(a: MasterArchivist, stageId: string, stars: number, rng: () => number = Math.random): VictoryReward {
+  const recruited = clear(a, stageId, stars);
+  const spools = rollDrops(stageId, stars, rng);
+  for (const s of spools) a.reliquary.addSpool(s, true);
+  saveArchivist(a);
+  return { recruited, spools };
+}
+
+/** Stars and the first-clear recruit, without saving. */
+function clear(a: MasterArchivist, stageId: string, stars: number): string | undefined {
   const first = !cleared(a, stageId);
   a.stars[stageId] = Math.max(a.stars[stageId] ?? 0, stars);
   const r = stage(stageId).recruit;
-  let recruited: string | undefined;
   if (first && r && !isUnlocked(a, r)) {
     a.reliquary.recruit(r);
-    recruited = r;
+    return r;
   }
-  saveArchivist(a);
-  return recruited;
+  return undefined;
+}
+
+/** Every spool the archivist holds: loose in the stock and woven in a matrix. */
+export function spoolsHeld(a: MasterArchivist): number {
+  return a.reliquary.spools().length + a.reliquary.files().reduce((n, f) => n + f.matrix.spools().length, 0);
+}
+
+/**
+ * Development and screenshots (?spools=1): 24 sample spools, every pattern in
+ * turn. A sample spool the archivist already holds, loose or woven, is not
+ * added again, so the link can be opened any number of times.
+ */
+export function stockSample(a: MasterArchivist) {
+  let seed = 11;
+  const rnd = () => (seed = (seed * 48271) % 2147483647) / 2147483647;
+  const sample = Array.from({ length: 24 }, (_, i) => rollSpool(PATTERN_IDS[i % PATTERN_IDS.length], (i % 3) as Grade, SPOOL_STATS[(i * 5) % SPOOL_STATS.length], rnd));
+  const held = [...a.reliquary.spools(), ...a.reliquary.files().flatMap((f) => f.matrix.spools())];
+  for (const s of sample) {
+    const i = held.findIndex((h) => sameSpool(h, s));
+    if (i >= 0) held.splice(i, 1);
+    else a.reliquary.addSpool(s);
+  }
 }
 
 export function totalStars(a: MasterArchivist): number {

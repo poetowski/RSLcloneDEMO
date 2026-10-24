@@ -12,7 +12,7 @@ import { recruitStage, zoneOf } from '../data/campaign';
 import { CHAMPIONS } from '../data/champions';
 import { AFFINITIES, FACTIONS, RARITIES } from '../data/meta';
 import { Affinity, ChampionDef, FactionId, Rarity, Role } from '../data/types';
-import { Scroller } from '../ui/scroll';
+import { drawScrollHints, Scroller } from '../ui/scroll';
 import { COLORS } from '../ui/ui';
 import { nine, Rect4 } from '../view/assets';
 import { drawChampion, frameAt } from '../view/unit';
@@ -175,44 +175,7 @@ export class CollectionScreen extends BaseScreen {
 
   /** Scrollbar on the right, and a fade with a chevron at each edge that has more cards beyond it. */
   private scrollHints(ctx: CanvasRenderingContext2D) {
-    const sc = this.scroll;
-    if (!sc.max) return;
-    const ui = this.ui;
-    const [, vy, , vh] = VIEW;
-    const total = vh + sc.max;
-    const th = Math.max(18, Math.round((vh - 8) * (vh / total)));
-    const ty = vy + 4 + Math.round(((vh - 8 - th) * sc.offset) / sc.max);
-    ctx.fillStyle = COLORS.ink;
-    ctx.fillRect(W - 9, vy + 3, 5, vh - 6);
-    ctx.fillStyle = '#1a2238';
-    ctx.fillRect(W - 8, vy + 4, 3, vh - 8);
-    ctx.fillStyle = COLORS.gold;
-    ctx.fillRect(W - 8, ty, 3, th);
-    ctx.fillStyle = COLORS.goldHi;
-    ctx.fillRect(W - 8, ty, 3, 1);
-    const bob = Math.round(Math.sin(this.t / 220) * 1.5);
-    const r = ui.part('chevron_gold');
-    const step = CH + GAP;
-    if (sc.after) {
-      ui.bands(ctx, 0, H - 14, W - 10, 14, '#05070c', '#05070c', 1);
-      ctx.globalAlpha = 0.55;
-      ui.bands(ctx, 0, H - 26, W - 10, 12, '#05070c', '#05070c', 1);
-      ctx.globalAlpha = 1;
-      ctx.drawImage(this.a.ui.img, r[0], r[1], r[2], r[3], W / 2 - 5, H - 12 + bob, r[2], r[3]);
-      ui.text(ctx, 'MORE', W / 2 - 12, H - 12, { color: COLORS.dim, align: 'right' });
-      ui.regions.push({ x: W / 2 - 60, y: H - 26, w: 120, h: 26, click: () => sc.by(step) });
-    }
-    if (sc.before) {
-      ctx.globalAlpha = 0.55;
-      ui.bands(ctx, 0, vy, W - 10, 10, '#05070c', '#05070c', 1);
-      ctx.globalAlpha = 1;
-      ctx.save();
-      ctx.translate(W / 2 - 5, vy + 11 - bob);
-      ctx.scale(1, -1);
-      ctx.drawImage(this.a.ui.img, r[0], r[1], r[2], r[3], 0, 0, r[2], r[3]);
-      ctx.restore();
-      ui.regions.push({ x: W / 2 - 60, y: vy, w: 120, h: 14, click: () => sc.by(-step) });
-    }
+    drawScrollHints(this.ui, ctx, this.scroll, VIEW, CH + GAP, this.t);
   }
 
   private card(ctx: CanvasRenderingContext2D, c: ChampionDef, x: number, y: number, w: number, h: number, list: ChampionDef[]) {

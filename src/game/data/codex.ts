@@ -167,6 +167,7 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'figure', id: 'stars' },
       { kind: 'list', items: ['3 stars: nobody fell.', '2 stars: one champion fell.', '1 star: you won with losses.'] },
       { kind: 'p', text: 'Some stages bring a new champion on their first clear. Bosses wear a crown and have 60% more HP.' },
+      { kind: 'p', text: "Every victory also finds a Thread Spool, and a flawless one a second. Each area holds two Weave Patterns and its stages find only those; an area's later stages find finer grades more often. The spools wait in Weaving, where you weave them into your champions." },
     ],
   },
   {

@@ -9,53 +9,27 @@ import { recruitStage, STARTERS } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../data/meta';
 import { STAT_LIMITS } from '../data/norms';
-import { ATTUNE_BONUS, CORE_WEAVE_PATTERNS, GRADES, MATRIX_LAYOUT, pattern, patternBonusText, SLOT_NAMES, SPOOL_STAT_NAME, STAT_NAME } from '../data/matrix';
-import { ChampionDef, SpoolStat, StatId, StatNode } from '../data/types';
+import { ATTUNE_BONUS, CORE_WEAVE_PATTERNS, GRADES, MATRIX_LAYOUT, patternBonusText, SLOT_NAMES, SPOOL_STAT_NAME, STAT_NAME } from '../data/matrix';
+import { ChampionDef, StatId } from '../data/types';
 import { homeZone } from '../data/zones';
-import { attunedStats, fits, sameSpool, SlotIndex, StatBonus, strandValue, ThreadSpool, WeavePatternEvaluator, WeaverMatrix, wovenStats } from '../reliquary/matrix';
+import { attunedStats, fits, sameSpool, SlotIndex, strandValue, ThreadSpool, WeavePatternEvaluator, WeaverMatrix, wovenStats } from '../reliquary/matrix';
+import { emptyLabel, GRADE_TINT, PATTERN_TINT, patternName, ruleText, spoolSummary, statText, strandText } from '../ui/spools';
 import { COLORS } from '../ui/ui';
 import { blit, nine } from '../view/assets';
 import { drawChampion, frameAt } from '../view/unit';
 import { BaseScreen, Diorama } from './base';
 
 type Tab = 'skills' | 'stats' | 'matrix' | 'lore';
-/** text colour of each pattern: the light step of its spool's thread (tools/art/ui/matrix.ts); Pulse a step deeper, apart from Needle's gold */
-const PATTERN_TINT: Record<string, string> = {
-  pattern_pulse: '#ffa030', pattern_sunder: '#ff6a5a', pattern_ward: '#9fd0ff', pattern_vigor: '#a2f56a',
-  pattern_needle: '#ffe890', pattern_apex: '#ff8ad0', pattern_focus: '#d89cff', pattern_tranquility: '#6ad8bc',
-};
-/** grade name colour: the cap metal */
-const GRADE_TINT = ['#a08a7a', '#cfd8e6', '#efc04a'];
-const patternName = (id: string) => pattern(id)?.name ?? id;
 
-/** "ATK +8", "ATK % +7%", "C.DMG +10%", "ACC +14" */
-function statText(s: SpoolStat, v: number): string {
-  const pct = s === 'atkPct' || s === 'hpPct' || s === 'defPct' || s === 'crit' || s === 'critDmg';
-  return `${SPOOL_STAT_NAME[s].replace(' %', '')} +${v}${pct ? '%' : ''}`;
-}
-
-/** What a slot takes: "flat ATK", "SPD or a base stat in %", "C.RATE, C.DMG or a base stat in %". */
-function ruleText(n: StatNode): string {
-  if (n.kind === 'fixed') return `flat ${SPOOL_STAT_NAME[n.stat]}`;
-  const special = n.stats.filter((s) => s !== 'atkPct' && s !== 'hpPct' && s !== 'defPct').map((s) => SPOOL_STAT_NAME[s]);
-  return `${special.join(', ')} or a base stat in %`;
-}
-
-/** The rule written inside an empty slot: its own stats, one a line, then "or %". */
-function emptyLabel(n: StatNode): string[] {
-  if (n.kind === 'fixed') return [SPOOL_STAT_NAME[n.stat]];
-  const special = n.stats.filter((s) => s !== 'atkPct' && s !== 'hpPct' && s !== 'defPct');
-  return [...(special.includes('crit') ? ['CRIT'] : special.map((s) => SPOOL_STAT_NAME[s])), 'or %'];
-}
-
-/** A strand as it counts in its slot: "ATK +2% +1" when attuned. */
-function strandText(m: WeaverMatrix, i: SlotIndex, st: StatBonus): string {
-  const extra = strandValue(m, i, st) - st.value;
-  return `${statText(st.stat, st.value)}${extra ? ` +${extra}` : ''}`;
+/** Where the champion page opens: a tab (the MATRIX tab on a slot), and where BACK goes (the collection by default). */
+export interface ChampionAt {
+  tab?: Tab;
+  slot?: SlotIndex;
+  back?: () => void;
 }
 
 /** A champion stat's value as shown: "1150", "2.5%", "100%". */
-function statValue(k: StatId, v: number): string {
+export function statValue(k: StatId, v: number): string {
   return k === 'crit' || k === 'critDmg' ? `${Math.round(v * 1000) / 10}%` : String(v);
 }
 
@@ -72,9 +46,12 @@ export class ChampionScreen extends BaseScreen {
     app: App,
     id: string,
     private list: string[] = CHAMPIONS.map((c) => c.id),
+    private at: ChampionAt = {},
   ) {
     super(app);
     this.c = champion(id);
+    this.tab = at.tab ?? 'skills';
+    this.slot = at.slot ?? 0;
     this.diorama = new Diorama(app, homeZone(this.c.faction).id);
     this.seen();
   }
@@ -84,7 +61,8 @@ export class ChampionScreen extends BaseScreen {
   }
 
   protected back() {
-    this.app.router.collection();
+    if (this.at.back) this.at.back();
+    else this.app.router.collection();
   }
 
   private cycle(d: number) {
@@ -217,10 +195,6 @@ export class ChampionScreen extends BaseScreen {
     const isFixed = (i: number) => m.slots[i].node.kind === 'fixed';
     const grade = (s: ThreadSpool) => GRADES[s.grade];
     const name = (s: ThreadSpool) => patternName(s.pattern);
-    const spoolBody = (s: ThreadSpool) => {
-      const p = pattern(s.pattern);
-      return `${grade(s)}. Main ${statText(s.main.stat, s.main.value)}; strands ${s.strands.map((st) => statText(st.stat, st.value)).join(', ')}.${p ? ` ${p.pieces} ${p.name} spools weave ${patternBonusText(p)}.` : ''}`;
-    };
 
     // the rose: the fixed triangle in gold, the choice triangle in arcane light
     const rx = x, ry = y - 2, half = 72;
@@ -369,12 +343,22 @@ export class ChampionScreen extends BaseScreen {
         } : undefined,
         tip: () => ({
           title: `${name(s)} spool`,
-          body: `${spoolBody(s)} ${ok ? `Fits ${SLOT_NAMES[sel]}.` : `${SLOT_NAMES[sel]} cannot take ${SPOOL_STAT_NAME[s.main.stat]}.`}`,
+          body: `${spoolSummary(s)} ${ok ? `Fits ${SLOT_NAMES[sel]}.` : `${SLOT_NAMES[sel]} cannot take ${SPOOL_STAT_NAME[s.main.stat]}.`}`,
           color: PATTERN_TINT[s.pattern],
         }),
       });
     });
-    if (groups.length > max) ui.text(ctx, `+${groups.length - max} more`, x2 + cw - 4, ky, { color: COLORS.faint, align: 'right' });
+    if (groups.length > max) {
+      // the rest wait in Weaving, which opens on the spools this slot takes
+      const more = `+${groups.length - max} more`, mw = ui.measure(more), mx = x2 + cw - 4 - mw;
+      const hot = ui.hot('mx_more', mx, ky - 1, mw, 11);
+      ui.text(ctx, more, x2 + cw - 4, ky, { color: hot ? COLORS.goldHi : COLORS.faint, align: 'right' });
+      ui.regions.push({
+        id: 'mx_more', x: mx, y: ky - 1, w: mw, h: 11,
+        click: () => this.toWeaving(),
+        tip: () => ({ title: 'Weaving', body: `Open Weaving on every spool that fits ${SLOT_NAMES[sel]}.` }),
+      });
+    }
 
     // legend
     const ly0 = y + 214;
@@ -388,6 +372,16 @@ export class ChampionScreen extends BaseScreen {
     let kx = key(x2, COLORS.gold, 'fixed');
     kx = key(kx, '#5aa8ff', 'choice');
     key(kx, COLORS.gold, 'attunes', true);
+  }
+
+  /** Weaving, on the spools the chosen slot takes, weaving into this champion first; BACK comes back to this tab. */
+  private toWeaving() {
+    const { c, list, slot, at } = this;
+    this.app.router.weaving({
+      slot,
+      champion: isUnlocked(this.archivist, c.id) ? c.id : undefined,
+      back: () => this.app.router.champion(c.id, list, { tab: 'matrix', slot, back: at.back }),
+    });
   }
 
   private skills(ctx: CanvasRenderingContext2D, x: number, y: number, w: number) {

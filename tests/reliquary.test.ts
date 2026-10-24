@@ -2,14 +2,17 @@
 // strands; the Weaver Matrix keeps six slots in two triangles that take only
 // what their stat nodes accept; attunement and the SPD strand cap shape what a
 // matrix adds; Weave Patterns count spools wherever they sit; the Reliquary
-// never loses or copies a spool, also through a save (docs/DDD.md 6.5,
+// never loses or copies a spool, also through a save, and marks new finds;
+// spools drop from every stage, of its area's two patterns (docs/DDD.md 6.5,
 // docs/MECHANICS_GUIDE.md 14). Patterns and fixture layouts here are test
-// fixtures, not content.
+// fixtures, not content; the drop tests run on the real campaign.
 import { describe, expect, it } from 'vitest';
-import { CORE_WEAVE_PATTERNS, MAIN_VALUE, MATRIX_LAYOUT, SLOT_NAMES, SPD_STRAND_CAP, SPOOL_STATS, STRAND_COUNT, STRAND_RANGE, STRAND_STATS } from '../src/game/data/matrix';
+import { allStages, locationOf, LOCATIONS } from '../src/game/data/campaign';
+import { CORE_WEAVE_PATTERNS, DROPS, MAIN_VALUE, MATRIX_LAYOUT, SLOT_NAMES, SPD_STRAND_CAP, SPOOL_STATS, STRAND_COUNT, STRAND_RANGE, STRAND_STATS } from '../src/game/data/matrix';
 import { MatrixLayout, SpoolStat, StatNode, Stats, WeavePatternDef } from '../src/game/data/types';
+import { dropCount, gradeOdds, rollDrops, rollMainStat } from '../src/game/reliquary/drops';
 import {
-  attunedStats, Grade, matrixBonus, rollSpool, sameSpool, SlotIndex, threadSpool, ThreadSpool, WeavePatternEvaluator, WeaverMatrix, wovenStats,
+  attunedStats, Grade, matrixBonus, rollSpool, sameSpool, SlotIndex, slotsFor, threadSpool, ThreadSpool, WeavePatternEvaluator, WeaverMatrix, wovenStats,
 } from '../src/game/reliquary/matrix';
 import { Reliquary, ReliquaryJson } from '../src/game/reliquary/reliquary';
 
@@ -150,6 +153,14 @@ describe('weaver matrix', () => {
     expect(out.removed).toBe(b);
     expect(out.matrix.spools()).toEqual([]);
     expect(Object.isFrozen(empty.slots) && Object.isFrozen(empty.slots[0])).toBe(true);
+  });
+
+  it('names the slots a spool fits: one for most main stats, the three choice slots for a base stat in %', () => {
+    expect(slotsFor(MATRIX_LAYOUT, sp('pair_a', 'atk'))).toEqual([0]);
+    expect(slotsFor(MATRIX_LAYOUT, sp('pair_a', 'spd'))).toEqual([1]);
+    expect(slotsFor(MATRIX_LAYOUT, sp('pair_a', 'critDmg'))).toEqual([3]);
+    expect(slotsFor(MATRIX_LAYOUT, sp('pair_a', 'res'))).toEqual([5]);
+    expect(slotsFor(MATRIX_LAYOUT, sp('pair_a', 'hpPct'))).toEqual([1, 3, 5]);
   });
 
   it('attunes each choice slot to the fixed stats beside it', () => {
@@ -347,5 +358,109 @@ describe('reliquary', () => {
     r.keepOnly((id) => id === 'alpha');
     expect(r.has('beta')).toBe(false);
     expect(count(r)).toBe(spools.length);
+  });
+
+  it('marks a new find with the NEW badge until it is looked at, also through a save', () => {
+    const r = stocked();
+    const find = sp('pair_b', 'crit', 2);
+    r.addSpool(find, true);
+    r.addSpool(find, true);
+    expect(r.freshCount()).toBe(2);
+    const json = JSON.parse(JSON.stringify(r.toJSON())) as ReliquaryJson;
+    expect(json.stock.filter((s) => s.fresh)).toHaveLength(2);
+    const back = Reliquary.fromJSON(json, MIXED);
+    expect(back.freshCount()).toBe(2);
+    expect(back.toJSON()).toEqual(r.toJSON());
+    // looking at it clears every loose copy; the others keep theirs
+    r.addSpool(sp('pair_a', 'spd'), true);
+    expect(r.markSpoolSeen(find)).toBe(true);
+    expect(r.markSpoolSeen(find)).toBe(false);
+    expect(r.freshCount()).toBe(1);
+    expect(r.markStockSeen()).toBe(true);
+    expect(r.markStockSeen()).toBe(false);
+    expect(r.freshCount()).toBe(0);
+    expect(count(r)).toBe(spools.length + 3);
+  });
+
+  it('brings a spool taken out of a slot back without the NEW badge', () => {
+    const r = stocked();
+    const find = sp('pair_a', 'atk', 2);
+    r.addSpool(find, true);
+    r.equip('alpha', 0, find);
+    expect(r.freshCount()).toBe(0);
+    r.unequip('alpha', 0);
+    expect(r.entries().find((e) => sameSpool(e.spool, find))?.fresh).toBe(false);
+  });
+
+  it('unravels a loose spool for good, one copy at a time, never a woven one', () => {
+    const r = stocked();
+    r.equip('alpha', 0, spools[0]);
+    r.unravel(spools[1]); // the second ATK spool, alike to the woven one
+    expect(count(r)).toBe(spools.length - 1);
+    expect(r.file('alpha').matrix.slots[0].spool).toBe(spools[0]);
+    expect(() => r.unravel(spools[0])).toThrow(); // no loose copy is left
+    expect(count(r)).toBe(spools.length - 1);
+  });
+});
+
+describe('spool drops', () => {
+  const stages = allStages();
+
+  it('find spools of the area\'s two patterns only, every stage of every area', () => {
+    const r = rngFor(5);
+    for (const s of stages) {
+      const own = locationOf(s.id).patterns!;
+      for (let i = 0; i < 40; i++) for (const d of rollDrops(s.id, 1 + (i % 3), r)) expect(own, `${s.id} dropped ${d.pattern}`).toContain(d.pattern);
+    }
+  });
+
+  it('find one spool a victory, and a second when nobody fell', () => {
+    const r = rngFor(6);
+    expect(rollDrops(stages[0].id, 1, r)).toHaveLength(DROPS.perVictory);
+    expect(rollDrops(stages[0].id, 2, r)).toHaveLength(DROPS.perVictory);
+    expect(rollDrops(stages[0].id, 3, r)).toHaveLength(DROPS.perVictory + DROPS.flawlessBonus);
+    expect(dropCount(3)).toBe(2);
+  });
+
+  it('step the grade odds evenly from an area\'s first stage to its last', () => {
+    for (const loc of LOCATIONS) {
+      if (!loc.stages.length) continue;
+      const first = gradeOdds(loc.stages[0].id), last = gradeOdds(loc.stages[loc.stages.length - 1].id);
+      first.forEach((v, g) => expect(v, `${loc.id} first ${g}`).toBeCloseTo(DROPS.firstStage[g]));
+      last.forEach((v, g) => expect(v, `${loc.id} last ${g}`).toBeCloseTo(DROPS.lastStage[g]));
+      for (const s of loc.stages) expect(gradeOdds(s.id).reduce((a, b) => a + b, 0), s.id).toBeCloseTo(1);
+      // Gilded grows stage by stage
+      const gilded = loc.stages.map((s) => gradeOdds(s.id)[2]);
+      for (let i = 1; i < gilded.length; i++) expect(gilded[i]).toBeGreaterThan(gilded[i - 1]);
+    }
+  });
+
+  it('roll grades, patterns and main stats in their shares, every spool within the rules', () => {
+    const r = rngFor(7);
+    const last = LOCATIONS[0].stages[LOCATIONS[0].stages.length - 1].id;
+    const n = 6000;
+    const drops = Array.from({ length: n }, () => rollDrops(last, 1, r)[0]);
+    const share = (f: (s: ThreadSpool) => boolean) => drops.filter(f).length / n;
+    DROPS.lastStage.forEach((odds, g) => expect(share((s) => s.grade === g), `grade ${g}`).toBeCloseTo(odds, 1));
+    expect(share((s) => s.pattern === LOCATIONS[0].patterns![0])).toBeCloseTo(0.5, 1);
+    // every slot gets its share: a sixth of the spools are flat ATK, a 24th SPD
+    expect(share((s) => s.main.stat === 'atk')).toBeCloseTo(1 / 6, 1);
+    expect(share((s) => s.main.stat === 'spd')).toBeCloseTo(1 / 24, 1);
+    for (const s of drops) expect(() => threadSpool(s.pattern, s.grade, s.main.stat, s.strands.map((t) => [t.stat, t.value]))).not.toThrow();
+  });
+
+  it('draw the main stat by slot: a slot at random, then one of the stats it takes', () => {
+    const r = rngFor(8);
+    const n = 12000;
+    const seen = new Map<SpoolStat, number>();
+    for (let i = 0; i < n; i++) {
+      const stat = rollMainStat(r);
+      seen.set(stat, (seen.get(stat) ?? 0) + 1);
+    }
+    for (const stat of SPOOL_STATS) {
+      // each slot a sixth of the time, then each of its stats alike
+      const want = MATRIX_LAYOUT.reduce((p, node) => p + (node.kind === 'fixed' ? (node.stat === stat ? 1 : 0) : node.stats.includes(stat) ? 1 / node.stats.length : 0) / 6, 0);
+      expect(Math.abs((seen.get(stat) ?? 0) / n - want), stat).toBeLessThan(0.015);
+    }
   });
 });

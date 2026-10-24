@@ -268,6 +268,12 @@ export const UIR = {
   parchment: fx(['#3a2814', '#7a5a34', '#b8946a', '#e2c89c', '#f8ecd0']),
   /** arcane light: the jewels of the logo, the threads of the Weaver Matrix */
   arcane: fx(['#06142e', '#143a7a', '#2a6ac8', '#5aa8ff', '#d8ecff']),
+  /** spool grades, after their cap metals (Ashen ebony gone to ash, Silver, Gilded gold): the frames of the spool cards in Weaving */
+  grade: {
+    ashen: fx(['#100c0e', '#2e2426', '#4e3e3c', '#7e6a62', '#bca896']),
+    silver: fx(['#141620', '#3c4256', '#68728a', '#aab4c8', '#eef2fa']),
+    gilded: fx(['#120c08', '#5a3410', '#a8701e', '#e8b440', '#fff0a8']),
+  },
   rarity: {
     common: fx(['#1a1c22', '#3a404c', '#6a7280', '#b8c0cc', '#eef2f8']),
     elite: fx(['#081428', '#163a6e', '#2a6ac0', '#5aa8ff', '#d0e8ff']),

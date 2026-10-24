@@ -329,6 +329,11 @@ export interface LocationDef {
   map: { x: number; y: number };
   /** empty while the area's stages are not designed */
   stages: StageDef[];
+  /**
+   * the two Weave Patterns whose spools every stage of the area drops (Jakub,
+   * 2026-10-24: exactly two per area); which two each area holds is a stand-in
+   */
+  patterns?: readonly [PatternId, PatternId];
 }
 
 // --- Weaver Matrix -----------------------------------------------------------

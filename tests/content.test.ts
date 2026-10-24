@@ -12,9 +12,10 @@ import { auditChampion, totalMult } from '../src/game/data/norms';
 import { STATUSES } from '../src/game/data/statuses';
 import { ChampionDef, StatusId } from '../src/game/data/types';
 import { ZONES } from '../src/game/data/zones';
-import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, stageOpen, writeSave } from '../src/game/archivist';
-import { PATTERN_IDS } from '../src/game/data/matrix';
+import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, recordVictory, spoolsHeld, stageOpen, stockSample, writeSave } from '../src/game/archivist';
+import { PATTERN_IDS, SPOOL_STATS } from '../src/game/data/matrix';
 import { threadSpool } from '../src/game/reliquary/matrix';
+import { roseMark } from '../src/game/ui/spools';
 
 const json = (p: string) => JSON.parse(fs.readFileSync(p, 'utf8'));
 const fx = json('public/assets/fx/fx.json').anims as Record<string, unknown>;
@@ -136,6 +137,18 @@ describe('campaign', () => {
     for (let i = 1; i < LOCATIONS.length; i++) expect(LOCATIONS[i].map.x, LOCATIONS[i].id).toBeGreaterThan(LOCATIONS[i - 1].map.x + 200);
   });
 
+  // Jakub, 2026-10-24: "Each campaign area has exactly 2 sets which can drop from every stage of that specific area."
+  it('gives every area with stages exactly two Weave Patterns to drop, and drops every pattern somewhere', () => {
+    for (const loc of LOCATIONS) {
+      if (!loc.stages.length) continue;
+      expect(loc.patterns, `${loc.id} patterns`).toBeTruthy();
+      const [a, b] = loc.patterns!;
+      expect(loc.patterns, loc.id).toHaveLength(2);
+      expect(a, `${loc.id} holds one pattern twice`).not.toBe(b);
+      for (const p of loc.patterns!) expect(PATTERN_IDS, `${loc.id} pattern ${p}`).toContain(p);
+    }
+    for (const p of PATTERN_IDS) expect(LOCATIONS.some((l) => l.patterns?.includes(p)), `${p} drops nowhere`).toBe(true);
+  });
 });
 
 // Jakub's locked decisions (docs/DESIGN_DECISIONS.md sections 2 and 4): a
@@ -543,6 +556,17 @@ describe('weaver matrix art', () => {
     for (const p of ['matrix_rose', 'lobe_sel', 'lobe_attune']) expect(ui.parts[p], p).toBeTruthy();
     for (const id of PATTERN_IDS) for (const g of [0, 1, 2]) expect(ui.parts[`spool_${id}_${g}`], `spool_${id}_${g}`).toBeTruthy();
   });
+
+  it('has what Weaving draws: a large spool for every pattern and grade, the grade frames, a small rose for every slot mark, its glyph', () => {
+    for (const id of PATTERN_IDS) for (const g of [0, 1, 2]) expect(ui.parts[`bigspool_${id}_${g}`], `bigspool_${id}_${g}`).toBeTruthy();
+    for (const p of ['card_ashen', 'card_silver', 'card_gilded', 'mi_weaving']) expect(ui.parts[p], p).toBeTruthy();
+    // every spool's mark (the slots it fits) has its rose
+    for (const stat of SPOOL_STATS) {
+      const mark = roseMark(threadSpool(PATTERN_IDS[0], 0, stat, [[stat === 'crit' ? 'spd' : 'crit', 1]]));
+      expect(ui.parts[mark], `${stat}: ${mark}`).toBeTruthy();
+    }
+    for (let i = 0; i < 6; i++) expect(ui.parts['rose_' + i], `rose_${i}`).toBeTruthy();
+  });
 });
 
 describe('save', () => {
@@ -643,6 +667,39 @@ describe('save', () => {
     expect(writeSave(q)).toBe(text);
     expect(q.reliquary.file(STARTERS[0]).matrix.slots[3].spool).toEqual(spool);
     expect(q.reliquary.spools()).toHaveLength(1);
+  });
+
+  it('records a victory: its stars, its recruit, and the spools it finds as new finds, kept through a save', () => {
+    const p = newArchivist();
+    const [first] = allStages();
+    let k = 0;
+    const rng = () => ((k = (k * 9301 + 49297) % 233280) / 233280);
+    const won = recordVictory(p, first.id, 3, rng);
+    expect(won.recruited).toBe(first.recruit);
+    expect(p.stars[first.id]).toBe(3);
+    expect(won.spools).toHaveLength(2); // flawless: a second spool
+    expect(p.reliquary.freshCount()).toBe(2);
+    expect(spoolsHeld(p)).toBe(2);
+    const q = readSave(writeSave(p));
+    expect(q.reliquary.freshCount()).toBe(2);
+    expect(q.reliquary.spools()).toEqual(won.spools);
+    // a replay finds more, and recruits nobody again
+    const again = recordVictory(p, first.id, 1, rng);
+    expect(again.recruited).toBeUndefined();
+    expect(again.spools).toHaveLength(1);
+    expect(spoolsHeld(p)).toBe(3);
+  });
+
+  it('adds the sample stock (?spools=1) once, however often it is asked for', () => {
+    const p = newArchivist();
+    stockSample(p);
+    expect(spoolsHeld(p)).toBe(24);
+    const s = p.reliquary.spools().find((x) => x.main.stat === 'atk')!;
+    p.reliquary.equip(STARTERS[0], 0, s);
+    stockSample(p);
+    stockSample(p);
+    expect(spoolsHeld(p)).toBe(24);
+    expect(p.reliquary.freshCount()).toBe(0);
   });
 
   it('drops spools of the placeholder patterns the core Weave Patterns replaced', () => {

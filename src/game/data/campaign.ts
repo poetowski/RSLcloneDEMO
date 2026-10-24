@@ -31,6 +31,13 @@
 // placeholder stages he asked for: their texts walk his description, from the
 // mesa's top to the arbiter on it; their enemies are copies of the roster and
 // their powers tuned stand-ins; no champion joins there.
+//
+// Every stage drops Thread Spools of its area's two Weave Patterns (Jakub,
+// 2026-10-24: exactly two sets per area). Which two each area holds is a
+// stand-in: the Reach the basics (Sunder, Vigor), the Grove speed and guard
+// (Pulse, Ward), the Basin the debuff contest (Focus, Tranquility), the Scars
+// critical rate (Needle, Sunder again) and the Mesa critical damage (Apex,
+// Pulse again), so every pattern drops somewhere.
 import { LocationDef, StageDef } from './types';
 
 /**
@@ -83,6 +90,7 @@ export const LOCATIONS: LocationDef[] = [
     zone: 'zone1',
     blurb: 'A farming settlement in the reach of the rift, under an open sky. The broken loom has connected warriors from two worlds here, the Azure Crown and the Sanguine Dominion, who would never meet naturally.',
     map: { x: 322, y: 198 },
+    patterns: ['pattern_sunder', 'pattern_vigor'],
     stages: [
       {
         id: '1-1',
@@ -171,6 +179,7 @@ export const LOCATIONS: LocationDef[] = [
     blurb: 'A grove deep in the forest, inside Court of Root territory.',
     requires: '1-10',
     map: { x: 722, y: 206 },
+    patterns: ['pattern_pulse', 'pattern_ward'],
     stages: [
       {
         id: '2-1',
@@ -262,6 +271,7 @@ export const LOCATIONS: LocationDef[] = [
     blurb: 'Beyond the trailing roots of Verdant Grove, the soil gradually pales into silver sand, giving rise to low-lying basin floor carpeted in glowing twilight-moss.',
     requires: '2-10',
     map: { x: 1084, y: 200 },
+    patterns: ['pattern_focus', 'pattern_tranquility'],
     stages: [
       {
         id: '3-1',
@@ -341,6 +351,7 @@ export const LOCATIONS: LocationDef[] = [
     blurb: 'The easternmost land, beyond the Moonlit Basin and its eastern hills: a steppe under the day sky, cut by two deep ravines.',
     requires: '3-10',
     map: { x: 1452, y: 190 },
+    patterns: ['pattern_needle', 'pattern_sunder'],
     stages: [
       {
         id: '4-1',
@@ -420,6 +431,7 @@ export const LOCATIONS: LocationDef[] = [
     blurb: 'East of Earth Scars, the top of a snow-capped tabletop mountain, many more all round it, all connected with many candles.',
     requires: '4-10',
     map: { x: 1768, y: 194 },
+    patterns: ['pattern_apex', 'pattern_pulse'],
     stages: [
       {
         id: '5-1',

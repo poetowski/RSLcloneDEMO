@@ -18,7 +18,8 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
   - *Earth Scars*: the steppe by day, yurts with chains of flags on very long poles, wild yaks, two snowy peaks and a zeppelin;
   - the *Snowy Mesa*: a snowy tabletop mountain before sunset among many more, joined by cables hung with candles, a castle breathing purple dust, the arbiter's statue with his sword and a snowstorm coming on.
 - **A campaign** of five areas on a painted world map three screens wide that grows east area by area: from a rift in the west through the Fracture Reach's village in its autumn fields, the forest of the Verdant Grove, the Moonlit Basin under its own night and the steppe of Earth Scars with its two ravines, to the brink beyond which the Snowy Mesa's tabletop mountains rise out of a sea of cloud. One node per area opens its list of stages (drag the map, step between areas with the arrows, or press `M` for the whole world). Zone 1 holds 10 stages; Zones 2 to 5 hold 10 placeholder stages each, to see and test them. The second champion joins after the first battle.
-- **A Weaver Matrix** for every champion: six named slots in two triangles holding Thread Spools, each with a main stat and strands, and eight Weave Patterns that two spools of a kind weave, on the champion page's MATRIX tab (spools have no sources yet; `?spools=1` adds a sample).
+- **A Weaver Matrix** for every champion: six named slots in two triangles holding Thread Spools, each with a main stat and strands, and eight Weave Patterns that two spools of a kind weave, on the champion page's MATRIX tab.
+- **Weaving**, the storage of every spool: spools drop from every campaign stage, each area holding two Weave Patterns, and wait here as cards in groups by pattern, one grade per row, filtered by slot and by state; choose one to read it, weave it into a champion (the champion, then the slot, with a preview of the stats it changes and the patterns it completes), take it out or unravel it. New finds wear the NEW badge.
 - **A collection** of champions in groups by faction, the rarest first and one rarity per row, filtered by affinity and by class, with locked silhouettes, and a detail page with every animation and skill.
 - **The Academy**: an in-game codex that teaches combat, the turn meter, damage, affinities, all buffs, debuffs and special mechanics, with live demonstrations.
 - **Real mechanics**: turn meter, A1/A2/A3 cooldowns, 15 statuses, the affinity cycle (Ember beats Bloom, Bloom beats Tide, Tide beats Ember), accuracy against resistance for debuffs, counterattacks, dispels, lifesteal, execute, turn meter boosts, passives (Undying, Overdrive, Rebuke, which answers a critical hit, stat passives that raise a stat in every battle, Shields given to the frailest at the end of a turn, to an ally just struck or to the struck one himself, a crit that grows as allies fall, Poison answering a blow, Regen answering a debuff, and Taunt with a heal answering a critical hit that leaves its holder standing), a cleanse, a blow that heals its user, a buff placed before the blow, a fallen ally raised, bosses, stars, auto battle and speed controls.
@@ -29,6 +30,7 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 | ![Menu](docs/images/screen_menu.png) | ![Campaign](docs/images/screen_campaign.png) |
 | ![Team select](docs/images/screen_team.png) | ![Battle](docs/images/screen_battle.png) |
 | ![Collection](docs/images/screen_collection.png) | ![Champion](docs/images/screen_champion.png) |
+| ![Weaving](docs/images/screen_weaving.png) | ![Weave](docs/images/screen_weave.png) |
 | ![Academy](docs/images/screen_academy.png) | ![Recruit](docs/images/screen_recruit.png) |
 
 ## Run it
@@ -48,7 +50,7 @@ Open http://localhost:5173. The sprite gallery (every animation, effect and icon
 | campaign map | drag to move; arrows jump between areas; `W` `A` `S` `D` or `Shift` + arrows slide the map; `M` shows the whole world |
 | arrows + `Enter` in menus | move between buttons, activate |
 
-Deep links: `?screen=campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=1-5`, `&team=captain_gareth,rime_scholar`, `&champion=rime_scholar`, `&chapter=buffs`; `?demo=<skill_id>` loops one skill; `&zone=zone5` (a battle or team select on another area's background), `&hp=0.1` (scales the enemies' max HP); `?unlockall=1`, `?progress=1-4` (clear up to a stage), `?reset=1`, `?spools=1` (a sample stock of Thread Spools), `?skyflash=1` (a zone's rare flash in its sky every few seconds).
+Deep links: `?screen=campaign|team|battle|collection|champion|weaving|academy|options|recruit`, `&stage=1-5`, `&team=captain_gareth,rime_scholar`, `&champion=rime_scholar`, `&chapter=buffs`; `?demo=<skill_id>` loops one skill; `&zone=zone5` (a battle or team select on another area's background), `&hp=0.1` (scales the enemies' max HP); `?unlockall=1`, `?progress=1-4` (clear up to a stage), `?reset=1`, `?spools=1` (a sample stock of Thread Spools, added once), `?skyflash=1` (a zone's rare flash in its sky every few seconds).
 
 ## The champions
 
@@ -159,11 +161,11 @@ src/
   engine/            640x360 screen with whole-number scaling, game clock, bitmap font, particles
   game/data/         champions, statuses, categories, campaign, zones, Academy text, balance norms
   game/archivist.ts  the Master Archivist: the save, its migration, unlocks
-  game/reliquary/    Hero Soul Files and the Weaver Matrix: Thread Spools, strands, Weave Patterns
+  game/reliquary/    Hero Soul Files and the Weaver Matrix: Thread Spools, strands, Weave Patterns, drops
   game/battle/       pure rules: turn meter, skill resolution, statuses, counters, AI, simulator (unit tested)
   game/view/         battle scene and choreography, units, effects, HUD, zone renderer
-  game/screens/      main menu, campaign, team select, battle, collection, champion, Academy, options, recruit
-  game/ui/           the immediate-mode UI kit (buttons, panels, tooltips, keyboard focus)
+  game/screens/      main menu, campaign, team select, battle, collection, champion, Weaving, Academy, options, recruit
+  game/ui/           the immediate-mode UI kit (buttons, panels, tooltips, keyboard focus, scrolling), how spools read
 tools/art/           the procedural art pipeline (writes public/assets and docs/images)
 tools/balance.ts     the balance report
 tools/shots.ts       headless screenshots and frame bursts of the running game

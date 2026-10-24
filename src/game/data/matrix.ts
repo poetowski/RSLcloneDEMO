@@ -1,11 +1,14 @@
 // Weaver Matrix catalog: the six slots in two triangles and their names, the
-// spool grades, the main-stat values, the strand rules and the core Weave
-// Patterns. Rules and invariants: docs/MECHANICS_GUIDE.md 14, docs/DDD.md 4.7.
+// spool grades, the main-stat values, the strand rules, the core Weave
+// Patterns and how spools drop. Rules and invariants: docs/MECHANICS_GUIDE.md
+// 14, docs/DDD.md 4.7.
 //
 // Jakub's (docs/DESIGN_DECISIONS.md section 9, 2026-10-11): the slot names
 // and what each takes, and the eight core Weave Patterns with their stats,
-// values and pieces. Stand-ins until he sets them: the grades' main-stat
-// values, the strands and attunement (carried over from the approved outline).
+// values and pieces; spools drop from every stage, two patterns per area
+// (2026-10-24). Stand-ins until he sets them: the grades' main-stat values,
+// the strands and attunement (carried over from the approved outline), and
+// the drop numbers.
 import { MatrixLayout, SpoolStat, StatId, StatNode, WeavePatternDef } from './types';
 
 /** Every champion stat once; the record type makes the compiler insist on all of them. */
@@ -88,6 +91,23 @@ export const SPD_STRAND = 1;
 export const SPD_STRAND_CAP = 4;
 /** What an attuned strand gains. */
 export const ATTUNE_BONUS = 1;
+
+/**
+ * Spool drops (Jakub, 2026-10-24: spools drop from every campaign stage, and
+ * every area holds exactly two Weave Patterns, `LocationDef.patterns`; the
+ * numbers are his to tune). Stand-ins: a victory finds one spool and a flawless
+ * one (three stars) a second; the grade odds step evenly from an area's first
+ * stage to its last; the main stat is drawn by slot (a slot at random, then
+ * one of the stats it takes), so every slot gets its share of spools.
+ */
+export const DROPS = {
+  perVictory: 1,
+  flawlessBonus: 1,
+  /** [Ashen, Silver, Gilded] at an area's first stage */
+  firstStage: [0.7, 0.25, 0.05],
+  /** [Ashen, Silver, Gilded] at an area's last stage */
+  lastStage: [0.3, 0.45, 0.25],
+} as const;
 
 /**
  * The core Weave Patterns (Jakub's CoreWeavePatterns, 2026-10-11): each is a

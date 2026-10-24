@@ -71,6 +71,8 @@ Section 7 lists what is not decided.
 | 2026-10-18 | The Automated Soul, an Elite Damage of the Ashveil Reign; the first status a skill places before its hit | 3.4, 5.7, 7, 32 |
 | 2026-10-19 | Irving Wellbington, an Elite Tank of the Ashveil Reign; the first passive that answers a critical hit on its holder; his shield much bigger | 3.4, 5.7, 7, 33 |
 | 2026-10-19 | Zone 5, the Snowy Mesa: its name and description; its battle background, the arbiter's sword in front of his arm and a dragon's bone at the front left on his word; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.8, 7 |
+| 2026-10-24 | Weaving: a main-menu section that stores the spools, a full inventory screen matching the Champions screen; spools drop from every campaign stage, each area holding exactly two Weave Patterns; no improving spools for now; the numbers are placeholders he tunes later. The button first read WEAVING STORAGE, then WEAVING | 7, 9.4 |
+| 2026-10-24 | The Spindle of Fate: a seventh, central piece of gear, a placeholder whose system comes later | 7, 9.5, 11 |
 
 ---
 
@@ -1047,7 +1049,16 @@ open questions.
 - Art pipeline specification
 - Save and progression *(gear decided: the Weaver Matrix, section 9; levels,
   ranks, ascension and skill upgrades are not)*
-- Where spools and materials come from
+- Where materials come from *(spools decided 2026-10-24: they drop from every
+  campaign stage, two Weave Patterns per area, section 9.4)*
+- The spool numbers: Jakub, 2026-10-24, "regarding numbers, i would like to
+  tune them, but for now just work with placeholder proposals and remember
+  this is not final design" *(the game stands in which two patterns each area
+  holds, one spool a victory and a second for a flawless one, grade odds
+  rising through an area's stages, the main stat drawn by slot, and the main
+  values, strands and attunement of 9.2; MECHANICS_GUIDE.md 14)*
+- Improving spools: "We do not have to improve spools as of now" (2026-10-24)
+- The Spindle of Fate's system (section 9.5)
 - How far Resistance must exceed Accuracy to resist a debuff *(the game
   stands in a curve, section 10)*
 - Zone 1's enemies *(the game stands in copies of the two starters)*
@@ -1332,6 +1343,49 @@ How the game reads the values, and what the record leaves open, are in
 [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14: stand-ins until Jakub confirms
 them.
 
+### 9.4 Weaving and spool drops (received 2026-10-24)
+
+Jakub's words, verbatim:
+
+> i want to have in main menu new navigational button called Weaving Storage.
+> develop full inventory screen for this section. be consistent with UI and match how we now have champions.
+> Spools should drop from every campaign node. Each campaign area has exactly 2 sets which can drop from every stage of that specific area.
+> also fix small dev bug.
+> regarding numbers, i would like to tune them, but for now just work with placeholder proposals and remember this is not final design.
+> We do not have to improve spools as of now.
+> be creative, stay consistent.
+
+Then, while it was being built:
+
+> change WEAVING STORAGE for WEAVING only instead so we have smaller wording
+
+Built:
+
+- **WEAVING** on the main menu, between CHAMPIONS and ACADEMY: how many
+  spools the archivist holds, and the NEW badge while new finds wait.
+- **The Weaving screen**, laid out like the Champions screen: the spools as
+  cards in groups by Weave Pattern, the finest grade first and every grade
+  on rows of its own; filters by slot (the slots a spool fits) and by state
+  (new, loose, woven) that combine; a panel that reads the chosen spool out
+  and weaves it into a champion (choosing the champion, then the slot, with
+  a preview of the stats it changes), takes it out or unravels it.
+- **Drops:** every victory on a campaign stage finds spools, each of one of
+  its area's two Weave Patterns. Which two each area holds, and every
+  number, are placeholders (section 7): the Fracture Reach Sunder and Vigor,
+  the Verdant Grove Pulse and Ward, the Moonlit Basin Focus and
+  Tranquility, Earth Scars Needle and Sunder, the Snowy Mesa Apex and Pulse.
+- **The dev bug** (`?spools=1` added another 24 sample spools every time the
+  link was opened): the sample is added once, however often.
+
+### 9.5 The Spindle of Fate (2026-10-24)
+
+Jakub, verbatim: "Spindle of fate if i understand correctly is a seventh
+central piece of gear, we can leave it like that for now as a placeholder and
+we will create new system for that later."
+
+Until then it is a name with nothing built; the logo's rose window already
+holds a seventh jewel at its centre, round which the six lobes stand.
+
 ---
 
 ## 10. Combat rules and champion stats
@@ -1384,8 +1438,9 @@ them.
 - **Lexicon:** the Master Archivist (the player), the Reliquary (the vault of
   everything the Archivist holds), a Hero Soul File (one champion's record),
   the Weaver Matrix (a champion's gear), a Thread Spool (one piece of gear), a
-  Weave Pattern (a set bonus). The Spindle of Fate is a placeholder name with
-  no meaning yet.
+  Weave Pattern (a set bonus), Weaving (the main-menu section that stores the
+  spools, 9.4). The Spindle of Fate: a seventh, central piece of gear, a
+  placeholder until its system is made (Jakub, 2026-10-24, 9.5).
 
 ---
 

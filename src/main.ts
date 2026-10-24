@@ -1,9 +1,7 @@
 import './style.css';
 import { H, Screen as Canvas, W } from './engine/screen';
 import { App } from './game/app';
-import { newArchivist, recordClear, saveArchivist, unlockEverything } from './game/archivist';
-import { PATTERN_IDS, SPOOL_STATS } from './game/data/matrix';
-import { Grade, rollSpool } from './game/reliquary/matrix';
+import { newArchivist, recordClear, saveArchivist, stockSample, unlockEverything } from './game/archivist';
 import { CHAMPIONS } from './game/data/champions';
 import { allStages, STARTERS } from './game/data/campaign';
 import { ZONES } from './game/data/zones';
@@ -16,6 +14,7 @@ import { MainMenu } from './game/screens/menu';
 import { OptionsScreen } from './game/screens/options';
 import { RecruitScreen } from './game/screens/recruit';
 import { TeamScreen } from './game/screens/team';
+import { WeavingScreen } from './game/screens/weaving';
 import { loadAssets } from './game/view/assets';
 
 async function boot() {
@@ -52,14 +51,12 @@ async function boot() {
     saveArchivist(app.archivist);
   }
   if (params.get('unlockall') === '1') unlockEverything(app.archivist);
-  // ?spools=1 adds 24 sample spools to the stock (development and screenshots: spools have no sources yet)
+  // ?spools=1 tops the stock up with 24 sample spools (development and screenshots); held once, however often the link is opened
   if (params.get('spools') === '1') {
-    let seed = 11;
-    const rnd = () => (seed = (seed * 48271) % 2147483647) / 2147483647;
-    for (let i = 0; i < 24; i++) app.archivist.reliquary.addSpool(rollSpool(PATTERN_IDS[i % PATTERN_IDS.length], (i % 3) as Grade, SPOOL_STATS[(i * 5) % SPOOL_STATS.length], rnd));
+    stockSample(app.archivist);
     saveArchivist(app.archivist);
   }
-  // ?progress=2-1 clears every stage up to and including 2-1 (3 stars, recruits included)
+  // ?progress=2-1 clears every stage up to and including 2-1 (3 stars, recruits included, no spools found)
   const upTo = params.get('progress');
   if (upTo) {
     for (const s of allStages()) {
@@ -74,14 +71,15 @@ async function boot() {
     team: (stageId) => app.go(() => new TeamScreen(app, stageId)),
     battle: (stageId, team) => app.go(() => new BattleScreen(app, { stageId, team })),
     collection: () => app.go(() => new CollectionScreen(app)),
-    champion: (id, list) => app.go(() => new ChampionScreen(app, id, list)),
+    champion: (id, list, at) => app.go(() => new ChampionScreen(app, id, list, at)),
+    weaving: (at) => app.go(() => new WeavingScreen(app, at)),
     academy: (chapter) => app.go(() => new AcademyScreen(app, chapter)),
     options: () => app.go(() => new OptionsScreen(app)),
     recruit: (id) => app.go(() => new RecruitScreen(app, id, () => app.router.campaign())),
     demo: (skill, back) => app.go(() => new BattleScreen(app, { demo: skill, back })),
   };
 
-  // deep links: ?screen=campaign|team|battle|collection|champion|academy|options|recruit
+  // deep links: ?screen=campaign|team|battle|collection|champion|weaving|academy|options|recruit
   //   &stage=1-2 &team=captain_gareth,rime_scholar &champion=captain_gareth &chapter=buffs   ?demo=<skill id>
   //   &zone=zone2 (battle, team: the stage on another background)
   const r = app.router;
@@ -105,6 +103,9 @@ async function boot() {
       break;
     case 'champion':
       r.champion(params.get('champion') ?? CHAMPIONS[0].id);
+      break;
+    case 'weaving':
+      r.weaving();
       break;
     case 'academy':
       r.academy(params.get('chapter') ?? undefined);

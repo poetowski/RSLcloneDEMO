@@ -81,6 +81,11 @@ export function fits(node: StatNode, spool: ThreadSpool): boolean {
   return node.kind === 'fixed' ? node.stat === spool.main.stat : node.stats.includes(spool.main.stat);
 }
 
+/** The slots of a layout that take this spool, in slot order: one for most main stats, the three choice slots for a base stat in %. */
+export function slotsFor(layout: MatrixLayout, spool: ThreadSpool): SlotIndex[] {
+  return layout.flatMap((node, i) => (fits(node, spool) ? [i as SlotIndex] : []));
+}
+
 /** One of the six slots: its stat node and the spool in it, if any. */
 export interface MatrixSlot {
   readonly index: SlotIndex;
