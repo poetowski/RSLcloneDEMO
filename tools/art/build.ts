@@ -1,7 +1,7 @@
 // Generates every runtime asset into public/assets. Deterministic: running it
 // twice produces byte-identical files.
 //   npm run art                    (everything)
-//   npm run art -- champions       (one group: champions | fx | zones | ui | font | map)
+//   npm run art -- champions       (one group: champions | fx | zones | ui | font | map | menu)
 //   npm run art -- champions captain_gareth  (one champion)
 //   npm run art -- zones zone1     (one zone)
 import fs from 'node:fs';
@@ -15,6 +15,7 @@ import { buildZones } from './zones/index.ts';
 import { buildUi } from './ui/index.ts';
 import { buildFont } from './font.ts';
 import { buildMap } from './map.ts';
+import { buildSanctum } from './sanctum.ts';
 
 export const OUT = path.resolve('public/assets');
 
@@ -91,4 +92,5 @@ if (want('zones')) buildZones(OUT, sub);
 if (want('font')) buildFont(OUT);
 if (want('ui')) buildUi(OUT, portraits);
 if (want('map')) buildMap(OUT);
+if (want('menu')) buildSanctum(OUT);
 console.log(`art done in ${((Date.now() - t0) / 1000).toFixed(1)}s`);

@@ -73,6 +73,7 @@ Section 7 lists what is not decided.
 | 2026-10-19 | Zone 5, the Snowy Mesa: its name and description; its battle background, the arbiter's sword in front of his arm and a dragon's bone at the front left on his word; the world map extended east to it; ten placeholder stages | 5.4a, 5.5, 5.8, 7 |
 | 2026-10-24 | Weaving: a main-menu section that stores the spools, a full inventory screen matching the Champions screen; spools drop from every campaign stage, each area holding exactly two Weave Patterns; no improving spools for now; the numbers are placeholders he tunes later. The button first read WEAVING STORAGE, then WEAVING | 7, 9.4 |
 | 2026-10-24 | The Spindle of Fate: a seventh, central piece of gear, a placeholder whose system comes later | 7, 9.5, 11 |
+| 2026-10-24 | The main menu redesigned: a diorama of its own, static, its places clicked instead of buttons, only the champions changing each time it opens; "very epic", "celestial or planetar", "full creativity" | 10 |
 
 ---
 
@@ -1418,6 +1419,8 @@ holds a seventh jewel at its centre, round which the six lobes stand.
   A passive that raises a stat comes on top of the rarity's stat budget, and
   the champion's stats outside battle (the collection, the champion page)
   never include it: there it is the passive's text under the skills.
+- **The main menu** (2026-10-24), Jakub's words: "i am thinking about main menu redesign. instead of changing dioramas, only champions would be changing at each refresh of main menu, diorama would be new and static, disagned just for main menu and instead of navigational buttons user can click on objects or building from diorama instead. i want to make the diorama very epic design, something exclusive and creative high fantasy with moving particles. maybe something celestial or planetar, idk. go. full creativity"
+  Built (all of it a first take, `tools/art/sanctum.ts`, `src/game/view/sanctum.ts`): the Sanctum, the Archivist's island adrift under the broken celestial Loom (the premise, section 1). Overhead the Loom's golden rim, its threads of starlight hanging loose, cracked open on the right with its fragments drifting and veils of its cloth streaming from the break; a ringed giant planet beyond; a nebula; the pole star, the key light. The places: the Starbridge Gate (the campaign), the Reliquary (the champions; its rose window is the logo's), the Weaver's Spire (Weaving; its spool draws a golden thread up toward the rim's break), the Observatory (the Academy), an astrolabe on a drifting rock (the options). A few of the champions you own stand on the plaza, a different few each time the menu opens.
 - **Regen and Weaken** (2026-10-12), Jakub's words: "regen should heal 15% max HP instead of 7.5%. change it. remove weken from debuffs."
   Regen heals 15% of the holder's max HP at the start of each of its turns,
   and Weaken (+25% damage taken) is gone from the game.

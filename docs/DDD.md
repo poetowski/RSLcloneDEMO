@@ -112,6 +112,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Zone (combat background) | where battles happen: behaviour, art, built layout, runtime renderer | `ZoneDef`, `ZoneArt` (art module), `ZoneJson`, `ZoneView` |
 | Home zone | the zone a faction's champions stand in outside battle | `homeZone()` |
 | Diorama | a living zone behind a menu, with champions standing in it | `Diorama`, `Figure` |
+| Sanctum | the main menu's own diorama: the island under the broken Loom, its places (the Starbridge Gate, the Reliquary, the Weaver's Spire, the Observatory, the astrolabe) clicked to go on, a few owned champions on its plaza | `SanctumView`, `MenuPlace`, `MenuJson` |
 | Prop, prop kind | a zone sprite and how it behaves: static, loop, pulse, fire (its own flames or the shared one), bob, drift (across the sky, coming round again), roam (to and fro along its row, an animal grazing at each end); in a layer: far, back, floor, fg | `PropKind`, `PropPlacement` |
 | Spark emitter | a line of a zone that sheds sparks (Zone 1's rift) | `SparkEmitter`, `ZoneJson.sparks` |
 | Sky flash | a rare moment when a zone's sky lights up in a strange colour (Zone 1's rift, every 10-25 s) | `ZoneDef.flash`, `ZoneView.drawFlash` |
@@ -561,7 +562,7 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | DR-13 | low | `src/game/view/scene.ts` | choreography keyed by id: the Arrow Rain volley, projectile trails as hex literals, arcs, slow projectiles, `crack` / `holy` / `ice_spikes`, the `ADDITIVE` list; each new projectile or light effect needs a code edit | R-9 |
 | DR-14 | low | `src/game/view/scene.ts` | `applyEvent` is not exhaustive: a new event kind compiles and shows nothing; `passive` always reads `OVERDRIVE!` whatever the passive | R-5; in part 2026-10-10: the `passive` event carries its `effect`, and a Rebuke has its own cue |
 | DR-15 | low | `src/game/profile.ts` (now `archivist.ts`), screens | profile fields are written from several screens and stored ids are never validated: a renamed champion makes `champion()` throw on load | R-10, R-11; in part 2026-10-08: loading drops unknown ids, and the NEW badge goes through `Reliquary.markSeen`; 2026-10-10: a team whose champions are all gone (the stand-ins renamed to `captain_gareth` and `rime_scholar`) starts over from the starters (test) |
-| DR-16 | low | `src/game/screens/base.ts` | menu dioramas draw shadows with `ctx.ellipse` (anti-aliased); battle shadows are built pixel by pixel | build the diorama shadow the same way |
+| DR-16 | low | `src/game/screens/base.ts`, `src/game/screens/menu.ts` | menu dioramas and the Sanctum draw shadows with `ctx.ellipse` (anti-aliased); battle shadows are built pixel by pixel | build the diorama shadow the same way |
 | DR-17 | low | `src/game/screens/battle.ts` | battle seeds come from `Math.random` and are never shown: a reported battle cannot be replayed | R-12 |
 | DR-18 | low | `tools/balance.ts` | re-implements the mulberry32 generator instead of using `Rng` | import `Rng` |
 | DR-19 | trivial | `src/main.ts` | `?? STARTERS.join(',')` is unreachable (`join` never returns nullish) | simplify |

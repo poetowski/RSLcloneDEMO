@@ -96,7 +96,7 @@ The Master Archivist (`src/game/archivist.ts`) is the player and their save, sto
 | Field | Meaning |
 | --- | --- |
 | `stars` | best stars per stage id |
-| `team` | last team, restored in team select and shown on the main menu |
+| `team` | last team, restored in team select |
 | `read` | Academy chapters read |
 | `settings` | default battle speed and auto |
 | `reliquary` | the champions owned, starters included |
@@ -138,5 +138,7 @@ Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `r
 | Options | `screens/options.ts` | `?screen=options` |
 | Recruit ceremony | `screens/recruit.ts` | `?screen=recruit&champion=rime_scholar` |
 | Skill demo | `screens/battle.ts` (demo mode) | `?demo=iron_blow` |
+
+The main menu is the Sanctum (`src/game/view/sanctum.ts`, art `tools/art/sanctum.ts`): the island under the broken Loom, whose places are the menu: the Starbridge Gate (campaign), the Reliquary (champions), the Weaver's Spire (Weaving), the Observatory (Academy), the astrolabe (options); a few owned champions, a different few each visit, stand on its plaza ([UI_GUIDE.md](UI_GUIDE.md) 4).
 
 All navigation goes through `app.router` (`src/main.ts`), which wraps each switch in a dithered dissolve. `?unlockall=1`, `?reset=1` and `?spools=1` change the save before the first screen opens.

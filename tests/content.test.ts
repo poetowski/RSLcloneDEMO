@@ -551,6 +551,47 @@ describe('font', () => {
   });
 });
 
+// Jakub, 2026-10-24: the main menu's own diorama, its places clicked instead of buttons, only the champions changing
+describe('main menu sanctum', () => {
+  const menu = json('public/assets/menu/menu.json') as {
+    sprites: Record<string, { frames: number[][]; layer: string; mode: string; bob?: unknown }>;
+    order: string[];
+    hotspots: { id: string; sprites: string[]; outline: number[]; label: number[] }[];
+    spots: { x: number; y: number }[];
+    warp: unknown[];
+    thread: unknown[];
+    lights: unknown[];
+  };
+
+  it('has a place for every way on from the menu, each made of sprites that exist, with its outline and label', () => {
+    expect(menu.hotspots.map((h) => h.id).sort()).toEqual(['academy', 'campaign', 'champions', 'options', 'weaving']);
+    for (const h of menu.hotspots) {
+      expect(h.sprites.length, h.id).toBeGreaterThan(0);
+      for (const s of h.sprites) expect(menu.sprites[s], `${h.id} -> ${s}`).toBeTruthy();
+      expect(h.outline[2] * h.outline[3], `${h.id} outline`).toBeGreaterThan(0);
+      expect(h.label[0] >= 0 && h.label[0] <= 640 && h.label[1] >= 0 && h.label[1] <= 360, `${h.id} label`).toBe(true);
+    }
+  });
+
+  it('draws every sprite once, with its frames, and its motion on whole frames', () => {
+    expect([...menu.order].sort()).toEqual(Object.keys(menu.sprites).sort());
+    for (const [k, s] of Object.entries(menu.sprites)) {
+      expect(s.frames.length, k).toBeGreaterThan(0);
+      if (s.mode === 'loop') expect(s.frames.length, `${k} loops`).toBeGreaterThan(1);
+      expect(['far', 'island', 'building', 'front'], k).toContain(s.layer);
+    }
+    expect(fs.existsSync('public/assets/menu/sky.png') && fs.existsSync('public/assets/menu/scene.png')).toBe(true);
+  });
+
+  it('has room for champions, and the paths its light runs along', () => {
+    expect(menu.spots.length).toBeGreaterThanOrEqual(3);
+    for (const s of menu.spots) expect(s.y, 'a champion stands on the island').toBeGreaterThan(240);
+    expect(menu.warp.length).toBeGreaterThan(0);
+    expect(menu.thread.length).toBeGreaterThan(1);
+    expect(menu.lights.length).toBeGreaterThan(0);
+  });
+});
+
 describe('weaver matrix art', () => {
   it('has the rose, the slot rings and a spool icon for every pattern and grade', () => {
     for (const p of ['matrix_rose', 'lobe_sel', 'lobe_attune']) expect(ui.parts[p], p).toBeTruthy();

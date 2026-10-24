@@ -53,7 +53,7 @@ Add a `ZoneDef` with the same id to `src/game/data/zones.ts`:
 | `flash` | optional: now and then the sky lights up for a moment in a strange colour, `{ at, every, ms, colors }` (Zone 1: from its rift every 10-25 s for 1.7 s); preview with `?skyflash=1` |
 | `shootingStars` | optional: now and then a shooting star crosses the sky, every `[min, max]` ms (Zone 3: 14-32 s); rare events stay rare, a content test keeps both at 10 s or more |
 
-Then point a location at it (`zone: '<id>'` in `campaign.ts`); while the location has no stages, `&zone=<id>` on the battle and team deep links shows the background with any stage. Champions whose `faction` belongs to the place show it behind their detail page and in their Academy demos: map the faction to the zone in `homeZone()` (`src/game/data/zones.ts`). The main menu stands in the zone of the newest open location.
+Then point a location at it (`zone: '<id>'` in `campaign.ts`); while the location has no stages, `&zone=<id>` on the battle and team deep links shows the background with any stage. Champions whose `faction` belongs to the place show it behind their detail page and in their Academy demos: map the faction to the zone in `homeZone()` (`src/game/data/zones.ts`). The collection and Weaving stand in the zone of the newest open location; the main menu is the Sanctum, a diorama of its own (`tools/art/sanctum.ts`), and no zone stands behind it.
 
 ## 4. Build and verify (all must pass)
 
