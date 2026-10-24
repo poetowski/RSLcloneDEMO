@@ -18,6 +18,8 @@ export interface ChampionAtlasJson {
   footprint?: number;
   frames: Record<string, Rect6>;
   anims: Record<string, { loop: boolean; ms: number[]; hits: number[]; events: Record<string, string> }>;
+  /** a burning blade (the Paladin's sword), key as in `frames`: its base and tip in the frame box, and its heat (1 at rest) */
+  glow?: Record<string, [number, number, number, number, number]>;
 }
 
 export interface FxJson {

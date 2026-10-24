@@ -15,10 +15,18 @@
 // others swirling behind it and bursts on the enemy, the motes scattering and
 // sinking as they dim; in Quickening they flare round her raised staff, then
 // wind up round each ally with streaks of speed; her Bitter Motes circle the
-// enemy that struck her, close in and sting, turning the green of poison.
-import { dith, ellipseRing, polyFill, rampDither } from '../paint.ts';
-import { Bitmap, RGBA, rng } from '../raster.ts';
-import { burst, cut, FxDef, motes, ramps, ring, sparks, W } from './kit.ts';
+// enemy that struck her, close in and sting, turning the green of poison. The
+// Paladin's are the fire of his sword, the brief's own (it burns, and it is
+// very bright), never his affinity: Searing Cut lands as a line of white-gold
+// fire with flames licking up off it; Beacon blazes up as a star of light at
+// the tip of the raised blade, its light streaming over each enemy (a glare,
+// motes of it sinking as they falter) and raising the shape of his shield,
+// the double cross on it, before each ally; in Trial by Fire the levelled
+// blade roars up along its length, and the sweep passes through each enemy as
+// a flat arc of flame, flames bursting up where it went.
+import { disc, dith, ellipseRing, polyFill, rampDither } from '../paint.ts';
+import { Bitmap, hash2, RGBA, rng } from '../raster.ts';
+import { burst, cut, flame, FxDef, motes, ramps, ring, sparks, W } from './kit.ts';
 
 const DU = ramps.dust;
 const GO = ramps.gold;
@@ -108,6 +116,57 @@ function kite(b: Bitmap, cx: number, cy: number, hw: number, hh: number, fade: n
       if (dith(x, y, fade)) b.set(x, y, k === 0 ? W : GO[4]);
     }
   }
+}
+
+/** The Paladin's fire: dark red at its edge to white-hot at its root. */
+const FI = ramps.fire;
+/** The heart of his blade's light: white-hot gold. */
+const CO = ramps.core;
+
+/** A star of light round (cx, cy): its longest ray up, shorter ones down and to the sides, short diagonals, the long rays thick near the heart; `fade` 0..1. */
+function star(b: Bitmap, cx: number, cy: number, len: number, fade: number, ramp: RGBA[]) {
+  const arms: [number, number, number][] = [[0, -1, 1.25], [0, 1, 0.55], [-1, 0, 0.8], [1, 0, 0.8], [-0.71, -0.71, 0.45], [0.71, -0.71, 0.45], [-0.71, 0.71, 0.3], [0.71, 0.71, 0.3]];
+  for (const [dx, dy, k] of arms) {
+    const l = len * k;
+    const wide = k >= 0.8;
+    for (let s = 1; s <= l; s++) {
+      const f = 1 - s / (l + 1);
+      for (const o of wide && s < l * 0.45 ? [-1, 0, 1] : [0]) {
+        const x = Math.round(cx + dx * s - dy * o), y = Math.round(cy + dy * s + dx * o);
+        if (!dith(x, y, fade * (0.45 + 0.55 * f) * (o ? 0.7 : 1))) continue;
+        b.set(x, y, rampDither(ramp, (o ? 0.8 : 1.4) + f * 2.8, x, y));
+      }
+    }
+  }
+}
+
+/**
+ * The Paladin's shield in gold light: the Swiss shape (a straight top, straight
+ * sides, the lower half curving to a point), a dithered body, a bright rim and
+ * the white double cross; `fade` 0..1.
+ */
+function swissShield(b: Bitmap, cx: number, cy: number, hw: number, hh: number, fade: number) {
+  const top = cy - hh * 0.55, side = cy + hh * 0.05, foot = cy + hh;
+  const curve = (sgn: number, u: number): [number, number] => [cx + sgn * hw * Math.pow(Math.cos((u * Math.PI) / 2), 0.85), side + (foot - side) * (1 - Math.cos((u * Math.PI) / 2))];
+  const pts: [number, number][] = [[cx - hw, top], [cx + hw, top]];
+  for (let k = 0; k < 8; k++) pts.push(curve(1, k / 8));
+  pts.push([cx, foot]);
+  for (let k = 7; k >= 0; k--) pts.push(curve(-1, k / 8));
+  polyFill(b, pts, (x, y) => (dith(x, y, fade * 0.45) ? GO[2] : 0));
+  for (let k = 0; k < pts.length; k++) {
+    const [x0, y0] = pts[k], [x1, y1] = pts[(k + 1) % pts.length];
+    const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) * 1.5);
+    for (let s = 0; s <= n; s++) {
+      const x = Math.round(x0 + ((x1 - x0) * s) / n), y = Math.round(y0 + ((y1 - y0) * s) / n);
+      if (dith(x, y, fade)) b.set(x, y, k === 0 ? W : GO[4]);
+    }
+  }
+  const bar = (x0: number, y0: number, x1: number, y1: number) => {
+    for (let y = Math.round(y0); y <= Math.round(y1); y++) for (let x = Math.round(x0); x <= Math.round(x1); x++) if (dith(x, y, fade)) b.set(x, y, W);
+  };
+  bar(cx - 0.5, top + hh * 0.2, cx + 0.5, foot - hh * 0.4);
+  bar(cx - hw * 0.4, top + hh * 0.45, cx + hw * 0.4, top + hh * 0.45 + 1);
+  bar(cx - hw * 0.62, top + hh * 0.85, cx + hw * 0.62, top + hh * 0.85 + 1);
 }
 
 export const AZURE_CROWN_FX: Record<string, FxDef> = {
@@ -386,6 +445,149 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
       }
       if (i >= 5 && i <= 7) burst(b, cx, cy, 6, 1, [6, 9, 6][i - 5], 1, GR, 0.3);
       if (i >= 6) sparks(b, cx, cy, 10, 16, (i - 6) / 3, GR, 337, 12);
+    },
+  },
+  /**
+   * Searing Cut: the burning blade cuts from high behind to low in front: a
+   * line of white-gold fire, flames licking up off it as it fades, sparks
+   * flying.
+   */
+  searing_cut: {
+    w: 72, h: 72, n: 8, ms: 45, ax: 0.5, ay: 0.5, pad: [6, 6, 10, 6],
+    draw: (b, t, i) => {
+      const reach = [0.55, 1, 1, 1, 1, 1, 1, 1][i];
+      const heat = [1.45, 1.35, 1.1, 0.85, 0.65, 0.48, 0.32, 0.2][i];
+      const th = [3.4, 4.4, 3.6, 2.8, 2.0, 1.4, 1.0, 0.8][i];
+      if (i < 7) cut(b, 12, 10, 62, 60, -2, th, FI, heat, reach);
+      if (i === 1 || i === 2) burst(b, 38, 36, 8, 2, [13, 9][i - 1], 1.4, CO, 0.4);
+      if (i >= 2) {
+        for (let k = 0; k < 6; k++) {
+          const u = 0.18 + k * 0.13;
+          const h = (9 - (i - 2) * 1.4) * (0.6 + 0.4 * hash2(k, 3, 7));
+          flame(b, 12 + 50 * u, 10 + 50 * u, h, 2.2, k * 1.7 + i * 0.9, FI, 1.1 - (i - 2) * 0.13);
+        }
+      }
+      if (i >= 1) sparks(b, 38, 36, 16, 30, (i - 1) / 6, FI, 401, 18);
+    },
+  },
+  /**
+   * Beacon's flare: the burning sword raised high blazes up: a star of
+   * white-gold light at its tip, two rings of light opening out, motes of fire
+   * rising. Played on the skill's `cast` event at the actor's head point (8 px
+   * ahead of the feet and 8 below the top of his 75 px standing sprite); the
+   * tip of his raised blade, its fire above it, stands 13.6 px behind that
+   * point and 50 above it, where the star sits.
+   */
+  beacon_flare: {
+    w: 96, h: 110, n: 11, ms: 60, ax: 0.6417, ay: 0.9273,
+    draw: (b, t, i) => {
+      const cx = 48, cy = 52;
+      const grow = [0.35, 0.7, 1, 1, 0.95, 0.85, 0.7, 0.55, 0.4, 0.25, 0.12][i];
+      star(b, cx, cy, 36 * Math.min(1, grow * 1.2), grow, CO);
+      if (i < 6) disc(b, cx, cy, [4, 6, 7, 6, 4, 2][i], (x, y, d) => rampDither(CO, 4.4 - d * 2.2, x, y));
+      for (const lag of [0, 3]) {
+        const tt = (i - lag) / 7;
+        if (tt <= 0 || tt > 1) continue;
+        const r = 6 + tt * 34;
+        ring(b, cx, cy, r, r * 0.55, Math.max(1, 3.2 - tt * 2.2), GO, 1.3 - tt * 0.8);
+      }
+      motes(b, cx, cy + 20, 30, 46, 14, t, FI, 409);
+    },
+  },
+  /**
+   * Beacon reaches an enemy: its light streams in from the Paladin's side
+   * (drawn from the left; the battle turns it), a glare flashes across the
+   * eyes, and motes of the light sink slowly round the enemy as it falters
+   * (Slow). Played at the chest.
+   */
+  beacon_glare: {
+    w: 64, h: 64, n: 10, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const cx = 32, cy = 26;
+      // a wash of the light sweeping over it from his side, its leading edge bright
+      const front = 6 + t * 84;
+      for (let y = 0; y < 60; y++) {
+        const env = Math.max(0, 1 - Math.abs(y - cy) / 30);
+        for (let x = 0; x < 64; x++) {
+          const dd = front - x;
+          if (dd < 0 || dd > 24) continue;
+          const f = 1 - dd / 24;
+          if (!dith(x, y, f * env * 0.85 * (1 - t * 0.5))) continue;
+          b.set(x, y, rampDither(GO, 0.8 + f * 3.2, x, y));
+        }
+      }
+      // the glare across its eyes
+      if (i >= 1 && i <= 5) burst(b, cx + 2, cy - 8, 8, 1, [6, 10, 12, 9, 5][i - 1], 1.2, GO, 0.3);
+      // motes of the light sinking slowly round it as it falters
+      const m = rng(431);
+      for (let k = 0; k < 10; k++) {
+        const x0 = cx + (m() - 0.5) * 36, start = 0.15 + m() * 0.3;
+        const tt = (t - start) / (1 - start);
+        if (tt <= 0) continue;
+        const x = Math.round(x0 + Math.sin(tt * 4 + k) * 2), y = Math.round(cy - 10 + tt * 32);
+        if (!dith(x, y, 1 - tt * 0.7)) continue;
+        b.set(x, y, tt < 0.5 ? GO[4] : GO[2]);
+        if (k % 3 === 0 && tt < 0.6) b.set(x, y - 1, GO[2]);
+      }
+    },
+  },
+  /**
+   * Beacon reaches an ally: the shape of his shield rises before it in gold
+   * light, the white double cross on it, then fades (DEF Up); a ring settles
+   * at its feet. Played at the chest.
+   */
+  beacon_ward: {
+    w: 56, h: 72, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 32;
+      const grow = [0.5, 0.8, 1, 1, 1, 1, 1, 1, 1, 1][i];
+      const fade = i < 6 ? 1 : [0.75, 0.5, 0.3, 0.15][i - 6];
+      swissShield(b, cx, cy, 10 * grow, 15 * grow, fade);
+      if (i >= 1) ring(b, cx, cy + 32, 10 + t * 10, 3 + t * 2, 1.2, GO, 1.1 - t * 0.6);
+      if (i >= 1 && i <= 6) sparks(b, cx, cy, 10, 24, (i - 1) / 6, GO, 437, 0);
+    },
+  },
+  /**
+   * Trial by Fire's challenge: the burning sword levelled at the enemy roars
+   * up along its length, a flash at its tip, sparks flying. Played on the
+   * `cast` event at the actor's head point (8 px ahead of the feet, 8 below
+   * the top of his 75 px standing sprite); the middle of his levelled blade is
+   * 14.4 px ahead of that point and 2 below it, and the blade runs up and
+   * forward at 58 degrees, as drawn here.
+   */
+  trial_blaze: {
+    w: 64, h: 80, n: 9, ms: 55, ax: 0.2758, ay: 0.575, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const bx = 24.95, by = 59.3, tx = 39.05, ty = 36.7;
+      const roar = [0.6, 1, 1, 0.9, 0.75, 0.6, 0.45, 0.3, 0.18][i];
+      for (let k = 0; k <= 6; k++) {
+        const u = k / 6;
+        const h = (8 + 9 * hash2(k, i, 11)) * roar;
+        flame(b, bx + (tx - bx) * u, by + (ty - by) * u, h, 2.4, k * 1.9 + i * 1.1, FI, 0.9 + roar * 0.5);
+      }
+      if (i < 4) burst(b, tx, ty, 8, 2, [9, 14, 12, 8][i], 1.4, CO, 0.25);
+      sparks(b, 32, 48, 16, 28, t, FI, 443, -14);
+    },
+  },
+  /**
+   * Trial by Fire lands: the sweep of fire passes through the enemy, a flat
+   * arc of flame with its leading edge thick, then flames burst up where it
+   * passed and embers fly. Played at the chest.
+   */
+  trial_flames: {
+    w: 96, h: 64, n: 9, ms: 50, ax: 0.5, ay: 0.5, pad: [6, 4, 14, 4],
+    draw: (b, t, i) => {
+      const grow = [0.45, 0.85, 1, 1, 1, 1, 1, 1, 1][i];
+      const heat = [1.4, 1.3, 1.1, 0.85, 0.65, 0.48, 0.34, 0.22, 0.12][i];
+      const a0 = Math.PI * 0.98, a1 = a0 - Math.PI * 0.96 * grow;
+      if (i < 7) flatArc(b, 48, 24, 44, 17, 16 * (1 - t * 0.45), a0, a1, FI, heat);
+      if (i >= 2) {
+        for (let k = 0; k < 5; k++) {
+          const x = 30 + k * 9, base = 44 - Math.abs(k - 2) * 2;
+          flame(b, x, base, (14 - (i - 2) * 2) * (0.6 + 0.4 * hash2(k, 5, 9)), 3, k * 1.3 + i, FI, 1.15 - (i - 2) * 0.12);
+        }
+      }
+      if (i >= 1) sparks(b, 54, 30, 16, 30, (i - 1) / 7, FI, 449, 12);
     },
   },
 };

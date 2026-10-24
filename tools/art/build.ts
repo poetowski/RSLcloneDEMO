@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { writeJson } from './io.ts';
-import { FRAME_H, FRAME_W, PIVOT, renderAnim } from './char.ts';
+import { FRAME_H, FRAME_W, frameGlow, PIVOT, renderAnim } from './char.ts';
 import { HEROES } from './champions/index.ts';
 import { Bitmap, packShelves, PackItem } from './raster.ts';
 import { buildFx } from './fx/index.ts';
@@ -31,6 +31,8 @@ export interface ChampionAtlasJson {
   /** key "R|L/anim/index" -> atlas rect + offset of the trimmed rect inside the frame box */
   frames: Record<string, [number, number, number, number, number, number]>;
   anims: Record<string, { loop: boolean; ms: number[]; hits: number[]; events: Record<string, string> }>;
+  /** a burning blade (CharDef.glow), key as in `frames` -> its base and tip in the frame box, and its heat */
+  glow?: Record<string, [number, number, number, number, number]>;
 }
 
 function buildChampions(only?: string) {
@@ -42,6 +44,7 @@ function buildChampions(only?: string) {
     const items: PackItem[] = [];
     const offsets = new Map<string, [number, number]>();
     const anims: ChampionAtlasJson['anims'] = {};
+    const glow: NonNullable<ChampionAtlasJson['glow']> = {};
     for (const [face, facing] of [['R', 1], ['L', -1]] as const) {
       for (const name of Object.keys(c.anims)) {
         const frames = renderAnim(c, name, facing);
@@ -50,6 +53,8 @@ function buildChampions(only?: string) {
           const b = f.bmp.bounds() ?? { x: 0, y: 0, w: 1, h: 1 };
           items.push({ key, bmp: f.bmp.crop(b) });
           offsets.set(key, [b.x, b.y]);
+          const g = frameGlow(c, name, i, facing);
+          if (g) glow[key] = g;
         });
         if (face === 'R') {
           anims[name] = {
@@ -72,6 +77,7 @@ function buildChampions(only?: string) {
       ...(c.footprint ? { footprint: c.footprint } : {}),
       frames: Object.fromEntries(frames.map((f) => [f.key, [f.x, f.y, f.w, f.h, ...offsets.get(f.key)!]])),
       anims,
+      ...(Object.keys(glow).length ? { glow } : {}),
     };
     atlas.save(path.join(OUT, 'champions', `${id}.png`));
     writeJson(path.join(OUT, 'champions', `${id}.json`), json);

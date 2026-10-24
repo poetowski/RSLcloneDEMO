@@ -219,6 +219,15 @@ export class UnitView {
       ctx.drawImage(this.art.white, f[0], f[1], f[2], f[3], dx, dy, f[2], f[3]);
     }
     ctx.globalAlpha = 1;
+    drawBladeGlow(ctx, this.art, `${this.facing}/${this.anim}/${this.frame}`, this.x + sx, this.y - this.h, 1, this.alpha);
+  }
+
+  /** A point along this frame's burning blade, if it has one (0 its base, 1 its tip), in screen pixels: where embers come off it. */
+  bladePoint(u: number): { x: number; y: number; heat: number } | undefined {
+    const j = this.art.json;
+    const g = j.glow?.[`${this.facing}/${this.anim}/${this.frame}`];
+    if (!g) return undefined;
+    return { x: this.x - j.pivotX + g[0] + (g[2] - g[0]) * u, y: this.y - this.h - j.pivotY + g[1] + (g[3] - g[1]) * u, heat: g[4] };
   }
 
   /** Overlays that sit on top of the sprite. */
@@ -248,12 +257,65 @@ export function drawChampion(ctx: CanvasRenderingContext2D, art: ChampionArt, an
   const j = art.json;
   const a = j.anims[anim] ?? j.anims.idle;
   const fi = Math.min(frame, a.ms.length - 1);
-  const f = j.frames[`${o.facing ?? 'R'}/${j.anims[anim] ? anim : 'idle'}/${fi}`];
+  const key = `${o.facing ?? 'R'}/${j.anims[anim] ? anim : 'idle'}/${fi}`;
+  const f = j.frames[key];
   if (!f) return;
   const s = o.scale ?? 1;
   ctx.globalAlpha = o.alpha ?? 1;
   ctx.drawImage(o.shadow ? art.shadow : art.img, f[0], f[1], f[2], f[3], Math.round(x + (f[4] - j.pivotX) * s), Math.round(y + (f[5] - j.pivotY) * s), f[2] * s, f[3] * s);
   ctx.globalAlpha = 1;
+  // a locked champion is only a silhouette: no light of its own
+  if (!o.shadow) drawBladeGlow(ctx, art, key, x, y, s, o.alpha ?? 1);
+}
+
+/** Warm light round a burning blade, its colour, and the soft discs of it by radius (in bands: no smooth gradient). */
+const GLOW_RGB = [255, 200, 110];
+const glowDiscs = new Map<number, HTMLCanvasElement>();
+
+function glowDisc(r: number): HTMLCanvasElement {
+  let c = glowDiscs.get(r);
+  if (c) return c;
+  c = document.createElement('canvas');
+  c.width = c.height = r * 2;
+  const g = c.getContext('2d')!;
+  const img = g.createImageData(r * 2, r * 2);
+  for (let y = 0; y < r * 2; y++) {
+    for (let x = 0; x < r * 2; x++) {
+      const d = Math.hypot(x + 0.5 - r, y + 0.5 - r) / r;
+      if (d >= 1) continue;
+      const k = Math.floor((1 - d) * 5) / 5;
+      const i = (y * r * 2 + x) * 4;
+      img.data[i] = GLOW_RGB[0];
+      img.data[i + 1] = GLOW_RGB[1];
+      img.data[i + 2] = GLOW_RGB[2];
+      img.data[i + 3] = Math.round(k * 150);
+    }
+  }
+  g.putImageData(img, 0, 0);
+  glowDiscs.set(r, c);
+  return c;
+}
+
+/**
+ * The light a frame's burning blade sheds (ChampionAtlasJson.glow): soft bands
+ * of warm light along it, added to what is behind, stirring a little like the
+ * fire. `x`, `y` is where the champion stands (its pivot), `scale` its size.
+ */
+export function drawBladeGlow(ctx: CanvasRenderingContext2D, art: ChampionArt, key: string, x: number, y: number, scale: number, alpha: number) {
+  const j = art.json;
+  const g = j.glow?.[key];
+  if (!g || alpha <= 0) return;
+  const r = Math.round(18 * scale);
+  const disc = glowDisc(r);
+  const t = performance.now();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalAlpha = Math.min(1, 0.8 + 0.2 * (g[4] - 1)) * alpha * (0.86 + 0.08 * Math.sin(t / 170) + 0.06 * Math.sin(t / 71 + 1.3));
+  for (const u of [0.15, 0.5, 0.85]) {
+    const px = x + (g[0] + (g[2] - g[0]) * u - j.pivotX) * scale, py = y + (g[1] + (g[3] - g[1]) * u - j.pivotY) * scale;
+    ctx.drawImage(disc, Math.round(px - r), Math.round(py - r));
+  }
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
 }
 
 /** Frame index for a looping animation at time `t` (ms). */

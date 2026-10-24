@@ -2,7 +2,7 @@
 import { INK, Material } from './palette.ts';
 import { Bitmap } from './raster.ts';
 import { Frame, RenderOptions } from './render.ts';
-import { Dims, Draw, lerpPose, Pose, Skel, solve, v } from './rig.ts';
+import { Dims, Draw, lerpPose, Pose, Skel, solve, v, V } from './rig.ts';
 
 /** Fixed frame box for every hero (see docs/ART_GUIDE.md "Sprite frames"). */
 export const FRAME_W = 208;
@@ -44,6 +44,13 @@ export interface CharDef {
   render?: RenderOptions;
   /** the shadow's width as a share of a standing champion's (1): a beast on four legs casts a longer one */
   footprint?: number;
+  /**
+   * A burning blade (the Paladin's sword): in each frame the stretch that
+   * shines, from its base to its tip in rig space, and how hot it burns (1 at
+   * rest), or nothing while it does not burn. The atlas carries it so the game
+   * can light the air round it and throw embers off it.
+   */
+  glow?: (s: Skel, info: BuildInfo) => { from: V; to: V; heat: number } | undefined;
 }
 
 /**
@@ -84,6 +91,18 @@ function groundClip(b: Bitmap, y0: number) {
   for (let y = y0 + 1; y < b.h; y++) for (let x = 0; x < b.w; x++) b.set(x, y, 0);
   // close the cut like any other silhouette edge
   for (let x = 0; x < b.w; x++) if (b.get(x, y0) & 255) b.set(x, y0, INK.black);
+}
+
+/** A frame's burning blade (CharDef.glow) in frame-box pixels for this facing: base x, y, tip x, y, heat. */
+export function frameGlow(c: CharDef, anim: string, i: number, facing: 1 | -1): [number, number, number, number, number] | undefined {
+  if (!c.glow) return undefined;
+  const a = c.anims[anim];
+  const def = a.frames[i];
+  const prevDef = i > 0 ? a.frames[i - 1] : a.loop ? a.frames[a.frames.length - 1] : undefined;
+  const g = c.glow(solve(def.pose, c.dims), { anim, index: i, def, prev: prevDef ? solve(prevDef.pose, c.dims) : undefined });
+  if (!g) return undefined;
+  const f = def.pose.p.turn ? -facing : facing;
+  return [Math.round(PIVOT.x + f * g.from.x), Math.round(PIVOT.y - g.from.y), Math.round(PIVOT.x + f * g.to.x), Math.round(PIVOT.y - g.to.y), Math.round(g.heat * 100) / 100];
 }
 
 export function renderAnim(c: CharDef, anim: string, facing: 1 | -1): RenderedFrame[] {

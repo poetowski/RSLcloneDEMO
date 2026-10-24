@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare', 'grudge_runes']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare', 'grudge_runes', 'searing_cut', 'beacon_flare', 'beacon_glare', 'beacon_ward', 'trial_blaze', 'trial_flames']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -198,6 +198,8 @@ export class BattleScene {
     const ev = this.battle.endTurn(actor);
     const v = this.view(actor.uid);
     v.tm = actor.tm;
+    // a skill that fills its user's own turn meter (`selfTm`, the Paladin's Beacon) shows it as the turn ends
+    if (actor.alive && actor.tm > 0) this.fx.text(v.uid, v.x, v.head().y - 30 - (v.boss ? 8 : 0), `+${Math.round(actor.tm)}% TURN`, { color: '#8fd0ff' });
     for (const e of ev) this.applyEvent(e, null);
     this.syncStatuses(v);
     // a passive acting at the end of the turn (the Jungle Herder's ward) is given a moment to be seen
@@ -913,11 +915,34 @@ export class BattleScene {
     this.t += real;
     if (!this.paused) this.zone.update(real);
     for (const v of this.views.values()) v.update(dt);
+    this.throwEmbers(dt);
     this.fx.update(dt);
     this.shakeAmp = Math.max(0, this.shakeAmp - real * 0.02);
     this.flash = Math.max(0, this.flash - real / 400);
     if (this.results) this.resultsT += real;
     this.render(real);
+  }
+
+  /** Embers come off a burning blade (the Paladin's sword) and rise as they die: a few a second while it burns, more the hotter it is. */
+  private throwEmbers(dt: number) {
+    for (const v of this.views.values()) {
+      if (v.dead || v.alpha < 0.5) continue;
+      const p = v.bladePoint(Math.random());
+      if (!p || Math.random() > dt * 0.006 * p.heat) continue;
+      this.fx.particles.add({
+        x: p.x + (Math.random() - 0.5) * 4,
+        y: p.y - 2,
+        vx: (Math.random() - 0.5) * 12,
+        vy: -24 - Math.random() * 22,
+        life: 500 + Math.random() * 500,
+        color: '#fff0a0',
+        fade: ['#fff0a0', '#ffd060', '#f2861e', '#d0401a'],
+        gravity: -8,
+        drag: 0.6,
+        sway: 6,
+        additive: true,
+      });
+    }
   }
 
   private render(real: number) {

@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, grudger, guard, hide, inAffinity, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
+import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, grudger, guard, herald, hide, inAffinity, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -95,6 +95,21 @@ describe('turn meter', () => {
     b.useSkill(s, skill(stalker, 'mirage'), 'e0');
     b.endTurn(s);
     expect(s.tm).toBe(25);
+  });
+
+  it("aims a skill at every enemy that strikes none: a debuff on each, a buff on each ally, no counterattack, turn meter for its user (the Paladin's Beacon)", () => {
+    const b = new Battle(combatants([herald, guard]), combatants([twin, striker]), { seed: 3 });
+    const h = b.get('p0');
+    for (const e of b.alive('enemy')) b.addStatus(e, 'counter', 2, 0, 'test');
+    b.advance();
+    h.tm = 100;
+    const r = b.useSkill(h, skill(herald, 'beacon'));
+    expect(r.events.some((e) => e.kind === 'damage')).toBe(false);
+    expect(r.counters).toHaveLength(0);
+    for (const e of b.alive('enemy')) expect(b.has(e, 'spd_down')).toBe(true);
+    for (const a of b.alive('player')) expect(b.has(a, 'def_up')).toBe(true);
+    b.endTurn(h);
+    expect(h.tm).toBe(35);
   });
 });
 

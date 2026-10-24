@@ -30,7 +30,9 @@
 // Mesa, named and described by Jakub (2026-10-19), east of Earth Scars, has ten
 // placeholder stages he asked for: their texts walk his description, from the
 // mesa's top to the arbiter on it; their enemies are copies of the roster and
-// their powers tuned stand-ins; no champion joins there.
+// their powers tuned stand-ins. The first clear of 5-10, the campaign's last
+// stage, brings the Paladin (2026-10-24), a stand-in: Jakub made him the reward
+// of a quest line he designs later.
 //
 // Every stage drops Thread Spools of its area's two Weave Patterns (Jakub,
 // 2026-10-24: exactly two sets per area). Which two each area holds is a
@@ -492,6 +494,8 @@ export const LOCATIONS: LocationDef[] = [
         blurb: `${ARBITER} The last stage of the area.`,
         enemies: [{ champion: 'irving_wellbington', boss: true }, { champion: 'necromancer' }, { champion: 'automated_soul' }],
         power: 0.67,
+        // a stand-in until his quest line: the Paladin is the reward of a quest Jakub designs later
+        recruit: 'paladin',
       },
     ],
   },

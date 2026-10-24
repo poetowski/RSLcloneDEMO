@@ -74,6 +74,8 @@ Section 7 lists what is not decided.
 | 2026-10-24 | Weaving: a main-menu section that stores the spools, a full inventory screen matching the Champions screen; spools drop from every campaign stage, each area holding exactly two Weave Patterns; no improving spools for now; the numbers are placeholders he tunes later. The button first read WEAVING STORAGE, then WEAVING | 7, 9.4 |
 | 2026-10-24 | The Spindle of Fate: a seventh, central piece of gear, a placeholder whose system comes later | 7, 9.5, 11 |
 | 2026-10-24 | The main menu redesigned: a diorama of its own, static, its places clicked instead of buttons, only the champions changing each time it opens; "very epic", "celestial or planetar", "full creativity" | 10 |
+| 2026-10-24 | The Paladin, a Heroic Tank of the Azure Crown and the roster's first Heroic; the reward of a quest line Jakub designs later | 5.8, 7, 34 |
+| 2026-10-24 | The Paladin's affinity: Ember (Tide in the brief) | 34 |
 
 ---
 
@@ -997,8 +999,9 @@ candles round the statue and the storm's reach.
 his description, from the mesa's top and the mesas round it to the sunset, the
 castle, the storm and the arbiter; the area's blurb places it. Their enemies
 are copies of the roster's champions, the Ashveil Reign's Elites among them,
-and 5-10 is a boss Irving Wellbington; their powers are tuned stand-ins. No
-champion joins there. Stages, enemies and story wait for him.
+and 5-10 is a boss Irving Wellbington; their powers are tuned stand-ins. The
+first clear of 5-10 brings the Paladin (section 34), standing in for the quest
+line Jakub made him the reward of. Stages, enemies and story wait for him.
 
 ---
 
@@ -1039,8 +1042,9 @@ open questions.
   Emissary Handlings', Red Cloak's, Big Ears', the Associate's, the Black
   Rhino's and the Grove Keeper's 2026-10-17, sections 21-27, and the
   Skeleton's, the Rot Hulk's, the Bellringer's, the Necromancer's and the
-  Automated Soul's 2026-10-18, sections 28-32, and Irving Wellbington's
-  2026-10-19, section 33; their numbers are not)*
+  Automated Soul's 2026-10-18, sections 28-32, Irving Wellbington's
+  2026-10-19, section 33, and the Paladin's 2026-10-24, section 34; their
+  numbers are not)*
 - The affinities of the Jungle Herder, Emissary Handlings, Red Cloak and Big
   Ears: Jakub, 2026-10-17, "i will optimize affinities for these 4 new heroes
   later" *(the game stands in Bloom, Tide, Bloom and Ember)*
@@ -1079,6 +1083,10 @@ open questions.
   and a once-a-battle passive still spent, section 31)*
 - Team size *(the game uses 3)* and how champions are acquired *(one recruit
   per first clear)*
+- The quest line whose reward is the Paladin: Jakub, 2026-10-24, "this will
+  be reward for quest line later, i will specify later the whole quest
+  concept" *(until it exists, the first clear of 5-10, the campaign's last
+  stage, brings him, section 34)*
 - Campaign count of zones
 - Zone 3's stages, enemies and story *(the game stands in ten placeholder
   stages, 5.6)*
@@ -2644,3 +2652,97 @@ with the shield, the beard and its ring, the helmet's band and ridge, the
 horns' sweep, the planks, rim and boss, the eight runes and their pale light,
 the effects). Like the Skeleton, he stands in the first zone on his page and
 in his demos.
+
+## 34. The Paladin (received 2026-10-24)
+
+Jakub's brief, verbatim:
+
+```
+i want to add new champion, this will be reward for quest line later, i will specify later the whole quest concept. now just proceed with this new hero:
+
+name = Paladin
+faction = azure crown
+rarity = HEROIC
+class = DEFENSE
+affinity = tide
+design = tall human knight with full silver and metal plate armor with wide ornated shoulders. long back cloak in dark blue with three white crowns. no helmet. longer blonde hair and young fierce sight. wields a swiss-shaped big shield with a double cross on it. in other hand he wields a wide sword which has animated flames. this sword is very bright.
+kit = A1 - attack one enemy. cause attack down for 1 turn.
+A2 - all allies get DEFENSE UP for 2 turns and all enemies get SPEED DOWN for 2 turns. no damage. also fill this champion turn meter by 35% towards next turn. CD 4 turns.
+A3 - buff this champion with taunt for 2 turns and regeneration buff for 3 turns. then attacks all enemies. CD 5 turns.
+A4 (passive) - This champion has permanent 50 resistance bonus.
+```
+
+and, while he was being built:
+
+```
+change his affinity to ember
+```
+
+The Azure Crown's sixth champion and the roster's first Heroic. He is Ember:
+Tide in the brief, Ember on Jakub's word the same day, as with the
+Quartermaster (section 14) and the Bellringer (section 30).
+
+**Readings.** "class = DEFENSE" is the Tank role (2.3). ATTACK DOWN, DEFENSE UP
+and SPEED DOWN are the game's ATK Down, DEF Up and Slow, and "regeneration"
+its Regen (MECHANICS_GUIDE 7). The ATK Down and the Slow are certain, but like
+every debuff they meet the target's RES (section 10). "All allies" includes
+him. "Fill this champion turn meter by 35% towards next turn": after the turn,
+when a champion's meter starts again from empty, his starts at 35%; the battle
+shows "+35% TURN" over him as his turn ends. A2 strikes no enemy, so nothing
+counterattacks it. A3 places Taunt and Regen on him before its sweep (the rule
+of section 32); placed on his own turn, Taunt lasts through his next two turns
+and Regen heals him by 15% of his max HP at the start of each of his next
+three. "A4 (passive)" is his passive, as with the Skeleton, the Bellringer and
+Irving Wellbington: he has an A1, an A2, an A3 and the passive, the first
+champion with all four. "Permanent 50 resistance bonus" is a stat passive,
++50 RES in battle only and extra to the stat budget, like the Skeleton's +20
+(section 10). "Swiss-shaped" is the shape of the Swiss coat of arms: a
+straight top, straight sides, the lower half curving to a point. "Very
+bright": the blade burns white-gold, and in the game its light spills round
+it.
+
+**Acquisition.** He is the reward of a quest line Jakub designs later. Until
+it exists the first clear of 5-10, the campaign's last stage, brings him, so
+he can be played; a save that has cleared 5-10 already has him.
+
+**As built:** the tallest of the Crown's knights, young and fierce, in silver
+plate from the gorget to the sabatons, edged in gold at the neck, the fauld
+and the tassets; wide pauldrons of three lames, each with a gold rim, a gold
+rosette on the near one. Bareheaded: blonde hair swept back off the brow and
+falling to his shoulders over the ear and the nape; a clean-shaven young face
+under a hard brow. A long dark-blue cloak from his shoulders to his calves,
+three white crowns one under another down the part of it that shows behind
+him. On his far arm, before him, the big shield in the Swiss shape,
+silver-rimmed, its field azure, a white double cross on it, gold studs at its
+corners. In his near hand the wide sword: a grip of dark leather, a silver
+pommel and guard with gold at their ends, and a blade burning white-gold,
+flames licking up its length, each tongue flickering at its own pace, rising
+whichever way the blade points and trailing its swing, embers drifting off
+it; in the game a warm light spills round the blade and embers rise from it.
+Idle: he stands behind the shield, the burning sword held low at his side,
+its point before his feet. Searing Cut: the sword drawn up over his shoulder,
+then one cut down through the enemy, a line of white-gold fire with flames
+licking up off it. Beacon: he raises the burning sword high above his head,
+the fire roaring up; a star of light blazes at its tip, its light streams
+over each enemy (a glare across the eyes, motes of it sinking as they falter)
+and raises the shape of his shield in gold light before each ally. Trial by
+Fire: Taunt and Regen show on him; he runs into the middle of the enemy line,
+levels the burning sword at them, the fire roaring along it, draws it back
+low and sweeps it round through the whole line in a flat arc of flame, flames
+bursting up where it passes. Run: the shield carried before him, the sword
+trailing low behind, its fire and the cloak streaming back. Victory: the
+burning sword raised high. Death: he kneels on the planted sword as its fire
+dies and falls on his face, the cloak over his back, the shield on the ground
+before him, the fire out.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Searing
+Cut, Beacon, Trial by Fire and Unbowed and their texts, the multipliers (1.0;
+0.7 on each enemy, the floor of the norms, as his kit carries him far over
+the balance band, MECHANICS_GUIDE 10), his stats (on the Heroic budget: HP
+1480, ATK 92, DEF 78, SPD 98), the lore line, the stage that brings him until
+his quest line exists (the first clear of 5-10), and the details of his art
+and effects (the cut of the plate and its gold, the rosette, the crowns'
+shape and places, the shield's azure field, white cross and gold studs, the
+hilt, the face and the hair, the flames, the light round the blade and the
+embers, the effects). Like the Crown's other champions, he stands in the
+first zone on his page and in his demos.

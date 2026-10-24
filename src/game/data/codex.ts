@@ -42,7 +42,7 @@ export const CHAPTERS: Chapter[] = [
     title: 'Turn Meter & Speed',
     icon: 'g_speed',
     blocks: [
-      { kind: 'p', text: 'Every champion has a Turn Meter that fills in proportion to its Speed (SPD). When a meter reaches 100% that champion takes a turn, then its meter starts again from zero. The track at the top of the screen shows every meter: allies above it, enemies below.' },
+      { kind: 'p', text: "Every champion has a Turn Meter that fills in proportion to its Speed (SPD). When a meter reaches 100% that champion takes a turn, then its meter starts again from zero, or from where a skill of its own fills it: the Paladin's Beacon leaves his at 35%. The track at the top of the screen shows every meter: allies above it, enemies below." },
       { kind: 'figure', id: 'turnmeter' },
       { kind: 'p', text: 'A champion with 120 SPD acts six times while one with 100 SPD acts five times. Speed is the most valuable stat in the game: SPD Up and Slow shift who acts first, and skills that drain or grant Turn Meter can steal a whole turn.' },
       { kind: 'tip', text: 'Meters start with a small random head start, so the first turn is never quite the same twice.' },

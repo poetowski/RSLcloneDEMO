@@ -443,8 +443,8 @@ describe('design decisions', () => {
     expect([scars.requires, scars.stages.map((s) => s.id)]).toEqual(['3-10', ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6', '4-7', '4-8', '4-9', '4-10']]);
     const mesa = LOCATIONS[4];
     expect([mesa.requires, mesa.stages.map((s) => s.id)]).toEqual(['4-10', ['5-1', '5-2', '5-3', '5-4', '5-5', '5-6', '5-7', '5-8', '5-9', '5-10']]);
-    // no champion joins there
-    expect(mesa.stages.some((s) => s.recruit)).toBe(false);
+    // only its last stage brings a champion: the Paladin, a stand-in for the quest line Jakub designs later
+    expect(mesa.stages.filter((s) => s.recruit).map((s) => [s.id, s.recruit])).toEqual([['5-10', 'paladin']]);
   });
 });
 

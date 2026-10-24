@@ -115,6 +115,11 @@ export const drummer = fixture('drummer', {
   skills: [undefined, skill('march', 2, { target: 'allies', hits: [{ mult: 0 }], tmAllies: 20, statuses: [{ status: 'spd_up', turns: 2, to: 'allies' }] })],
 });
 
+/** A2 aimed at every enemy that strikes none: Slow on each enemy, DEF Up on each ally, and 35% turn meter for itself (the Paladin's Beacon). */
+export const herald = fixture('herald', {
+  skills: [undefined, skill('beacon', 2, { target: 'enemies', hits: [{ mult: 0 }], selfTm: 35, statuses: [{ status: 'def_up', turns: 2, to: 'allies' }, { status: 'spd_down', turns: 2, to: 'targets' }] })],
+});
+
 /** Undying: rises once at 25% HP. */
 export const undying = fixture('undying', { passive: { id: 'undying', name: 'Undying', desc: '', kind: 'undying', value: 0.25 } });
 
