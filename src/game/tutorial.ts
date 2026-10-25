@@ -20,6 +20,11 @@
 // the player's. Steps that teach once (the welcome, the turn meter, the first
 // skill and target, a cooldown) remember they were shown. The first victory
 // finishes it; the steps after it lead to the Challenges to claim that quest.
+//
+// A later lesson (2026-10-25, with summoning) starts on its own the first time
+// a summon waits (Beat Campaign 1-3 claimed, or Stardust enough): the Wishing
+// Star, MERGE, the wish, SUMMON, and the champion who answers. It can only be
+// closed, and is shown once (the save's `lessons`).
 import { Alignment, Config, driver, Driver, PopoverDOM, Side } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import '../tutorial.css';
@@ -30,7 +35,7 @@ import { Unit } from './battle/battle';
 import { questState } from './challenges';
 import { LOCATIONS } from './data/campaign';
 import { JOURNEY } from './data/challenges';
-import { TUTORIAL, TUTORIAL_PATH, TUTORIAL_SKIP, TutorialStepId } from './data/tutorial';
+import { SUMMON_LESSON_PATH, TUTORIAL, TUTORIAL_PATH, TUTORIAL_SKIP, TutorialStepId } from './data/tutorial';
 import { SkillDef } from './data/types';
 import { BaseScreen } from './screens/base';
 import { BattleScreen } from './screens/battle';
@@ -38,7 +43,9 @@ import { CampaignScreen } from './screens/campaign';
 import { ChallengesScreen } from './screens/challenges';
 import { MainMenu } from './screens/menu';
 import { RecruitScreen } from './screens/recruit';
+import { SummonScreen } from './screens/summon';
 import { TeamScreen } from './screens/team';
+import { canMerge, summonLessonDue } from './summoning';
 import { COLORS, Region, Ui } from './ui/ui';
 import { blit, nine, Rect4 } from './view/assets';
 import { BattleScene } from './view/scene';
@@ -114,7 +121,10 @@ function lessonSkill(sc: BattleScene, actor: Unit): SkillDef {
 }
 
 export class Tutorial implements TutorialControl {
-  private phase: 'core' | 'epilogue' | null = null;
+  /** the run from the Sanctum to the first victory, its steps after it, or the lesson on the first summon */
+  private phase: 'core' | 'epilogue' | 'summon' | null = null;
+  /** whether a lesson may start on its own when it is due (not on ?tutorial=0) */
+  lessons = true;
   /** steps that teach once, shown already */
   private seen = new Set<string>();
   /** the skill the first turn teaches, and whose turn it was */
@@ -123,6 +133,8 @@ export class Tutorial implements TutorialControl {
   private targetChoice: object | null = null;
   /** campaign screens already asked to show the first area */
   private shownArea = new WeakSet<object>();
+  /** the champion who answered the lesson's summon */
+  private answered: string | null = null;
   private drv: Driver | null = null;
   /** the step on screen and its card's key; the skip question; the card's button under the pointer */
   private step: Step | null = null;
@@ -178,10 +190,20 @@ export class Tutorial implements TutorialControl {
     this.hide();
   }
 
+  /** The lesson on the first summon (on its own when one waits; ?tutorial=summon). */
+  startLesson() {
+    this.phase = 'summon';
+    this.seen.delete('wish');
+    this.answered = null;
+    this.hide();
+  }
+
   frame(now: number) {
     const dt = this.last ? Math.min(100, now - this.last) : 16;
     this.last = now;
     this.t += dt;
+    // the lesson on summoning comes the first time a summon waits, in the Sanctum or at the Wishing Star
+    if (!this.phase && this.lessons && this.app.settled && (this.app.scene instanceof MainMenu || this.app.scene instanceof SummonScreen) && summonLessonDue(this.app.archivist)) this.startLesson();
     if (!this.phase) return;
     const step = this.situation();
     if (!step) {
@@ -222,6 +244,7 @@ export class Tutorial implements TutorialControl {
   private situation(): Step | null {
     const s = this.app.scene;
     if (!this.app.settled || !s) return null;
+    if (this.phase === 'summon') return this.inLesson(s);
     const epilogue = this.phase === 'epilogue';
     if (s instanceof BattleScreen) return this.inBattle(s.scene);
     if (s instanceof MainMenu) {
@@ -258,6 +281,28 @@ export class Tutorial implements TutorialControl {
       return this.at('claim', 'q_act', 'left');
     }
     return null;
+  }
+
+  /** The lesson on the first summon: the Wishing Star in the Sanctum, MERGE, the wish, SUMMON, the champion who answers; it ends once the ceremony is left. */
+  private inLesson(s: object): Step | null {
+    const a = this.app.archivist;
+    // the summon calling, and its ceremony: they have the stage to themselves
+    if (s instanceof RecruitScreen) {
+      if (s.summoned) this.answered = s.c.name;
+      return null;
+    }
+    if (s instanceof SummonScreen && s.summoning) return null;
+    if (a.summons > 0) {
+      // back at the Wishing Star, the last word; anywhere else the lesson is over
+      if (s instanceof SummonScreen && this.answered) return { id: 'summoned', spot: s.dustSpot, side: 'right', vars: { recruit: this.answered }, next: () => this.stop('end') };
+      this.stop('end');
+      return null;
+    }
+    if (s instanceof MainMenu) return { id: 'star', spot: s.spotOf('summon'), point: s.middleOf('summon'), side: 'right', click: true, act: this.region('m_summon')?.click };
+    if (!(s instanceof SummonScreen)) return null;
+    if (a.shards < 1 && canMerge(a)) return this.at('merge', 'merge', 'right', { dust: String(a.fragments) });
+    if (!this.seen.has('wish')) return { id: 'wish', spot: s.wishSpot, side: 'left', next: () => this.seen.add('wish') };
+    return this.at('summonNow', 'summon', 'bottom');
   }
 
   /** In battle: the turn meter, the first skill and target, a cooldown, then the result. */
@@ -354,7 +399,11 @@ export class Tutorial implements TutorialControl {
 
   private stop(how: 'skip' | 'end') {
     const a = this.app.archivist;
-    if (how === 'skip' && a.tutorial !== 'done') {
+    if (this.phase === 'summon') {
+      // the lesson is shown once, to its end or closed
+      if (!a.lessons.includes('summon')) a.lessons.push('summon');
+      saveArchivist(a);
+    } else if (how === 'skip' && a.tutorial !== 'done') {
       a.tutorial = 'skipped';
       saveArchivist(a);
     }
@@ -452,7 +501,7 @@ export class Tutorial implements TutorialControl {
       lines = font.wrap(this.fill(t.text, step), w - 2 * PAD);
       act = t.act ? this.fill(t.act, step) : undefined;
       if (step.next) buttons.push({ id: 'next', label: t.next ?? 'NEXT', kind: 'button', r: [0, 0, 0, 0] });
-      if (step.id !== 'farewell') buttons.push({ id: 'skip', label: this.phase === 'epilogue' ? TUTORIAL_SKIP.close : TUTORIAL_SKIP.link, kind: 'link', r: [0, 0, 0, 0] });
+      if (step.id !== 'farewell') buttons.push({ id: 'skip', label: this.phase === 'core' ? TUTORIAL_SKIP.link : TUTORIAL_SKIP.close, kind: 'link', r: [0, 0, 0, 0] });
     }
     let y = 20 + lines.length * LINE;
     if (act) y += 3 + LINE;
@@ -516,10 +565,11 @@ export class Tutorial implements TutorialControl {
     }
     // the pips: the way through, passed, here, still to come
     if (!this.confirming) {
-      let at = TUTORIAL_PATH.indexOf(step.id);
-      if (at < 0) at = TUTORIAL_PATH.indexOf(({ stage: 'area', targetAll: 'target', targetAlly: 'target', cooldown: 'target', victoryRecruit: 'victory', defeat: 'victory', recruit: 'victory', journeyTab: 'board' } as Partial<Record<TutorialStepId, TutorialStepId>>)[step.id] ?? 'welcome');
+      const path = this.phase === 'summon' ? SUMMON_LESSON_PATH : TUTORIAL_PATH;
+      let at = path.indexOf(step.id);
+      if (at < 0) at = path.indexOf(({ stage: 'area', targetAll: 'target', targetAlly: 'target', cooldown: 'target', victoryRecruit: 'victory', defeat: 'victory', recruit: 'victory', journeyTab: 'board' } as Partial<Record<TutorialStepId, TutorialStepId>>)[step.id] ?? 'welcome');
       const py = card.h - 7 - 10;
-      TUTORIAL_PATH.forEach((_, i) => {
+      path.forEach((_, i) => {
         const x = PAD + 1 + i * 6;
         ctx.fillStyle = i < at ? '#a8701e' : i === at ? COLORS.goldHi : '#2c3854';
         ctx.fillRect(x, py, 1, 3);
@@ -542,7 +592,7 @@ export class Tutorial implements TutorialControl {
     if (!st) return;
     if (id === 'next') st.next?.();
     else if (id === 'skip') {
-      if (this.phase === 'epilogue') this.stop('end');
+      if (this.phase !== 'core') this.stop('end');
       else this.confirming = true;
     } else if (id === 'stay') this.confirming = false;
     else if (id === 'confirm') this.stop('skip');

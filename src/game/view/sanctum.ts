@@ -5,7 +5,8 @@
 // threads, motes climbing the golden thread from the Weaver's Spire to the
 // rim's break, star-dust rising off the island, spray where the waterfalls
 // thin into the void, windows and the rose window breathing, pools of light,
-// now and then a shooting star. The menu stands the champions between
+// now and then a shooting star, and souls drifting up into the Wishing Star,
+// which shines brighter while a summon waits. The menu stands the champions between
 // `drawBack` and `drawFront`, and asks `placeAt` which place the pointer is on:
 // a place is hit on its own pixels (or the ring of light round them), never
 // on its bounding box.
@@ -38,6 +39,11 @@ export class SanctumView {
   private alpha: Uint8ClampedArray | null = null;
   private glows = new Map<string, HTMLCanvasElement>();
   private vignette: HTMLCanvasElement;
+  /** souls drifting up into the Wishing Star: where each set out, how long it has drifted, its whole way, how far it bows aside */
+  private souls: { x0: number; y0: number; t: number; life: number; sway: number }[] = [];
+  private soulT = 1200;
+  /** a summon waits: the Wishing Star shines brighter and calls more often */
+  wishLit = false;
 
   constructor(private a: Assets) {
     this.json = a.menu.json;
@@ -89,6 +95,16 @@ export class SanctumView {
         });
       }
     });
+    // now and then a soul drifts up into the Wishing Star from somewhere below it
+    this.soulT -= dt * (this.wishLit ? 1.7 : 1);
+    if (this.soulT <= 0) {
+      this.soulT = 1700 + Math.random() * 2300;
+      const a = Math.PI * (0.18 + Math.random() * 0.64), d = 44 + Math.random() * 36;
+      const [wx, wy] = this.json.wish;
+      this.souls.push({ x0: wx + Math.cos(a) * d, y0: wy + Math.sin(a) * d, t: 0, life: 3800 + Math.random() * 1800, sway: (Math.random() - 0.5) * 18 });
+    }
+    for (const s of this.souls) s.t += dt;
+    this.souls = this.souls.filter((s) => s.t < s.life);
     // a shooting star now and then, rarely
     this.sky.update(dt);
     if ((this.starT -= dt) <= 0) {
@@ -114,8 +130,9 @@ export class SanctumView {
     const img = this.a.menu.scene;
     const y = s.y + this.bobOf(s);
     if (s.mode === 'pulse') {
-      // one slow breath every `ms`, each glow on its own phase
-      ctx.globalAlpha = 0.25 + 0.45 * (0.5 + 0.5 * Math.sin((this.t / (s.ms ?? 4400)) * Math.PI * 2 + s.x * 0.05));
+      // one slow breath every `ms`, each glow on its own phase; the Wishing Star's brighter while a summon waits
+      const lit = key === 'wish_glow' ? (this.wishLit ? 1.3 : 0.8) : 1;
+      ctx.globalAlpha = Math.min(1, lit * (0.25 + 0.45 * (0.5 + 0.5 * Math.sin((this.t / (s.ms ?? 4400)) * Math.PI * 2 + s.x * 0.05))));
       blit(ctx, img, s.frames[0], s.x, y);
       ctx.globalAlpha = 1;
     } else if (s.mode === 'loop') {
@@ -201,7 +218,29 @@ export class SanctumView {
     this.drawLayer(ctx, 'island');
     this.drawLayer(ctx, 'building');
     this.lights(ctx);
+    this.drawSouls(ctx);
     if (hover && !this.inFront(hover)) this.drawOutline(ctx, hover);
+  }
+
+  /** The souls on their way into the Wishing Star: each kindles as it sets out, bows aside a little, and fades into the star. */
+  private drawSouls(ctx: CanvasRenderingContext2D) {
+    const [wx, wy] = this.json.wish;
+    ctx.globalCompositeOperation = 'lighter';
+    for (const s of this.souls) {
+      const u = s.t / s.life;
+      const e = u * u * (3 - 2 * u);
+      const x = Math.round(s.x0 + (wx - s.x0) * e + Math.sin(u * Math.PI) * s.sway), y = Math.round(s.y0 + (wy - s.y0) * e);
+      const k = Math.min(1, u * 5) * Math.min(1, (1 - u) * 8);
+      ctx.globalAlpha = k * 0.9;
+      ctx.fillStyle = '#f4eeff';
+      ctx.fillRect(x, y, 1, 1);
+      ctx.globalAlpha = k * 0.4;
+      ctx.fillStyle = '#b6a8e6';
+      ctx.fillRect(x - 1, y, 3, 1);
+      ctx.fillRect(x, y - 1, 1, 3);
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
   }
 
   /** Whether a place drifts in front of the champions (the astrolabe, the Herald's Board): its ring of light is drawn with the front. */
@@ -227,7 +266,8 @@ export class SanctumView {
       const key = `${l.rx}|${l.ry}|${l.rgb.join(',')}`;
       let c = this.glows.get(key);
       if (!c) this.glows.set(key, (c = makeGlow(l.rx, l.ry, l.rgb)));
-      ctx.globalAlpha = l.k * (0.75 + 0.25 * Math.sin(s * l.rate + l.x));
+      const lit = l.x === this.json.wish[0] && l.y === this.json.wish[1] ? (this.wishLit ? 1.3 : 0.75) : 1;
+      ctx.globalAlpha = Math.min(1, lit * l.k * (0.75 + 0.25 * Math.sin(s * l.rate + l.x)));
       ctx.drawImage(c, Math.round(l.x - l.rx), Math.round(l.y - l.ry));
     }
     ctx.globalAlpha = 1;

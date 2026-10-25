@@ -15,6 +15,7 @@ import { CollectionScreen } from './game/screens/collection';
 import { MainMenu } from './game/screens/menu';
 import { OptionsScreen } from './game/screens/options';
 import { RecruitScreen } from './game/screens/recruit';
+import { SummonScreen } from './game/screens/summon';
 import { TeamScreen } from './game/screens/team';
 import { WeavingScreen } from './game/screens/weaving';
 import { Tutorial } from './game/tutorial';
@@ -59,12 +60,20 @@ async function boot() {
     stockSample(app.archivist);
     saveArchivist(app.archivist);
   }
-  // ?progress=2-1 clears every stage up to and including 2-1 (3 stars, recruits included, no spools found)
+  // ?progress=2-1 clears every stage up to and including 2-1 (3 stars, recruits included, no spools or Stardust found)
   const upTo = params.get('progress');
   if (upTo) {
     for (const s of allStages()) {
       recordClear(app.archivist, s.id, 3);
       if (s.id === upTo) break;
+    }
+  }
+  // ?stardust=250 sets the Stardust held, ?soulstars=2 the Soulstars (development and screenshots)
+  for (const [key, field] of [['stardust', 'fragments'], ['soulstars', 'shards']] as const) {
+    const n = Number(params.get(key));
+    if (params.has(key) && Number.isFinite(n) && n >= 0) {
+      app.archivist[field] = Math.floor(n);
+      saveArchivist(app.archivist);
     }
   }
 
@@ -80,10 +89,12 @@ async function boot() {
     challenges: (tab) => app.go(() => new ChallengesScreen(app, tab)),
     options: () => app.go(() => new OptionsScreen(app)),
     recruit: (id) => app.go(() => new RecruitScreen(app, id, () => app.router.campaign())),
+    summon: () => app.go(() => new SummonScreen(app)),
+    summoned: (id, wished) => app.go(() => new RecruitScreen(app, id, () => app.router.summon(), { wished })),
     demo: (skill, back) => app.go(() => new BattleScreen(app, { demo: skill, back })),
   };
 
-  // deep links: ?screen=campaign|team|battle|collection|champion|weaving|academy|challenges|options|recruit
+  // deep links: ?screen=campaign|team|battle|collection|champion|weaving|academy|challenges|options|recruit|summon
   //   &stage=1-2 &team=captain_gareth,rime_scholar &champion=captain_gareth &chapter=buffs &tab=daily   ?demo=<skill id>
   //   &zone=zone2 (battle, team: the stage on another background)
   const r = app.router;
@@ -123,17 +134,23 @@ async function boot() {
     case 'recruit':
       r.recruit(params.get('champion') ?? CHAMPIONS[CHAMPIONS.length - 1].id);
       break;
+    case 'summon':
+      r.summon();
+      break;
     default:
       r.menu();
   }
 
   // the tutorial: on its own for a new account, which opens on the main menu; ?tutorial=1 starts it
   // on whatever screen the link opens, ?tutorial=epilogue at its steps after the first victory,
-  // ?tutorial=0 keeps it away (screenshots of a fresh game)
+  // ?tutorial=summon at the lesson on the first summon, ?tutorial=0 keeps it and its lessons away
+  // (screenshots of a fresh game)
   const tutorial = new Tutorial(app, canvas);
   app.tutorial = tutorial;
   const tut = params.get('tutorial');
+  if (tut === '0') tutorial.lessons = false;
   if (tut === 'epilogue') tutorial.startEpilogue();
+  else if (tut === 'summon') tutorial.startLesson();
   else if (tut === '1' || (tut !== '0' && !demo && !params.get('screen') && tutorialDue(app.archivist))) tutorial.start(true);
 
   const pos = (e: PointerEvent | WheelEvent) => canvas.toVirtual(e.clientX, e.clientY);

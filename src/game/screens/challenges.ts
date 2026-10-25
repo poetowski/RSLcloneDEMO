@@ -12,13 +12,15 @@ import { Particles } from '../../engine/particles';
 import { W } from '../../engine/screen';
 import { App } from '../app';
 import { frontier } from '../archivist';
-import { claimQuest, currentQuest, questState, QuestState } from '../challenges';
+import { claimQuest, currentQuest, QuestFind, questState, QuestState } from '../challenges';
 import { zoneOf } from '../data/campaign';
 import { CHALLENGE_TABS, ChallengeTab, JOURNEY, QuestDef } from '../data/challenges';
 import { GRADES, pattern, patternBonusText } from '../data/matrix';
-import { ThreadSpool } from '../reliquary/matrix';
+import { FRAGMENTS_PER_SHARD, SUMMONING } from '../data/summoning';
+import { summonsReady } from '../summoning';
 import { Scroller } from '../ui/scroll';
 import { PATTERN_TINT, patternName, spoolIcon, statText } from '../ui/spools';
+import { STARDUST_TINT } from '../ui/stardust';
 import { COLORS } from '../ui/ui';
 import { blit, nine, Rect4 } from '../view/assets';
 import { BaseScreen, Diorama } from './base';
@@ -49,8 +51,8 @@ export class ChallengesScreen extends BaseScreen {
   private sparks = new Particles();
   /** the thread weaving on from a claimed knot, since `t0` */
   private weave: { from: number; t0: number } | null = null;
-  /** the spool the last claim found */
-  private found: { quest: string; spool: ThreadSpool } | null = null;
+  /** what the last claim found */
+  private found: { quest: string; find: QuestFind } | null = null;
 
   constructor(app: App, tab: ChallengeTab = 'journey') {
     super(app);
@@ -118,12 +120,12 @@ export class ChallengesScreen extends BaseScreen {
     this.tab = t;
   }
 
-  /** Claims the chosen quest: its spool goes to storage, the thread weaves on, sparks fly off the knot. */
+  /** Claims the chosen quest: its spool goes to storage or its Stardust to the Wishing Star, the thread weaves on, sparks fly off the knot. */
   private claim(q: QuestDef) {
-    const spool = claimQuest(this.archivist, q.id);
-    if (!spool) return;
+    const find = claimQuest(this.archivist, q.id);
+    if (!find) return;
     const i = JOURNEY.indexOf(q);
-    this.found = { quest: q.id, spool };
+    this.found = { quest: q.id, find };
     this.weave = { from: i, t0: this.t };
     this.burst(i, 26);
   }
@@ -289,7 +291,11 @@ export class ChallengesScreen extends BaseScreen {
     const py = KNOT_Y - 52 + bob;
     ui.panel(ctx, 'well', x - 13, py, 26, 26);
     ctx.globalAlpha = st === 'claimed' ? 0.45 : st === 'locked' ? 0.6 : 1;
-    ui.blit(ctx, `spool_${q.reward.pattern}_${q.reward.grade}`, x - 9, py + 4);
+    if (q.reward.kind === 'spool') ui.blit(ctx, `spool_${q.reward.pattern}_${q.reward.grade}`, x - 9, py + 4);
+    else {
+      const r = ui.part('stardust');
+      blit(ctx, this.a.ui.img, r, x - Math.floor(r[2] / 2), py + 13 - Math.floor(r[3] / 2));
+    }
     ctx.globalAlpha = 1;
     if (st === 'claimed') ui.blit(ctx, 'check', x + 6, py - 2);
     // the name on a banner, how it stands under it
@@ -339,16 +345,25 @@ export class ChallengesScreen extends BaseScreen {
     ctx.fillStyle = '#a8701e';
     ctx.fillRect(rx - 12, py + 10, 1, ph - 20);
     ui.text(ctx, st === 'claimed' ? 'REWARD TAKEN' : 'REWARD', rx, py + 11, { color: COLORS.dim, variant: 'bold' });
-    const found = this.found?.quest === q.id ? this.found.spool : null;
-    const p = pattern(q.reward.pattern);
-    ui.blit(ctx, `bigspool_${q.reward.pattern}_${q.reward.grade}`, rx, py + 27);
-    ui.text(ctx, `${GRADES[q.reward.grade]} ${patternName(q.reward.pattern)} spool`, rx + 30, py + 30, { color: PATTERN_TINT[q.reward.pattern] });
-    if (found) {
-      ui.blit(ctx, spoolIcon(found), rx + 30, py + 42);
-      ui.text(ctx, statText(found.main.stat, found.main.value), rx + 51, py + 47, { color: COLORS.text });
-      ui.text(ctx, 'Found: in Weaving now.', rx + 30, py + 63, { color: COLORS.good });
-    } else ui.para(ctx, st === 'claimed' ? 'Taken, into Weaving.' : 'Its main stat is drawn when you claim it.', rx + 30, py + 42, 152, { color: COLORS.faint });
-    if (p) ui.para(ctx, `${p.pieces} ${p.name} spools in a matrix weave ${patternBonusText(p)}.`, rx, py + 82, 180, { color: COLORS.faint });
+    const found = this.found?.quest === q.id ? this.found.find : null;
+    const rw = q.reward;
+    if (rw.kind === 'spool') {
+      const p = pattern(rw.pattern);
+      ui.blit(ctx, `bigspool_${rw.pattern}_${rw.grade}`, rx, py + 27);
+      ui.text(ctx, `${GRADES[rw.grade]} ${patternName(rw.pattern)} spool`, rx + 30, py + 30, { color: PATTERN_TINT[rw.pattern] });
+      if (found?.kind === 'spool') {
+        ui.blit(ctx, spoolIcon(found.spool), rx + 30, py + 42);
+        ui.text(ctx, statText(found.spool.main.stat, found.spool.main.value), rx + 51, py + 47, { color: COLORS.text });
+        ui.text(ctx, 'Found: in Weaving now.', rx + 30, py + 63, { color: COLORS.good });
+      } else ui.para(ctx, st === 'claimed' ? 'Taken, into Weaving.' : 'Its main stat is drawn when you claim it.', rx + 30, py + 42, 152, { color: COLORS.faint });
+      if (p) ui.para(ctx, `${p.pieces} ${p.name} spools in a matrix weave ${patternBonusText(p)}.`, rx, py + 82, 180, { color: COLORS.faint });
+    } else {
+      ui.blit(ctx, 'bigstardust', rx, py + 27);
+      ui.text(ctx, `${rw.amount} ${SUMMONING.fragment}`, rx + 30, py + 30, { color: STARDUST_TINT });
+      if (found) ui.text(ctx, 'Found: at the Wishing Star now.', rx + 30, py + 44, { color: COLORS.good });
+      else ui.para(ctx, st === 'claimed' ? 'Taken, to the Wishing Star.' : `Every ${FRAGMENTS_PER_SHARD} merge into a ${SUMMONING.shard}.`, rx + 30, py + 44, 152, { color: COLORS.faint });
+      ui.para(ctx, `A ${SUMMONING.shard} summons a champion you do not have yet.`, rx, py + 82, 180, { color: COLORS.faint });
+    }
     // the way on
     const bw = 150, bh = 24, bx = px + pw - 14 - bw, by = py + ph - 14 - bh;
     const act = this.action(q, st);
@@ -364,18 +379,23 @@ export class ChallengesScreen extends BaseScreen {
       const prev = JOURNEY[JOURNEY.indexOf(q) - 1];
       return [`Opens once "${prev.title}" is claimed.`, COLORS.dim];
     }
-    return [q.goal.kind === 'tutorial' ? (this.archivist.tutorial === 'skipped' ? 'The tutorial was skipped: play it to the end.' : 'The tutorial is not finished yet.') : 'No spool is woven into a matrix yet.', COLORS.dim];
+    const g = q.goal;
+    if (g.kind === 'tutorial') return [this.archivist.tutorial === 'skipped' ? 'The tutorial was skipped: play it to the end.' : 'The tutorial is not finished yet.', COLORS.dim];
+    if (g.kind === 'stage') return [`Stage ${g.stage} is not cleared yet.`, COLORS.dim];
+    return ['No spool is woven into a matrix yet.', COLORS.dim];
   }
 
-  /** The panel's button: claim the reward, or the way to the quest's goal (and the tutorial again once it is done). */
+  /** The panel's button: claim the reward, or the way to the quest's goal (and the tutorial again once it is done, the Wishing Star once its Stardust is in). */
   private action(q: QuestDef, st: QuestState): { label: string; icon?: string; click?: () => void; second?: { label: string; click: () => void } } {
     const r = this.app.router;
     const tutorial = () => this.app.tutorial?.start();
     const replay = q.goal.kind === 'tutorial' && st !== 'open' ? { label: 'REPLAY TUTORIAL', click: tutorial } : undefined;
+    const star = q.reward.kind === 'fragments' && st === 'claimed' && summonsReady(this.archivist) > 0 ? { label: 'TO THE WISHING STAR', click: () => r.summon() } : undefined;
     if (st === 'ready') return { label: 'CLAIM', icon: 'mi_play', click: () => this.claim(q), second: replay };
-    if (st === 'claimed') return { label: 'CLAIMED', second: replay };
+    if (st === 'claimed') return { label: 'CLAIMED', second: replay ?? star };
     if (st === 'locked') return { label: 'LOCKED' };
     if (q.goal.kind === 'tutorial') return { label: 'START TUTORIAL', icon: 'mi_play', click: tutorial };
+    if (q.goal.kind === 'stage') return { label: 'TO THE CAMPAIGN', icon: 'mi_campaign', click: () => r.campaign() };
     return { label: 'OPEN WEAVING', icon: 'mi_weaving', click: () => r.weaving({ back: () => r.challenges() }) };
   }
 

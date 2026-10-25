@@ -4,8 +4,12 @@
 // but in Journey, we need to design a horizonal pathway of quests, these are
 // unlocked sequentialy. first quest is "Finish Tutorial". second quest is
 // placeholder."). The Journey's quests in their order; each opens once the one
-// before it is claimed. Stand-ins (DESIGN_DECISIONS.md 35): every text but the
-// first quest's title, the second quest (Weave a Spool) and both rewards.
+// before it is claimed. Then (2026-10-25): "maybe we can make also new journey
+// quest: beat campaign 1-3. reward can be 100 summoning fragments. so player
+// then can spawn his third hero", so Beat Campaign 1-3 comes second, before my
+// placeholder. Stand-ins (DESIGN_DECISIONS.md 35, 36): every text but the
+// first two quests' titles, the third quest (Weave a Spool) and the spool
+// rewards.
 import { PatternId } from './types';
 
 export type ChallengeTab = 'daily' | 'persistent' | 'journey';
@@ -17,15 +21,15 @@ export const CHALLENGE_TABS: readonly { id: ChallengeTab; name: string; placehol
   { id: 'journey', name: 'JOURNEY' },
 ];
 
-/** What a quest asks: the tutorial played to its end, or a spool woven into any champion's Weaver Matrix. */
-export type QuestGoal = { kind: 'tutorial' } | { kind: 'weave' };
+/** What a quest asks: the tutorial played to its end, a stage of the campaign cleared, or a spool woven into any champion's Weaver Matrix. */
+export type QuestGoal = { kind: 'tutorial' } | { kind: 'stage'; stage: string } | { kind: 'weave' };
 
-/** What claiming a quest gives: a spool of one Weave Pattern and grade (0 Ashen, 1 Silver, 2 Gilded), its main stat drawn by slot. */
-export interface QuestReward {
-  kind: 'spool';
-  pattern: PatternId;
-  grade: 0 | 1 | 2;
-}
+/**
+ * What claiming a quest gives: a spool of one Weave Pattern and grade (0
+ * Ashen, 1 Silver, 2 Gilded), its main stat drawn by slot; or Stardust, the
+ * fragments that merge into Soulstars.
+ */
+export type QuestReward = { kind: 'spool'; pattern: PatternId; grade: 0 | 1 | 2 } | { kind: 'fragments'; amount: number };
 
 export interface QuestDef {
   id: string;
@@ -44,6 +48,14 @@ export const JOURNEY: readonly QuestDef[] = [
     text: 'Walk the tutorial to its end: the Sanctum, the campaign and your first battle.',
     goal: { kind: 'tutorial' },
     reward: { kind: 'spool', pattern: 'pattern_vigor', grade: 1 },
+  },
+  // his (2026-10-25): its Stardust summons the third champion, the first one drawn at random
+  {
+    id: 'beat_1_3',
+    title: 'Beat Campaign 1-3',
+    text: 'Clear stage 1-3 of the campaign. Its reward is the Stardust for your first summon at the Wishing Star.',
+    goal: { kind: 'stage', stage: '1-3' },
+    reward: { kind: 'fragments', amount: 100 },
   },
   // his placeholder; a quest of my own stands in so the pathway can be walked
   {

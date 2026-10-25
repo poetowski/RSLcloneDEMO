@@ -85,7 +85,7 @@ export interface MenuSprite {
   bob?: { amp: number; ms: number; phase: number };
 }
 
-export type MenuPlace = 'campaign' | 'champions' | 'weaving' | 'academy' | 'options' | 'challenges';
+export type MenuPlace = 'campaign' | 'champions' | 'weaving' | 'academy' | 'options' | 'challenges' | 'summon';
 
 export interface MenuJson {
   sprites: Record<string, MenuSprite>;
@@ -99,6 +99,8 @@ export interface MenuJson {
   thread: [number, number][];
   falls: [number, number][];
   portal: [number, number];
+  /** the Wishing Star's heart, where the souls it calls drift in */
+  wish: [number, number];
   lights: { x: number; y: number; rx: number; ry: number; rgb: [number, number, number]; k: number; rate: number }[];
 }
 

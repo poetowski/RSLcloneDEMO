@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { allStages, LOCATIONS, recruitStage, STARTERS, WORLD_MAP } from '../src/game/data/campaign';
-import { CHAMPIONS } from '../src/game/data/champions';
+import { champion, CHAMPIONS } from '../src/game/data/champions';
 import { CHAPTERS } from '../src/game/data/codex';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../src/game/data/meta';
 import { auditChampion, totalMult } from '../src/game/data/norms';
@@ -16,8 +16,11 @@ import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, rea
 import { claimQuest, currentQuest, questState, readyCount } from '../src/game/challenges';
 import { CHALLENGE_TABS, JOURNEY } from '../src/game/data/challenges';
 import { PATTERN_IDS, SPOOL_STATS } from '../src/game/data/matrix';
-import { TUTORIAL, TUTORIAL_PATH, TUTORIAL_SKIP } from '../src/game/data/tutorial';
+import { SUMMON_LESSON_PATH, TUTORIAL, TUTORIAL_PATH, TUTORIAL_SKIP } from '../src/game/data/tutorial';
+import { FRAGMENT_DROPS, FRAGMENTS_PER_SHARD, SUMMON_ODDS, SUMMONING } from '../src/game/data/summoning';
+import { fragmentDrop } from '../src/game/reliquary/drops';
 import { threadSpool } from '../src/game/reliquary/matrix';
+import { canMerge, drawSummon, joinsBy, mergeShard, rarityOdds, summon, summonChances, summonLessonDue, summonPool, summonsReady, wishChance, wished } from '../src/game/summoning';
 import { roseMark } from '../src/game/ui/spools';
 
 const json = (p: string) => JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -75,11 +78,13 @@ describe('champions', () => {
     }
   });
 
-  it('are all obtainable: starters or exactly one recruiting stage', () => {
+  // Jakub, 2026-10-25: "all champions are being spawned like in rsl from a special currency ... rime scholar is guaranteed champion drop from stage 1-1. this is only exception."
+  it('are all obtainable: Gareth from the start, the Rime Scholar from 1-1, every other champion summoned', () => {
+    expect(allStages().filter((s) => s.recruit).map((s) => [s.id, s.recruit])).toEqual([['1-1', 'rime_scholar']]);
+    const pool = summonPool(newArchivist()).map((c) => c.id);
     for (const c of CHAMPIONS) {
-      const n = allStages().filter((s) => s.recruit === c.id).length;
-      if (STARTERS.includes(c.id)) expect(n, c.id).toBe(0);
-      else expect(n, `${c.id} recruited by ${n} stages`).toBe(1);
+      if (STARTERS.includes(c.id) || c.id === 'rime_scholar') expect(pool, c.id).not.toContain(c.id);
+      else expect(pool, `${c.id} cannot be summoned`).toContain(c.id);
     }
   });
 });
@@ -446,8 +451,8 @@ describe('design decisions', () => {
     expect([scars.requires, scars.stages.map((s) => s.id)]).toEqual(['3-10', ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6', '4-7', '4-8', '4-9', '4-10']]);
     const mesa = LOCATIONS[4];
     expect([mesa.requires, mesa.stages.map((s) => s.id)]).toEqual(['4-10', ['5-1', '5-2', '5-3', '5-4', '5-5', '5-6', '5-7', '5-8', '5-9', '5-10']]);
-    // only its last stage brings a champion: the Paladin, a stand-in for the quest line Jakub designs later
-    expect(mesa.stages.filter((s) => s.recruit).map((s) => [s.id, s.recruit])).toEqual([['5-10', 'paladin']]);
+    // none of its stages brings a champion: since summoning (2026-10-25) the Paladin is summoned like the rest
+    expect(mesa.stages.filter((s) => s.recruit)).toEqual([]);
   });
 });
 
@@ -540,6 +545,17 @@ describe('font', () => {
       'Done! Claim the reward. Opens once "Finish Tutorial" is claimed. The tutorial was skipped: play it to the end. The tutorial is not finished yet. No spool is woven into a matrix yet.',
       'CLAIM CLAIMED LOCKED START TUTORIAL REPLAY TUTORIAL OPEN WEAVING TO THE JOURNEY Claimed Ready to claim In progress Locked The Journey goes on. Claim a quest to open the next.',
       "Your quests wait on the Journey meanwhile. The Herald's Board 1 ready",
+      // summoning: its names, the Wishing Star's screen, the ceremony, the results, the stage list, the Journey's Stardust
+      ...Object.values(SUMMONING),
+      'SUMMON The Wishing Star - 0 summoned STARDUST SOULSTARS MERGE 100 70 more for a Soulstar. 100 merge into a Soulstar. Each Soulstar summons one champion. Every victory in the campaign finds Stardust.',
+      'YOUR WISH ANY Any faction Any role ODDS Your wish: 20% <1% 8% without wishing Wish for a faction, a role, or both. A wish is no promise, only a better chance.',
+      'Wish for the Court of Root: each of its champions twice as likely. Wish for a Support: each one twice as likely. Every faction as likely as the others. Every role as likely as the others.',
+      '1 Soulstar to spend. 2 Soulstars to spend. Merge 100 Stardust into a Soulstar first. No Soulstar yet: win battles for Stardust. Every champion is in your Reliquary. The star calls, and a soul answers...',
+      'A champion you do not have yet answers. STILL SCATTERED 12 Common 10 Elite 1 Heroic None: every soul has been recollected. Chance on the next summon: 3%.',
+      'Your wish came true! Summoned at the Wishing Star. +30 Stardust 20 Stardust a victory, 30 when nobody falls.',
+      'Every 100 Stardust merge into a Soulstar at the Wishing Star, and a Soulstar summons a champion. Every victory finds Stardust. 100 of it merge into a Soulstar at the Wishing Star.',
+      '100 Stardust Found: at the Wishing Star now. Taken, to the Wishing Star. Every 100 merge into a Soulstar. A Soulstar summons a champion you do not have yet.',
+      'Stage 1-3 is not cleared yet. TO THE CAMPAIGN TO THE WISHING STAR Summon at the Wishing Star At the Wishing Star Comes when summoned at the Wishing Star.',
     ];
     expect(missing('regular', texts)).toEqual([]);
     expect(missing('bold', texts)).toEqual([]);
@@ -576,7 +592,7 @@ describe('main menu sanctum', () => {
   };
 
   it('has a place for every way on from the menu, each made of sprites that exist, with its outline and label', () => {
-    expect(menu.hotspots.map((h) => h.id).sort()).toEqual(['academy', 'campaign', 'challenges', 'champions', 'options', 'weaving']);
+    expect(menu.hotspots.map((h) => h.id).sort()).toEqual(['academy', 'campaign', 'challenges', 'champions', 'options', 'summon', 'weaving']);
     for (const h of menu.hotspots) {
       expect(h.sprites.length, h.id).toBeGreaterThan(0);
       for (const s of h.sprites) expect(menu.sprites[s], `${h.id} -> ${s}`).toBeTruthy();
@@ -615,34 +631,46 @@ describe('challenges and the tutorial', () => {
   it("has the Journey's knots, the tutorial's hand and the Herald's Board", () => {
     for (const k of ['open', 'ready', 'done', 'locked']) expect(ui.parts['quest_' + k], 'quest_' + k).toBeTruthy();
     expect(ui.parts.tut_hand).toBeTruthy();
-    for (const q of JOURNEY) expect(ui.parts[`spool_${q.reward.pattern}_${q.reward.grade}`], q.id).toBeTruthy();
+    for (const q of JOURNEY) {
+      const r = q.reward;
+      if (r.kind === 'spool') expect(ui.parts[`spool_${r.pattern}_${r.grade}`] && ui.parts[`bigspool_${r.pattern}_${r.grade}`], q.id).toBeTruthy();
+      else expect(ui.parts.stardust && ui.parts.bigstardust, q.id).toBeTruthy();
+    }
     expect(CHALLENGE_TABS.map((t) => t.id)).toEqual(['daily', 'persistent', 'journey']);
     expect(JOURNEY[0].title).toBe('Finish Tutorial');
+    // Jakub, 2026-10-25: "new journey quest: beat campaign 1-3. reward can be 100 summoning fragments"
+    expect([JOURNEY[1].title, JOURNEY[1].goal, JOURNEY[1].reward]).toEqual(['Beat Campaign 1-3', { kind: 'stage', stage: '1-3' }, { kind: 'fragments', amount: 100 }]);
   });
 
-  it('opens the Journey one quest at a time, and a claim gives its spool once', () => {
+  it('opens the Journey one quest at a time, and a claim gives its spool or its Stardust once', () => {
     const p = newArchivist();
-    const [first, second] = JOURNEY;
-    expect([questState(p, first), questState(p, second)]).toEqual(['open', 'locked']);
+    const [first, second, third] = JOURNEY;
+    expect([questState(p, first), questState(p, second), questState(p, third)]).toEqual(['open', 'locked', 'locked']);
     // a goal met before its quest opens waits for it
     weave(p);
-    expect(questState(p, second)).toBe('locked');
+    expect(questState(p, third)).toBe('locked');
     expect(claimQuest(p, first.id)).toBeNull();
     p.tutorial = 'done';
     expect(questState(p, first)).toBe('ready');
     expect(readyCount(p)).toBe(1);
     expect(claimQuest(p, second.id)).toBeNull();
     const before = p.reliquary.spools().length;
-    const spool = claimQuest(p, first.id)!;
-    expect(spool.pattern).toBe(first.reward.pattern);
-    expect(spool.grade).toBe(first.reward.grade);
+    const find = claimQuest(p, first.id)!;
+    expect(find.kind === 'spool' && first.reward.kind === 'spool' && [find.spool.pattern, find.spool.grade]).toEqual([first.reward.kind === 'spool' && first.reward.pattern, first.reward.kind === 'spool' && first.reward.grade]);
     expect(p.reliquary.spools()).toHaveLength(before + 1);
     expect(p.reliquary.freshCount()).toBe(1);
     expect(claimQuest(p, first.id)).toBeNull();
-    expect([questState(p, first), questState(p, second)]).toEqual(['claimed', 'ready']);
+    // Beat Campaign 1-3 waits for its stage, then gives the Stardust of a summon
+    expect([questState(p, first), questState(p, second)]).toEqual(['claimed', 'open']);
     expect(currentQuest(p)).toBe(second);
-    claimQuest(p, second.id);
-    expect(p.claimed).toEqual(JOURNEY.slice(0, 2).map((q) => q.id));
+    for (const s of allStages().slice(0, 3)) recordClear(p, s.id, 2);
+    expect(questState(p, second)).toBe('ready');
+    const dust = p.fragments;
+    expect(claimQuest(p, second.id)).toEqual({ kind: 'fragments', amount: 100 });
+    expect(p.fragments).toBe(dust + 100);
+    expect(questState(p, third)).toBe('ready');
+    claimQuest(p, third.id);
+    expect(p.claimed).toEqual(JOURNEY.slice(0, 3).map((q) => q.id));
     expect(readyCount(p)).toBe(0);
   });
 
@@ -680,7 +708,171 @@ describe('challenges and the tutorial', () => {
       expect(t.title && t.text, id).toBeTruthy();
       expect(!!t.act !== !!t.next, `${id}: a click or a button`).toBe(true);
     }
-    for (const id of TUTORIAL_PATH) expect(TUTORIAL[id], id).toBeTruthy();
+    for (const id of [...TUTORIAL_PATH, ...SUMMON_LESSON_PATH]) expect(TUTORIAL[id], id).toBeTruthy();
+  });
+});
+
+// Jakub, 2026-10-25: champions are summoned with fragments from the campaign, 100 to a shard, a shard a summon,
+// 70% Common, 25% Elite, 5% Heroic, a wish of a faction and a role "just a better chance"
+describe('summoning', () => {
+  /** a seeded random, the same every run */
+  const seeded = (seed: number) => {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  };
+
+  it('keeps his numbers: 100 fragments to a shard, 70 / 25 / 5% by rarity', () => {
+    expect(FRAGMENTS_PER_SHARD).toBe(100);
+    expect(SUMMON_ODDS).toEqual({ common: 0.7, elite: 0.25, heroic: 0.05, mythic: 0 });
+    expect(Object.values(rarityOdds(summonPool(newArchivist()))).reduce((a, b) => a + b, 0)).toBeCloseTo(1, 9);
+  });
+
+  it('has its parts: Stardust, the Soulstar, the SUMMON glyph and the Wishing Star in the Sanctum', () => {
+    for (const p of ['stardust', 'bigstardust', 'soulstar', 'bigsoulstar', 'mi_summon']) expect(ui.parts[p], p).toBeTruthy();
+    const menu = json('public/assets/menu/menu.json') as { sprites: Record<string, unknown>; wish: number[]; hotspots: { id: string; sprites: string[] }[] };
+    expect(menu.sprites.wish && menu.sprites.wish_glow).toBeTruthy();
+    expect(menu.hotspots.find((h) => h.id === 'summon')?.sprites).toEqual(['wish']);
+    expect(menu.wish).toHaveLength(2);
+  });
+
+  it('finds Stardust in every victory, more in later areas and when nobody falls; a recorded clear finds none', () => {
+    let last = 0;
+    for (const loc of LOCATIONS) {
+      const s = loc.stages[0].id;
+      expect(fragmentDrop(s, 1), loc.id).toBeGreaterThan(last);
+      expect(fragmentDrop(s, 3), loc.id).toBe(fragmentDrop(s, 1) + FRAGMENT_DROPS.flawless);
+      last = fragmentDrop(s, 1);
+    }
+    const p = newArchivist();
+    const won = recordVictory(p, '1-1', 3, seeded(1));
+    expect(won.fragments).toBe(fragmentDrop('1-1', 3));
+    expect(p.fragments).toBe(won.fragments);
+    recordClear(p, '1-2', 3);
+    expect(p.fragments).toBe(won.fragments);
+    // three first clears alone stay short of a summon: the third champion comes with Beat Campaign 1-3 (his design)
+    expect(['1-1', '1-2', '1-3'].reduce((n, s) => n + fragmentDrop(s, 3), 0)).toBeLessThan(FRAGMENTS_PER_SHARD);
+  });
+
+  it('merges 100 Stardust into a Soulstar, and spends a Soulstar on a champion not yet owned', () => {
+    const p = newArchivist();
+    recordClear(p, '1-1', 3);
+    expect([canMerge(p), mergeShard(p), summon(p)]).toEqual([false, false, null]);
+    p.fragments = 230;
+    expect(summonsReady(p)).toBe(2);
+    expect(mergeShard(p)).toBe(true);
+    expect([p.fragments, p.shards]).toEqual([130, 1]);
+    const owned = new Set(p.reliquary.files().map((f) => f.champion));
+    const s = summon(p, seeded(7))!;
+    expect(owned.has(s.champion)).toBe(false);
+    expect([STARTERS[0], 'rime_scholar']).not.toContain(s.champion);
+    expect(isUnlocked(p, s.champion) && isFresh(p, s.champion)).toBe(true);
+    expect([p.shards, p.summons, s.wished]).toEqual([0, 1, false]);
+    expect(summon(p)).toBeNull();
+  });
+
+  it('never brings a champion twice, and gives a found-out rarity\'s share to the others', () => {
+    const p = newArchivist();
+    p.shards = 999;
+    const seen = new Set<string>();
+    const rng = seeded(3);
+    let s;
+    while ((s = summon(p, rng))) {
+      expect(seen.has(s.champion), s.champion).toBe(false);
+      seen.add(s.champion);
+    }
+    expect(seen.size).toBe(CHAMPIONS.length - 2);
+    expect(summonPool(p)).toEqual([]);
+    expect(summonsReady(p)).toBe(0);
+    // with the only Heroic found, the 5% goes to Common and Elite in proportion
+    const q = newArchivist();
+    q.reliquary.recruit('paladin');
+    const odds = rarityOdds(summonPool(q));
+    expect(odds.heroic).toBe(0);
+    expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);
+    expect(odds.elite).toBeCloseTo(0.25 / 0.95, 9);
+  });
+
+  it('draws the rarities at his odds', () => {
+    const pool = summonPool(newArchivist());
+    const rng = seeded(11);
+    const n = 20000;
+    const got: Record<string, number> = {};
+    for (let i = 0; i < n; i++) {
+      const c = drawSummon(pool, {}, rng)!;
+      got[c.rarity] = (got[c.rarity] ?? 0) + 1;
+    }
+    expect(got.common / n).toBeCloseTo(0.7, 1);
+    expect(got.elite / n).toBeCloseTo(0.25, 1);
+    expect(Math.abs(got.heroic / n - 0.05)).toBeLessThan(0.01);
+  });
+
+  it('makes what a wish names likelier but never certain, and leaves the rarity odds alone', () => {
+    const pool = summonPool(newArchivist());
+    const wish = { faction: 'court_of_root', role: 'Support' } as const;
+    const plain = new Map(summonChances(pool, {}).map((e) => [e.c.id, e.p]));
+    const chances = summonChances(pool, wish);
+    expect(chances.reduce((s, e) => s + e.p, 0)).toBeCloseTo(1, 9);
+    const byRarity = (list: typeof chances, r: string) => list.filter((e) => e.c.rarity === r).reduce((s, e) => s + e.p, 0);
+    for (const r of ['common', 'elite', 'heroic']) expect(byRarity(chances, r), r).toBeCloseTo(SUMMON_ODDS[r as 'common'], 9);
+    // within a rarity, both named: four times as likely as one named in neither, one named: twice
+    const commons = chances.filter((e) => e.c.rarity === 'common');
+    const p = (id: string) => commons.find((e) => e.c.id === id)!.p;
+    expect(p('wild_speaker') / p('enforcer')).toBeCloseTo(4, 9);
+    expect(p('follower') / p('enforcer')).toBeCloseTo(2, 9);
+    expect(p('quartermaster') / p('enforcer')).toBeCloseTo(2, 9);
+    expect(wished(champion('wild_speaker'), wish) && !wished(champion('follower'), wish)).toBe(true);
+    const chance = wishChance(pool, wish);
+    expect(chance).toBeGreaterThan(wishChance(pool, wish, false));
+    expect(chance).toBeLessThan(1);
+    expect(plain.get('wild_speaker')).toBeCloseTo(0.7 / 12, 9);
+    expect(wishChance(pool, {})).toBe(0);
+  });
+
+  it('keeps the Stardust, the Soulstars, the wish, the summons and the lessons through a save; an older save holds none', () => {
+    const p = newArchivist();
+    Object.assign(p, { fragments: 42, shards: 2, wish: { faction: 'ashveil_reign', role: 'Tank' }, summons: 3, lessons: ['summon'] });
+    const q = readSave(writeSave(p));
+    expect([q.fragments, q.shards, q.wish, q.summons, q.lessons]).toEqual([42, 2, { faction: 'ashveil_reign', role: 'Tank' }, 3, ['summon']]);
+    const save = JSON.parse(writeSave(newArchivist())) as Record<string, unknown>;
+    for (const k of ['fragments', 'shards', 'wish', 'summons', 'lessons']) delete save[k];
+    const old = readSave(JSON.stringify(save));
+    expect([old.fragments, old.shards, old.wish, old.summons, old.lessons]).toEqual([0, 0, {}, 0, []]);
+    // nonsense is cleaned: counts never negative or broken, a wish only of what exists
+    const odd = readSave(JSON.stringify({ ...save, fragments: -5, shards: 'x', wish: { faction: 'nowhere', role: 'Bard' } }));
+    expect([odd.fragments, odd.shards, odd.wish]).toEqual([0, 0, {}]);
+  });
+
+  it('is taught in the Academy with the numbers it uses', () => {
+    const blocks = CHAPTERS.flatMap((ch) => ch.blocks);
+    const text = blocks.flatMap((b) => ('text' in b ? [b.text] : b.kind === 'list' ? b.items : [])).join(' ');
+    const odds = (['common', 'elite', 'heroic'] as const).map((r) => `${RARITIES[r].name}: ${Math.round(SUMMON_ODDS[r] * 100)}%.`);
+    expect(blocks.some((b) => b.kind === 'list' && JSON.stringify(b.items) === JSON.stringify(odds)), odds.join(' ')).toBe(true);
+    expect(text).toContain(`${FRAGMENTS_PER_SHARD} ${SUMMONING.fragment} merge into a ${SUMMONING.shard}`);
+    // the drops step evenly from area to area, as the Academy says
+    const [first, second] = FRAGMENT_DROPS.byArea;
+    FRAGMENT_DROPS.byArea.forEach((v, i) => expect(v, `area ${i + 1}`).toBe(first + i * (second - first)));
+    expect(text).toContain(`${first} in the Fracture Reach and ${second - first} more in each area beyond it, ${FRAGMENT_DROPS.flawless} more when nobody falls`);
+  });
+
+  it('tells how each champion comes, and when the lesson on summoning is due', () => {
+    expect(joinsBy(STARTERS[0])).toEqual({ kind: 'start' });
+    expect(joinsBy('rime_scholar')).toEqual({ kind: 'stage', stage: '1-1' });
+    expect(joinsBy('paladin')).toEqual({ kind: 'summon' });
+    const p = newArchivist();
+    expect(summonLessonDue(p)).toBe(false);
+    p.fragments = 100;
+    expect(summonLessonDue(p)).toBe(true);
+    p.lessons = ['summon'];
+    expect(summonLessonDue(p)).toBe(false);
+    p.lessons = [];
+    p.tutorial = 'skipped';
+    expect(summonLessonDue(p)).toBe(false);
   });
 });
 

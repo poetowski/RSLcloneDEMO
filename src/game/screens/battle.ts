@@ -1,7 +1,7 @@
 // Wraps the battle scene for the app: builds the setup from a campaign stage
 // (or an Academy demonstration), records the result in the save (stars, the
-// recruit, the spools found) and routes onward — recruit ceremony, next stage,
-// retry or back to the map.
+// recruit, the spools and the Stardust found) and routes onward — recruit
+// ceremony, next stage, retry or back to the map.
 import { App, Screen } from '../app';
 import { battleStats, recordVictory } from '../archivist';
 import { allStages, stage, zoneOf } from '../data/campaign';
@@ -38,7 +38,7 @@ export class BattleScreen implements Screen {
           const first = victory && !(p.stars[st.id] > 0);
           const reward = victory ? recordVictory(p, st.id, out.stars) : undefined;
           this.recruited = reward?.recruited;
-          return { victory, stars: out.stars, stageId: st.id, recruit: this.recruited ? champion(this.recruited) : undefined, spools: reward?.spools, firstClear: first, turns: out.turns };
+          return { victory, stars: out.stars, stageId: st.id, recruit: this.recruited ? champion(this.recruited) : undefined, spools: reward?.spools, fragments: reward?.fragments, firstClear: first, turns: out.turns };
         },
         next: () => {
           if (this.recruited) app.router.recruit(this.recruited);

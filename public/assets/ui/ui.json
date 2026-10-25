@@ -829,602 +829,632 @@
    24,
    24
   ],
-  "card_common": [
+  "bigstardust": [
    931,
    283,
    24,
    24
   ],
-  "card_elite": [
+  "bigsoulstar": [
    956,
    283,
    24,
    24
   ],
-  "card_heroic": [
+  "card_common": [
    981,
    283,
    24,
    24
   ],
-  "card_mythic": [
+  "card_elite": [
    0,
    319,
    24,
    24
   ],
-  "card_ashen": [
+  "card_heroic": [
    25,
    319,
    24,
    24
   ],
-  "card_silver": [
+  "card_mythic": [
    50,
    319,
    24,
    24
   ],
-  "card_gilded": [
+  "card_ashen": [
    75,
    319,
    24,
    24
   ],
-  "podium": [
+  "card_silver": [
    100,
+   319,
+   24,
+   24
+  ],
+  "card_gilded": [
+   125,
+   319,
+   24,
+   24
+  ],
+  "podium": [
+   150,
    319,
    64,
    22
   ],
   "node_open": [
-   165,
+   215,
    319,
    21,
    21
   ],
   "node_cleared": [
-   187,
+   237,
    319,
    21,
    21
   ],
   "node_locked": [
-   209,
+   259,
    319,
    21,
    21
   ],
   "node_boss": [
-   231,
+   281,
    319,
    21,
    21
   ],
   "ring_ally": [
-   253,
+   303,
    319,
    56,
    20
   ],
   "ring_enemy": [
-   310,
+   360,
    319,
    56,
    20
   ],
   "ring_active_0": [
-   367,
+   417,
    319,
    56,
    20
   ],
   "ring_target_0": [
-   424,
+   474,
    319,
    56,
    20
   ],
   "ring_heal_0": [
-   481,
+   531,
    319,
    56,
    20
   ],
   "ring_active_1": [
-   538,
+   588,
    319,
    56,
    20
   ],
   "ring_target_1": [
-   595,
+   645,
    319,
    56,
    20
   ],
   "ring_heal_1": [
-   652,
+   702,
    319,
    56,
    20
   ],
   "ring_active_2": [
-   709,
+   759,
    319,
    56,
    20
   ],
   "ring_target_2": [
-   766,
+   816,
    319,
    56,
    20
   ],
   "ring_heal_2": [
-   823,
+   873,
    319,
    56,
    20
   ],
   "banner": [
-   880,
+   930,
    319,
    32,
    18
   ],
   "tut_hand": [
-   913,
+   963,
    319,
    15,
    18
   ],
   "spool_pattern_pulse_0": [
-   929,
+   979,
    319,
    18,
    18
   ],
   "spool_pattern_pulse_1": [
-   948,
+   998,
    319,
    18,
    18
   ],
   "spool_pattern_pulse_2": [
-   967,
-   319,
-   18,
-   18
-  ],
-  "spool_pattern_sunder_0": [
-   986,
-   319,
-   18,
-   18
-  ],
-  "spool_pattern_sunder_1": [
-   1005,
-   319,
-   18,
-   18
-  ],
-  "spool_pattern_sunder_2": [
    0,
    344,
    18,
    18
   ],
-  "spool_pattern_ward_0": [
+  "spool_pattern_sunder_0": [
    19,
    344,
    18,
    18
   ],
-  "spool_pattern_ward_1": [
+  "spool_pattern_sunder_1": [
    38,
    344,
    18,
    18
   ],
-  "spool_pattern_ward_2": [
+  "spool_pattern_sunder_2": [
    57,
    344,
    18,
    18
   ],
-  "spool_pattern_vigor_0": [
+  "spool_pattern_ward_0": [
    76,
    344,
    18,
    18
   ],
-  "spool_pattern_vigor_1": [
+  "spool_pattern_ward_1": [
    95,
    344,
    18,
    18
   ],
-  "spool_pattern_vigor_2": [
+  "spool_pattern_ward_2": [
    114,
    344,
    18,
    18
   ],
-  "spool_pattern_needle_0": [
+  "spool_pattern_vigor_0": [
    133,
    344,
    18,
    18
   ],
-  "spool_pattern_needle_1": [
+  "spool_pattern_vigor_1": [
    152,
    344,
    18,
    18
   ],
-  "spool_pattern_needle_2": [
+  "spool_pattern_vigor_2": [
    171,
    344,
    18,
    18
   ],
-  "spool_pattern_apex_0": [
+  "spool_pattern_needle_0": [
    190,
    344,
    18,
    18
   ],
-  "spool_pattern_apex_1": [
+  "spool_pattern_needle_1": [
    209,
    344,
    18,
    18
   ],
-  "spool_pattern_apex_2": [
+  "spool_pattern_needle_2": [
    228,
    344,
    18,
    18
   ],
-  "spool_pattern_focus_0": [
+  "spool_pattern_apex_0": [
    247,
    344,
    18,
    18
   ],
-  "spool_pattern_focus_1": [
+  "spool_pattern_apex_1": [
    266,
    344,
    18,
    18
   ],
-  "spool_pattern_focus_2": [
+  "spool_pattern_apex_2": [
    285,
    344,
    18,
    18
   ],
-  "spool_pattern_tranquility_0": [
+  "spool_pattern_focus_0": [
    304,
    344,
    18,
    18
   ],
-  "spool_pattern_tranquility_1": [
+  "spool_pattern_focus_1": [
    323,
    344,
    18,
    18
   ],
-  "spool_pattern_tranquility_2": [
+  "spool_pattern_focus_2": [
    342,
    344,
    18,
    18
   ],
-  "btn_up": [
+  "spool_pattern_tranquility_0": [
    361,
+   344,
+   18,
+   18
+  ],
+  "spool_pattern_tranquility_1": [
+   380,
+   344,
+   18,
+   18
+  ],
+  "spool_pattern_tranquility_2": [
+   399,
+   344,
+   18,
+   18
+  ],
+  "btn_up": [
+   418,
    344,
    16,
    16
   ],
   "btn_hover": [
-   378,
+   435,
    344,
    16,
    16
   ],
   "btn_down": [
-   395,
+   452,
    344,
    16,
    16
   ],
   "btn_off": [
-   412,
+   469,
    344,
    16,
    16
   ],
   "well": [
-   429,
+   486,
+   344,
+   16,
+   16
+  ],
+  "mi_summon": [
+   503,
    344,
    16,
    16
   ],
   "mi_campaign": [
-   446,
+   520,
    344,
    16,
    16
   ],
   "mi_champions": [
-   463,
+   537,
    344,
    16,
    16
   ],
   "mi_academy": [
-   480,
+   554,
    344,
    16,
    16
   ],
   "mi_options": [
-   497,
+   571,
    344,
    16,
    16
   ],
   "mi_back": [
-   514,
+   588,
    344,
    16,
    16
   ],
   "mi_fight": [
-   531,
+   605,
    344,
    16,
    16
   ],
   "mi_play": [
-   548,
+   622,
    344,
    16,
    16
   ],
   "mi_weaving": [
-   565,
+   639,
    344,
    16,
    16
   ],
   "arrow_l": [
-   582,
+   656,
    344,
    10,
    15
   ],
   "arrow_r": [
-   593,
+   667,
    344,
    10,
    15
   ],
   "emblem_azure_crown": [
-   604,
+   678,
    344,
    15,
    15
   ],
   "emblem_sanguine_dominion": [
-   620,
+   694,
    344,
    15,
    15
   ],
   "emblem_court_of_root": [
-   636,
+   710,
    344,
    15,
    15
   ],
   "emblem_ashveil_reign": [
-   652,
+   726,
    344,
    15,
    15
   ],
   "tab_on": [
-   668,
+   742,
    344,
    16,
    14
   ],
   "tab_off": [
-   685,
+   759,
    344,
    16,
    14
   ],
   "lock": [
-   702,
+   776,
    344,
    11,
    13
   ],
   "star_m": [
-   714,
+   788,
    344,
    13,
    13
   ],
   "star_m_off": [
-   728,
+   802,
    344,
    13,
    13
   ],
   "rose_0": [
-   742,
+   816,
    344,
    13,
    13
   ],
   "rose_1": [
-   756,
+   830,
    344,
    13,
    13
   ],
   "rose_2": [
-   770,
+   844,
    344,
    13,
    13
   ],
   "rose_3": [
-   784,
+   858,
    344,
    13,
    13
   ],
   "rose_4": [
-   798,
+   872,
    344,
    13,
    13
   ],
   "rose_5": [
-   812,
+   886,
    344,
    13,
    13
   ],
   "rose_135": [
-   826,
+   900,
    344,
    13,
    13
   ],
+  "stardust": [
+   914,
+   344,
+   11,
+   11
+  ],
+  "soulstar": [
+   926,
+   344,
+   11,
+   11
+  ],
   "gem_ember": [
-   840,
+   938,
    344,
    11,
    11
   ],
   "gem_bloom": [
-   852,
+   950,
    344,
    11,
    11
   ],
   "gem_tide": [
-   864,
+   962,
    344,
    11,
    11
   ],
   "crown": [
-   876,
+   974,
    344,
    13,
    10
   ],
   "chevron_red": [
-   890,
+   988,
    344,
    11,
    9
   ],
   "chevron_gold": [
-   902,
+   1000,
    344,
    11,
    9
   ],
   "chevron_green": [
-   914,
+   1012,
    344,
    11,
    9
   ],
   "new": [
-   926,
-   344,
+   0,
+   363,
    19,
    9
   ],
   "star_s": [
-   946,
-   344,
+   20,
+   363,
    9,
    9
   ],
   "star_s_off": [
-   956,
-   344,
+   30,
+   363,
    9,
    9
   ],
   "role_Tank": [
-   966,
-   344,
+   40,
+   363,
    9,
    9
   ],
   "role_Damage": [
-   976,
-   344,
+   50,
+   363,
    9,
    9
   ],
   "role_Support": [
-   986,
-   344,
+   60,
+   363,
    9,
    9
   ],
   "check": [
-   996,
-   344,
+   70,
+   363,
    9,
    8
   ],
   "g_auto": [
-   1006,
-   344,
+   80,
+   363,
    7,
    8
   ],
   "g_restart": [
-   1014,
-   344,
+   88,
+   363,
    7,
    8
   ],
   "divider": [
-   0,
+   96,
    363,
    40,
    7
   ],
   "g_speed": [
-   41,
+   137,
    363,
    7,
    7
   ],
   "g_pause": [
-   49,
+   145,
    363,
    5,
    7
   ],
   "g_play": [
-   55,
+   151,
    363,
    5,
    7
@@ -1433,151 +1463,151 @@
  "portraits": {
   "captain_gareth": [
    0,
-   372,
+   374,
    28,
    28
   ],
   "rime_scholar": [
    29,
-   372,
+   374,
    28,
    28
   ],
   "follower": [
    58,
-   372,
+   374,
    28,
    28
   ],
   "skirmisher": [
    87,
-   372,
+   374,
    28,
    28
   ],
   "dominion_medic": [
    116,
-   372,
+   374,
    28,
    28
   ],
   "lineholder": [
    145,
-   372,
+   374,
    28,
    28
   ],
   "bloodhound": [
    174,
-   372,
+   374,
    28,
    28
   ],
   "quartermaster": [
    203,
-   372,
+   374,
    28,
    28
   ],
   "enforcer": [
    232,
-   372,
+   374,
    28,
    28
   ],
   "walking_bush": [
    261,
-   372,
+   374,
    28,
    28
   ],
   "wild_speaker": [
    290,
-   372,
+   374,
    28,
    28
   ],
   "jungle_herder": [
    319,
-   372,
+   374,
    28,
    28
   ],
   "associate": [
    348,
-   372,
+   374,
    28,
    28
   ],
   "emissary_handlings": [
    377,
-   372,
+   374,
    28,
    28
   ],
   "black_rhino": [
    406,
-   372,
+   374,
    28,
    28
   ],
   "red_cloak": [
    435,
-   372,
+   374,
    28,
    28
   ],
   "grove_keeper": [
    464,
-   372,
+   374,
    28,
    28
   ],
   "big_ears": [
    493,
-   372,
+   374,
    28,
    28
   ],
   "skeleton": [
    522,
-   372,
+   374,
    28,
    28
   ],
   "rot_hulk": [
    551,
-   372,
+   374,
    28,
    28
   ],
   "bellringer": [
    580,
-   372,
+   374,
    28,
    28
   ],
   "necromancer": [
    609,
-   372,
+   374,
    28,
    28
   ],
   "automated_soul": [
    638,
-   372,
+   374,
    28,
    28
   ],
   "irving_wellbington": [
    667,
-   372,
+   374,
    28,
    28
   ],
   "paladin": [
    696,
-   372,
+   374,
    28,
    28
   ]

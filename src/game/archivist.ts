@@ -1,15 +1,19 @@
 // The Master Archivist: the player, and the save that remembers them. Stage
-// stars, the last team, Academy chapters read, settings, the tutorial and the
-// Journey's claimed quests live here; the champions owned, with their Weaver
-// Matrices, live in the Reliquary. Stored
+// stars, the last team, Academy chapters read, settings, the tutorial, its
+// lessons and the Journey's claimed quests live here, and what summons
+// champions: the Stardust found, the Soulstars merged from it and the wish
+// made at the Wishing Star; the champions owned, with their Weaver Matrices,
+// live in the Reliquary. Stored
 // in localStorage; every access is guarded because storage can be missing
 // (private windows) and the game must still run.
 import { LOCATIONS, STARTERS, allStages, stage } from './data/campaign';
 import { JOURNEY } from './data/challenges';
 import { champion, CHAMPIONS } from './data/champions';
 import { MATRIX_LAYOUT, PATTERN_IDS, SPOOL_STATS } from './data/matrix';
+import { FACTIONS, ROLES } from './data/meta';
+import { Wish } from './data/summoning';
 import { LocationDef, Stats } from './data/types';
-import { rollDrops } from './reliquary/drops';
+import { fragmentDrop, rollDrops } from './reliquary/drops';
 import { Grade, rollSpool, sameSpool, ThreadSpool, wovenStats } from './reliquary/matrix';
 import { Reliquary, ReliquaryJson } from './reliquary/reliquary';
 
@@ -27,6 +31,16 @@ export interface MasterArchivist {
   tutorial: TutorialState;
   /** the Journey's quests claimed, in order */
   claimed: string[];
+  /** Stardust found and not merged yet (the fragments) */
+  fragments: number;
+  /** Soulstars merged and not spent yet (the shards) */
+  shards: number;
+  /** the faction and the role wished for at the Wishing Star */
+  wish: Wish;
+  /** champions summoned so far */
+  summons: number;
+  /** the tutorial's later lessons shown to their end or closed ('summon': the first summon) */
+  lessons: string[];
 }
 
 export type TutorialState = 'todo' | 'skipped' | 'done';
@@ -42,6 +56,12 @@ interface SaveJson {
   /** since the tutorial and the Journey (2026-10-24); a save without them reads 'todo' and none claimed */
   tutorial?: TutorialState;
   claimed?: string[];
+  /** since summoning (2026-10-25); a save without them holds none, wishes nothing and has seen no lesson */
+  fragments?: number;
+  shards?: number;
+  wish?: Wish;
+  summons?: number;
+  lessons?: string[];
 }
 
 /**
@@ -63,7 +83,7 @@ const OLD_KEYS = ['tlrol.save.v2', 'oathbound.profile.v1'];
 export function newArchivist(): MasterArchivist {
   const reliquary = new Reliquary(MATRIX_LAYOUT);
   for (const id of STARTERS) reliquary.recruit(id, false);
-  return { stars: {}, team: [...STARTERS], read: [], settings: { speed: 1, auto: false }, reliquary, tutorial: 'todo', claimed: [] };
+  return { stars: {}, team: [...STARTERS], read: [], settings: { speed: 1, auto: false }, reliquary, tutorial: 'todo', claimed: [], fragments: 0, shards: 0, wish: {}, summons: 0, lessons: [] };
 }
 
 /**
@@ -83,6 +103,11 @@ export function readSave(raw: string | null, rawOld: string | null = null): Mast
       if (Array.isArray(s.team)) a.team = [...s.team];
       if (s.tutorial === 'skipped' || s.tutorial === 'done') a.tutorial = s.tutorial;
       if (Array.isArray(s.claimed)) a.claimed = s.claimed.filter((id) => typeof id === 'string');
+      a.fragments = count(s.fragments);
+      a.shards = count(s.shards);
+      a.summons = count(s.summons);
+      if (s.wish && typeof s.wish === 'object') a.wish = { faction: s.wish.faction, role: s.wish.role };
+      if (Array.isArray(s.lessons)) a.lessons = s.lessons.filter((id) => typeof id === 'string');
       keepHabits(a, s);
     } else if (rawOld) {
       const s = JSON.parse(rawOld) as Partial<OldSaveJson>;
@@ -101,10 +126,16 @@ function keepHabits(a: MasterArchivist, s: Partial<Pick<SaveJson, 'read' | 'sett
   a.settings = { ...a.settings, ...s.settings };
 }
 
+/** A saved count: a whole number, never below zero. */
+function count(v: unknown): number {
+  return typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0;
+}
+
 /**
  * Drops ids the catalog no longer has (renamed or removed content), gives
  * every starter its soul file and every cleared stage's champion its own, so
- * a save survives stages that change what they bring.
+ * a save survives stages that change what they bring (since summoning only
+ * 1-1 brings one; every champion a save already holds stays).
  */
 function validated(a: MasterArchivist): MasterArchivist {
   const champions = new Set(CHAMPIONS.map((c) => c.id));
@@ -113,6 +144,9 @@ function validated(a: MasterArchivist): MasterArchivist {
   for (const id of Object.keys(a.stars)) if (!stages.has(id)) delete a.stars[id];
   for (const id of STARTERS) a.reliquary.recruit(id, false);
   for (const s of allStages()) if (s.recruit && cleared(a, s.id)) a.reliquary.recruit(s.recruit, false);
+  // a wish only names a faction and a role that exist
+  if (!a.wish.faction || !(a.wish.faction in FACTIONS)) delete a.wish.faction;
+  if (!a.wish.role || !(a.wish.role in ROLES)) delete a.wish.role;
   a.team = a.team.filter((id) => a.reliquary.has(id));
   // a save whose team is gone (champions renamed or removed) starts from the starters
   if (!a.team.length) a.team = [...STARTERS];
@@ -140,7 +174,10 @@ export function loadArchivist(): MasterArchivist {
 
 /** The archivist as stored text. */
 export function writeSave(a: MasterArchivist): string {
-  const s: SaveJson = { version: 3, stars: a.stars, team: a.team, read: a.read, settings: a.settings, reliquary: a.reliquary.toJSON(), tutorial: a.tutorial, claimed: a.claimed };
+  const s: SaveJson = {
+    version: 3, stars: a.stars, team: a.team, read: a.read, settings: a.settings, reliquary: a.reliquary.toJSON(), tutorial: a.tutorial, claimed: a.claimed,
+    fragments: a.fragments, shards: a.shards, wish: a.wish, summons: a.summons, lessons: a.lessons,
+  };
   return JSON.stringify(s);
 }
 
@@ -202,30 +239,34 @@ export function frontier(a: MasterArchivist): string {
   return (uncleared[0] ?? open[open.length - 1]).id;
 }
 
-/** Records a clear without finding spools (the ?progress deep link). Returns the champion recruited by a first clear, if any. */
+/** Records a clear without finding spools or Stardust (the ?progress deep link). Returns the champion recruited by a first clear, if any. */
 export function recordClear(a: MasterArchivist, stageId: string, stars: number): string | undefined {
   const recruited = clear(a, stageId, stars);
   saveArchivist(a);
   return recruited;
 }
 
-/** What a campaign victory brought: the champion a first clear recruits, and the spools it found. */
+/** What a campaign victory brought: the champion a first clear recruits (1-1's), the spools and the Stardust it found. */
 export interface VictoryReward {
   recruited?: string;
   spools: ThreadSpool[];
+  fragments: number;
 }
 
 /**
- * Records a campaign victory: its stars, the champion of a first clear, and
- * the spools it finds (spools drop from every stage, Jakub, 2026-10-24), which
- * come into the stock with the NEW badge.
+ * Records a campaign victory: its stars, the champion of a first clear, the
+ * spools it finds (spools drop from every stage, Jakub, 2026-10-24), which
+ * come into the stock with the NEW badge, and its Stardust (Jakub,
+ * 2026-10-25: "campaign nodes drop these fragments").
  */
 export function recordVictory(a: MasterArchivist, stageId: string, stars: number, rng: () => number = Math.random): VictoryReward {
   const recruited = clear(a, stageId, stars);
   const spools = rollDrops(stageId, stars, rng);
   for (const s of spools) a.reliquary.addSpool(s, true);
+  const fragments = fragmentDrop(stageId, stars);
+  a.fragments += fragments;
   saveArchivist(a);
-  return { recruited, spools };
+  return { recruited, spools, fragments };
 }
 
 /** Stars and the first-clear recruit, without saving. */

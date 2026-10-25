@@ -18,7 +18,7 @@ Snapshot: commit `8dd9a26`, 2026-10-06. Every dependency rule in section 8 and e
 | Content design: kits, stages, norms | core | the game's variety lives in the kits; the norms hold their quality | `src/game/data/`, `norms.ts`, `tools/balance.ts` |
 | Battle presentation | core (experience) | turns rule events into spectacle ([MDA.md](MDA.md) AE2) | `src/game/view/` |
 | Procedural art | supporting, strategic | the entire look, generated and versioned | `tools/art/`, `public/assets/` |
-| Progression and collection | supporting | the recruit loop, stars, unlocks | `src/game/archivist.ts`, `src/game/reliquary/`, `campaign.ts`, `src/game/screens/` |
+| Progression and collection | supporting | the summoning loop, stars, unlocks | `src/game/archivist.ts`, `src/game/reliquary/`, `campaign.ts`, `src/game/screens/` |
 | Growth: the Weaver Matrix | supporting | how champions grow through gear; outline approved, content not yet | `src/game/reliquary/`, `src/game/data/matrix.ts` |
 | Teaching (the Academy) | supporting | learnability ([MDA.md](MDA.md) AE4) | `codex.ts`, `screens/academy.ts` |
 | Quality tooling | supporting | the guardrails | `tests/`, `tools/balance.ts`, `tools/art/audit.ts`, `tools/shots.ts` |
@@ -95,7 +95,12 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | --- | --- | --- |
 | Location (area, campaign node) | an area of the campaign: one node on the world map whose stage list opens from it, one zone for its stages, opened by a `requires` stage; it may have no stages yet | `LocationDef`, `CampaignScreen` |
 | Stage | one battle of the campaign, called by its id `"<chapter>-<n>"`; stages have no names and no place on the map: they open from their area's node | `StageDef` |
-| Recruit, first clear | the first win of a stage brings its champion, fought there or not (the second champion joins after the first battle without being fought) | `StageDef.recruit`, `recordClear`, `Reliquary.recruit` |
+| Recruit, first clear | the first win of a stage brings its champion, fought there or not: since summoning only 1-1's, the Rime Scholar (the second champion joins after the first battle without being fought) | `StageDef.recruit`, `recordClear`, `Reliquary.recruit` |
+| Summon | spending a Soulstar at the Wishing Star: a rarity drawn at 70 / 25 / 5% (Common, Elite, Heroic), then a champion of it not yet owned, those the wish names likelier; how every champion but the starter and 1-1's comes | `summon`, `drawSummon`, `summonPool`, `SummonScreen`, `MasterArchivist.summons` |
+| Stardust, Soulstar | the summoning currency (names proposed, his to choose): Stardust, the fragments every campaign victory finds; a Soulstar, 100 Stardust merged, spent on one summon | `MasterArchivist.fragments`, `MasterArchivist.shards`, `fragmentDrop`, `mergeShard`, `FRAGMENTS_PER_SHARD` |
+| Wish | the faction and role the Archivist hopes for: within the rarity drawn, each part a champion matches makes it twice as likely; never a promise | `Wish`, `MasterArchivist.wish`, `wishWeight`, `wishChance` |
+| Wishing Star | the Sanctum's place in the sky where Stardust is merged and champions summoned | `SummonScreen`, the `summon` place of `menu.json` |
+| Still scattered | the champions a summon can still bring: not owned, not a starter, brought by no stage | `summonPool` |
 | Starters | the champions owned from the start | `STARTERS` |
 | Roster | the champions the player owns | `roster()` |
 | Collection | every champion, owned or locked | `CollectionScreen` |
@@ -103,11 +108,11 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Frontier | the newest playable stage | `frontier()` |
 | World map, overview | the campaign map in world pixels (1920x360, growing east area by area), scrolled sideways under a camera: the campaign is a line of areas crossed from left to right; the overview draws the same world on one screen | `WORLD_MAP`, `CampaignScreen` |
 | Stars | 3, 2 or 1 by champions lost; the best is kept | `starsFor`, `MasterArchivist.stars` |
-| Master Archivist | the player and their save: stars, last team, Academy chapters read, settings, the tutorial's state, the Journey's claims, and the Reliquary | `MasterArchivist`, `loadArchivist`, `saveArchivist`, `readSave`, `writeSave` |
+| Master Archivist | the player and their save: stars, last team, Academy chapters read, settings, the tutorial's state and lessons, the Journey's claims, the Stardust, Soulstars, wish and summons, and the Reliquary | `MasterArchivist`, `loadArchivist`, `saveArchivist`, `readSave`, `writeSave` |
 | Challenges | the main-menu place of quests, in three tabs: Daily and Persistent (placeholders) and the Journey | `ChallengesScreen`, `CHALLENGE_TABS` |
 | Journey, quest | quests in an order, each opened by claiming the one before it; a quest has a goal read from the save and a reward; its state is locked, open, ready or claimed | `JOURNEY`, `QuestDef`, `questState`, `claimQuest`, `MasterArchivist.claimed` |
-| Tutorial | the guided first visit of a new account: the Sanctum, the campaign, stage 1-1 and its rewards, the Challenges; finished by its first victory (the Journey's first quest), or skipped | `Tutorial`, `tutorialDue`, `MasterArchivist.tutorial` |
-| Fresh (NEW) | recruited, not yet opened on the champion page | `HeroSoulFile.fresh`, `isFresh`, `Reliquary.markSeen` |
+| Tutorial | the guided first visit of a new account: the Sanctum, the campaign, stage 1-1 and its rewards, the Challenges; finished by its first victory (the Journey's first quest), or skipped; and a later lesson, the first summon, once a summon waits | `Tutorial`, `tutorialDue`, `summonLessonDue`, `MasterArchivist.tutorial`, `MasterArchivist.lessons` |
+| Fresh (NEW) | recruited or summoned, not yet opened on the champion page | `HeroSoulFile.fresh`, `isFresh`, `Reliquary.markSeen` |
 
 ### 2.4 World, presentation and art
 
@@ -315,7 +320,7 @@ winner()           checked before choosing and after every action
 ### 4.4 Progression (C4)
 
 - **Aggregate root: `MasterArchivist`**: `stars`, `team`, `read`, `settings`, and the `reliquary` it holds (C10).
-- **Policies:** `isUnlocked` (the champion has a soul file), `isFresh`, `anyFresh`, `roster`, `cleared`, `locationOpen`, `stageOpen`, `frontier`, `recordClear` (stars only go up; recruit on the first clear only), `totalStars`, `unlockEverything`.
+- **Policies:** `isUnlocked` (the champion has a soul file), `isFresh`, `anyFresh`, `roster`, `cleared`, `locationOpen`, `stageOpen`, `frontier`, `recordClear` (stars only go up; recruit on the first clear only), `recordVictory` (and the Stardust a victory finds), `totalStars`, `unlockEverything`; summoning's in `src/game/summoning.ts`: `summonPool`, `rarityOdds`, `summonChances`, `wishChance`, `drawSummon`, `mergeShard`, `summon`, `summonsReady`, `summonLessonDue`, `joinsBy`.
 - **Repository:** `loadArchivist` and `saveArchivist` under `tlrol.save.v2`, through the pure `readSave` and `writeSave`; every access is guarded. A version 1 save (`oathbound.profile.v1`) is migrated once and left in place; another version, or unreadable text, starts a new game. Loading drops champion and stage ids the catalog lacks and gives every starter its soul file.
 - **Writers:** `recordClear` saves by itself; the champion page clears the NEW badge through `Reliquary.markSeen`; screens write `team`, `read` and `settings` directly and call `app.save()` (DR-15).
 
@@ -429,7 +434,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-P1 | Stage ids are unique; 1-3 enemies, all known champions; an area with stages names a known zone; campaign nodes inside the world, clear of its frame and the header | test |
 | INV-P9 | The world map and its overview have the sizes `WORLD_MAP` declares; the overview fits one screen (`WORLD_MAP.w / overview` at most 640); each area's node stands east of the one before | test |
 | INV-P2 | Every location ends on a boss stage; `requires` names an existing stage | test |
-| INV-P3 | Every non-starter is brought by exactly one stage; it need not be among that stage's enemies | test |
+| INV-P3 | Only 1-1 brings a champion (the Rime Scholar); every other non-starter can be summoned (Jakub, 2026-10-25) | test |
 | INV-P4 | A stage opens when its location is open and the previous stage there is cleared | test (save); the battle route does not check it (DR-11) |
 | INV-P5 | A recruit happens on the first clear only, and only if not owned; stars only go up | test |
 | INV-P6 | Every champion and stage id in the save exists in the catalog | test: loading drops unknown ids (`readSave`) |
@@ -439,6 +444,8 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-P11 | Every area with stages holds exactly two different Weave Patterns, both in the catalog, and every pattern drops in some area (Jakub, 2026-10-24) | test |
 | INV-P12 | The Journey is claimed in order: a quest opens only when the one before it is claimed, is claimed at most once, and a save keeps only the claims up to the first gap | test |
 | INV-P13 | The tutorial starts on its own only for a save with no stage cleared whose tutorial is neither finished nor skipped; skipping never undoes a finish | test (`tutorialDue`); `Tutorial.stop` |
+| INV-P14 | A summon spends exactly one Soulstar and brings a champion not owned, never a starter or a stage's champion; the rarity odds are his (70 / 25 / 5%), a found-out rarity's share going to the others; a wish never changes a rarity's odds | test (`summon`, `rarityOdds`, `summonChances`) |
+| INV-P15 | 100 Stardust make one Soulstar; Stardust and Soulstars never go below 0, in play or in a save | test (`mergeShard`, `readSave`) |
 
 ### 6.4 Presentation and art
 
@@ -490,7 +497,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | AI | skill and target | `ai.ts`: highest `ai.priority` ready skill (a heal with priority 4 and `allyHurt` goes before the A3 when an ally is hurt); `allyHurt` below 70% HP or with a debuff; control aims at the uncontrolled with the highest ATK; dispel at the most buffed; otherwise 70% lowest HP%, 30% random |
 | Stars | 3 / 2 / 1 | `starsFor` |
 | Unlocks | open stages and locations | `stageOpen`, `locationOpen`, `frontier` |
-| Rewards | recruit on first clear | `recordClear`, `Reliquary.recruit` |
+| Rewards | recruit on 1-1's first clear; Stardust on every victory; a summon per Soulstar | `recordClear`, `recordVictory`, `fragmentDrop`, `summon`, `Reliquary.recruit` |
 | Spool placement | which slot takes a spool | `fits`, `StatNode`, `MATRIX_LAYOUT` |
 | Pattern completion | which Weave Patterns a matrix weaves, and how often | `WeavePatternEvaluator` |
 | Difficulty | enemy scaling | `Battle` constructor (`power` on HP and ATK, `bossHp`), `campaign.ts` |

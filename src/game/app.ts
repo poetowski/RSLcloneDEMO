@@ -140,6 +140,11 @@ export interface Router {
   /** the quests: Daily, Persistent and the Journey (opens on the Journey) */
   challenges(tab?: ChallengeTab): void;
   options(): void;
+  /** the ceremony of a champion a first clear brought (1-1's); CONTINUE goes back to the campaign */
   recruit(id: string): void;
+  /** the Wishing Star: Stardust, Soulstars, the wish and the summon */
+  summon(): void;
+  /** the ceremony of a summoned champion, and whether the wish came true; CONTINUE goes back to the Wishing Star */
+  summoned(id: string, wished: boolean): void;
   demo(skillId: string, back: () => void): void;
 }

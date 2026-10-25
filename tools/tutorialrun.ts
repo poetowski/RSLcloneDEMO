@@ -6,7 +6,9 @@
 // (a step that teaches) or a real click where its hand points (a step that
 // asks for one; if the step is still up after a while, Enter, as a keyboard
 // player would). While no step is up in battle, the player's turns are played with
-// Enter (the chosen skill at the first target).
+// Enter (the chosen skill at the first target), and on a summon's ceremony
+// CONTINUE is clicked. `?tutorial=summon&stardust=100` plays the lesson on the
+// first summon.
 import { chromium } from 'playwright-core';
 
 const [url = 'http://localhost:5173/?hp=0.1', out = 'tutorial', start] = process.argv.slice(2);
@@ -44,6 +46,12 @@ while (Date.now() - t0 < 180000) {
     // free play in battle: the player's turn, played with Enter
     if (s.scene === 'BattleScreen' && s.choice && ++idle > 3) {
       await page.keyboard.press('Enter');
+      idle = 0;
+    }
+    // a summon's ceremony, which the lesson leaves alone: CONTINUE, as a player would
+    if (s.scene === 'RecruitScreen' && ++idle > 10) {
+      const go = await page.evaluate(() => (window as unknown as { app: any }).app.scene.ui.regions.find((r: { id?: string }) => r.id === 'go'));
+      if (go) await page.mouse.click((go.x + go.w / 2) * 2, (go.y + go.h / 2) * 2);
       idle = 0;
     }
     continue;

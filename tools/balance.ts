@@ -7,15 +7,25 @@
 //   3. impact: win rate of random teams that include the champion, against
 //      random enemy teams from the roster. Healthy band: 40-60%. Needs at
 //      least six champions (two teams of three without repeats); skipped below.
-//   4. campaign curve: win rate of every team the player can own at that
+//   4. campaign curve: win rate of the teams the player can own at that
 //      point (three champions, or all of them while they own fewer), against
-//      the stage. Bands per stage kind (below).
+//      the stage. Since summoning (2026-10-25) what they own grows by chance:
+//      Gareth from the start, the Rime Scholar from 1-1, and a summon for every
+//      100 Stardust the first clears before the stage find (one star each) and
+//      the Journey gives (Beat Campaign 1-3). Each stage averages ROSTERS
+//      rosters, each summoned in its own seeded order at the summon odds, and
+//      up to TEAMS teams of each. Bands per stage kind (below).
 import { combatants, Combatant } from '../src/game/battle/battle';
 import { simulate } from '../src/game/battle/sim';
 import { BOSS_HP, LOCATIONS, STARTERS } from '../src/game/data/campaign';
+import { JOURNEY } from '../src/game/data/challenges';
 import { CHAMPIONS, champion } from '../src/game/data/champions';
 import { auditChampion, budgetDelta, RARITY_BUDGET, statScore } from '../src/game/data/norms';
+import { FRAGMENTS_PER_SHARD } from '../src/game/data/summoning';
 import { ChampionDef } from '../src/game/data/types';
+import { fragmentDrop } from '../src/game/reliquary/drops';
+import { drawSummon, summonPool } from '../src/game/summoning';
+import { newArchivist } from '../src/game/archivist';
 
 const quick = process.argv.includes('quick');
 // 960 battles keep the impact noise near +-1.6 points; 240 left about +-3 and flagged noise as failures
@@ -86,34 +96,60 @@ for (const [id, w] of impacts.sort((a, b) => b[1] - a[1])) {
   console.log(`${flag(w >= IMPACT_BAND[0] && w <= IMPACT_BAND[1])} ${id.padEnd(12)} ${pct(w)}  ${'#'.repeat(Math.round(w * 40))}`);
 }
 
-console.log(`\n== 4. Campaign curve (every team the player can own, ${STAGE_SEEDS} seeds per team) ==`);
-const owned = [...STARTERS];
+const ROSTERS = quick ? 3 : 8;
+const TEAMS = quick ? 20 : 60;
+console.log(`\n== 4. Campaign curve (${ROSTERS} summoned rosters, up to ${TEAMS} teams each, ${STAGE_SEEDS} seeds per team) ==`);
 /** every team of `size` from the pool, in pool order */
 function teamsOf(pool: ChampionDef[], size: number): ChampionDef[][] {
   if (size === 0) return [[]];
   return pool.flatMap((c, i) => teamsOf(pool.slice(i + 1), size - 1).map((t) => [c, ...t]));
 }
+// each roster's summons in the order they would answer, drawn at the summon odds without a wish
+const orders = Array.from({ length: ROSTERS }, (_, k) => {
+  const r = rngFor(7000 + k * 131);
+  let pool = summonPool(newArchivist());
+  const order: ChampionDef[] = [];
+  for (let c = drawSummon(pool, {}, r); c; c = drawSummon(pool, {}, r)) {
+    order.push(c);
+    pool = pool.filter((x) => x !== c);
+  }
+  return order;
+});
+const owned = [...STARTERS];
+let dust = 0;
 for (const loc of LOCATIONS) {
   loc.stages.forEach((s, si) => {
-    const pool = owned.map((id) => champion(id));
-    const teams = teamsOf(pool, Math.min(3, pool.length));
+    const summons = Math.floor(dust / FRAGMENTS_PER_SHARD);
     const enemy: Combatant[] = s.enemies.map((e) => ({ def: champion(e.champion), boss: e.boss }));
-    let wins = 0, total = 0, best = 0;
-    for (const t of teams) {
-      let tw = 0;
-      for (let seed = 1; seed <= STAGE_SEEDS; seed++) {
-        const r = simulate(combatants(t), enemy, { seed, enemyPower: s.power, bossHp: BOSS_HP });
-        if (r.winner === 'player') tw++;
+    let wins = 0, total = 0, best = 0, size = 0;
+    orders.forEach((order, k) => {
+      const pool = [...owned.map((id) => champion(id)), ...order.slice(0, summons)];
+      size = pool.length;
+      let teams = teamsOf(pool, Math.min(3, pool.length));
+      // a large roster: a seeded sample of its teams
+      if (teams.length > TEAMS) {
+        const r = rngFor(9000 + k * 17 + si);
+        teams = Array.from({ length: TEAMS }, () => teams.splice(Math.floor(r() * teams.length), 1)[0]);
       }
-      wins += tw;
-      total += STAGE_SEEDS;
-      best = Math.max(best, tw / STAGE_SEEDS);
-    }
+      for (const t of teams) {
+        let tw = 0;
+        for (let seed = 1; seed <= STAGE_SEEDS; seed++) {
+          const res = simulate(combatants(t), enemy, { seed, enemyPower: s.power, bossHp: BOSS_HP });
+          if (res.winner === 'player') tw++;
+        }
+        wins += tw;
+        total += STAGE_SEEDS;
+        best = Math.max(best, tw / STAGE_SEEDS);
+      }
+    });
     const w = wins / total;
     const kind = loc === LOCATIONS[0] && si === 0 ? 'first' : s.enemies.some((e) => e.boss) ? 'boss' : 'normal';
     const [lo, hi] = CURVE_BANDS[kind];
-    console.log(`${flag(w >= lo && w <= hi)} ${s.id.padEnd(6)} power ${s.power.toFixed(2)}  avg ${pct(w)}  best team ${pct(best)}  (${kind} band ${pct(lo)}-${pct(hi)}, ${teams.length} teams)`);
+    console.log(`${flag(w >= lo && w <= hi)} ${s.id.padEnd(6)} power ${s.power.toFixed(2)}  avg ${pct(w)}  best team ${pct(best)}  (${kind} band ${pct(lo)}-${pct(hi)}, ${size} owned)`);
+    // after its first clear: the champion it brings, its Stardust, and the Journey's for it
     if (s.recruit && !owned.includes(s.recruit)) owned.push(s.recruit);
+    dust += fragmentDrop(s.id, 1);
+    for (const q of JOURNEY) if (q.goal.kind === 'stage' && q.goal.stage === s.id && q.reward.kind === 'fragments') dust += q.reward.amount;
   });
 }
 

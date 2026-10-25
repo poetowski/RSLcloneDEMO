@@ -1,9 +1,13 @@
-// Spool drops: what a campaign victory finds. Every stage of an area drops
-// spools of the area's two Weave Patterns (Jakub, 2026-10-24); how many, of
-// which grade and with which main stat are stand-ins (`DROPS` in
-// data/matrix.ts). Rules: docs/MECHANICS_GUIDE.md 14.
-import { locationOf } from '../data/campaign';
+// Drops: what a campaign victory finds. Every stage of an area drops spools
+// of the area's two Weave Patterns (Jakub, 2026-10-24); how many, of which
+// grade and with which main stat are stand-ins (`DROPS` in data/matrix.ts).
+// Every victory also finds Stardust, the fragments that merge into Soulstars
+// (Jakub, 2026-10-25: "campaign nodes drop these fragments"); how much is a
+// stand-in (`FRAGMENT_DROPS` in data/summoning.ts). Rules:
+// docs/MECHANICS_GUIDE.md 14 and 16.
+import { LOCATIONS, locationOf } from '../data/campaign';
 import { DROPS, MATRIX_LAYOUT } from '../data/matrix';
+import { FRAGMENT_DROPS } from '../data/summoning';
 import { MatrixLayout, PatternId, SpoolStat } from '../data/types';
 import { Grade, rollSpool, ThreadSpool } from './matrix';
 
@@ -44,4 +48,10 @@ export function rollDrops(stageId: string, stars: number, rng: () => number): Th
     const grade: Grade = r < ashen ? 0 : r < ashen + silver ? 1 : 2;
     return rollSpool(pattern, grade, rollMainStat(rng), rng);
   });
+}
+
+/** The Stardust a victory on a stage finds: its area's share, and more when nobody fell. */
+export function fragmentDrop(stageId: string, stars: number): number {
+  const i = Math.min(LOCATIONS.indexOf(locationOf(stageId)), FRAGMENT_DROPS.byArea.length - 1);
+  return FRAGMENT_DROPS.byArea[i] + (stars >= 3 ? FRAGMENT_DROPS.flawless : 0);
 }

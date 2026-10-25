@@ -14,9 +14,11 @@ import { champion } from '../data/champions';
 import { GRADES, pattern, patternBonusText } from '../data/matrix';
 import { AFFINITIES, RARITIES } from '../data/meta';
 import { LocationDef, StageDef } from '../data/types';
-import { gradeOdds } from '../reliquary/drops';
+import { FRAGMENTS_PER_SHARD, SUMMONING } from '../data/summoning';
+import { fragmentDrop, gradeOdds } from '../reliquary/drops';
 import { Scroller } from '../ui/scroll';
 import { GRADE_TINT, PATTERN_TINT, patternName } from '../ui/spools';
+import { fragmentsText, STARDUST_TINT } from '../ui/stardust';
 import { COLORS } from '../ui/ui';
 import { blit, Rect4 } from '../view/assets';
 import { BaseScreen } from './base';
@@ -342,6 +344,14 @@ export class CampaignScreen extends BaseScreen {
       y += 11;
     }
     ui.text(ctx, 'A spool a victory, two when nobody falls.', x, y, { color: COLORS.faint });
+    // and the Stardust every victory here finds, for the Wishing Star
+    y += 16;
+    const first = loc.stages[0]?.id;
+    if (!first) return;
+    const base = fragmentDrop(first, 1), flawless = fragmentDrop(first, 3);
+    ui.blit(ctx, 'stardust', x, y - 2);
+    ui.text(ctx, `${fragmentsText(base)} a victory, ${flawless} when nobody falls.`, x + 15, y, { color: STARDUST_TINT });
+    ui.regions.push({ x, y: y - 2, w: 220, h: 12, tip: () => ({ title: SUMMONING.fragment, body: `Every victory finds ${SUMMONING.fragment}. ${FRAGMENTS_PER_SHARD} of it merge into a ${SUMMONING.shard} at ${SUMMONING.place}, and a ${SUMMONING.shard} summons a champion.`, color: STARDUST_TINT }) });
   }
 
   /** One stage in the list: its node, its id, its stars; click to select it. */

@@ -13,6 +13,7 @@ import { banner, button, chevron, footRing, GLYPHS, panel, skillFrame, smallGlyp
 import { arrow, bigButton, campGlow, campNode, cardFrame, check, crown, divider, emblem, gem, lock, logo, mapNode, MENU_ICONS, newBadge, nodeGlow, podium, questKnot, roleIcon, star, tab, tutHand, well } from './menu.ts';
 import { matrixParts } from './matrix.ts';
 import { STATUS_ICONS, statusIcon } from './status.ts';
+import { soulstar, stardust, summonGlyph } from './summon.ts';
 
 type Rect4 = [number, number, number, number];
 
@@ -81,6 +82,12 @@ export function allParts(): Record<string, Bitmap> {
     podium: podium(),
     divider: divider(),
     tut_hand: tutHand(),
+    // summoning: Stardust, the Soulstar, the SUMMON glyph
+    stardust: stardust(11),
+    bigstardust: stardust(24),
+    soulstar: soulstar(11),
+    bigsoulstar: soulstar(24),
+    mi_summon: summonGlyph(),
   };
   for (const [r, ramp] of Object.entries(UIR.rarity)) parts['card_' + r] = cardFrame(ramp);
   for (const a of Object.keys(UIR.affinity) as (keyof typeof UIR.affinity)[]) parts['gem_' + a] = gem(a);

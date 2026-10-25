@@ -4,9 +4,11 @@
 import { H, W } from '../../engine/screen';
 import { RARITIES } from '../data/meta';
 import { STATUSES } from '../data/statuses';
+import { FRAGMENTS_PER_SHARD, SUMMONING } from '../data/summoning';
 import { ChampionDef, SkillDef } from '../data/types';
 import { ThreadSpool } from '../reliquary/matrix';
 import { PATTERN_TINT, patternName, spoolIcon, spoolSummary, statText } from '../ui/spools';
+import { fragmentsText, STARDUST_TINT } from '../ui/stardust';
 import { COLORS, Ui } from '../ui/ui';
 import { Assets, blit, nine } from './assets';
 import { UnitView } from './unit';
@@ -27,6 +29,8 @@ export interface ResultsInfo {
   recruit?: ChampionDef;
   /** Thread Spools this victory found (campaign stages; none in demos) */
   spools?: ThreadSpool[];
+  /** Stardust this victory found (campaign stages) */
+  fragments?: number;
   firstClear?: boolean;
   turns: number;
 }
@@ -295,12 +299,13 @@ export class Hud extends Ui {
     this.text(ctx, 'Esc to resume', W / 2, by + 4, { color: COLORS.faint, align: 'center' });
   }
 
-  /** Victory / defeat panel with stars, the spools found, the first-clear recruit and the way out. */
+  /** Victory / defeat panel with stars, the Stardust and the spools found, the first-clear recruit and the way out. */
   drawResults(ctx: CanvasRenderingContext2D, r: ResultsInfo, t: number, on: { next: () => void; retry: () => void; map: () => void }) {
     this.dim(ctx, Math.min(0.55, t / 600));
     if (t < 300) return;
     const finds = r.victory ? (r.spools ?? []) : [];
-    const w = 260, h = r.victory ? (r.recruit ? 176 : 150) + (finds.length ? 36 : 0) : 142;
+    const dust = r.victory ? (r.fragments ?? 0) : 0;
+    const w = 260, h = r.victory ? (r.recruit ? 176 : 150) + (finds.length ? 36 : 0) + (dust ? 16 : 0) : 142;
     const x = W / 2 - w / 2, y = 64;
     this.panel(ctx, r.victory ? 'gold' : 'red', x, y, w, h);
     const pop = Math.min(1, (t - 300) / 200);
@@ -321,6 +326,17 @@ export class Hud extends Ui {
       cy += 32;
       this.text(ctx, r.stars === 3 ? 'Flawless: nobody fell.' : r.stars === 2 ? 'One champion fell.' : 'Several champions fell.', W / 2, cy, { color: COLORS.text, align: 'center' });
       cy += 14;
+      if (dust) {
+        // the Stardust found, for the Wishing Star
+        if (t > 1150) {
+          const label = `+${fragmentsText(dust)}`;
+          const lx = Math.round(W / 2 - (this.measure(label) + 15) / 2);
+          blit(ctx, this.a.ui.img, this.part('stardust'), lx, cy - 2);
+          this.text(ctx, label, lx + 15, cy, { color: STARDUST_TINT });
+          this.regions.push({ x: lx, y: cy - 2, w: this.measure(label) + 15, h: 12, tip: () => ({ title: SUMMONING.fragment, body: `Every ${FRAGMENTS_PER_SHARD} ${SUMMONING.fragment} merge into a ${SUMMONING.shard} at ${SUMMONING.place}, and a ${SUMMONING.shard} summons a champion.`, color: STARDUST_TINT }) });
+        }
+        cy += 16;
+      }
       if (finds.length) {
         // the spools found, one after another: each its icon and its main stat in its pattern's colour
         if (t > 1250) this.text(ctx, finds.length > 1 ? 'SPOOLS FOUND' : 'SPOOL FOUND', W / 2, cy, { color: COLORS.goldHi, variant: 'bold', align: 'center' });

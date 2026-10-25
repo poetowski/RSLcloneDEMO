@@ -7,16 +7,18 @@
 // time the menu opens; its places lead on: the Starbridge Gate to the
 // campaign, the Reliquary to the champions, the Weaver's Spire to Weaving, the
 // Observatory to the Academy, the astrolabe to the options, the Herald's Board
-// on its own drifting rock to the Challenges. A place lights up
+// on its own drifting rock to the Challenges, the Wishing Star in the sky to
+// summoning. A place lights up
 // under the pointer (its own pixels, not a box) or the keyboard's focus, and
 // its label carries what the old buttons said: the frontier, the roster, the
-// spools, the unread chapters, the NEW badges.
+// spools, the unread chapters, the summons waiting, the NEW badges.
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
 import { anyFresh, cleared, frontier, roster, spoolsHeld } from '../archivist';
 import { readyCount } from '../challenges';
 import { CHAMPIONS } from '../data/champions';
 import { CHAPTERS } from '../data/codex';
+import { summonsReady } from '../summoning';
 import { COLORS } from '../ui/ui';
 import { MenuPlace, Rect4 } from '../view/assets';
 import { SanctumView } from '../view/sanctum';
@@ -71,6 +73,7 @@ export class MainMenu extends BaseScreen {
   }
 
   protected update(dt: number) {
+    this.view.wishLit = summonsReady(this.archivist) > 0;
     this.view.update(dt);
   }
 
@@ -81,6 +84,7 @@ export class MainMenu extends BaseScreen {
     const unread = CHAPTERS.filter((c) => !a.read.includes(c.id)).length;
     const held = spoolsHeld(a);
     const ready = readyCount(a);
+    const summons = summonsReady(a);
     return [
       { id: 'campaign', label: 'CAMPAIGN', note: cleared(a, fr) ? 'replay' : fr, go: () => r.campaign() },
       { id: 'champions', label: 'CHAMPIONS', note: `${roster(a).length}/${CHAMPIONS.length}`, badge: anyFresh(a), go: () => r.collection() },
@@ -90,6 +94,8 @@ export class MainMenu extends BaseScreen {
       { id: 'options', label: 'OPTIONS', go: () => r.options() },
       // the quests (Jakub, 2026-10-24: "new object in main menu, clickable ... call it Challenges"): NEW while one waits to be claimed
       { id: 'challenges', label: 'CHALLENGES', note: ready ? `${ready} ready` : undefined, badge: ready > 0, go: () => r.challenges() },
+      // summoning (Jakub, 2026-10-25: "new object in main menu, somewhere on the sky, where people can click and merge fragments ... and then summon heroes"): NEW while a summon waits
+      { id: 'summon', label: 'SUMMON', note: summons ? `${summons} ready` : undefined, badge: summons > 0, go: () => r.summon() },
     ];
   }
 
@@ -178,7 +184,7 @@ export class MainMenu extends BaseScreen {
     ui.text(ctx, 'Choose a place on the island.  Arrows + Enter work too.', W / 2, H - 12, { color: COLORS.faint, align: 'center' });
   }
 
-  /** A place's label: a banner with its name and what it holds; lit, with the place's own name under it, while it is hot. */
+  /** A place's label: a banner with its name and what it holds; lit, with the place's own name beside it (away from the place), while it is hot. */
   private label(ctx: CanvasRenderingContext2D, p: Place, cx: number, top: number, hot: boolean, name: string) {
     const ui = this.ui;
     const tw = ui.measure(p.label, 'bold'), nw = p.note ? ui.measure(p.note) + 6 : 0;
@@ -193,8 +199,9 @@ export class MainMenu extends BaseScreen {
     ui.text(ctx, p.label, x + 13, top + 5, { color: hot ? COLORS.goldHi : '#e8d9a0', variant: 'bold' });
     if (p.note) ui.text(ctx, p.note, x + 13 + tw + 6, top + 5, { color: hot ? COLORS.text : COLORS.dim });
     if (p.badge) ui.blit(ctx, 'new', x + w - 14, top - 5);
-    // the place's own name under its label, or over it where the label hangs at the foot of the screen
-    if (hot) ui.text(ctx, name, x + w / 2, top + b[3] + 10 > H ? top - 10 : top + b[3] + 1, { color: '#c8b8f0', align: 'center' });
+    // the place's own name under its label, or over it where the label hangs at the foot of the screen or above its place (the Wishing Star's)
+    const over = top + b[3] + 10 > H || top < this.view.boxOf(p.id)[1];
+    if (hot) ui.text(ctx, name, x + w / 2, over ? top - 10 : top + b[3] + 1, { color: '#c8b8f0', align: 'center' });
     this.labelBoxes.push({ id: p.id, r: [x, top, w, b[3]] });
   }
 }

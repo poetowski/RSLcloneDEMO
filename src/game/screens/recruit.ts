@@ -1,11 +1,13 @@
-// Recruit ceremony: after a first clear the defeated guardian joins you. A
-// beam of light falls, the champion appears at double size over a slowly
-// turning sunburst in its rarity color, and its card is read out.
+// Recruit ceremony: a champion joins, after the first clear of 1-1 or from the
+// Wishing Star. A beam of light falls, the champion appears at double size
+// over a slowly turning sunburst in its rarity color, and its card is read
+// out; a summon says whether the wish came true.
 import { H, W } from '../../engine/screen';
 import { Particles } from '../../engine/particles';
 import { App } from '../app';
 import { champion } from '../data/champions';
 import { AFFINITIES, FACTIONS, RARITIES } from '../data/meta';
+import { SUMMONING } from '../data/summoning';
 import { ChampionDef } from '../data/types';
 import { COLORS } from '../ui/ui';
 import { drawChampion, frameAt } from '../view/unit';
@@ -14,6 +16,8 @@ import { BaseScreen } from './base';
 export class RecruitScreen extends BaseScreen {
   /** the champion recruited (the tutorial names it) */
   readonly c: ChampionDef;
+  /** a summon's ceremony: whether the wish came true (undefined: a stage brought the champion) */
+  readonly summoned?: { wished: boolean };
   private burst: HTMLCanvasElement;
   private sparks = new Particles();
   private landed = false;
@@ -22,9 +26,11 @@ export class RecruitScreen extends BaseScreen {
     app: App,
     id: string,
     private then: () => void,
+    summoned?: { wished: boolean },
   ) {
     super(app);
     this.c = champion(id);
+    this.summoned = summoned;
     this.burst = makeBurst(420, RARITIES[this.c.rarity].color);
     this.ui.focusId = 'view';
   }
@@ -89,6 +95,7 @@ export class RecruitScreen extends BaseScreen {
     const a = Math.min(1, Math.max(0, (bt - 800) / 300));
     ctx.globalAlpha = a;
     this.a.font.draw(ctx, 'NEW CHAMPION', W / 2, 18, { color: '#fff6c0', gradient: '#f0a020', variant: 'display', align: 'center', outline: COLORS.ink, shadow: '#3a1e06' });
+    if (this.summoned) ui.text(ctx, this.summoned.wished ? 'Your wish came true!' : `Summoned at ${SUMMONING.place}.`, W / 2, 41, { color: this.summoned.wished ? COLORS.goldHi : COLORS.dim, align: 'center' });
     ui.text(ctx, c.name, W / 2, 268, { color: c.color, variant: 'display', align: 'center' });
     const aff = AFFINITIES[c.affinity], fac = FACTIONS[c.faction];
     const line = `${rar.name}   ${aff.name}   ${c.role}   ${fac.name}`;

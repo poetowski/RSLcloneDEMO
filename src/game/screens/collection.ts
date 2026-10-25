@@ -1,6 +1,7 @@
 // Champion collection: every champion as a card. Recruited champions stand
 // in their idle loop (hover: they show off their basic attack); locked ones
-// are dark silhouettes with the stage that recruits them. Filters by affinity
+// are dark silhouettes with the way they come (the Wishing Star, or 1-1 for
+// the Rime Scholar). Filters by affinity
 // and by class (role) combine; the cards stand in groups by faction, each
 // under its emblem, the rarest first, every rarity on rows of its own (Jakub,
 // 2026-10-12). The grid scrolls (wheel, PageUp/PageDown, Home/End, the edge
@@ -8,8 +9,9 @@
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
 import { frontier, isFresh, isUnlocked } from '../archivist';
-import { recruitStage, zoneOf } from '../data/campaign';
+import { zoneOf } from '../data/campaign';
 import { CHAMPIONS } from '../data/champions';
+import { joinsBy } from '../summoning';
 import { AFFINITIES, FACTIONS, RARITIES } from '../data/meta';
 import { Affinity, ChampionDef, FactionId, Rarity, Role } from '../data/types';
 import { drawScrollHints, Scroller } from '../ui/scroll';
@@ -218,10 +220,10 @@ export class CollectionScreen extends BaseScreen {
       ui.text(ctx, RARITIES[c.rarity].name.toUpperCase(), x + w / 2, y + 116, { color: RARITIES[c.rarity].color, align: 'center' });
       ui.text(ctx, c.role, x + w / 2, y + 126, { color: COLORS.faint, align: 'center' });
     } else {
-      const st = recruitStage(c.id);
+      const by = joinsBy(c.id);
       ui.blit(ctx, 'lock', x + w / 2 - 5, y + 44);
       ui.text(ctx, c.name, x + w / 2, y + 104, { color: '#8a90a0', variant: 'bold', align: 'center' });
-      ui.text(ctx, st ? `Clear stage ${st.id}` : 'Locked', x + w / 2, y + 117, { color: COLORS.bad, align: 'center' });
+      ui.text(ctx, by.kind === 'stage' ? `Clear stage ${by.stage}` : by.kind === 'summon' ? 'At the Wishing Star' : 'Locked', x + w / 2, y + 117, { color: COLORS.bad, align: 'center' });
     }
     if (isFresh(this.archivist, c.id)) ui.blit(ctx, 'new', x + w - 24, y - 3);
     if (hot) {

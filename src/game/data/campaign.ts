@@ -1,6 +1,6 @@
 // The campaign: locations (one combat background each) holding stages, in a
 // line the player crosses from left to right. Clearing a stage for the first
-// time opens the next one and can bring a new champion; clearing the last
+// time opens the next one (1-1's brings a new champion); clearing the last
 // stage of a location opens the next location. Difficulty is tuned with
 // `npm run balance` (see docs/MECHANICS_GUIDE.md, "Difficulty curve").
 //
@@ -18,21 +18,22 @@
 // Basin, named and described by Jakub (2026-10-17), has ten placeholder stages
 // like Zone 2's, so it can be played and seen in game: their texts walk his
 // description from the grove's roots to the eastern hills, their enemies are
-// copies of the roster, their powers are tuned stand-ins; 3-1, 3-2 and 3-3
-// bring the Skeleton, the Rot Hulk and the Bellringer, the Ashveil Reign's first
-// champions (stand-ins). Zone 4, Earth Scars, named and described by Jakub
-// (2026-10-18), the easternmost place, has ten placeholder stages he asked for
-// "like in the past": their texts walk his description, from the steppe and its
-// two ravines to the camp, the yaks, the mountains and the zeppelin; their
-// enemies are copies of the roster and their powers tuned stand-ins; 4-1 brings
-// the Necromancer, the Ashveil Reign's first Elite, 4-2 the Automated Soul, its
-// second, and 4-3 Irving Wellbington, its third (stand-ins). Zone 5, the Snowy
-// Mesa, named and described by Jakub (2026-10-19), east of Earth Scars, has ten
-// placeholder stages he asked for: their texts walk his description, from the
-// mesa's top to the arbiter on it; their enemies are copies of the roster and
-// their powers tuned stand-ins. The first clear of 5-10, the campaign's last
-// stage, brings the Paladin (2026-10-24), a stand-in: Jakub made him the reward
-// of a quest line he designs later.
+// copies of the roster, their powers are tuned stand-ins. Zone 4, Earth Scars,
+// named and described by Jakub (2026-10-18), the easternmost place, has ten
+// placeholder stages he asked for "like in the past": their texts walk his
+// description, from the steppe and its two ravines to the camp, the yaks, the
+// mountains and the zeppelin; their enemies are copies of the roster and their
+// powers tuned stand-ins. Zone 5, the Snowy Mesa, named and described by Jakub
+// (2026-10-19), east of Earth Scars, has ten placeholder stages he asked for:
+// their texts walk his description, from the mesa's top to the arbiter on it;
+// their enemies are copies of the roster and their powers tuned stand-ins.
+//
+// Champions are summoned, not won (Jakub, 2026-10-25: "all champions are being
+// spawned like in rsl from a special currency ... rime scholar is guaranteed
+// champion drop from stage 1-1. this is only exception."): the first clear of
+// 1-1 brings the Rime Scholar, and every other champion comes from the
+// Wishing Star (src/game/summoning.ts). Every victory finds Stardust for it
+// (reliquary/drops.ts).
 //
 // Every stage drops Thread Spools of its area's two Weave Patterns (Jakub,
 // 2026-10-24: exactly two sets per area). Which two each area holds is a
@@ -117,57 +118,43 @@ export const LOCATIONS: LocationDef[] = [
         id: '1-4',
         blurb: SETTLEMENT,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
-        power: 0.86,
-        // a stand-in: the stage that brings the Follower is not Jakub's
-        recruit: 'follower',
+        power: 1.2,
       },
       {
         id: '1-5',
         blurb: SETTLEMENT,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
         power: 0.92,
-        // a stand-in: the stage that brings the Skirmisher is not Jakub's
-        recruit: 'skirmisher',
       },
       {
         id: '1-6',
         blurb: ESCALATION,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'rime_scholar' }],
         power: 0.9,
-        // a stand-in: the stage that brings the Dominion Medic is not Jakub's
-        recruit: 'dominion_medic',
       },
       {
         id: '1-7',
         blurb: ESCALATION,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
         power: 0.73,
-        // a stand-in: the stage that brings the Lineholder is not Jakub's
-        recruit: 'lineholder',
       },
       {
         id: '1-8',
         blurb: ESCALATION,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }, { champion: 'captain_gareth' }],
-        power: 0.71,
-        // a stand-in: the stage that brings the Bloodhound is not Jakub's
-        recruit: 'bloodhound',
+        power: 0.78,
       },
       {
         id: '1-9',
         blurb: 'The turning point.',
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'captain_gareth' }],
-        power: 0.68,
-        // a stand-in: the stage that brings the Quartermaster is not Jakub's
-        recruit: 'quartermaster',
+        power: 0.76,
       },
       {
         id: '1-10',
         blurb: 'Leaving the reach, on to the next area.',
         enemies: [{ champion: 'captain_gareth', boss: true }, { champion: 'rime_scholar' }, { champion: 'rime_scholar' }],
-        power: 0.7,
-        // a stand-in: the stage that brings the Enforcer is not Jakub's
-        recruit: 'enforcer',
+        power: 0.78,
       },
     ],
   },
@@ -188,72 +175,54 @@ export const LOCATIONS: LocationDef[] = [
         blurb: APPROACH,
         enemies: [{ champion: 'follower' }, { champion: 'follower' }],
         power: 1.03,
-        // a stand-in: the stage that brings the Walking Bush is not Jakub's
-        recruit: 'walking_bush',
       },
       {
         id: '2-2',
         blurb: APPROACH,
         enemies: [{ champion: 'follower' }, { champion: 'follower' }, { champion: 'follower' }],
         power: 0.7,
-        // a stand-in: the stage that brings the Wild Speaker is not Jakub's
-        recruit: 'wild_speaker',
       },
       {
         id: '2-3',
         blurb: ARRIVAL,
         enemies: [{ champion: 'lineholder' }, { champion: 'follower' }, { champion: 'quartermaster' }],
         power: 0.89,
-        // a stand-in: the stage that brings the Jungle Herder is not Jakub's
-        recruit: 'jungle_herder',
       },
       {
         id: '2-4',
         blurb: ARRIVAL,
         enemies: [{ champion: 'bloodhound' }, { champion: 'follower' }, { champion: 'dominion_medic' }],
         power: 0.99,
-        // a stand-in: the stage that brings the Associate is not Jakub's
-        recruit: 'associate',
       },
       {
         id: '2-5',
         blurb: CONTEST,
         enemies: [{ champion: 'enforcer' }, { champion: 'skirmisher' }, { champion: 'follower' }],
         power: 0.82,
-        // a stand-in: the stage that brings Emissary Handlings is not Jakub's
-        recruit: 'emissary_handlings',
       },
       {
         id: '2-6',
         blurb: CONTEST,
         enemies: [{ champion: 'lineholder' }, { champion: 'rime_scholar' }, { champion: 'follower' }],
         power: 0.81,
-        // a stand-in: the stage that brings the Black Rhino is not Jakub's
-        recruit: 'black_rhino',
       },
       {
         id: '2-7',
         blurb: CONTEST,
         enemies: [{ champion: 'bloodhound' }, { champion: 'enforcer' }, { champion: 'quartermaster' }],
         power: 1.02,
-        // a stand-in: the stage that brings Red Cloak is not Jakub's
-        recruit: 'red_cloak',
       },
       {
         id: '2-8',
         blurb: CONTEST,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'follower' }, { champion: 'follower' }],
         power: 0.76,
-        // a stand-in: the stage that brings the Grove Keeper is not Jakub's
-        recruit: 'grove_keeper',
       },
       {
         id: '2-9',
         blurb: OUTCOME,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'dominion_medic' }],
         power: 0.83,
-        // a stand-in: the stage that brings Big Ears is not Jakub's
-        recruit: 'big_ears',
       },
       {
         id: '2-10',
@@ -280,24 +249,18 @@ export const LOCATIONS: LocationDef[] = [
         blurb: BEYOND,
         enemies: [{ champion: 'associate' }, { champion: 'follower' }, { champion: 'walking_bush' }],
         power: 0.92,
-        // a stand-in: the stage that brings the Skeleton is not Jakub's
-        recruit: 'skeleton',
       },
       {
         id: '3-2',
         blurb: BASIN,
         enemies: [{ champion: 'grove_keeper' }, { champion: 'wild_speaker' }, { champion: 'follower' }],
         power: 0.84,
-        // a stand-in: the stage that brings the Rot Hulk is not Jakub's
-        recruit: 'rot_hulk',
       },
       {
         id: '3-3',
         blurb: REEDS,
         enemies: [{ champion: 'jungle_herder' }, { champion: 'big_ears' }, { champion: 'follower' }],
         power: 0.75,
-        // a stand-in: the stage that brings the Bellringer is not Jakub's
-        recruit: 'bellringer',
       },
       {
         id: '3-4',
@@ -360,24 +323,18 @@ export const LOCATIONS: LocationDef[] = [
         blurb: STEPPE,
         enemies: [{ champion: 'skeleton' }, { champion: 'follower' }, { champion: 'wild_speaker' }],
         power: 0.83,
-        // a stand-in: the stage that brings the Necromancer is not Jakub's
-        recruit: 'necromancer',
       },
       {
         id: '4-2',
         blurb: RAVINES,
         enemies: [{ champion: 'rot_hulk' }, { champion: 'skirmisher' }, { champion: 'enforcer' }],
         power: 0.84,
-        // a stand-in: the stage that brings the Automated Soul is not Jakub's
-        recruit: 'automated_soul',
       },
       {
         id: '4-3',
         blurb: RAVINES,
         enemies: [{ champion: 'skeleton' }, { champion: 'skeleton' }, { champion: 'big_ears' }],
         power: 0.81,
-        // a stand-in: the stage that brings Irving Wellbington is not Jakub's
-        recruit: 'irving_wellbington',
       },
       {
         id: '4-4',
@@ -494,8 +451,6 @@ export const LOCATIONS: LocationDef[] = [
         blurb: `${ARBITER} The last stage of the area.`,
         enemies: [{ champion: 'irving_wellbington', boss: true }, { champion: 'necromancer' }, { champion: 'automated_soul' }],
         power: 0.67,
-        // a stand-in until his quest line: the Paladin is the reward of a quest Jakub designs later
-        recruit: 'paladin',
       },
     ],
   },
@@ -524,7 +479,7 @@ export function zoneOf(stageId: string): string {
   return l.zone;
 }
 
-/** The stage whose first clear recruits this champion (undefined for starters). */
+/** The stage whose first clear recruits this champion: 1-1's Rime Scholar; undefined for the starters and every champion summoned. */
 export function recruitStage(championId: string): StageDef | undefined {
   return allStages().find((s) => s.recruit === championId);
 }

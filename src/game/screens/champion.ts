@@ -1,12 +1,13 @@
 // Champion detail: the champion at double size on a podium (preview any of
 // its animations), and its card: rarity, affinity, faction, role, skills,
-// stats, its Weaver Matrix and lore. Locked champions show as a silhouette with the stage that
-// recruits them; their kit can still be studied.
+// stats, its Weaver Matrix and lore. Locked champions show as a silhouette with the way
+// they come (the Wishing Star, or 1-1 for the Rime Scholar); their kit can still be studied.
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
 import { isUnlocked } from '../archivist';
-import { recruitStage, STARTERS } from '../data/campaign';
 import { champion, CHAMPIONS } from '../data/champions';
+import { SUMMONING } from '../data/summoning';
+import { joinsBy } from '../summoning';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../data/meta';
 import { STAT_LIMITS } from '../data/norms';
 import { ATTUNE_BONUS, CORE_WEAVE_PATTERNS, GRADES, MATRIX_LAYOUT, patternBonusText, SLOT_NAMES, SPOOL_STAT_NAME, STAT_NAME } from '../data/matrix';
@@ -118,11 +119,11 @@ export class ChampionScreen extends BaseScreen {
     drawChampion(ctx, art, this.anim, f, sx, sy, { facing: 'R', scale: 2, shadow: !own });
     ctx.restore();
     if (!own) {
-      const st = recruitStage(c.id);
+      const by = joinsBy(c.id);
       ui.panel(ctx, 'red', sx - 96, 54, 192, 34);
       ui.blit(ctx, 'lock', sx - 88, 64);
       ui.text(ctx, 'NOT YET RECRUITED', sx + 6, 60, { color: '#ffd0c0', variant: 'bold', align: 'center' });
-      ui.text(ctx, st ? `Clear stage ${st.id}` : '', sx + 6, 72, { color: COLORS.dim, align: 'center' });
+      ui.text(ctx, by.kind === 'stage' ? `Clear stage ${by.stage}` : by.kind === 'summon' ? `Summon at ${SUMMONING.place}` : '', sx + 6, 72, { color: COLORS.dim, align: 'center' });
     }
     // animation preview buttons
     const anims: [string, string][] = [['IDLE', 'idle'], ['RUN', 'run'], ...c.skills.map((s, i) => [`A${i + 1}`, s.anim] as [string, string])];
@@ -466,8 +467,8 @@ export class ChampionScreen extends BaseScreen {
     cy += ui.para(ctx, fac.desc, x, cy, w, { color: COLORS.dim }) + 4;
     if (fac.standard) cy += ui.para(ctx, `Standard: ${fac.standard}`, x, cy, w, { color: COLORS.dim }) + 6;
     else cy += 6;
-    const st = recruitStage(this.c.id);
-    ui.text(ctx, STARTERS.includes(this.c.id) ? 'Joins you from the start.' : st ? `Joins on the first clear of stage ${st.id}.` : '', x, cy, { color: COLORS.faint });
+    const by = joinsBy(this.c.id);
+    ui.text(ctx, by.kind === 'start' ? 'Joins you from the start.' : by.kind === 'stage' ? `Joins on the first clear of stage ${by.stage}.` : `Comes when summoned at ${SUMMONING.place}.`, x, cy, { color: COLORS.faint });
   }
 
   key(k: string) {

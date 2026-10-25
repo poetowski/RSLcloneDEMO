@@ -77,6 +77,7 @@ Section 7 lists what is not decided.
 | 2026-10-24 | The Paladin, a Heroic Tank of the Azure Crown and the roster's first Heroic; the reward of a quest line Jakub designs later | 5.8, 7, 34 |
 | 2026-10-24 | The Paladin's affinity: Ember (Tide in the brief) | 34 |
 | 2026-10-24 | Challenges: a new place on the main menu leading to a screen of quests in three tabs, Daily and Persistent (placeholders) and the Journey (a horizontal pathway of quests unlocked one after another: Finish Tutorial, then a placeholder); a short tutorial for new accounts, made with driver.js | 7, 11, 35 |
+| 2026-10-25 | Summoning: champions are summoned with a currency found in the campaign (100 fragments merge into a shard, a shard summons one champion at random: 70% Common, 25% Elite, 5% Heroic), a wish of a faction and a role making them likelier, a new object in the Sanctum's sky where fragments are merged and champions summoned; the Rime Scholar, from 1-1, the only champion a stage brings; a Journey quest, Beat Campaign 1-3, giving 100 fragments; better names asked for (my proposal stands in) | 2.2, 5.6-5.8, 7, 11, 34, 35, 36 |
 
 ---
 
@@ -154,7 +155,8 @@ Four values, ascending.
 | 4 | Mythic |
 
 Rarity is fixed per champion at authoring time. Gating (stats, kits,
-ascension, recruit pools) is deferred.
+ascension, recruit pools) is deferred. Since 2026-10-25 a rarity has its odds
+in a summon: 70% Common, 25% Elite, 5% Heroic (section 36).
 
 ### 2.3 Role
 
@@ -787,8 +789,9 @@ my addition for the same reason, since without stages its background cannot
 be seen in the game. Their texts walk his description from the grove's roots
 to the eastern hills, the area's blurb is its first sentence; their enemies are
 copies of the roster's champions, 3-10 a boss Black Rhino; their powers are
-tuned stand-ins. The first clears of 3-1, 3-2 and 3-3 bring the Skeleton, the
-Rot Hulk and the Bellringer (sections 28-30; the stages are stand-ins).
+tuned stand-ins. The first clears of 3-1, 3-2 and 3-3 brought the Skeleton, the
+Rot Hulk and the Bellringer (sections 28-30; the stages were stand-ins) until
+2026-10-25, when champions came to be summoned (section 36).
 Stages, enemies and story wait for him.
 
 ### 5.7 Zone 4 — Earth Scars (2026-10-18)
@@ -883,9 +886,9 @@ description, from the steppe and its two ravines to the camp, the yaks, the
 mountains and the zeppelin; the area's blurb places it. Their enemies are
 copies of the roster's champions, the Ashveil Reign's Skeleton and Rot Hulk
 among them for the first time, and 4-10 is a boss Red Cloak; their powers are
-tuned stand-ins. The first clears of 4-1, 4-2 and 4-3 bring the Necromancer,
-the Automated Soul and Irving Wellbington (sections 31-33; the stages are
-stand-ins). Stages, enemies and story wait for him.
+tuned stand-ins. The first clears of 4-1, 4-2 and 4-3 brought the Necromancer,
+the Automated Soul and Irving Wellbington (sections 31-33; the stages were
+stand-ins) until 2026-10-25, when champions came to be summoned (section 36). Stages, enemies and story wait for him.
 
 ### 5.8 Zone 5 — the Snowy Mesa (2026-10-19)
 
@@ -1001,8 +1004,9 @@ his description, from the mesa's top and the mesas round it to the sunset, the
 castle, the storm and the arbiter; the area's blurb places it. Their enemies
 are copies of the roster's champions, the Ashveil Reign's Elites among them,
 and 5-10 is a boss Irving Wellbington; their powers are tuned stand-ins. The
-first clear of 5-10 brings the Paladin (section 34), standing in for the quest
-line Jakub made him the reward of. Stages, enemies and story wait for him.
+first clear of 5-10 brought the Paladin (section 34), standing in for the quest
+line Jakub made him the reward of, until 2026-10-25, when champions came to be
+summoned (section 36). Stages, enemies and story wait for him.
 
 ---
 
@@ -1028,8 +1032,8 @@ open questions.
 
 - Affinity mechanics (multipliers, what they affect, visibility) *(the game
   stands in ±20% damage)*
-- Rarity gating (stats, kits, ascension, recruit pools) *(the game stands in a
-  stat budget per rarity)*
+- Rarity gating (stats, kits, ascension) *(the game stands in a stat budget per
+  rarity; a rarity's odds in a summon are his, section 36)*
 - Role mechanics (whether roles change battle rules, AI, or nothing) *(a
   Tank draws no fire today: enemies hit whoever is lowest on HP; MDA T20)*
 - Faction mechanics (synergies, team-building constraints, UI filtering)
@@ -1068,10 +1072,10 @@ open questions.
 - How far Resistance must exceed Accuracy to resist a debuff *(the game
   stands in a curve, section 10)*
 - Zone 1's enemies *(the game stands in copies of the two starters)*
-- Balance, the stage that brings each champion and every stage's enemies:
-  Jakub, 2026-10-12, "regarding balancing and where is what spawned and what
-  is composition of each stage, i will dictate these later" *(the game's
-  stage powers, recruiting stages and enemies are stand-ins)*
+- Balance and every stage's enemies: Jakub, 2026-10-12, "regarding balancing
+  and where is what spawned and what is composition of each stage, i will
+  dictate these later" *(the game's stage powers and enemies are stand-ins;
+  since 2026-10-25 no stage brings a champion but 1-1, section 36)*
 - Where crit is taught, at or before the point Cold Rebuke first fires
   meaningfully (section 8, the Rime Scholar's notes)
 - A battle that cannot end: a side left only with champions that never
@@ -1082,19 +1086,28 @@ open questions.
 - How a raised champion comes back *(the game stands in 30% of its max HP,
   nothing on it, an empty turn meter, its cooldowns as they were when it fell
   and a once-a-battle passive still spent, section 31)*
-- Team size *(the game uses 3)* and how champions are acquired *(one recruit
-  per first clear)*
+- Team size *(the game uses 3)*
+- The names of summoning: "propose better naming" (2026-10-25) *(the game
+  stands in my proposal: Stardust for the fragments, the Soulstar for the
+  shard, the Wishing Star for the place, section 36)*
+- How much a victory finds, how strong a wish is, and whether a summon can
+  bring a champion already owned *(the game stands in 20 Stardust a victory in
+  the Fracture Reach and 5 more in each area beyond it, 10 more for three
+  stars; twice as likely for each part of a wish a champion matches; never
+  twice, a rarity whose champions are all owned giving its share to the
+  others; section 36)*
 - The quest line whose reward is the Paladin: Jakub, 2026-10-24, "this will
   be reward for quest line later, i will specify later the whole quest
-  concept" *(until it exists, the first clear of 5-10, the campaign's last
-  stage, brings him, section 34; the Journey, section 35, holds no link to
-  him yet)*
+  concept" *(since 2026-10-25 he is summoned like every champion but the
+  Rime Scholar, "this is only exception": the only Heroic, so the 5%;
+  section 36)*
 - The Daily and Persistent challenges: "for now in daily and persistent tabs
   those ar ejust placeholders" (2026-10-24) *(the tabs show empty rows and
   "not designed yet", section 35)*
-- The Journey after its first quest, and what quests give: "second quest is
-  placeholder" (2026-10-24) *(the game stands in Weave a Spool, and a spool
-  for each quest claimed, section 35)*
+- The Journey after its second quest, and what the first gives: "second
+  quest is placeholder" (2026-10-24), then "beat campaign 1-3. reward can be
+  100 summoning fragments" (2026-10-25) *(the game stands in Weave a Spool as
+  the third, and a spool for Finish Tutorial and for it, sections 35, 36)*
 - Campaign count of zones
 - Zone 3's stages, enemies and story *(the game stands in ten placeholder
   stages, 5.6)*
@@ -1462,7 +1475,11 @@ holds a seventh jewel at its centre, round which the six lobes stand.
   placeholder until its system is made (Jakub, 2026-10-24, 9.5). Challenges
   (the main-menu place of quests: Daily, Persistent and the Journey, a
   pathway of quests unlocked one after another) and the tutorial (Jakub,
-  2026-10-24, section 35).
+  2026-10-24, section 35). Summoning (Jakub, 2026-10-25, section 36):
+  champions are summoned with fragments found in the campaign, merged into
+  shards; the names are proposals until he chooses: Stardust (the fragments),
+  a Soulstar (100 Stardust merged), the Wishing Star (the place in the
+  Sanctum's sky), a wish (a faction and a role made likelier).
 
 ---
 
@@ -2714,7 +2731,9 @@ it.
 
 **Acquisition.** He is the reward of a quest line Jakub designs later. Until
 it exists the first clear of 5-10, the campaign's last stage, brings him, so
-he can be played; a save that has cleared 5-10 already has him.
+he can be played; a save that has cleared 5-10 already has him. *(Since
+2026-10-25 he is summoned like every champion but the Rime Scholar, the only
+Heroic so far: section 36. A save that has him keeps him.)*
 
 **As built:** the tallest of the Crown's knights, young and fierce, in silver
 plate from the gorget to the sabatons, edged in gold at the neck, the fauld
@@ -2775,7 +2794,8 @@ read from the save as it stands, so a goal met before the quest opens counts
 the moment it does; claiming gives the quest's reward and opens the next.
 "Finish Tutorial" is done when the tutorial is finished: the first battle won
 while it runs. "Second quest is placeholder": a quest of my own stands in so
-the pathway can be walked. He named no rewards; each quest gives a spool. "For
+the pathway can be walked *(since 2026-10-25 his Beat Campaign 1-3 is the
+second quest and mine the third, section 36)*. He named no rewards; each quest gives a spool. "For
 new accounts": the tutorial starts on its own on a save with no stage
 cleared, unless it was finished or skipped; anyone can play it from the
 Journey. "Use driver.js": driver.js (1.9.0) draws the overlay and its
@@ -2831,3 +2851,120 @@ Sunder spool; the Journey's look (the band, the thread, the knots); the
 tutorial's steps, order and look (the cards, the corners, the hand); that the
 first victory finishes it, that it starts on its own only on a save with no
 stage cleared, and that it can be skipped and played again.
+
+## 36. Summoning (received 2026-10-25)
+
+Jakub's brief, verbatim:
+
+```
+we need to rework how champions are being recruited. all champions are being spawned like in rsl from a special currency, something like a spawning shard. but propose better naming. campaign nodes drop these fragments. each 100 fragments can be merged to 1 spawning shard. then we need to have an option to spawn random champion. maybe player could a bit change randomness by choosing which faction and role he would like to get, but this is not guaranteed but just a better chance for that wish. also create new object in main menu, somewhere on the sky, where people can click and merge fragments dropped from campaing nodes and then summon heroes. chances are 70% for common, 25% for elite and 5% for heroic champion. rime scholar is guaranteed champion drop from stage 1-1. this is only exception. so after 1-1 user has 2 players, gareth from the beginning and rime scholar as reward of beating 1-1. maybe we can make also new journey quest: beat campaign 1-3. reward can be 100 summoning fragments. so player then can spawn his third hero, this one will be first randomized.
+```
+
+and, while it was being built:
+
+```
+go
+```
+
+**Naming.** "Propose better naming": these stand in so the game can be
+played, until he chooses (the words live in one place,
+`src/game/data/summoning.ts`):
+
+- the fragments: **Stardust**, the dust of the Loom's scattered light that
+  every victory shakes loose ("120 Stardust");
+- the shard: a **Soulstar**, 100 Stardust pressed into one star, which calls
+  one soul home: the champions are fragmented souls (section 1);
+- the object in the sky: **the Wishing Star**, a star of the Loom's own light
+  still hanging from one of its threads, where his "better chance for that
+  wish" is made;
+- the act: **summon**, his word; the place's label and its button read
+  SUMMON.
+
+Other pairs he may prefer: Soul Shards and a Soul Sigil; Echoes and a
+Recollection (the Archivist recollects souls, section 1); Starmotes and a
+Lodestar. "Fragments" itself was kept out of the game's words: in the lore the
+champions are fragments (section 8).
+
+**Readings.**
+
+- "All champions are being spawned ... from a special currency" and "rime
+  scholar is guaranteed champion drop from stage 1-1. this is only
+  exception": no stage brings a champion but 1-1, which brings the Rime
+  Scholar; Captain Gareth is with the Archivist from the start (section 8);
+  every other champion is summoned, the Paladin too ("only exception";
+  section 34 made him the reward of a quest line to come). A save keeps every
+  champion it already has.
+- "Campaign nodes drop these fragments": every victory in the campaign finds
+  some, a first clear or a replay, as spools drop (9.4).
+- "Each 100 fragments can be merged to 1 spawning shard": MERGE turns 100 into
+  one shard; a summon spends one.
+- "Spawn random champion ... 70% for common, 25% for elite and 5% for heroic":
+  the rarity is drawn at his odds, then one champion of that rarity.
+- "A bit change randomness by choosing which faction and role ... not
+  guaranteed but just a better chance for that wish": a wish names a faction,
+  a role, both or neither; within the rarity drawn, a champion counts twice
+  for each part of the wish it matches (twice for one, four times for both),
+  and the rarity's odds never change. A wish for the Court of Root and
+  Support raises the chance of a Court of Root Support from about 8% to 20%.
+- A champion already owned: a summon never brings a champion twice (a
+  champion is one soul, recollected once); once every champion of a rarity is
+  owned, its share goes to the others in proportion (with the Paladin found:
+  Common 74%, Elite 26%).
+- "New object in main menu, somewhere on the sky": a new place of the
+  Sanctum (section 10), hung in its sky; its label shows how many summons
+  wait, with the NEW badge while one does.
+- "Beat campaign 1-3. reward can be 100 summoning fragments": a Journey quest
+  (section 35), Beat Campaign 1-3, second after Finish Tutorial (my
+  placeholder moves on to third); its goal is stage 1-3 cleared, its reward
+  100 Stardust. "So player then can spawn his third hero, this one will be
+  first randomized": the first three stages find less than 100 between them
+  (20 a victory, 30 when nobody falls), so the third champion comes with the
+  quest.
+
+**As built.** *The Wishing Star:* in the Sanctum's sky between the Starbridge
+Gate and the Reliquary, at the end of a thread of the Loom's starlight that
+falls straight from the rim; a crystal of eight points in the lilac light of
+souls, lit from the pole star, with long rays out of its four long points; a
+slim ring of the Loom's gold round it, tilted, its runes creeping round it
+once in half a minute, two motes circling it every seven seconds; its light
+breathes, and now and then a soul, a mote of pale light, rises from the island
+and drifts up into it. While a summon waits it shines brighter and calls more
+often. Its label hangs on its thread above it: SUMMON, how many summons wait
+("1 ready") and NEW. The small moon that stood there moved to the right of the
+title. *The screen:* SUMMON, under the Sanctum's sky, the star at twice its
+size on its thread; on the left the Stardust held, the way to the next
+Soulstar and MERGE 100, then the Soulstars held; on the right the wish (ANY
+and the four standards, ANY and the three roles), the odds of each rarity as
+they stand, and with a wish its chance beside the chance without it ("Your
+wish: 20%", "8% without wishing"); under the star SUMMON; along the foot every
+champion still scattered, those the wish names lit, each with its chance on
+the next summon. MERGE streams the dust into the Soulstars; SUMMON draws motes
+into the star from all round, its light turns the colour of the rarity that
+answers and runs out from it in two rings, a white flash, and the ceremony:
+NEW CHAMPION, "Your wish came true!" when it did, else "Summoned at the
+Wishing Star." Until the ceremony the screen shows the champions still
+scattered as they were, so nothing gives the summon away. *Elsewhere:* the
+results panel shows the Stardust found ("+30 Stardust"); an area's stage list
+"20 Stardust a victory, 30 when nobody falls"; a champion not owned reads "At
+the Wishing Star" in the Champions screen and "Summon at the Wishing Star" on
+its page (the Rime Scholar still "Clear stage 1-1"); the Academy has a
+chapter, Summoning; Beat Campaign 1-3 carries its Stardust above its knot and
+offers TO THE CAMPAIGN while open, TO THE WISHING STAR once claimed while a
+summon waits. *The tutorial:* a lesson for the first summon starts on its own
+the first time a summon waits (a save whose tutorial was not skipped): the
+Wishing Star in the Sanctum, MERGE 100, a word on the wish, SUMMON; the
+ceremony plays alone; back at the star a last card names who answered. It can
+be closed, and is shown once. *Balance:* with champions summoned, Zone 1 is
+fought by Gareth and the Rime Scholar with one or two others drawn at random,
+stronger on average than the Commons the stages used to bring, so 1-4, 1-8,
+1-9 and 1-10 were raised (power 0.86 to 1.20, 0.71 to 0.78, 0.68 to 0.76,
+0.70 to 0.78); `npm run balance` now grows its rosters as summoning does.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names (Stardust,
+the Soulstar, the Wishing Star); how much Stardust a victory finds (20 in the
+Fracture Reach, 5 more in each area beyond it, 10 more when nobody falls);
+that a wish counts a champion twice for each part it matches; that a summon
+never brings a champion twice and a found-out rarity's share goes to the
+others; the Paladin among the summons; the place, its look and where its label
+hangs; the screen, its words and its animation; the lesson; the raised powers
+of 1-4, 1-8, 1-9 and 1-10; Weave a Spool as the third quest.

@@ -14,8 +14,10 @@
 // Starbridge Gate (the campaign), the Reliquary (the champions), the
 // Weaver's Spire (Weaving), its spool drawing a golden thread up toward the
 // rim's break, the Observatory (the Academy), and an astrolabe on a rock
-// drifting below (the options). Everything here is a first take of mine:
-// names, places and look.
+// drifting below (the options); since 2026-10-24 the Herald's Board on a rock
+// off the west end (the Challenges), and since 2026-10-25 the Wishing Star
+// hanging from one of the Loom's threads in the sky over the Gate (summoning).
+// Everything here is a first take of mine: names, places and look.
 //
 // Writes public/assets/menu/ (sky.png, scene.png, menu.json) and the preview
 // docs/images/menu_sanctum.png. The runtime is src/game/view/sanctum.ts.
@@ -24,6 +26,7 @@ import { writeJson } from './io.ts';
 import { MAT, UIR } from './palette.ts';
 import { dith, ellipseFill, outline, polyFill, rampDither } from './paint.ts';
 import { A, Bitmap, hash2, hex, packShelves, RGBA, rng } from './raster.ts';
+import { starCrystal, StarShape } from './star.ts';
 
 const H = (list: string[]) => list.map((h) => hex(h));
 const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
@@ -68,8 +71,8 @@ const GTHREAD = H(['#5a3a10', '#a87a28', '#f0c650', '#fff0a8', '#fffbe8']);
 const STAR_X = 54, STAR_Y = 36;
 /** the giant planet beyond the Loom's break, cut by the screen's right edge */
 const PLANET = { x: 604, y: 116, r: 66 };
-/** a small moon */
-const MOONP = { x: 168, y: 132, r: 9 };
+/** a small moon, high on the right between the title and the break (until 2026-10-25 over the Gate, where the Wishing Star hangs now) */
+const MOONP = { x: 488, y: 42, r: 9 };
 
 /** An ellipse in the sky: centre, radii, tilt (radians). */
 interface Ring {
@@ -154,6 +157,7 @@ function skyImage(): Bitmap {
   planet(b);
   moon(b);
   loom(b);
+  WARP.push(wishThread(b));
   THREAD_PTS = goldenThread(b);
   return b;
 }
@@ -1531,6 +1535,122 @@ function pennantFrame(frame: number, frames: number): Bitmap {
 }
 
 /**
+ * The Wishing Star (summoning; Jakub, 2026-10-25: "create new object in main
+ * menu, somewhere on the sky, where people can click and merge fragments
+ * dropped from campaing nodes and then summon heroes"): a star of the Loom's
+ * own light still hanging at the end of one of its loosed threads, in the sky
+ * between the Starbridge Gate and the title. A crystal of eight points lit
+ * from the pole star, in a slim ring of the Loom's gold whose runes creep
+ * round, two motes circling it; its light breathes, and souls drift up into
+ * it (view/sanctum.ts). Its name, look and place are mine.
+ */
+export const WISH = { cx: 167, cy: 152 };
+/** the star's light: lilac in the shade, white where the pole star strikes it */
+const SOUL = H(['#1a1230', '#2c2050', '#433474', '#5f4e9c', '#8a78c4', '#b6a8e6', '#e0d8fa', '#ffffff']);
+/** its crystal, its ring (round its heart, tilted) and the motes' wider orbit */
+const WISH_STAR: StarShape = { up: 19, down: 21, side: 14, diag: 9, waist: 6.5 };
+const WISH_RING = { rx: 25, ry: 6.5, tilt: -0.2, dy: 1 };
+const WISH_ORBIT = { rx: 31, ry: 9 };
+
+/** The thread it hangs from: out of the rim straight above it, down to its upper point in a slight sway; its course, sampled, for the light that runs down it into the star. */
+function wishThread(b: Bitmap): [number, number][] {
+  const a = -Math.acos((WISH.cx - RIM.cx) / RIM.rx);
+  const [x0, y0r] = ringAt(RIM, a);
+  const y0 = y0r + RIM.half, y1 = WISH.cy - WISH_STAR.up + 2;
+  const pts: [number, number][] = [];
+  const n = Math.ceil((y1 - y0) * 1.5);
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    const x = x0 + (WISH.cx - x0) * t + Math.sin(t * Math.PI) * 2.2;
+    const y = y0 + (y1 - y0) * t;
+    const ix = Math.floor(x), iy = Math.floor(y);
+    if (dith(ix - 1, iy, 0.34)) blendSky(b, ix - 1, iy, THREAD[0]);
+    if (dith(ix + 1, iy, 0.34)) blendSky(b, ix + 1, iy, THREAD[0]);
+    const bead = hash2(Math.floor(t * 34), 7, 931) > 0.8;
+    b.set(ix, iy, bead ? THREAD[4] : dith(ix, iy, 0.6) ? THREAD[3] : THREAD[2]);
+    if (i % 6 === 0) pts.push([ix, iy]);
+  }
+  return pts;
+}
+
+/** A point on the ring (or the motes' orbit) at angle t, and whether it lies on the near side of the star. */
+function wishRingAt(t: number, rx: number, ry: number): [number, number, boolean] {
+  const c = Math.cos(WISH_RING.tilt), s = Math.sin(WISH_RING.tilt);
+  const ex = rx * Math.cos(t), ey = ry * Math.sin(t);
+  return [WISH.cx + ex * c - ey * s, WISH.cy + WISH_RING.dy + ex * s + ey * c, Math.sin(t) > 0];
+}
+
+/** The ring's far or near half: a band of gold two pixels deep, lit along its upper edge, four runes creeping round it a quarter turn a loop. */
+function wishRing(b: Bitmap, near: boolean, ph: number) {
+  for (let t = 0; t < TAU; t += 0.008) {
+    const [x, y, isNear] = wishRingAt(t, WISH_RING.rx, WISH_RING.ry);
+    if (isNear !== near) continue;
+    const ix = Math.round(x), iy = Math.round(y);
+    const lit = Math.cos(t) < 0.2;
+    b.set(ix, iy, GOLD[near ? (lit ? 5 : 4) : 2]);
+    b.set(ix, iy + 1, GOLD[near ? 2 : 1]);
+  }
+  for (let k = 0; k < 4; k++) {
+    const t = ph / 4 + (k * Math.PI) / 2;
+    const [x, y, isNear] = wishRingAt(t, WISH_RING.rx, WISH_RING.ry);
+    if (isNear !== near) continue;
+    const ix = Math.round(x), iy = Math.round(y);
+    b.set(ix, iy, near ? RUNE[4] : RUNE[2]);
+    b.set(ix, iy + 1, near ? RUNE[3] : RUNE[1]);
+  }
+}
+
+/** The two motes on their orbit, a turn a loop, on the far or the near side. */
+function wishMotes(b: Bitmap, near: boolean, ph: number) {
+  for (let m = 0; m < 2; m++) {
+    const [x, y, isNear] = wishRingAt(ph + m * Math.PI, WISH_ORBIT.rx, WISH_ORBIT.ry);
+    if (isNear !== near) continue;
+    const ix = Math.round(x), iy = Math.round(y);
+    b.set(ix, iy, near ? SOUL[7] : SOUL[5]);
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(ix + dx, iy + dy, near ? SOUL[4] : SOUL[2]);
+  }
+}
+
+/** Rays of light out of the crystal's long points, thinning into the dark as the pole star's do, the upright pair longer. */
+function wishRays(b: Bitmap) {
+  for (const [dx, dy, from, len] of [[0, -1, WISH_STAR.up, 15], [0, 1, WISH_STAR.down, 15], [-1, 0, WISH_STAR.side, 11], [1, 0, WISH_STAR.side, 11]] as const) {
+    for (let i = from - 3; i < from + len; i++) {
+      const k = 1 - (i - from + 3) / (len + 3);
+      const x = WISH.cx + dx * i, y = WISH.cy + dy * i;
+      if (dith(x, y, Math.min(1, k * 1.5))) b.set(x, y, rampDither(SOUL, 3 + k * 4, x, y));
+    }
+  }
+}
+
+/** The Wishing Star, one frame of its loop: the far half of the ring and the far mote behind the crystal, its rays, the near ones before it. */
+function wishFrame(frame: number, frames: number): Bitmap {
+  const b = new Bitmap(W, HT);
+  const ph = (frame / frames) * TAU;
+  wishRing(b, false, ph);
+  wishMotes(b, false, ph);
+  wishRays(b);
+  starCrystal(b, WISH.cx, WISH.cy, WISH_STAR, SOUL);
+  wishRing(b, true, ph);
+  wishMotes(b, true, ph);
+  return b;
+}
+
+/** Its light: a dithered halo round it, breathing at runtime. */
+function wishGlow(): Bitmap {
+  const b = new Bitmap(W, HT);
+  const R = 36;
+  for (let y = WISH.cy - R; y <= WISH.cy + R; y++) {
+    for (let x = WISH.cx - R; x <= WISH.cx + R; x++) {
+      const d = Math.hypot(x + 0.5 - WISH.cx, (y + 0.5 - WISH.cy) * 1.08) / R;
+      if (d >= 1) continue;
+      const k = Math.pow(1 - d, 1.6);
+      if (dith(x, y, Math.min(1, k * 1.7))) b.set(x, y, rampDither(SOUL, 1 + k * 4.2, x, y));
+    }
+  }
+  return b;
+}
+
+/**
  * A star-willow between the Gate and the Reliquary: a dark twisted trunk, and
  * from its crown long strands falling in arcs like a fountain, hung with
  * pale leaves that catch the starlight, glowing at their tips.
@@ -1741,7 +1861,7 @@ export interface MenuSprite {
 
 /** A place to click: the sprites that make it (their pixels are what the pointer hits), its hover outline, where its label hangs. */
 export interface MenuHotspot {
-  id: 'campaign' | 'champions' | 'weaving' | 'academy' | 'options' | 'challenges';
+  id: 'campaign' | 'champions' | 'weaving' | 'academy' | 'options' | 'challenges' | 'summon';
   /** the place's name in the sanctum (a first take) */
   name: string;
   sprites: string[];
@@ -1774,6 +1894,8 @@ export interface SanctumJson {
   falls: [number, number][];
   /** the portal's far point, where its motes stream */
   portal: [number, number];
+  /** the Wishing Star's heart, where the souls it calls drift in */
+  wish: [number, number];
   /** pools of light that breathe: centre, radii, colour, strength, breaths a second (radians) */
   lights: { x: number; y: number; rx: number; ry: number; rgb: [number, number, number]; k: number; rate: number }[];
 }
@@ -1843,6 +1965,9 @@ export function buildSanctum(out: string) {
   add('herald', [board.body], 'front', 'static', undefined, heraldBob);
   add('herald_glow', [board.glow], 'front', 'pulse', 3000, heraldBob);
   add('herald_flag', loopFrames(10, pennantFrame), 'front', 'loop', 220, heraldBob);
+  // the Wishing Star: its light breathes slowly; its runes take half a minute round the ring, its motes seven seconds
+  add('wish_glow', [wishGlow()], 'far', 'pulse', 5600);
+  add('wish', loopFrames(24, wishFrame), 'far', 'loop', 300);
 
   const items: { key: string; bmp: Bitmap }[] = [];
   const sprites: Record<string, MenuSprite> = {};
@@ -1874,6 +1999,8 @@ export function buildSanctum(out: string) {
     { id: 'academy', name: 'The Observatory', sprites: ['observatory'], label: lip(OBS.cx + 8) },
     { id: 'options', name: 'The Astrolabe', sprites: ['astro_rock', 'astro'], label: [ASTRO.cx, 342] },
     { id: 'challenges', name: "The Herald's Board", sprites: ['herald_rock', 'herald', 'herald_flag'], label: [HERALD.cx, 342] },
+    // its label hangs on its thread above it, in the sky between the Gate and the Reliquary
+    { id: 'summon', name: 'The Wishing Star', sprites: ['wish'], label: [WISH.cx, WISH.cy - WISH_STAR.up - 34] },
   ];
   const hotspots: MenuHotspot[] = [];
   for (const h of spotsDef) {
@@ -1905,7 +2032,9 @@ export function buildSanctum(out: string) {
     thread: THREAD_PTS,
     falls: FALLS.map(([x]) => [x, Math.round(frontY(x))]),
     portal: [GATE.cx, GATE.spring + 4],
+    wish: [WISH.cx, WISH.cy],
     lights: [
+      { x: WISH.cx, y: WISH.cy, rx: 34, ry: 34, rgb: [176, 156, 255], k: 0.42, rate: 0.5 },
       { x: GATE.cx, y: GATE.spring + 12, rx: 34, ry: 46, rgb: [150, 110, 255], k: 0.5, rate: 0.7 },
       { x: REL.cx, y: 173, rx: 30, ry: 30, rgb: [110, 160, 255], k: 0.38, rate: 0.45 },
       { x: SPIRE.cx, y: SPIRE.spoolY, rx: 30, ry: 30, rgb: [255, 214, 120], k: 0.42, rate: 0.8 },

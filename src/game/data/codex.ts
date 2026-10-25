@@ -159,6 +159,19 @@ export const CHAPTERS: Chapter[] = [
     ],
   },
   {
+    id: 'summoning',
+    title: 'Summoning',
+    icon: 'mi_summon',
+    blocks: [
+      { kind: 'p', text: "Champions answer the Wishing Star, in the Sanctum's sky. Every victory in the campaign finds Stardust; 100 Stardust merge into a Soulstar, and each Soulstar summons one champion you do not have yet." },
+      { kind: 'list', items: ['Common: 70%.', 'Elite: 25%.', 'Heroic: 5%.'] },
+      { kind: 'p', text: 'Once every champion of a rarity is yours, its share goes to the others. Captain Gareth is with you from the start and the first clear of stage 1-1 brings the Rime Scholar; every other champion is summoned.' },
+      { kind: 'h', text: 'A wish' },
+      { kind: 'p', text: 'Before you summon you may wish for a faction, a role or both. Within its rarity, every champion your wish names is twice as likely, four times when it names both; the odds of each rarity stay as they are. A wish is no promise.' },
+      { kind: 'tip', text: 'The Wishing Star shows the chance of your wish, and of every champion still scattered.' },
+    ],
+  },
+  {
     id: 'campaign',
     title: 'Campaign & Stars',
     icon: 'mi_campaign',
@@ -166,8 +179,9 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'p', text: 'The campaign is a line of areas you cross from left to right, each with its stages. Each stage you clear opens the next; clearing an area\'s last stage opens the next area.' },
       { kind: 'figure', id: 'stars' },
       { kind: 'list', items: ['3 stars: nobody fell.', '2 stars: one champion fell.', '1 star: you won with losses.'] },
-      { kind: 'p', text: 'Some stages bring a new champion on their first clear. Bosses wear a crown and have 60% more HP.' },
+      { kind: 'p', text: 'The first clear of stage 1-1 brings a new champion. Bosses wear a crown and have 60% more HP.' },
       { kind: 'p', text: "Every victory also finds a Thread Spool, and a flawless one a second. Each area holds two Weave Patterns and its stages find only those; an area's later stages find finer grades more often. The spools wait in Weaving, where you weave them into your champions." },
+      { kind: 'p', text: 'And every victory finds Stardust for the Wishing Star: 20 in the Fracture Reach and 5 more in each area beyond it, 10 more when nobody falls.' },
     ],
   },
   {
