@@ -638,8 +638,11 @@ describe('challenges and the tutorial', () => {
     }
     expect(CHALLENGE_TABS.map((t) => t.id)).toEqual(['daily', 'persistent', 'journey']);
     expect(JOURNEY[0].title).toBe('Finish Tutorial');
-    // Jakub, 2026-10-25: "new journey quest: beat campaign 1-3. reward can be 100 summoning fragments"
-    expect([JOURNEY[1].title, JOURNEY[1].goal, JOURNEY[1].reward]).toEqual(['Beat Campaign 1-3', { kind: 'stage', stage: '1-3' }, { kind: 'fragments', amount: 100 }]);
+    // Jakub, 2026-10-25: "new journey quest: beat campaign 1-3. reward can be 100 summoning fragments", then
+    // "swap quests: weave a spool make sooner and after that make beat campaign 1-3 ... swap also rewards"
+    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3']);
+    expect([JOURNEY[1].goal, JOURNEY[1].reward]).toEqual([{ kind: 'weave' }, { kind: 'fragments', amount: 100 }]);
+    expect([JOURNEY[2].goal, JOURNEY[2].reward.kind]).toEqual([{ kind: 'stage', stage: '1-3' }, 'spool']);
   });
 
   it('opens the Journey one quest at a time, and a claim gives its spool or its Stardust once', () => {
@@ -648,7 +651,7 @@ describe('challenges and the tutorial', () => {
     expect([questState(p, first), questState(p, second), questState(p, third)]).toEqual(['open', 'locked', 'locked']);
     // a goal met before its quest opens waits for it
     weave(p);
-    expect(questState(p, third)).toBe('locked');
+    expect(questState(p, second)).toBe('locked');
     expect(claimQuest(p, first.id)).toBeNull();
     p.tutorial = 'done';
     expect(questState(p, first)).toBe('ready');
@@ -660,16 +663,17 @@ describe('challenges and the tutorial', () => {
     expect(p.reliquary.spools()).toHaveLength(before + 1);
     expect(p.reliquary.freshCount()).toBe(1);
     expect(claimQuest(p, first.id)).toBeNull();
-    // Beat Campaign 1-3 waits for its stage, then gives the Stardust of a summon
-    expect([questState(p, first), questState(p, second)]).toEqual(['claimed', 'open']);
+    // Weave a Spool, its goal met before it opened, is ready the moment it opens; its Stardust is a summon
+    expect([questState(p, first), questState(p, second)]).toEqual(['claimed', 'ready']);
     expect(currentQuest(p)).toBe(second);
-    for (const s of allStages().slice(0, 3)) recordClear(p, s.id, 2);
-    expect(questState(p, second)).toBe('ready');
     const dust = p.fragments;
     expect(claimQuest(p, second.id)).toEqual({ kind: 'fragments', amount: 100 });
     expect(p.fragments).toBe(dust + 100);
+    // Beat Campaign 1-3 waits for its stage, then gives its spool
+    expect(questState(p, third)).toBe('open');
+    for (const s of allStages().slice(0, 3)) recordClear(p, s.id, 2);
     expect(questState(p, third)).toBe('ready');
-    claimQuest(p, third.id);
+    expect(claimQuest(p, third.id)?.kind).toBe('spool');
     expect(p.claimed).toEqual(JOURNEY.slice(0, 3).map((q) => q.id));
     expect(readyCount(p)).toBe(0);
   });
@@ -755,8 +759,9 @@ describe('summoning', () => {
     expect(p.fragments).toBe(won.fragments);
     recordClear(p, '1-2', 3);
     expect(p.fragments).toBe(won.fragments);
-    // three first clears alone stay short of a summon: the third champion comes with Beat Campaign 1-3 (his design)
-    expect(['1-1', '1-2', '1-3'].reduce((n, s) => n + fragmentDrop(s, 3), 0)).toBeLessThan(FRAGMENTS_PER_SHARD);
+    // the first battle alone stays short of a summon: the third champion comes with the Journey's Stardust (his design)
+    expect(fragmentDrop('1-1', 3)).toBeLessThan(FRAGMENTS_PER_SHARD);
+    expect(JOURNEY.flatMap((q) => (q.reward.kind === 'fragments' ? [q.reward.amount] : []))).toEqual([FRAGMENTS_PER_SHARD]);
   });
 
   it('merges 100 Stardust into a Soulstar, and spends a Soulstar on a champion not yet owned', () => {

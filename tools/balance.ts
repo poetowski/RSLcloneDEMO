@@ -12,7 +12,7 @@
 //      the stage. Since summoning (2026-10-25) what they own grows by chance:
 //      Gareth from the start, the Rime Scholar from 1-1, and a summon for every
 //      100 Stardust the first clears before the stage find (one star each) and
-//      the Journey gives (Beat Campaign 1-3). Each stage averages ROSTERS
+//      the Journey gives (Weave a Spool, after the first battle). Each stage averages ROSTERS
 //      rosters, each summoned in its own seeded order at the summon odds, and
 //      up to TEAMS teams of each. Bands per stage kind (below).
 import { combatants, Combatant } from '../src/game/battle/battle';
@@ -115,6 +115,12 @@ const orders = Array.from({ length: ROSTERS }, (_, k) => {
   }
   return order;
 });
+// after which stage (its place in the campaign) each Journey quest is claimed: a stage's goal after that
+// stage, the tutorial and a woven spool after the first battle (it finds a spool, and the tutorial's
+// farewell sends the player to Weaving); never before the quest ahead of it
+const stageIds = LOCATIONS.flatMap((l) => l.stages.map((s) => s.id));
+let ahead = 0;
+const claimedAfter = JOURNEY.map((q) => (ahead = Math.max(ahead, q.goal.kind === 'stage' ? stageIds.indexOf(q.goal.stage) : 0)));
 const owned = [...STARTERS];
 let dust = 0;
 for (const loc of LOCATIONS) {
@@ -146,10 +152,12 @@ for (const loc of LOCATIONS) {
     const kind = loc === LOCATIONS[0] && si === 0 ? 'first' : s.enemies.some((e) => e.boss) ? 'boss' : 'normal';
     const [lo, hi] = CURVE_BANDS[kind];
     console.log(`${flag(w >= lo && w <= hi)} ${s.id.padEnd(6)} power ${s.power.toFixed(2)}  avg ${pct(w)}  best team ${pct(best)}  (${kind} band ${pct(lo)}-${pct(hi)}, ${size} owned)`);
-    // after its first clear: the champion it brings, its Stardust, and the Journey's for it
+    // after its first clear: the champion it brings, its Stardust, and the Journey's claimed then
     if (s.recruit && !owned.includes(s.recruit)) owned.push(s.recruit);
     dust += fragmentDrop(s.id, 1);
-    for (const q of JOURNEY) if (q.goal.kind === 'stage' && q.goal.stage === s.id && q.reward.kind === 'fragments') dust += q.reward.amount;
+    JOURNEY.forEach((q, i) => {
+      if (claimedAfter[i] === stageIds.indexOf(s.id) && q.reward.kind === 'fragments') dust += q.reward.amount;
+    });
   });
 }
 

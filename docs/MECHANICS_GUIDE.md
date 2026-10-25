@@ -405,8 +405,8 @@ The Challenges are quests to accomplish, in three tabs (Jakub, 2026-10-24, [DESI
 | Quest | Goal | Reward |
 | --- | --- | --- |
 | Finish Tutorial (his) | the tutorial finished: its first victory | a Silver Vigor spool |
-| Beat Campaign 1-3 (his, 2026-10-25) | stage 1-3 cleared | 100 Stardust (his): the third champion's summon |
-| Weave a Spool (stand-in for his placeholder) | any spool woven into any champion's Weaver Matrix | a Gilded Sunder spool |
+| Weave a Spool (stand-in for his placeholder; second on his word, 2026-10-25) | any spool woven into any champion's Weaver Matrix | 100 Stardust (his): the third champion's summon |
+| Beat Campaign 1-3 (his, 2026-10-25; third on his word) | stage 1-3 cleared | a Gilded Sunder spool |
 
 A reward spool has its quest's pattern and grade; its main stat is drawn by slot and its strands rolled as a found spool's are (section 14), and it comes into storage as a new find. Stardust goes to the Wishing Star (section 16). The spool rewards are stand-ins.
 
@@ -417,7 +417,7 @@ A reward spool has its quest's pattern and grade; its main stat is drawn by slot
 Champions are summoned (Jakub, 2026-10-25, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) 36): Captain Gareth is there from the start, the first clear of 1-1 brings the Rime Scholar, and every other champion comes from the Wishing Star. The names (Stardust, Soulstar, the Wishing Star) are my proposal for his "fragments" and "spawning shard", standing in until he chooses.
 
 **Rules.**
-1. Every campaign victory finds Stardust: a first clear or a replay alike, a defeat none (`?progress=` none either). How much is a stand-in: 20 in the Fracture Reach and 5 more in each area beyond it, 10 more when nobody fell. The Journey's Beat Campaign 1-3 gives 100 (his).
+1. Every campaign victory finds Stardust: a first clear or a replay alike, a defeat none (`?progress=` none either). How much is a stand-in: 20 in the Fracture Reach and 5 more in each area beyond it, 10 more when nobody fell. The Journey's second quest, Weave a Spool, gives 100 (his, the quests and their rewards swapped on his word).
 2. 100 Stardust merge into one Soulstar (his number), one MERGE at a time.
 3. A summon spends one Soulstar. Its rarity is drawn at his odds: 70% Common, 25% Elite, 5% Heroic (Mythic 0).
 4. Then one champion of that rarity, from those the Archivist does not own; never a starter, never the champion a stage brings. A champion is never summoned twice (a stand-in): once every champion of a rarity is owned, its share goes to the rarities left, in proportion; once every champion is owned, nothing can be summoned.
@@ -435,4 +435,4 @@ Champions are summoned (Jakub, 2026-10-25, [DESIGN_DECISIONS.md](DESIGN_DECISION
 
 **The menu:** the SUMMON label counts the summons waiting (Soulstars and whole hundreds of Stardust, no more than the champions left to find), with the NEW badge while there is one; the Wishing Star shines brighter then.
 
-**Balance:** `npm run balance` section 4 grows each roster as summoning would: the starters, 1-1's Rime Scholar, and a summon for every 100 Stardust the first clears before a stage find at one star, plus the Journey's 100 after 1-3; eight rosters, each summoned in its own seeded order at these odds without a wish, up to 60 of their teams each.
+**Balance:** `npm run balance` section 4 grows each roster as summoning would: the starters, 1-1's Rime Scholar, and a summon for every 100 Stardust the first clears before a stage find at one star, plus the Journey's 100 when their quest can first be claimed (Weave a Spool: after the first battle, which finds a spool to weave); eight rosters, each summoned in its own seeded order at these odds without a wish, up to 60 of their teams each.

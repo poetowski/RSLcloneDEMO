@@ -6,10 +6,12 @@
 // placeholder."). The Journey's quests in their order; each opens once the one
 // before it is claimed. Then (2026-10-25): "maybe we can make also new journey
 // quest: beat campaign 1-3. reward can be 100 summoning fragments. so player
-// then can spawn his third hero", so Beat Campaign 1-3 comes second, before my
-// placeholder. Stand-ins (DESIGN_DECISIONS.md 35, 36): every text but the
-// first two quests' titles, the third quest (Weave a Spool) and the spool
-// rewards.
+// then can spawn his third hero", and the same day: "swap quests: weave a spool
+// make sooner and after that make beat campaign 1-3. reweards can stay. swap
+// also rewards": my placeholder, Weave a Spool, comes second and gives the 100
+// Stardust; Beat Campaign 1-3 comes third and gives the spool. Stand-ins
+// (DESIGN_DECISIONS.md 35, 36): every text but the titles Finish Tutorial and
+// Beat Campaign 1-3, the quest Weave a Spool, and the spool rewards.
 import { PatternId } from './types';
 
 export type ChallengeTab = 'daily' | 'persistent' | 'journey';
@@ -49,20 +51,21 @@ export const JOURNEY: readonly QuestDef[] = [
     goal: { kind: 'tutorial' },
     reward: { kind: 'spool', pattern: 'pattern_vigor', grade: 1 },
   },
-  // his (2026-10-25): its Stardust summons the third champion, the first one drawn at random
-  {
-    id: 'beat_1_3',
-    title: 'Beat Campaign 1-3',
-    text: 'Clear stage 1-3 of the campaign. Its reward is the Stardust for your first summon at the Wishing Star.',
-    goal: { kind: 'stage', stage: '1-3' },
-    reward: { kind: 'fragments', amount: 100 },
-  },
-  // his placeholder; a quest of my own stands in so the pathway can be walked
+  // his placeholder, a quest of my own; second on his word, with the second place's 100 Stardust (his):
+  // the summon of the third champion, the first one drawn at random
   {
     id: 'weave_spool',
     title: 'Weave a Spool',
-    text: "Weave any spool into a champion's Weaver Matrix: open WEAVING, choose a spool and WEAVE it.",
+    text: "Weave any spool into a champion's Weaver Matrix: open WEAVING, choose a spool and WEAVE it. Its reward is the Stardust for your first summon at the Wishing Star.",
     goal: { kind: 'weave' },
+    reward: { kind: 'fragments', amount: 100 },
+  },
+  // his (2026-10-25), third on his word, with the spool the third place gave
+  {
+    id: 'beat_1_3',
+    title: 'Beat Campaign 1-3',
+    text: 'Clear stage 1-3 of the campaign.',
+    goal: { kind: 'stage', stage: '1-3' },
     reward: { kind: 'spool', pattern: 'pattern_sunder', grade: 2 },
   },
 ];

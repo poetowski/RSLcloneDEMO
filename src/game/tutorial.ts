@@ -22,7 +22,7 @@
 // finishes it; the steps after it lead to the Challenges to claim that quest.
 //
 // A later lesson (2026-10-25, with summoning) starts on its own the first time
-// a summon waits (Beat Campaign 1-3 claimed, or Stardust enough): the Wishing
+// a summon waits (Weave a Spool claimed, or Stardust enough): the Wishing
 // Star, MERGE, the wish, SUMMON, and the champion who answers. It can only be
 // closed, and is shown once (the save's `lessons`).
 import { Alignment, Config, driver, Driver, PopoverDOM, Side } from 'driver.js';

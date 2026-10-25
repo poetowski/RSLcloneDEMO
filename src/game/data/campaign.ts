@@ -106,13 +106,13 @@ export const LOCATIONS: LocationDef[] = [
         id: '1-2',
         blurb: CONTACT,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
-        power: 0.81,
+        power: 1.2,
       },
       {
         id: '1-3',
         blurb: `${SETTLEMENT} The pair fight together for the first time.`,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }],
-        power: 1.03,
+        power: 1.19,
       },
       {
         id: '1-4',

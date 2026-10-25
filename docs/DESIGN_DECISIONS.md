@@ -78,6 +78,7 @@ Section 7 lists what is not decided.
 | 2026-10-24 | The Paladin's affinity: Ember (Tide in the brief) | 34 |
 | 2026-10-24 | Challenges: a new place on the main menu leading to a screen of quests in three tabs, Daily and Persistent (placeholders) and the Journey (a horizontal pathway of quests unlocked one after another: Finish Tutorial, then a placeholder); a short tutorial for new accounts, made with driver.js | 7, 11, 35 |
 | 2026-10-25 | Summoning: champions are summoned with a currency found in the campaign (100 fragments merge into a shard, a shard summons one champion at random: 70% Common, 25% Elite, 5% Heroic), a wish of a faction and a role making them likelier, a new object in the Sanctum's sky where fragments are merged and champions summoned; the Rime Scholar, from 1-1, the only champion a stage brings; a Journey quest, Beat Campaign 1-3, giving 100 fragments; better names asked for (my proposal stands in) | 2.2, 5.6-5.8, 7, 11, 34, 35, 36 |
+| 2026-10-25 | The Journey reordered: Weave a Spool second, Beat Campaign 1-3 third, the two swapping rewards, so the second quest still gives the 100 fragments | 7, 35, 36 |
 
 ---
 
@@ -1104,10 +1105,13 @@ open questions.
 - The Daily and Persistent challenges: "for now in daily and persistent tabs
   those ar ejust placeholders" (2026-10-24) *(the tabs show empty rows and
   "not designed yet", section 35)*
-- The Journey after its second quest, and what the first gives: "second
-  quest is placeholder" (2026-10-24), then "beat campaign 1-3. reward can be
-  100 summoning fragments" (2026-10-25) *(the game stands in Weave a Spool as
-  the third, and a spool for Finish Tutorial and for it, sections 35, 36)*
+- The Journey after its third quest, and what Finish Tutorial and Beat
+  Campaign 1-3 give: "second quest is placeholder" (2026-10-24), then "beat
+  campaign 1-3. reward can be 100 summoning fragments" and "swap quests:
+  weave a spool make sooner and after that make beat campaign 1-3"
+  (2026-10-25) *(the game stands in Weave a Spool as the second quest, giving
+  the 100 fragments since the swap, and a spool for Finish Tutorial and for
+  Beat Campaign 1-3, sections 35, 36)*
 - Campaign count of zones
 - Zone 3's stages, enemies and story *(the game stands in ten placeholder
   stages, 5.6)*
@@ -2794,8 +2798,8 @@ read from the save as it stands, so a goal met before the quest opens counts
 the moment it does; claiming gives the quest's reward and opens the next.
 "Finish Tutorial" is done when the tutorial is finished: the first battle won
 while it runs. "Second quest is placeholder": a quest of my own stands in so
-the pathway can be walked *(since 2026-10-25 his Beat Campaign 1-3 is the
-second quest and mine the third, section 36)*. He named no rewards; each quest gives a spool. "For
+the pathway can be walked *(since 2026-10-25 it stays second, now giving
+the 100 Stardust, and his Beat Campaign 1-3 follows it, section 36)*. He named no rewards; each quest gives a spool. "For
 new accounts": the tutorial starts on its own on a save with no stage
 cleared, unless it was finished or skipped; anyone can play it from the
 Journey. "Use driver.js": driver.js (1.9.0) draws the overlay and its
@@ -2919,7 +2923,8 @@ champions are fragments (section 8).
   100 Stardust. "So player then can spawn his third hero, this one will be
   first randomized": the first three stages find less than 100 between them
   (20 a victory, 30 when nobody falls), so the third champion comes with the
-  quest.
+  quest. *(Changed the same day by the swap below: the 100 Stardust now come
+  with the second quest, Weave a Spool.)*
 
 **As built.** *The Wishing Star:* in the Sanctum's sky between the Starbridge
 Gate and the Reliquary, at the end of a thread of the Loom's starlight that
@@ -2948,9 +2953,9 @@ results panel shows the Stardust found ("+30 Stardust"); an area's stage list
 "20 Stardust a victory, 30 when nobody falls"; a champion not owned reads "At
 the Wishing Star" in the Champions screen and "Summon at the Wishing Star" on
 its page (the Rime Scholar still "Clear stage 1-1"); the Academy has a
-chapter, Summoning; Beat Campaign 1-3 carries its Stardust above its knot and
-offers TO THE CAMPAIGN while open, TO THE WISHING STAR once claimed while a
-summon waits. *The tutorial:* a lesson for the first summon starts on its own
+chapter, Summoning; the quest that gives Stardust carries it above its knot
+and offers TO THE WISHING STAR once claimed while a summon waits, and Beat
+Campaign 1-3 offers TO THE CAMPAIGN while open. *The tutorial:* a lesson for the first summon starts on its own
 the first time a summon waits (a save whose tutorial was not skipped): the
 Wishing Star in the Sanctum, MERGE 100, a word on the wish, SUMMON; the
 ceremony plays alone; back at the star a last card names who answered. It can
@@ -2967,4 +2972,31 @@ that a wish counts a champion twice for each part it matches; that a summon
 never brings a champion twice and a found-out rarity's share goes to the
 others; the Paladin among the summons; the place, its look and where its label
 hangs; the screen, its words and its animation; the lesson; the raised powers
-of 1-4, 1-8, 1-9 and 1-10; Weave a Spool as the third quest.
+of 1-4, 1-8, 1-9 and 1-10 (and since the swap 1-2 and 1-3); Weave a Spool,
+my quest, on the Journey.
+
+**The swap** (the same day), verbatim:
+
+```
+swap quests: weave a spool make sooner and after that make beat campaign 1-3. reweards can stay. swap also rewards
+```
+
+*Reading.* The two quests trade places, Weave a Spool second and Beat
+Campaign 1-3 third, and "swap also rewards": they trade rewards too, so each
+place keeps its reward ("reweards can stay"). Weave a Spool now gives the 100
+Stardust and Beat Campaign 1-3 the Gilded Sunder spool. The Journey reads:
+Finish Tutorial (a Silver Vigor spool), Weave a Spool (100 Stardust), Beat
+Campaign 1-3 (a Gilded Sunder spool). Its goal is quick to meet (Finish
+Tutorial's spool and the first battle's are there to weave, and the
+tutorial's farewell sends the player to Weaving), so the third champion now
+comes just after the tutorial, the first drawn at random, before 1-2. *As
+built:* the order and the rewards in `JOURNEY`; Weave a Spool's text names
+its Stardust ("Its reward is the Stardust for your first summon at the
+Wishing Star."), Beat Campaign 1-3's reads "Clear stage 1-3 of the
+campaign."; the tutorial's farewell now points at Weave a Spool. A save that
+had claimed Beat Campaign 1-3 before the swap keeps its claims only up to the
+first quest not claimed in the new order (section 35's rule). With a third
+champion from 1-2 on, 1-2 and 1-3 ran 100% and 99%, and were raised to their
+neighbour's level (power 0.81 to 1.20 and 1.03 to 1.19: 87% and 86%); the
+balance tool credits the Journey's Stardust when its quest can first be
+claimed.
