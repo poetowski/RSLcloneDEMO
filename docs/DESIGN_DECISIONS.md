@@ -85,6 +85,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Forest Gargoyle's affinity: Tide | 38 |
 | 2026-10-31 | Dead Knight Amstron, a Heroic Tank of the Ashveil Reign | 39 |
 | 2026-10-31 | Dead Knight Amstron's A2: a 40% chance of Stun (50% in the brief) | 39 |
+| 2026-10-31 | The Strongman, a Common Damage of the Azure Crown; the worksheet's recommended options approved | 40 |
 
 ---
 
@@ -3194,3 +3195,46 @@ Grave Pierce, Last Bastion and Unbreached Plate and their texts, the multipliers
 1.2), his stats (on the Heroic budget: HP 1560, ATK 94, DEF 78, SPD 94), the lore line
 and every detail of his art and effects above, the choice of skull and bone for the
 emblems among them. He is summoned (section 36), a fourth Heroic in that pool.
+
+## 40. The Strongman (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion.
+Rarity common
+Azure crown
+Class damage
+Tide affinity
+Name Strongman
+Design naked torso strong man holding heavy stone. Blue wide belt.
+Kit A1 damage 1 target
+A2 buff this champion with attack up for 2 turns. 3 cd.
+```
+
+and, to the worksheet that followed (heavy stats or a striker's, names, A1's
+multiplier, a pure-buff A2, no passive), each with a recommended option:
+
+```
+Go
+```
+
+read as a yes to every recommended option.
+
+**Readings.** "Class damage" is the Damage role. "Attack up" is ATK Up (+25%); placed
+on himself, it starts counting at his next turn, so it covers two of them (like the
+Lineholder's Brace). A2 strikes no one. No passive.
+
+**As built:** a broad man bare to the waist, cropped dark hair, no helmet, a big grey
+boulder held in both hands before his chest; a wide belt of bright blue with an iron
+buckle; charcoal breeches and brown boots. Stone Slam: the stone raised overhead,
+then brought down before him. Gather Strength: he crouches, then heaves the stone up
+before his face with a shout. Victory: the stone raised overhead.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Stone Slam and
+Gather Strength and their texts, A1's 1.0, his stats (the heavy option, on the Common
+budget: HP 1080, ATK 118, DEF 56, SPD 100, CRIT 3.5%, score 396), the lore line and
+every detail of his art and effects above (the stone's grey, the belt's buckle, the
+hair, the breeches; Gareth's `heavy_blow` for the slam and Brace's dust for the
+buff). He is summoned (section 36), a thirteenth Common in that pool; with him in it,
+1-5 runs at 0.88 and 2-1 to 2-4 at 1.08, 0.74, 0.94 and 1.04.

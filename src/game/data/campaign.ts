@@ -124,7 +124,7 @@ export const LOCATIONS: LocationDef[] = [
         id: '1-5',
         blurb: SETTLEMENT,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
-        power: 0.91,
+        power: 0.88,
       },
       {
         id: '1-6',
@@ -174,25 +174,25 @@ export const LOCATIONS: LocationDef[] = [
         id: '2-1',
         blurb: APPROACH,
         enemies: [{ champion: 'follower' }, { champion: 'follower' }],
-        power: 1.03,
+        power: 1.08,
       },
       {
         id: '2-2',
         blurb: APPROACH,
         enemies: [{ champion: 'follower' }, { champion: 'follower' }, { champion: 'follower' }],
-        power: 0.7,
+        power: 0.74,
       },
       {
         id: '2-3',
         blurb: ARRIVAL,
         enemies: [{ champion: 'lineholder' }, { champion: 'follower' }, { champion: 'quartermaster' }],
-        power: 0.89,
+        power: 0.94,
       },
       {
         id: '2-4',
         blurb: ARRIVAL,
         enemies: [{ champion: 'bloodhound' }, { champion: 'follower' }, { champion: 'dominion_medic' }],
-        power: 0.99,
+        power: 1.04,
       },
       {
         id: '2-5',
