@@ -74,7 +74,7 @@ describe('champions', () => {
       }
       for (const f of [c.passive?.fx, c.passive?.holderFx]) if (f) expect(fx[f], `${c.passive?.id} -> fx ${f}`).toBeTruthy();
       // a passive that acts in the flow of the fight shows on whom it reaches
-      if (c.passive && ['tend', 'ward', 'retaliate', 'remedy'].includes(c.passive.kind)) expect(c.passive.fx, `${c.passive.id} needs an fx`).toBeTruthy();
+      if (c.passive && ['tend', 'ward', 'retaliate', 'remedy', 'purge'].includes(c.passive.kind)) expect(c.passive.fx, `${c.passive.id} needs an fx`).toBeTruthy();
     }
   });
 
@@ -311,6 +311,17 @@ describe('design decisions', () => {
     expect(a1 && [a1.slot, a1.target, a1.statuses, totalMult(a1) > 0]).toEqual([1, 'enemy', [{ status: 'spd_down', turns: 1, chance: 0.35, to: 'targets' }], true]);
     expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses, totalMult(a2) > 0]).toEqual([2, 'enemy', 4, [{ status: 'def_up', turns: 2, to: 'self' }, { status: 'counter', turns: 1, to: 'self' }], true]);
     expect(w?.passive && [w.passive.kind, w.passive.value, w.passive.statuses]).toEqual(['defy', 0.2, [{ status: 'taunt', turns: 1 }]]);
+  });
+
+  it('has Chief Engineer CJ of his brief: a Heroic Tank of the Sanguine Dominion, Bloom; an A1 of two hits, a 50% chance of Stun on each and 10% of the Turn Meter; an A2 of DEF Up for 2 turns and Regen for 1 on all allies and 7% of every enemy\'s Turn Meter, cooldown 4; an A3 on all enemies, a 35% chance of Stun for 2 turns on each and a Shield of 15% of his max HP for 2 turns on the ally with the lowest max HP, cooldown 4; a passive lifting one random debuff from every ally at the start of his turn', () => {
+    const c = CHAMPIONS.find((x) => x.id === 'chief_engineer_cj');
+    expect(c && [c.name, c.rarity, c.role, c.faction, c.affinity]).toEqual(['Chief Engineer CJ', 'heroic', 'Tank', 'sanguine_dominion', 'bloom']);
+    expect(c?.skills).toHaveLength(3);
+    const [a1, a2, a3] = c?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, a1.hits.length, a1.statuses, a1.tmTargets]).toEqual([1, 'enemy', 2, [{ status: 'stun', turns: 1, chance: 0.5, to: 'targets', perHit: true }], -10]);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, totalMult(a2), a2.statuses, a2.tmTargets]).toEqual([2, 'enemies', 4, 0, [{ status: 'def_up', turns: 2, to: 'allies' }, { status: 'regen', turns: 1, to: 'allies' }], -7]);
+    expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.statuses, totalMult(a3) > 0]).toEqual([3, 'enemies', 4, [{ status: 'stun', turns: 2, chance: 0.35, to: 'targets' }, { status: 'shield', turns: 2, value: 0.15, to: 'lowestMaxHp' }], true]);
+    expect(c?.passive?.kind).toBe('purge');
   });
 
   it('has the Follower of his brief: a Common of the Court of Root, Damage, Tide; A1 a single-target attack, A2 a single-target attack with a 50% chance of DEF Down for 2 turns, cooldown 4', () => {
@@ -794,9 +805,10 @@ describe('summoning', () => {
     expect(seen.size).toBe(CHAMPIONS.length - 2);
     expect(summonPool(p)).toEqual([]);
     expect(summonsReady(p)).toBe(0);
-    // with the only Heroic found, the 5% goes to Common and Elite in proportion
+    // with every Heroic found, the 5% goes to Common and Elite in proportion
     const q = newArchivist();
     q.reliquary.recruit('paladin');
+    q.reliquary.recruit('chief_engineer_cj');
     const odds = rarityOdds(summonPool(q));
     expect(odds.heroic).toBe(0);
     expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);

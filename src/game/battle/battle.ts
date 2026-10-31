@@ -64,7 +64,8 @@ export type BattleEvent =
   | { kind: 'revive'; target: string; hp: number; hit: number }
   /** a fallen champion raised by an ally's skill (the Necromancer's Raise Dead) */
   | { kind: 'raise'; target: string; hp: number; hit: number }
-  | { kind: 'passive'; target: string; name: string; hit: number; effect: PassiveDef['kind']; source?: string }
+  /** `quiet`: the same waking of the passive reaching one more ally: its effect there, no name over its holder again */
+  | { kind: 'passive'; target: string; name: string; hit: number; effect: PassiveDef['kind']; source?: string; quiet?: boolean }
   | { kind: 'death'; target: string; hit: number };
 
 export interface SkillResult {
@@ -242,10 +243,11 @@ export class Battle {
     return best!;
   }
 
-  /** Start-of-turn ticks (poison, burn, regen). `skip` = stunned/frozen. */
+  /** Start of turn: a passive that acts now, then the ticks (poison, burn, regen). `skip` = stunned/frozen. */
   startTurn(u: Unit): { events: BattleEvent[]; skip: boolean } {
     this.acting = u;
     const events: BattleEvent[] = [];
+    this.purge(u, events);
     if (this.has(u, 'poison')) this.applyDamage(u, Math.round(u.maxHp * POISON_PCT), false, 0, 0, events, 'poison');
     if (u.alive && this.has(u, 'burn')) this.applyDamage(u, Math.round(u.maxHp * BURN_PCT), false, 0, 0, events, 'burn');
     if (u.alive && this.has(u, 'regen')) this.heal(u, Math.round(u.maxHp * REGEN_PCT), 0, events);
@@ -344,7 +346,7 @@ export class Battle {
     const place = (before: boolean, hit: number) => {
       for (const app of skill.statuses ?? []) {
         if (app.perHit || !!app.before !== before) continue;
-        const recipients = app.to === 'self' ? [actor] : app.to === 'allies' ? this.allies(actor) : targets;
+        const recipients = app.to === 'self' ? [actor] : app.to === 'allies' ? this.allies(actor) : app.to === 'lowestMaxHp' ? [this.lowestMaxHp(actor)] : targets;
         for (const r of recipients) {
           if (!r.alive || given.has(r.uid + app.status)) continue;
           given.add(r.uid + app.status);
@@ -416,7 +418,8 @@ export class Battle {
         if (!t.alive) continue;
         const before = t.tm;
         t.tm = Math.max(0, Math.min(TURN_FULL, t.tm + skill.tmTargets));
-        events.push({ kind: 'tm', target: t.uid, delta: t.tm - before, hit: last });
+        // an empty meter has nothing to lose, and shows nothing
+        if (t.tm !== before) events.push({ kind: 'tm', target: t.uid, delta: t.tm - before, hit: last });
       }
     }
     if (skill.tmAllies) {
@@ -559,17 +562,43 @@ export class Battle {
     u.statuses.push({ id, turns, value, source, ...(fresh ? { fresh } : {}) });
   }
 
+  /** The living ally of `u`, `u` included, with the lowest max HP; a tie goes to the one lower on HP, then to the front. */
+  private lowestMaxHp(u: Unit): Unit {
+    return [...this.allies(u)].sort((x, y) => x.maxHp - y.maxHp || x.hp / x.maxHp - y.hp / y.maxHp || x.slot - y.slot)[0];
+  }
+
+  /**
+   * Purge (passive): at the start of its holder's turn, before anything ticks and
+   * on a turn it will skip too, every living ally, the holder included, loses one
+   * debuff at random (Chief Engineer CJ's Master's Eye). A Stun or a Freeze can
+   * be the one it lifts, and on the holder that gives it its turn back.
+   */
+  private purge(u: Unit, events: BattleEvent[]) {
+    const p = u.champion.passive;
+    if (p?.kind !== 'purge') return;
+    let woke = false;
+    for (const a of this.allies(u)) {
+      const debuffs = a.statuses.filter((s) => !STATUSES[s.id].buff);
+      if (!debuffs.length) continue;
+      const deb = this.rng.pick(debuffs);
+      a.statuses.splice(a.statuses.indexOf(deb), 1);
+      events.push({ kind: 'passive', target: a.uid, name: p.name, hit: 0, effect: 'purge', source: u.uid, ...(woke ? { quiet: true } : {}) });
+      events.push({ kind: 'cleanse', target: a.uid, status: deb.id, hit: 0 });
+      woke = true;
+    }
+  }
+
   /**
    * Tend (passive): at the end of its holder's turn, skipped or not, the ally
    * with the lowest max HP, the holder included, receives the passive's
    * statuses; then it rests for `cooldown` of the holder's turns (the Jungle
    * Herder's Herder's Ward: a Shield of 10% of his max HP every second turn,
-   * from his first). Ties go to the one lower on HP, then to the front.
+   * from his first).
    */
   private tend(u: Unit, events: BattleEvent[]) {
     const p = u.champion.passive;
     if (p?.kind !== 'tend' || !u.alive || (u.cooldowns[p.id] ?? 0) > 0) return;
-    const ward = [...this.allies(u)].sort((x, y) => x.maxHp - y.maxHp || x.hp / x.maxHp - y.hp / y.maxHp || x.slot - y.slot)[0];
+    const ward = this.lowestMaxHp(u);
     // the rest counts the holder's own turns, and this turn's cooldowns tick right after
     u.cooldowns[p.id] = (p.cooldown ?? 0) + 1;
     events.push({ kind: 'passive', target: ward.uid, name: p.name, hit: 0, effect: 'tend', source: u.uid });

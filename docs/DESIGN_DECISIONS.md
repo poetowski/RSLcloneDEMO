@@ -79,6 +79,7 @@ Section 7 lists what is not decided.
 | 2026-10-24 | Challenges: a new place on the main menu leading to a screen of quests in three tabs, Daily and Persistent (placeholders) and the Journey (a horizontal pathway of quests unlocked one after another: Finish Tutorial, then a placeholder); a short tutorial for new accounts, made with driver.js | 7, 11, 35 |
 | 2026-10-25 | Summoning: champions are summoned with a currency found in the campaign (100 fragments merge into a shard, a shard summons one champion at random: 70% Common, 25% Elite, 5% Heroic), a wish of a faction and a role making them likelier, a new object in the Sanctum's sky where fragments are merged and champions summoned; the Rime Scholar, from 1-1, the only champion a stage brings; a Journey quest, Beat Campaign 1-3, giving 100 fragments; better names asked for (my proposal stands in) | 2.2, 5.6-5.8, 7, 11, 34, 35, 36 |
 | 2026-10-25 | The Journey reordered: Weave a Spool second, Beat Campaign 1-3 third, the two swapping rewards, so the second quest still gives the 100 fragments | 7, 35, 36 |
+| 2026-10-31 | Chief Engineer CJ, a Heroic Tank of the Sanguine Dominion, made more fantasy and without the words on his brief's suit; a Stun may last 2 turns | 37 |
 
 ---
 
@@ -3000,3 +3001,70 @@ champion from 1-2 on, 1-2 and 1-3 ran 100% and 99%, and were raised to their
 neighbour's level (power 0.81 to 1.20 and 1.03 to 1.19: 87% and 86%); the
 balance tool credits the Journey's Stardust when its quest can first be
 claimed.
+
+## 37. Chief Engineer CJ (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+we are going to create new hero.
+rarity = HEROIC
+faction = sanguine dominion.
+role = TANK
+name = Chief Engineer CJ
+affinity bloom.
+design = fat guy with technical engineering suite holding a big twohander hammer. hammer produces electrical sparks. he wears gear belt. he wears orange safety hat, which is weird for settings, but he do. bug letters NO YOLO on his suit from front.
+kit = A1 - hits one target twice. 50% chance to stun target on each hit. remove 10% of target turn meter.
+A2 - buff all allies with DEFENSE UP for 2 turns and REGEN for 1 turn. remove all enemies turn meter by 7%. CD 4 turns.
+A3 - attack all enemies. has 35% chance to stun each target separately for 2 turns. place shield on the ally with lowest max hp for 2 turns. shield is valued at 15% of this champion max hp. CD 4 turns.
+A4 passive - remove 1 random debuff from every ally at the beginning of this champion turn.
+```
+
+and, while he was being built:
+
+```
+actually, make him more fantasy and remove no yolo words
+```
+
+The Sanguine Dominion's seventh champion and first Heroic, the roster's second.
+
+**Readings.** "More fantasy" changes the look and my stand-in names and effects,
+not the kit. The orange hat stays, as he said it should be odd in this world: it
+is now an enamelled helm. The gear belt, the two-handed hammer and its sparks
+stay. The Stun's 50% rolls on each of A1's hits, so about three attacks in four
+stun; A1's Stun lasts 1 turn (the brief names no length). The 10% of turn meter
+comes off once, after the last hit. A2 strikes no enemy, so nothing
+counterattacks it. "All allies" and "every ally" include him. The ally with the
+lowest max HP can be himself; a tie goes to the one lower on HP, then to the
+front, as with the Jungle Herder's ward. A3's Stun is rolled for each enemy and
+lasts 2 of its turns: the first control that lasts more than one, so the norm
+widened to 2. The passive acts first thing on his turn, before Poison, Burn and
+Regen tick, and on a turn he will skip too, so if it lifts a lone Stun or Freeze
+from him he keeps the turn. His debuffs meet RES like every other (section 10).
+
+**As built:** a forge-master of the Dominion, a broad, heavy man with a belly
+hanging over his belt: a maroon coat and dark breeches under a great leather
+apron with the Dominion's red hexagon on a bronze-rimmed medallion; dark steel
+pauldrons edged in bronze, leather bracers, heavy boots; a round face, a thick
+moustache and a long brown beard. His hat is a loud orange helm with a bronze
+ridge and rim, a long peak and a lit rune at its front. The belt carries a copper
+cog for a buckle, an iron cog, a spanner and pouches. The hammer has a long dark
+haft with a leather grip and bronze collars, a great iron head with flared steel
+faces, a dark band with three lit runes; blue-white arcs jump off it now and then,
+each on its own slow cycle, sparks falling. Idle: both hands low, the head dropped
+forward near the ground. Mending Blows: a blow swung over from behind, then the
+hammer lifted and brought straight down. Master's Decree: the hammer planted, one
+finger raised and wagged, a hexagon sigil over him, a band of lit runes rising
+round each ally, a meter of pale light draining on each enemy. Earthen Surge: the
+hammer heaved overhead, then driven down in place; the charge runs along the
+ground and climbs each enemy, and a hexagon plate of light closes on the ally it
+shields. Master's Eye: its name over him, a green star on each ally relieved.
+Victory: the hammer thrust up in one hand, the other fist on his hip. Death: he
+sits down hard and goes over on his back, the hat rolling off.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Mending Blows,
+Master's Decree, Earthen Surge and Master's Eye and their texts, the multipliers
+(0.5 + 0.5; 0.7 on each enemy, the floor of the norms), his stats (on the Heroic
+budget: HP 1600, ATK 90, DEF 74, SPD 92), the lore line, and every detail of his
+art and effects above. Like every champion but the Rime Scholar he is summoned
+(section 36), a second Heroic in that pool.

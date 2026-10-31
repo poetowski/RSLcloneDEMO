@@ -48,7 +48,8 @@ export interface StatusApp {
   turns: number;
   /** 0..1, default 1 */
   chance?: number;
-  to: 'targets' | 'self' | 'allies';
+  /** `lowestMaxHp`: the living ally with the lowest max HP, the actor included (Chief Engineer CJ's Earthen Surge: his Shield) */
+  to: 'targets' | 'self' | 'allies' | 'lowestMaxHp';
   /** shield amount as a fraction of the caster's max HP */
   value?: number;
   /** roll on every damaging hit instead of once on the last hit (targets only) */
@@ -161,8 +162,11 @@ export interface PassiveDef {
    *            standing, after the skill's last hit, once per skill: the champion takes
    *            `statuses` and heals by `value` x its max HP (Irving Wellbington's Old Grudge:
    *            Taunt for 1 turn and 20%, 2026-10-19)
+   * purge:     at the start of each of the champion's turns, a skipped one too, every ally (the
+   *            champion included) loses one debuff at random (Chief Engineer CJ's Master's Eye,
+   *            2026-10-31)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
   /** rebuke and tend: the champion's own turns the passive rests after it acts */

@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, brute, cleaver, drummer, druid, fixture, freezer, grudger, guard, herald, hide, inAffinity, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
+import { balm, bannerman, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -452,6 +452,115 @@ describe('statuses', () => {
       b.endTurn(k);
     }
     expect(b.has(k, 'atk_up')).toBe(false);
+  });
+
+  it("rolls a Stun on each hit and takes the turn meter once, after the last hit (Chief Engineer CJ's A1)", () => {
+    // certain on each hit: two status events, one turn meter event of -10
+    let b = new Battle(combatants([foreman(1)]), combatants([{ ...striker, stats: { ...striker.stats, hp: 1700 } }]), { seed: 5 });
+    const t = b.get('e0');
+    t.tm = 40;
+    let r = b.useSkill(b.get('p0'), skill(foreman(1), 'tap'), 'e0');
+    expect(r.events.filter((e) => e.kind === 'status' && e.status === 'stun').length).toBe(2);
+    const tm = r.events.filter((e) => e.kind === 'tm');
+    expect(tm.length === 1 && tm[0].kind === 'tm' && [tm[0].delta, tm[0].hit]).toEqual([-10, 1]);
+    expect(t.tm).toBe(30);
+    // 50% on each hit: over many seeds, three in four attacks stun
+    let stunned = 0;
+    for (let seed = 1; seed <= 400; seed++) {
+      b = new Battle(combatants([foreman(0.5)]), combatants([{ ...striker, stats: { ...striker.stats, hp: 1700 } }]), { seed });
+      b.useSkill(b.get('p0'), skill(foreman(0.5), 'tap'), 'e0');
+      if (b.has(b.get('e0'), 'stun')) stunned++;
+    }
+    expect(stunned / 400).toBeGreaterThan(0.68);
+    expect(stunned / 400).toBeLessThan(0.82);
+    // an empty meter loses nothing and shows nothing
+    b = new Battle(combatants([foreman(0)]), combatants([{ ...striker, stats: { ...striker.stats, hp: 1700 } }]), { seed: 5 });
+    b.get('e0').tm = 0;
+    r = b.useSkill(b.get('p0'), skill(foreman(0), 'tap'), 'e0');
+    expect(r.events.some((e) => e.kind === 'tm')).toBe(false);
+  });
+
+  it("skips two of its holder's turns with a 2-turn Stun, rolled for each enemy apart", () => {
+    const tough = { ...striker, stats: { ...striker.stats, hp: 1700 } };
+    const b = new Battle(combatants([foreman(1)]), combatants([tough, twin]), { seed: 5 });
+    b.useSkill(b.get('p0'), skill(foreman(1), 'fault'));
+    const t = b.get('e0');
+    expect(b.has(t, 'stun') && b.has(b.get('e1'), 'stun')).toBe(true);
+    expect(b.startTurn(t).skip).toBe(true);
+    b.endTurn(t);
+    expect(b.startTurn(t).skip).toBe(true);
+    b.endTurn(t);
+    expect(b.startTurn(t).skip).toBe(false);
+    // at 35% some enemies are stunned and some are not, in the same skill
+    let split = 0;
+    for (let seed = 1; seed <= 60; seed++) {
+      const c = new Battle(combatants([foreman(0.35)]), combatants([tough, twin]), { seed });
+      c.useSkill(c.get('p0'), skill(foreman(0.35), 'fault'));
+      if (c.has(c.get('e0'), 'stun') !== c.has(c.get('e1'), 'stun')) split++;
+    }
+    expect(split).toBeGreaterThan(0);
+  });
+
+  it("shields the ally with the lowest max HP, the actor included, by a share of the actor's max HP", () => {
+    // an ally lower than the actor takes it, however hurt the others are
+    let b = new Battle(combatants([foreman(0), { ...striker, stats: { ...striker.stats, hp: 1000 } }, { ...twin, stats: { ...twin.stats, hp: 1200 } }]), combatants([cleaver]), { seed: 5 });
+    b.get('p2').hp = 10;
+    b.useSkill(b.get('p0'), skill(foreman(0), 'fault'));
+    expect(b.get('p1').statuses.find((s) => s.id === 'shield')?.value).toBe(Math.round(b.get('p0').maxHp * 0.15));
+    expect(b.has(b.get('p0'), 'shield') || b.has(b.get('p2'), 'shield')).toBe(false);
+    // the lowest himself, it is his
+    const low = foreman(0);
+    b = new Battle(combatants([{ ...low, stats: { ...low.stats, hp: 900 } }, striker]), combatants([cleaver]), { seed: 5 });
+    b.useSkill(b.get('p0'), skill(low, 'fault'));
+    expect(b.has(b.get('p0'), 'shield')).toBe(true);
+    expect(b.has(b.get('p1'), 'shield')).toBe(false);
+  });
+
+  it("lifts one random debuff from every ally at the start of its holder's turn with Purge, before the ticks", () => {
+    let b = new Battle(combatants([inspector, striker, twin]), combatants([cleaver]), { seed: 5 });
+    const h = b.get('p0'), s = b.get('p1');
+    b.addStatus(s, 'poison', 3, 0, 'e0');
+    b.addStatus(s, 'def_down', 3, 0, 'e0');
+    b.addStatus(s, 'atk_up', 3, 0, 'p1');
+    let st = b.startTurn(h);
+    expect(s.statuses.filter((x) => x.id === 'poison' || x.id === 'def_down').length).toBe(1);
+    expect(b.has(s, 'atk_up')).toBe(true);
+    expect(st.events.map((e) => e.kind)).toEqual(['passive', 'cleanse']);
+    // nobody afflicted: it says nothing; each afflicted ally loses one, and only the first shows its name
+    b = new Battle(combatants([inspector, striker, twin]), combatants([cleaver]), { seed: 5 });
+    expect(b.startTurn(b.get('p0')).events).toEqual([]);
+    b = new Battle(combatants([inspector, striker, twin]), combatants([cleaver]), { seed: 5 });
+    b.addStatus(b.get('p1'), 'poison', 3, 0, 'e0');
+    b.addStatus(b.get('p2'), 'burn', 3, 0, 'e0');
+    st = b.startTurn(b.get('p0'));
+    const woke = st.events.filter((e) => e.kind === 'passive');
+    expect(woke.map((e) => e.kind === 'passive' && [e.target, !!e.quiet])).toEqual([['p1', false], ['p2', true]]);
+    expect(b.has(b.get('p1'), 'poison') || b.has(b.get('p2'), 'burn')).toBe(false);
+    // on its holder it comes before the ticks: a lifted Poison never ticks, a lone Stun gives the turn back
+    b = new Battle(combatants([inspector]), combatants([cleaver]), { seed: 5 });
+    b.addStatus(b.get('p0'), 'poison', 3, 0, 'e0');
+    st = b.startTurn(b.get('p0'));
+    expect(st.events.some((e) => e.kind === 'damage')).toBe(false);
+    b = new Battle(combatants([inspector]), combatants([cleaver]), { seed: 5 });
+    b.addStatus(b.get('p0'), 'stun', 1, 0, 'e0');
+    expect(b.startTurn(b.get('p0')).skip).toBe(false);
+    // a Stun beside a second debuff may stay: then the turn is skipped, and the passive still acted
+    let skipped = 0;
+    for (let seed = 1; seed <= 40; seed++) {
+      b = new Battle(combatants([inspector]), combatants([cleaver]), { seed });
+      b.addStatus(b.get('p0'), 'stun', 1, 0, 'e0');
+      b.addStatus(b.get('p0'), 'def_down', 2, 0, 'e0');
+      st = b.startTurn(b.get('p0'));
+      expect(st.events.some((e) => e.kind === 'cleanse')).toBe(true);
+      if (st.skip) skipped++;
+    }
+    expect(skipped).toBeGreaterThan(0);
+    expect(skipped).toBeLessThan(40);
+    // nothing for the other side
+    b = new Battle(combatants([inspector]), combatants([cleaver]), { seed: 5 });
+    b.addStatus(b.get('e0'), 'poison', 3, 0, 'p0');
+    b.startTurn(b.get('p0'));
+    expect(b.has(b.get('e0'), 'poison')).toBe(true);
   });
 
   it('answers a critical hit on its holder with Defy: Taunt on itself and a heal of a share of its max HP, once per skill, while it stands', () => {

@@ -83,6 +83,10 @@ export const MAT = {
   azurePlate: m('azurePlate', 'metal', ['#0a1030', '#14245e', '#1e3d98', '#2d62cc', '#5a98ee', '#dcecff']),
   /** black cloth: the Dominion Medic's tunic between its red stripes */
   blackCloth: m('blackCloth', 'cloth', ['#07060a', '#121016', '#1c1922', '#28242f', '#383341', '#4e4858']),
+  /** Chief Engineer CJ's hat: a loud enamelled orange, nothing else in the world is this colour */
+  safetyOrange: m('safetyOrange', 'matte', ['#2c0f05', '#6e2606', '#b8460a', '#f26c10', '#ff9a34', '#ffdc9c']),
+  /** copper: the cog of Chief Engineer CJ's belt */
+  copper: m('copper', 'metal', ['#260d06', '#5a2110', '#8e3f1c', '#c0632c', '#e8934e', '#ffd6a8']),
   /** white cloth, cool and crisp: the stripes of the Associate's azure robe */
   whiteCloth: m('whiteCloth', 'cloth', ['#1c2234', '#4a5674', '#8a96b4', '#c8d2e6', '#eef2fa', '#ffffff']),
 

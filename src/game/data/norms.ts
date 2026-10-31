@@ -44,8 +44,8 @@ export const SKILL_NORMS: Record<1 | 2 | 3, { cooldown: [number, number]; single
 
 /** Status application norms: durations in turns. */
 export const STATUS_NORMS = {
-  /** hard control (stun, freeze) never lasts longer than this */
-  maxControlTurns: 1,
+  /** hard control (stun, freeze) never lasts longer than this; 2: Jakub's Chief Engineer CJ's Earthen Surge (2026-10-31), a 35% chance on each enemy */
+  maxControlTurns: 2,
   /** any other status */
   maxTurns: 3,
   /** a guaranteed (chance 1) hard control effect is only allowed on A3 */
@@ -103,6 +103,7 @@ export function auditChampion(c: ChampionDef): string[] {
   // a chance between 0 and 1 when they roll one; a retaliation hurts the attacker, and a remedy, answering a
   // debuff, only helps (a debuff would answer itself)
   if (p?.kind === 'fallen' && (!p.stat || !p.max)) out.push(`${p.id}: a fallen passive needs a stat and a cap`);
+  if (p?.kind === 'purge' && (p.statuses?.length || p.value)) out.push(`${p.id}: a purge passive only lifts debuffs`);
   if ((p?.kind === 'tend' || p?.kind === 'ward' || p?.kind === 'retaliate' || p?.kind === 'remedy') && !p.statuses?.length) out.push(`${p.id}: a ${p.kind} passive needs statuses`);
   if (p?.chance !== undefined && !(p.chance > 0 && p.chance <= 1)) out.push(`${p.id}: a chance of ${p.chance}`);
   if (p?.kind === 'retaliate' && p.statuses?.some((st) => STATUSES[st.status].buff)) out.push(`${p.id}: a retaliation places debuffs`);

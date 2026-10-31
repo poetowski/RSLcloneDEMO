@@ -9,7 +9,7 @@ export const STATUSES: Record<StatusId, StatusDef> = {
   taunt: { id: 'taunt', name: 'Taunt', buff: true, desc: 'Enemies must aim single-target skills at this champion.', color: '#ffa060' },
   regen: { id: 'regen', name: 'Regen', buff: true, desc: 'Heals 15% max HP at the start of each turn.', color: '#8cff9a' },
   counter: { id: 'counter', name: 'Counterattack', buff: true, desc: 'Strikes back with the basic skill when hit by an enemy skill.', color: '#ffd27a' },
-  stun: { id: 'stun', name: 'Stun', buff: false, desc: 'Skips the next turn.', color: '#fff070' },
+  stun: { id: 'stun', name: 'Stun', buff: false, desc: 'Skips its turn while it lasts.', color: '#fff070' },
   freeze: { id: 'freeze', name: 'Freeze', buff: false, desc: 'Encased in ice: skips the next turn.', color: '#a6ecff' },
   poison: { id: 'poison', name: 'Poison', buff: false, desc: 'Loses 5% max HP at the start of each turn. Ignores shields.', color: '#9dff5a' },
   burn: { id: 'burn', name: 'Burn', buff: false, desc: 'Loses 6% max HP at the start of each turn. Ignores shields.', color: '#ff9a40' },

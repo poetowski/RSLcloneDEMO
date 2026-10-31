@@ -12,6 +12,11 @@
 // up; his War Bellow: heavy rings of sound from his mouth, and at each ally's
 // feet the dust of his stamp with a wall of dull iron light rising in front;
 // his Thick Hide: a shell of dull light closing over him, his coat bristling.
+// Chief Engineer CJ's blows: a dull flash, blue-white arcs jumping off where the
+// hammer lands, because the hammer throws them; his Master's Decree: a sigil of
+// bronze light over him, a band of lit runes round each ally, a meter draining on
+// each enemy; his Earthen Surge: arcs running along the ground and up each enemy;
+// a plate of the Dominion's hexagon for his Shield; a green star for an affliction lifted.
 // Never their affinity (affinities are abstract, Jakub, 2026-10-11). Light
 // effects are additive in src/game/view/scene.ts.
 import { ACCENT } from '../palette.ts';
@@ -23,6 +28,26 @@ const I = ramps.ice;
 const DU = ramps.dust;
 /** A dull flash: grey to white, no hue of its own. */
 const DULL: RGBA[] = [DU[0], DU[2], DU[3], DU[4], W];
+
+/** A jagged arc of the hammer's charge from (x0, y0) to (x1, y1): a white core and a blue edge; `seed` keeps its shape, `k` thins it away. */
+function bolt(b: Bitmap, x0: number, y0: number, x1: number, y1: number, jag: number, seed: number, k = 1) {
+  const r = rng(seed);
+  const n = Math.max(3, Math.round(Math.hypot(x1 - x0, y1 - y0) / 4));
+  let px = x0, py = y0;
+  for (let i = 1; i <= n; i++) {
+    const t = i / n, off = i === n ? 0 : (r() - 0.5) * 2 * jag;
+    const qx = x0 + (x1 - x0) * t - ((y1 - y0) / Math.hypot(x1 - x0, y1 - y0 || 1)) * off;
+    const qy = y0 + (y1 - y0) * t + ((x1 - x0) / Math.hypot(x1 - x0 || 1, y1 - y0)) * off;
+    const steps = Math.ceil(Math.hypot(qx - px, qy - py));
+    for (let s = 0; s <= steps; s++) {
+      const x = Math.round(px + ((qx - px) * s) / Math.max(1, steps)), y = Math.round(py + ((qy - py) * s) / Math.max(1, steps));
+      if (dith(x, y, Math.min(1, k * 1.3))) b.set(x, y, k > 0.5 ? W : I[4]);
+      if (dith(x + 1, y, k * 0.7)) b.set(x + 1, y, I[2]);
+    }
+    px = qx;
+    py = qy;
+  }
+}
 
 /** A small six-armed snowflake: a white core and pale arms. */
 function flake(b: Bitmap, x: number, y: number, r: number, core: RGBA = W, arm: RGBA = I[3]) {
@@ -310,6 +335,174 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
         }
       }
       sparks(b, 36, 36, 8, 24, t, ramps.gold, 283, -10);
+    },
+  },
+
+  /** Mending Blows' hook: a short flat cut of the hammer, a dull flash, arcs jumping off where it lands. */
+  jolt_blow: {
+    w: 84, h: 72, n: 7, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 4, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 42, cy = 36;
+      if (i < 3) burst(b, cx, cy, 10, 2, [13, 18, 12][i], 1.8, DULL, 0.3);
+      for (let k = 0; k < 4; k++) {
+        const a = (k / 4) * Math.PI * 2 + 0.5 + (i >> 1) * 0.7;
+        const len = 14 + (k % 2) * 8 + i * 2;
+        if (i <= 5) bolt(b, cx, cy, cx + Math.cos(a) * len, cy + Math.sin(a) * len * 0.8, 2.6, 601 + k * 3 + (i >> 1) * 7, 1 - i * 0.14);
+      }
+      if (i >= 1) sparks(b, cx, cy, 12, 30, (i - 1) / 5, ramps.ice, 607, 22);
+    },
+  },
+  /** Mending Blows' slam: a heavy flash where the head comes down, a ring of the blow, more arcs, and sparks thrown up. */
+  jolt_slam: {
+    w: 104, h: 112, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 4, 6, 4],
+    draw: (b, t, i) => {
+      const cx = 52, cy = 56;
+      if (i < 4) disc(b, cx, cy, [8, 14, 11, 6][i], (x, y, d) => rampDither(DULL, 4.4 - d * 2.4, x, y));
+      if (i < 3) burst(b, cx, cy, 12, 4, [20, 28, 22][i], 2.2, DULL, 0.25);
+      if (i >= 1) ring(b, cx, cy, 6 + i * 5, 5 + i * 4, Math.max(0.7, 2.2 - i * 0.3), DULL, Math.max(0.2, 1.1 - i * 0.16));
+      for (let k = 0; k < 6; k++) {
+        const a = (k / 6) * Math.PI * 2 + 0.2 + (i >> 1) * 0.5;
+        const len = 18 + (k % 3) * 8 + i * 2;
+        if (i <= 6) bolt(b, cx, cy, cx + Math.cos(a) * len, cy + Math.sin(a) * len * 0.85, 3, 611 + k * 5 + (i >> 1) * 11, 1 - i * 0.12);
+      }
+      if (i >= 1) sparks(b, cx, cy, 18, 40, (i - 1) / 6, ramps.ice, 613, 30);
+    },
+  },
+  /** Master's Decree's sigil: a hexagon of bronze light opens over him, a rune lit in its middle, holds a moment and fades. Additive, at his head on the `cast` event. */
+  decree_sigil: {
+    w: 60, h: 64, n: 14, ms: 70, ax: 0.5, ay: 0.72, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 30, cy = 24 - Math.round(i * 0.4);
+      const pop = [0.3, 0.7, 1.1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1][i];
+      const fade = i < 9 ? 1 : [0.8, 0.6, 0.42, 0.26, 0.12][i - 9];
+      const A = ramps.amber;
+      const R = 17 * pop;
+      for (let s = 0; s < 6; s++) {
+        const a0 = (s / 6) * Math.PI * 2 + Math.PI / 6, a1 = ((s + 1) / 6) * Math.PI * 2 + Math.PI / 6;
+        const n = Math.ceil(R) + 1;
+        for (let q = 0; q <= n; q++) {
+          const x = Math.round(cx + Math.cos(a0) * R + ((Math.cos(a1) - Math.cos(a0)) * R * q) / n), y = Math.round(cy + Math.sin(a0) * R + ((Math.sin(a1) - Math.sin(a0)) * R * q) / n);
+          if (!dith(x, y, fade)) continue;
+          b.set(x, y, W);
+          b.set(x + 1, y, A[3]);
+          b.set(x, y + 1, A[2]);
+        }
+      }
+      if (pop < 0.7) return;
+      // the rune: an upright with two pairs of arms
+      for (let y = -10; y <= 10; y++) if (dith(cx, cy + y, fade)) { b.set(cx, cy + y, W); b.set(cx + 1, cy + y, A[3]); }
+      for (let k = 1; k <= 5; k++) for (const [x, y] of [[k, -9 + k], [-k, -9 + k], [k, k], [-k, k]]) if (dith(cx + x, cy + y, fade)) b.set(cx + x, cy + y, A[4]);
+    },
+  },
+  /** Master's Decree reaches an enemy: it stops and listens. A meter of pale light drains round its chest, and motes of it sink away. */
+  decree_lull: {
+    w: 60, h: 60, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 30, cy = 28;
+      const left = 1 - t;
+      for (let k = 0; k < 64; k++) {
+        const u = k / 64;
+        if (u > left) continue;
+        const a = -Math.PI / 2 + u * Math.PI * 2;
+        for (const r of [13, 14]) {
+          const x = Math.round(cx + Math.cos(a) * r), y = Math.round(cy + Math.sin(a) * r * 0.8);
+          if (dith(x, y, 0.5 + left * 0.5)) b.set(x, y, rampDither(ramps.ice, 2.6 + left, x, y));
+        }
+      }
+      const r = rng(631);
+      for (let k = 0; k < 8; k++) {
+        const a = r() * Math.PI * 2, dist = 10 + r() * 6, ph = r() * 0.5;
+        const q = t - ph;
+        if (q < 0 || q > 0.5) continue;
+        const x = Math.round(cx + Math.cos(a) * dist), y = Math.round(cy + Math.sin(a) * dist * 0.8 + q * 30);
+        b.set(x, y, q < 0.25 ? I[4] : I[2]);
+      }
+    },
+  },
+  /** Master's Decree reaches an ally: a band of lit runes rises round it (DEF Up), and motes of green light go up through it (Regen). Anchored at the feet. */
+  decree_ward: {
+    w: 72, h: 80, n: 12, ms: 60, ax: 0.5, ay: 1, pad: [2, 4, 3, 4],
+    draw: (b, t, i) => {
+      const cx = 36, gy = 78;
+      const rise = [4, 12, 22, 32, 40, 46, 50, 53, 55, 56, 57, 58][i];
+      const fade = i < 7 ? 1 : [0.8, 0.6, 0.42, 0.26, 0.12][i - 7];
+      const A = ramps.amber;
+      for (const dy of [0, 3]) {
+        ellipseRing(b, cx, gy - rise + dy, 20, 5.4, 1, (x, y, a) => (dith(x, y, fade * (Math.sin(a) > -0.1 ? 1 : 0.45)) ? rampDither(A, Math.sin(a) > -0.1 ? 3.4 : 2.4, x, y) : 0));
+      }
+      // the runes between its two edges: short strokes, turning slowly round it
+      for (let k = 0; k < 12; k++) {
+        const a = (k / 12) * Math.PI * 2 + t * 1.2;
+        if (Math.sin(a) < -0.1) continue;
+        const x = Math.round(cx + Math.cos(a) * 20), y = Math.round(gy - rise + 1 + Math.sin(a) * 5.4);
+        if (dith(x, y, fade)) { b.set(x, y, W); b.set(x, y + 1, k % 2 ? W : A[3]); }
+      }
+      motes(b, cx, gy - 10, 18, 56, 10, t, ramps.green, 641);
+    },
+  },
+  /** Earthen Surge reaches an enemy: arcs run in along the ground, a scorch opens at its feet, and they climb it. Anchored at the feet. */
+  earth_surge: {
+    w: 112, h: 96, n: 10, ms: 55, ax: 0.5, ay: 0.96, pad: [2, 4, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 56, gy = 90;
+      if (i <= 7) ellipseFill(b, cx, gy, 24, 5.5, (x, y, d) => (dith(x, y, (1 - d) * (1 - i * 0.1)) ? DU[0] : 0));
+      const run = Math.min(1, (i + 1) / 3);
+      for (let k = 0; k < 3; k++) {
+        if (i > 8) continue;
+        const seed = 651 + k * 9 + (i >> 1) * 13;
+        bolt(b, 4, gy - 1 - k * 2, 4 + (cx - 4) * run, gy - 2 - k, 2.4, seed, 1 - i * 0.08);
+      }
+      if (i >= 2 && i <= 8) {
+        // up the body: three arcs from the feet to the chest and the head, each its own shape every other frame
+        const k0 = 1 - (i - 2) * 0.12;
+        bolt(b, cx - 10, gy - 2, cx - 6, gy - 52, 4.5, 661 + (i >> 1) * 3, k0);
+        bolt(b, cx + 9, gy - 2, cx + 7, gy - 62, 4.5, 667 + (i >> 1) * 5, k0);
+        bolt(b, cx, gy - 2, cx + 2, gy - 38, 3.6, 673 + (i >> 1) * 7, k0);
+      }
+      if (i === 2 || i === 3) burst(b, cx, gy - 30, 10, 3, [22, 14][i - 2], 1.6, I, 0.3);
+      if (i >= 2) sparks(b, cx, gy - 26, 16, 38, (i - 2) / 7, I, 677, 26);
+    },
+  },
+  /** Earthen Surge's Shield: a plate of the Dominion's hexagon closes before the ally in copper light, sparks running round its edge. At its chest. */
+  surge_plate: {
+    w: 72, h: 72, n: 11, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 36, cy = 36;
+      const close = [1.5, 1.25, 1.08, 1, 1, 1, 1, 1, 1, 1, 1][i];
+      const fade = i < 6 ? 1 : [0.8, 0.6, 0.42, 0.25, 0.12][i - 6];
+      const C = ramps.chi;
+      const R = 22 * close;
+      const hex = (a: number): [number, number] => [cx + Math.cos(a) * R, cy + Math.sin(a) * R];
+      for (let s = 0; s < 6; s++) {
+        const [x0, y0] = hex((s / 6) * Math.PI * 2 + Math.PI / 6), [x1, y1] = hex(((s + 1) / 6) * Math.PI * 2 + Math.PI / 6);
+        const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0));
+        for (let q = 0; q <= n; q++) {
+          const x = Math.round(x0 + ((x1 - x0) * q) / n), y = Math.round(y0 + ((y1 - y0) * q) / n);
+          if (!dith(x, y, fade)) continue;
+          b.set(x, y, W);
+          b.set(x + 1, y, C[3]);
+          b.set(x, y + 1, C[2]);
+        }
+      }
+      // the face of the plate, thin
+      disc(b, cx, cy, R * 0.86, (x, y, d) => (dith(x, y, fade * 0.22 * (1 - d * 0.4)) ? C[1] : 0));
+      if (i <= 5) {
+        const a = (i / 6) * Math.PI * 2;
+        const [x0, y0] = hex(a + Math.PI / 6);
+        bolt(b, x0, y0, x0 + Math.cos(a) * 10, y0 + Math.sin(a) * 10, 2, 691 + i, 1 - i * 0.1);
+      }
+    },
+  },
+  /** Master's Eye lifts a debuff: a four-pointed star of green light rises from the ally's chest and fades. */
+  eye_cleared: {
+    w: 44, h: 52, n: 10, ms: 60, ax: 0.5, ay: 0.6, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const G = ramps.green;
+      const r = [3, 7, 10, 8, 7, 6, 5, 4, 3, 2][i];
+      const fade = i < 5 ? 1 : [0.8, 0.6, 0.4, 0.25, 0.1][i - 5];
+      const cx = 22, cy = 30 - Math.round(t * 14);
+      for (let k = 0; k <= r; k++) for (const [dx, dy] of [[k, 0], [-k, 0], [0, k], [0, -k]]) if (dith(cx + dx, cy + dy, fade)) b.set(cx + dx, cy + dy, k < r / 2 ? W : G[3]);
+      for (const [dx, dy] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) if (dith(cx + dx, cy + dy, fade)) b.set(cx + dx, cy + dy, G[3]);
     },
   },
 

@@ -183,6 +183,20 @@ export const druid = fixture('druid', {
   skills: [skill('briar', 1, { healSelf: 0.07 }), skill('rite', 2, { target: 'ally', approach: 'none', hits: [{ mult: 0 }], cleanseAll: true, ai: { priority: 2, when: 'allyDebuffed' } })],
 });
 
+/** Purge: at the start of its turn every ally, itself included, loses one debuff at random. */
+export const inspector = fixture('inspector', { passive: { id: 'purge', name: 'Purge', desc: '', kind: 'purge', value: 0 } });
+
+/** A1 strikes twice, a chance of Stun on each hit, and takes 10% of the target's turn meter; A3 on every enemy, a chance of a 2-turn Stun on each, with a Shield of 15% of its max HP on the ally with the lowest max HP. */
+export const foreman = (stun: number) =>
+  fixture(`foreman_${stun}`, {
+    stats: { hp: 1600 },
+    skills: [
+      skill('tap', 1, { hits: [{ mult: 0.5 }, { mult: 0.5 }], statuses: [{ status: 'stun', turns: 1, chance: stun, to: 'targets', perHit: true }], tmTargets: -10 }),
+      undefined,
+      skill('fault', 3, { target: 'enemies', approach: 'none', hits: [{ mult: 0.7 }], statuses: [{ status: 'stun', turns: 2, chance: stun, to: 'targets' }, { status: 'shield', turns: 2, value: 0.15, to: 'lowestMaxHp' }] }),
+    ],
+  });
+
 /** Fallen: +20% C.RATE for each fallen ally, up to +30%; no C.RATE of its own. */
 export const mourner = fixture('mourner', { stats: { crit: 0 }, passive: { id: 'fallen', name: 'Fallen', desc: '', kind: 'fallen', stat: 'crit', value: 0.2, max: 0.3 } });
 
