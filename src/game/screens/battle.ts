@@ -5,7 +5,7 @@
 import { App, Screen } from '../app';
 import { battleStats, recordVictory } from '../archivist';
 import { allStages, stage, zoneOf } from '../data/campaign';
-import { champion, CHAMPIONS } from '../data/champions';
+import { ALL_CHAMPIONS, champion, CHAMPIONS } from '../data/champions';
 import { homeZone, zone } from '../data/zones';
 import { BattleScene, BattleSetup } from '../view/scene';
 
@@ -57,7 +57,7 @@ export class BattleScreen implements Screen {
       });
       void this.scene.run();
     } else {
-      const owner = CHAMPIONS.find((c) => c.skills.some((s) => s.id === o.demo));
+      const owner = ALL_CHAMPIONS.find((c) => c.skills.some((s) => s.id === o.demo));
       if (!owner) throw new Error(`no champion has skill "${o.demo}"`);
       // the owner and two companions against three others from the far end of the roster; a small
       // roster repeats itself, so the demo always has a full line on each side

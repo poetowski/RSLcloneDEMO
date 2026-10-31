@@ -639,14 +639,19 @@ export class Battle {
    * Handlings' Unbroken Flag: a Shield of 15% of his max HP, half the time).
    * A ward of its holder alone (`self`) answers only the blows on it (the
    * Black Rhino's Thick Hide: a Shield of 10% of his max HP, every time).
+   * With a `cooldown`, a ward that answered rests for that many of its holder's
+   * own turns; it is ready from the start of the battle (the Junior Ward's Hold
+   * Fast: 25% for DEF Up, then a rest of 1, so at most every other turn of his).
    */
   private ward(actor: Unit, damaged: Set<Unit>, hit: number, events: BattleEvent[]) {
     for (const d of damaged) {
       if (!d.alive || d.team === actor.team) continue;
       for (const h of this.allies(d)) {
         const p = h.champion.passive;
-        if (p?.kind !== 'ward' || (p.self && h !== d)) continue;
+        if (p?.kind !== 'ward' || (p.self && h !== d) || (h.cooldowns[p.id] ?? 0) > 0) continue;
         if (p.chance !== undefined && !this.rng.chance(p.chance)) continue;
+        // the rest counts the holder's own turns: one more if it is its turn now (cooldowns tick at the end of its turn)
+        if (p.cooldown) h.cooldowns[p.id] = p.cooldown + (h === this.acting ? 1 : 0);
         events.push({ kind: 'passive', target: d.uid, name: p.name, hit, effect: 'ward', source: h.uid });
         for (const st of p.statuses ?? []) this.tryApply(h, d, st.status, st.turns, undefined, p.value, hit, events);
       }

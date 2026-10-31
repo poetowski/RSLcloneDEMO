@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest';
 import { decide } from '../src/game/battle/ai';
 import { Battle, combatants, landShare } from '../src/game/battle/battle';
 import { flatten, simulate } from '../src/game/battle/sim';
-import { CHAMPIONS } from '../src/game/data/champions';
+import { ALL_CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
+import { balm, bannerman, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -514,6 +514,23 @@ describe('statuses', () => {
     b.useSkill(b.get('p0'), skill(low, 'fault'));
     expect(b.has(b.get('p0'), 'shield')).toBe(true);
     expect(b.has(b.get('p1'), 'shield')).toBe(false);
+  });
+
+  it('rests a ward with a cooldown for that many of its holder\'s turns, ready from the start', () => {
+    const b = new Battle(combatants([striker]), combatants([holdfast]), { seed: 5 });
+    const a = b.get('p0'), h = b.get('e0');
+    const hit = () => b.useSkill(a, skill(striker, 'striker_a1'), 'e0');
+    // ready from the start: the first blow wakes it
+    hit();
+    expect(b.has(h, 'def_up')).toBe(true);
+    // resting: until its own next turn ends, no blow wakes it again
+    h.statuses = [];
+    hit();
+    expect(b.has(h, 'def_up')).toBe(false);
+    b.startTurn(h);
+    b.endTurn(h);
+    hit();
+    expect(b.has(h, 'def_up')).toBe(true);
   });
 
   it("ignores a share of the target's Defense as it stands in battle", () => {
@@ -1057,7 +1074,7 @@ describe('full auto battles', () => {
   });
 
   it('runs every champion of the roster through battles without errors', () => {
-    const all = CHAMPIONS;
+    const all = ALL_CHAMPIONS;
     const at = (i: number) => all[i % all.length];
     // a side left only with champions that never strike can neither win nor lose (the Bellringer alone
     // shields and heals himself every turn): such a battle runs to the cap, a stalemate the rules do not

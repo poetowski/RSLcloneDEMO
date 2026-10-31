@@ -32,6 +32,7 @@ import { forestGargoyle } from './forest_gargoyle';
 import { groveKeeper } from './grove_keeper';
 import { irvingWellbington } from './irving_wellbington';
 import { jungleHerder } from './jungle_herder';
+import { juniorWard } from './junior_ward';
 import { lastRiter } from './last_riter';
 import { lineholder } from './lineholder';
 import { necromancer } from './necromancer';
@@ -53,7 +54,16 @@ export const CHAMPIONS: ChampionDef[] = [
   walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer,
 ];
 
-const byId = new Map(CHAMPIONS.map((c) => [c.id, c]));
+/**
+ * Enemies only: they fight on the enemy side of campaign stages and are never
+ * summoned, collected or put in a team (Jakub's Junior Ward, 2026-10-31).
+ */
+export const ENEMIES: ChampionDef[] = [juniorWard];
+
+/** Every champion the game knows: the roster and the enemies only (norms, art, assets, demos). */
+export const ALL_CHAMPIONS: ChampionDef[] = [...CHAMPIONS, ...ENEMIES];
+
+const byId = new Map(ALL_CHAMPIONS.map((c) => [c.id, c]));
 
 export function champion(id: string): ChampionDef {
   const c = byId.get(id);
@@ -61,4 +71,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { archer, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, irvingWellbington, jungleHerder, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };
+export { archer, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };

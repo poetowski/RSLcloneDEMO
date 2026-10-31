@@ -183,7 +183,7 @@ export interface PassiveDef {
   kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
-  /** rebuke and tend: the champion's own turns the passive rests after it acts */
+  /** rebuke, tend and ward: the champion's own turns the passive rests after it acts (a ward is ready from the start) */
   cooldown?: number;
   /** stat and fallen: the stat it raises */
   stat?: StatId;

@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { allStages, LOCATIONS, recruitStage, STARTERS, WORLD_MAP } from '../src/game/data/campaign';
-import { champion, CHAMPIONS } from '../src/game/data/champions';
+import { ALL_CHAMPIONS, champion, CHAMPIONS, ENEMIES } from '../src/game/data/champions';
 import { CHAPTERS } from '../src/game/data/codex';
 import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../src/game/data/meta';
 import { auditChampion, totalMult } from '../src/game/data/norms';
@@ -29,8 +29,8 @@ const ui = json('public/assets/ui/ui.json') as { icons: Record<string, unknown>;
 
 describe('champions', () => {
   it('have unique ids and valid categories', () => {
-    expect(new Set(CHAMPIONS.map((c) => c.id)).size).toBe(CHAMPIONS.length);
-    for (const c of CHAMPIONS) {
+    expect(new Set(ALL_CHAMPIONS.map((c) => c.id)).size).toBe(ALL_CHAMPIONS.length);
+    for (const c of ALL_CHAMPIONS) {
       expect(RARITIES[c.rarity], c.id).toBeTruthy();
       expect(AFFINITIES[c.affinity], c.id).toBeTruthy();
       expect(FACTIONS[c.faction], c.id).toBeTruthy();
@@ -39,11 +39,11 @@ describe('champions', () => {
   });
 
   it('respect the balance norms (src/game/data/norms.ts)', () => {
-    for (const c of CHAMPIONS) expect(auditChampion(c), c.id).toEqual([]);
+    for (const c of ALL_CHAMPIONS) expect(auditChampion(c), c.id).toEqual([]);
   });
 
   it('have generated art: atlas, portrait and one icon per skill', () => {
-    for (const c of CHAMPIONS) {
+    for (const c of ALL_CHAMPIONS) {
       expect(fs.existsSync(`public/assets/champions/${c.id}.png`), `${c.id} atlas`).toBe(true);
       expect(ui.portraits[c.id], `${c.id} portrait`).toBeTruthy();
       for (const s of c.skills) expect(ui.icons[s.id], `${s.id} icon`).toBeTruthy();
@@ -51,7 +51,7 @@ describe('champions', () => {
   });
 
   it('have every animation their skills use, with one hit frame per hit', () => {
-    for (const c of CHAMPIONS) {
+    for (const c of ALL_CHAMPIONS) {
       const atlas = json(`public/assets/champions/${c.id}.json`);
       for (const anim of ['idle', 'run', 'hurt', 'death']) expect(atlas.anims[anim], `${c.id} ${anim}`).toBeTruthy();
       if (c.passive?.kind === 'undying') expect(atlas.anims.rise, `${c.id} rise (Undying)`).toBeTruthy();
@@ -67,7 +67,7 @@ describe('champions', () => {
   });
 
   it('reference effects that exist', () => {
-    for (const c of CHAMPIONS) {
+    for (const c of ALL_CHAMPIONS) {
       for (const s of c.skills) {
         for (const f of [...s.hits.map((h) => h.fx), s.projectile, s.castFx, s.actorFx, s.allyFx]) if (f) expect(fx[f], `${s.id} -> fx ${f}`).toBeTruthy();
         if (s.projectile) expect(c.muzzle, `${c.id} fires projectiles, needs a muzzle`).toBeTruthy();
@@ -87,6 +87,18 @@ describe('champions', () => {
       else expect(pool, `${c.id} cannot be summoned`).toContain(c.id);
     }
   });
+
+  it('keeps the enemies only out of the roster and the summons, and puts each in a stage', () => {
+    const pool = summonPool(newArchivist()).map((c) => c.id);
+    const fought = new Set(allStages().flatMap((s) => s.enemies.map((e) => e.champion)));
+    for (const c of ENEMIES) {
+      expect(CHAMPIONS.some((x) => x.id === c.id), `${c.id} in the roster`).toBe(false);
+      expect(pool, `${c.id} summoned`).not.toContain(c.id);
+      expect(allStages().some((s) => s.recruit === c.id), `${c.id} recruited`).toBe(false);
+      expect(fought.has(c.id), `${c.id} fights in no stage`).toBe(true);
+    }
+    expect(ALL_CHAMPIONS.length).toBe(CHAMPIONS.length + ENEMIES.length);
+  });
 });
 
 describe('statuses', () => {
@@ -104,7 +116,7 @@ describe('campaign', () => {
   it('has unique stage ids, known champions and zones, and campaign nodes inside the world', () => {
     const stages = allStages();
     expect(new Set(stages.map((s) => s.id)).size).toBe(stages.length);
-    const ids = new Set(CHAMPIONS.map((c) => c.id));
+    const ids = new Set(ALL_CHAMPIONS.map((c) => c.id));
     const zones = new Set(ZONES.map((z) => z.id));
     for (const loc of LOCATIONS) {
       if (loc.requires) expect(stages.some((s) => s.id === loc.requires), `${loc.id} requires ${loc.requires}`).toBe(true);
@@ -183,7 +195,7 @@ describe('design decisions', () => {
     expect(first.skills[2]?.statuses ?? []).toEqual([]);
     expect(first.passive).toBeUndefined();
     // no subtitles (Jakub, 2026-10-11)
-    for (const c of CHAMPIONS) expect('title' in c, `${c.id} has a subtitle`).toBe(false);
+    for (const c of ALL_CHAMPIONS) expect('title' in c, `${c.id} has a subtitle`).toBe(false);
     // hers: Pale Strike (plain), Rimebind (Slow on every enemy), no A3, Cold Rebuke
     expect(second.skills.map((k) => k.name)).toEqual(['Pale Strike', 'Rimebind']);
     expect(second.skills[0].statuses ?? []).toEqual([]);
@@ -530,13 +542,13 @@ describe('zones', () => {
 
 describe('academy', () => {
   it('demos replay skills that exist', () => {
-    const skills = new Set(CHAMPIONS.flatMap((c) => c.skills.map((s) => s.id)));
+    const skills = new Set(ALL_CHAMPIONS.flatMap((c) => c.skills.map((s) => s.id)));
     for (const ch of CHAPTERS) if (ch.demo) expect(skills.has(ch.demo.skill), `${ch.id} demo ${ch.demo.skill}`).toBe(true);
   });
 
   it('quotes the turn-meter numbers of the skills it names ("Resonance: -15%")', () => {
     const text = CHAPTERS.flatMap((ch) => ch.blocks.flatMap((b) => ('text' in b ? [b.text] : b.kind === 'list' ? b.items : []))).join(' ');
-    for (const s of CHAMPIONS.flatMap((c) => c.skills)) {
+    for (const s of ALL_CHAMPIONS.flatMap((c) => c.skills)) {
       const tm = s.tmTargets ?? s.tmAllies;
       const quoted = text.match(new RegExp(`${s.name}: ([+-]\\d+)%`));
       if (tm !== undefined && quoted) expect(Number(quoted[1]), `${s.name} in the Academy`).toBe(tm);

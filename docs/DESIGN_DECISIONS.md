@@ -93,6 +93,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Last Riter's hood made deep, to cover her face | 42 |
 | 2026-10-31 | The Last Riter approved as built: her art, the names Incense Veil and Last Unction, the lore line | 42 |
 | 2026-10-31 | The Archer, a Common Damage of the Sanguine Dominion; the worksheet's recommended options approved | 43 |
+| 2026-10-31 | The Junior Ward, a Common Tank of the Sanguine Dominion and the game's first enemy only, fought in 2-1 and 2-4; the worksheet's recommended options approved | 3-5, 44 |
 
 ---
 
@@ -3438,3 +3439,63 @@ Dominion who learned to find the soft place under a beast's hide, and now finds 
 armour.") and every detail of his art and effects above. He is summoned (section 36), a
 sixteenth Common in that pool; with him in it 2-5 rose over its band (93%), so it runs
 at 0.86 (was 0.82).
+
+## 44. The Junior Ward (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new enemy.
+Sanguine dominion
+Rarity common
+Role tank
+Affinity bloom.
+Name Junior Ward
+Design young tall man holding long spear. Wearing black tunic. Naked arms.
+Kit A1 attack single target.
+A2 passive - when hit, has 25% chance to place defense up on himself for 2 turns. CD 1turn, so this can be used every other turn. can be used on first turn as well.
+```
+
+and, to the worksheet that followed (enemy only or also summoned, the stages he fights
+in, sturdy stats or lighter ones, names, how the passive reads, the look, the lore
+line), each with a recommended option:
+
+```
+Go
+```
+
+read as a yes to every recommended option.
+
+**Readings.** "New enemy" is an enemy only, the game's first: he fights only on the
+enemy side of stages and is never summoned, collected or put in a team. His "A2
+passive" is his passive (as the Skeleton's was); he has no A2. "When hit" is an enemy
+skill that damages him and leaves him standing, answered once per skill, with a 25%
+chance of DEF Up for 2 turns (placed on him, it covers his next two turns). "CD 1 turn"
+is a rest of 1 of his own turns after it answers, so it answers at most every other
+turn of his; "can be used on first turn as well" is ready from the start of the
+battle. He has no Taunt.
+
+**New rules.** A ward with a `cooldown` (MECHANICS_GUIDE.md, the Academy, DDD
+INV-C30); enemies only, `ENEMIES` (DDD INV-C31).
+
+**As built:** a tall young man, taller than the Town Guard: a black sleeveless tunic to
+mid-thigh, belted with a red sash knotted at his side, a small red hexagon on the
+chest; bare arms; dark-brown breeches and plain leather boots; short brown hair and a
+clean-shaven, young face; a spear longer than he is, an ash shaft, an iron butt, a
+red binding under a leaf-shaped head of steel, held upright in his near hand, its butt
+on the ground. Long Thrust: the spear drawn back level at his hip, then a lunge that
+drives it straight in, landing as Dead Knight Amstron's plain lance of light. Hold
+Fast: the Lineholder's ring of dust at his feet. Victory: the spear raised high.
+Death: he kneels on the spear, it falls away, he goes down.
+
+**Where he fights** (stand-ins; stages' enemies wait for Jakub): in 2-1 in place of one
+of the two Followers, and in 2-4 in place of the Bloodhound (a Common Tank of the
+Dominion too). 2-1 got easier with him (94%), so it runs at 1.26 (was 1.08; 88%); 2-4
+stayed in its band (82%).
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Long Thrust and Hold
+Fast and their texts, A1's 1.0, his stats (the sturdy option, on the Common budget: HP
+1380, ATK 80, DEF 68, SPD 94, CRIT 2.5%, score 396), the lore line ("A junior of the
+Sanguine Dominion's ward, tall for his years and given a spear longer than he is; he
+has not lost a fight yet, and has not fought many.") and every detail of his art and
+effects above.
