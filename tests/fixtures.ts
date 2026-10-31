@@ -214,3 +214,15 @@ export const keen = fixture('keen', { passive: { id: 'keen', name: 'Keen', desc:
 
 /** The same striker in each affinity (strong and weak hits). */
 export const inAffinity = (affinity: Affinity) => fixture(`striker_${affinity}`, { affinity });
+
+/**
+ * A1 heals itself and shields the ally with the lowest max HP but itself; A2 takes 75% of one
+ * enemy's turn meter and heals that same ally by a share of its own max HP, striking nobody.
+ */
+export const riter = fixture('riter', {
+  stats: { hp: 1260 },
+  skills: [
+    skill('veil', 1, { target: 'self', approach: 'none', hits: [{ mult: 0 }], healSelf: 0.1, statuses: [{ status: 'shield', turns: 1, value: 0.1, to: 'lowestMaxHpOther' }] }),
+    skill('unction', 2, { cooldown: 4, approach: 'none', hits: [{ mult: 0 }], tmTargets: -75, healLowest: 0.3 }),
+  ],
+});

@@ -130,7 +130,7 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'h', text: 'Lifesteal, Execute, Turn Meter' },
       { kind: 'list', items: ['Lifesteal heals the attacker for a share of the damage dealt. Heal Block stops it.', 'Execute deals bonus damage to targets below a HP threshold.', 'Turn Meter effects push enemies back, let a champion act again sooner, speed up the whole team or the ally with the lowest HP.'] },
       { kind: 'h', text: 'Heals' },
-      { kind: 'p', text: "A heal restores HP up to the maximum. It is a share of a max HP: the healed champion's own, or the healer's when the skill says so. A blow can heal its user too: the Grove Keeper's Thornburst returns 7% of his max HP to him; and so can a skill that helps an ally: the Bellringer's Warning Toll shields one ally and heals him by 10% of his max HP. Heal Block stops every heal." },
+      { kind: 'p', text: "A heal restores HP up to the maximum. It is a share of a max HP: the healed champion's own, or the healer's when the skill says so. A blow can heal its user too: the Grove Keeper's Thornburst returns 7% of his max HP to him; and so can a skill that helps an ally: the Bellringer's Warning Toll shields one ally and heals him by 10% of his max HP. A heal can seek out the frailest: the Last Riter's Last Unction heals the ally with the lowest max HP, someone other than her while anyone else stands, by 30% of her max HP. Heal Block stops every heal." },
       { kind: 'h', text: 'Undying' },
       { kind: 'p', text: 'A passive: the first time its holder falls, it rises again with part of its HP and every debuff removed. Plan for two kills, and save Heal Block and burst for the second.' },
       { kind: 'h', text: 'Revive' },

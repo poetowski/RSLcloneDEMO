@@ -348,7 +348,7 @@ export class Battle {
     const place = (before: boolean, hit: number) => {
       for (const app of skill.statuses ?? []) {
         if (app.perHit || !!app.before !== before) continue;
-        const recipients = app.to === 'self' ? [actor] : app.to === 'allies' ? this.allies(actor) : app.to === 'lowestMaxHp' ? [this.lowestMaxHp(actor)] : targets;
+        const recipients = app.to === 'self' ? [actor] : app.to === 'allies' ? this.allies(actor) : app.to === 'lowestMaxHp' ? [this.lowestMaxHp(actor)] : app.to === 'lowestMaxHpOther' ? [this.lowestMaxHp(actor, true)] : targets;
         for (const r of recipients) {
           if (!r.alive || given.has(r.uid + app.status)) continue;
           given.add(r.uid + app.status);
@@ -384,6 +384,7 @@ export class Battle {
       for (const a of this.allies(actor)) this.heal(a, Math.round((skill.healOf === 'caster' ? actor.maxHp : a.maxHp) * skill.healAllies), last, events);
     }
     if (skill.healSelf && actor.alive) this.heal(actor, Math.round(actor.maxHp * skill.healSelf), last, events);
+    if (skill.healLowest && actor.alive) this.heal(this.lowestMaxHp(actor, true), Math.round(actor.maxHp * skill.healLowest), last, events);
     if (skill.cleanse) {
       for (const a of this.allies(actor)) {
         const deb = a.statuses.find((s) => !STATUSES[s.id].buff);
@@ -569,9 +570,14 @@ export class Battle {
     u.statuses.push({ id, turns, value, source, ...(fresh ? { fresh } : {}) });
   }
 
-  /** The living ally of `u`, `u` included, with the lowest max HP; a tie goes to the one lower on HP, then to the front. */
-  private lowestMaxHp(u: Unit): Unit {
-    return [...this.allies(u)].sort((x, y) => x.maxHp - y.maxHp || x.hp / x.maxHp - y.hp / y.maxHp || x.slot - y.slot)[0];
+  /**
+   * The living ally of `u`, `u` included, with the lowest max HP; a tie goes to the one lower on HP, then to the front.
+   * With `other`, someone other than `u` while anyone else stands (the Last Riter's Incense Veil and Last Unction).
+   */
+  private lowestMaxHp(u: Unit, other = false): Unit {
+    const all = this.allies(u);
+    const others = other ? all.filter((a) => a !== u) : [];
+    return [...(others.length ? others : all)].sort((x, y) => x.maxHp - y.maxHp || x.hp / x.maxHp - y.hp / y.maxHp || x.slot - y.slot)[0];
   }
 
   /**

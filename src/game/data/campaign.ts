@@ -130,7 +130,7 @@ export const LOCATIONS: LocationDef[] = [
         id: '1-6',
         blurb: ESCALATION,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'rime_scholar' }, { champion: 'rime_scholar' }],
-        power: 0.9,
+        power: 0.86,
       },
       {
         id: '1-7',

@@ -169,6 +169,20 @@ function swissShield(b: Bitmap, cx: number, cy: number, hw: number, hh: number, 
   bar(cx - hw * 0.62, top + hh * 0.85, cx + hw * 0.62, top + hh * 0.85 + 1);
 }
 
+
+/** A puff of the Last Riter's olibanum smoke: a soft dithered blob of pale grey, lit on its upper side (screen space). */
+function puff(b: Bitmap, x: number, y: number, rad: number, alpha: number) {
+  const SM = ramps.smoke;
+  for (let yy = Math.floor(y - rad); yy <= Math.ceil(y + rad); yy++) {
+    for (let xx = Math.floor(x - rad); xx <= Math.ceil(x + rad); xx++) {
+      const d = Math.hypot(xx + 0.5 - x, yy + 0.5 - y) / rad;
+      if (d > 1 || !dith(xx, yy, alpha * (1 - d * 0.7))) continue;
+      const lit = 3.6 - d * 1.4 + (y - yy) / rad * 0.8;
+      b.set(xx, yy, rampDither(SM, Math.max(0, Math.min(4, lit)), xx, yy));
+    }
+  }
+}
+
 export const AZURE_CROWN_FX: Record<string, FxDef> = {
   /** Line Cut: one straight cut from high behind to low in front, a white line shedding chips of light. */
   sword_cut: {
@@ -588,6 +602,34 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
         }
       }
       if (i >= 1) sparks(b, 54, 30, 16, 30, (i - 1) / 7, FI, 449, 12);
+    },
+  },
+  /** Incense Veil: smoke curls up from the casket and rises round her in a slow column, a few gold motes in it. */
+  incense_veil: {
+    w: 64, h: 88, n: 10, ms: 70, ax: 0.5, ay: 0.95, pad: [2, 4, 2, 4],
+    draw: (b, t) => {
+      const r = rng(511);
+      for (let k = 0; k < 12; k++) {
+        const ph = r(), side = r() - 0.5;
+        const tt = Math.min(1, t * 1.2 + ph * 0.25);
+        const x = 32 + side * 22 + Math.sin(tt * 5 + k) * 3, y = 66 - tt * 52 - ph * 6;
+        puff(b, x, y, 3 + tt * 5, (1 - tt * 0.85) * (tt < 0.08 ? tt / 0.08 : 1));
+      }
+      motes(b, 32, 62, 30, 54, 10, t, GO, 513);
+    },
+  },
+  /** Last Unction: the smoke drifts in over the enemy, settles round it and sinks, gold motes falling through it. */
+  unction_smoke: {
+    w: 76, h: 64, n: 10, ms: 70, ax: 0.5, ay: 0.5, pad: [2, 4, 2, 4],
+    draw: (b, t) => {
+      const r = rng(521);
+      for (let k = 0; k < 11; k++) {
+        const ph = r(), dy = (r() - 0.5) * 26;
+        const tt = Math.min(1, t * 1.25 + ph * 0.2);
+        const x = 6 + tt * 34 + ph * 20, y = 32 + dy + tt * 8 + Math.sin(tt * 4 + k) * 2;
+        puff(b, x, y, 3.5 + tt * 4, (1 - tt * 0.8) * (tt < 0.1 ? tt / 0.1 : 1));
+      }
+      if (t > 0.2) sparks(b, 40, 22, 8, 22, (t - 0.2) / 0.8, GO, 523, 18);
     },
   },
 };

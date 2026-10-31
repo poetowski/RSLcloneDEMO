@@ -89,6 +89,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Strongman approved as built: his art, the names Stone Slam and Gather Strength, the lore line | 40 |
 | 2026-10-31 | The Town Guard, a Common Tank of the Azure Crown; the worksheet's recommended options approved | 41 |
 | 2026-10-31 | The Town Guard approved as built: his art, the names Watch Cut and Shield Check, the lore line | 41 |
+| 2026-10-31 | The Last Riter, a Common Support of the Azure Crown; the worksheet's recommended options approved | 42 |
 
 ---
 
@@ -3308,3 +3309,63 @@ ATK 82, DEF 70, SPD 94, CRIT 2.5%, score 397), and every detail of his art and
 effects above (Gareth's `sword_cut` for the cut, the Lineholder's
 `mace_blow` for the shield). He is summoned (section 36), a fourteenth Common in that
 pool; with him in it every stage stayed in its band.
+
+## 42. The Last Riter (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion
+Name "Last Riter"
+Azure crown
+Rarity common
+Support role
+Affinity ember
+Design white dressed with yellow big exalter cloak and hoody. Female. Dark blue dress and small crown on it yellow. Holds olibanum in ornate box.
+A1 heal himself by 10% of his max hp. Also grant the ally with lowest max hp shield for 1 turn values by same value as the heal.
+A2 decrease target enemy turn meter by 75%. Heal the ally with lowest max hp by 30% of this champion max hp. CD 4.
+```
+
+and, to the worksheet that followed (fast stats or sturdy ones, names, the readings of
+the design, who "the ally with the lowest max HP" is, whether the drain rolls against
+RES, the lore line), each with a recommended option:
+
+```
+Go
+```
+
+read as a yes to every recommended option.
+
+**Readings.** "Heal himself" is herself. "The ally with lowest max hp" is the living
+ally with the lowest max HP other than her while anyone else stands (alone, herself),
+as the Bellringer's shield is someone else's; it is the same ally for the Shield and
+the heal. The Shield is worth 10% of her max HP, the same as her heal. The 75% is of a
+full turn meter and certain, with no RES roll, as Chief Engineer CJ's and the Forest
+Gargoyle's are; a meter under it empties. A2 strikes no one, nor does A1. No passive.
+"White dressed ... dark blue dress" is a white undergown under a dark-blue dress;
+"exalter cloak" a ceremonial cope; "hoody" its hood, up. "Olibanum in ornate box" a gold
+casket of frankincense, smoking.
+
+**New rule.** A status `to: 'lowestMaxHpOther'` and a skill's `healLowest` reach the
+ally with the lowest max HP other than the actor while anyone else stands
+(MECHANICS_GUIDE.md, the Academy, DDD INV-C28).
+
+**As built:** a priestess: a dark-blue dress to the floor with a small gold crown on
+the chest and a white sash, the white undergown at the hem and in wide sleeves with
+dark-blue cuffs; a big yellow cope down her back nearly to the ground, its yellow over
+her shoulders with a gold edge, and its hood up, her face in its shadow, brown hair
+under the brim; in her hands a gold casket with bronze bands and a pitched lid, pale
+smoke curling from it. Incense Veil: she lifts the casket to her bowed face and smoke
+rises round her in a slow column with a few gold motes. Last Unction: she opens the
+lid and holds the casket out; smoke drifts over the enemy, settles and sinks, gold
+motes falling through it. Victory: the casket raised before her face, the smoke tall.
+Death: she kneels, the casket falls beside her, she lies with the cope along her.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Incense Veil and
+Last Unction and their texts, her stats (the fast option, on the Common budget, ATK at
+the floor: HP 1260, ATK 70, DEF 64, SPD 110, CRIT 2.5%, score 387), the lore line ("A
+rite-keeper of the Azure Crown who walks behind its soldiers with a casket of olibanum
+and says the last rites over those who fall; where her smoke drifts, the dying stand a
+little longer.") and every detail of her art and effects above (`yellowCloth`, a new
+material, for the cope). She is summoned (section 36), a fifteenth Common in that
+pool; with her in it 1-6 fell under its band (53%), so it runs at 0.86 (was 0.90).

@@ -48,8 +48,11 @@ export interface StatusApp {
   turns: number;
   /** 0..1, default 1 */
   chance?: number;
-  /** `lowestMaxHp`: the living ally with the lowest max HP, the actor included (Chief Engineer CJ's Earthen Surge: his Shield) */
-  to: 'targets' | 'self' | 'allies' | 'lowestMaxHp';
+  /**
+   * `lowestMaxHp`: the living ally with the lowest max HP, the actor included (Chief Engineer CJ's Earthen Surge: his Shield);
+   * `lowestMaxHpOther`: the same, but someone other than the actor while anyone else stands (the Last Riter's Incense Veil)
+   */
+  to: 'targets' | 'self' | 'allies' | 'lowestMaxHp' | 'lowestMaxHpOther';
   /** shield amount as a fraction of the caster's max HP */
   value?: number;
   /** roll on every damaging hit instead of once on the last hit (targets only) */
@@ -89,6 +92,11 @@ export interface SkillDef {
   cleanseAll?: boolean;
   /** heals the actor by this fraction of its own max HP, on the last hit (the Grove Keeper's Thornburst) */
   healSelf?: number;
+  /**
+   * heals the living ally with the lowest max HP, someone other than the actor while anyone else
+   * stands, by this fraction of the actor's max HP, on the last hit (the Last Riter's Last Unction)
+   */
+  healLowest?: number;
   /**
    * raises the fallen ally the skill targets (`target: 'fallen'`, one at random) with this
    * fraction of its max HP, on the last hit: no statuses, an empty turn meter (the

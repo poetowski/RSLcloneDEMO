@@ -408,6 +408,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C25 | A skill aimed at the fallen (`target: 'fallen'`) is ready only while an ally of its user has fallen, and takes one of them at random; with `revive` that ally gets up on the last hit with that share of its max HP (at least 1), no statuses and an empty turn meter, its cooldowns and its spent once-a-battle passives unchanged; it never reaches an enemy | code (`Battle.ready`, `Battle.fallen`, `useSkill`); tests |
 | INV-C26 | A status marked `before` is placed on its recipients before the skill's first hit (event hit -1), so the skill's own hits carry it; it counts like any status placed on its holder's own turn, and it reaches each unit once per skill like any other | code (`Battle.useSkill`); test |
 | INV-C27 | A defy answers an enemy skill that landed a critical hit on its holder and left it standing, once per skill, after the skill's last hit: the holder takes its statuses and heals by its share of max HP (Heal Block stops the heal); a crit that fells the holder, or a hit that is not critical, never wakes it | code (`Battle.defy`), norms; test |
+| INV-C28 | A status `to: 'lowestMaxHpOther'` and a `healLowest` heal reach the living ally with the lowest max HP other than the actor while anyone else stands (ties: the lower HP share, then the front); alone, the actor. The heal is a share of the actor's max HP, on the last hit, and Heal Block stops it | `battle.test.ts` (shields and heals the ally with the lowest max HP but the actor) |
 
 ### 6.2 Catalog
 
