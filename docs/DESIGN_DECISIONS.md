@@ -80,6 +80,7 @@ Section 7 lists what is not decided.
 | 2026-10-25 | Summoning: champions are summoned with a currency found in the campaign (100 fragments merge into a shard, a shard summons one champion at random: 70% Common, 25% Elite, 5% Heroic), a wish of a faction and a role making them likelier, a new object in the Sanctum's sky where fragments are merged and champions summoned; the Rime Scholar, from 1-1, the only champion a stage brings; a Journey quest, Beat Campaign 1-3, giving 100 fragments; better names asked for (my proposal stands in) | 2.2, 5.6-5.8, 7, 11, 34, 35, 36 |
 | 2026-10-25 | The Journey reordered: Weave a Spool second, Beat Campaign 1-3 third, the two swapping rewards, so the second quest still gives the 100 fragments | 7, 35, 36 |
 | 2026-10-31 | Chief Engineer CJ, a Heroic Tank of the Sanguine Dominion, made more fantasy and without the words on his brief's suit; a Stun may last 2 turns | 37 |
+| 2026-10-31 | Chief Engineer CJ's A1: a 25% chance of Stun on each hit (50% in the brief) | 37 |
 
 ---
 
@@ -3026,13 +3027,19 @@ and, while he was being built:
 actually, make him more fantasy and remove no yolo words
 ```
 
+and, once he was built:
+
+```
+ok, lower chance of stun to 25% instead of 50% on a1.
+```
+
 The Sanguine Dominion's seventh champion and first Heroic, the roster's second.
 
 **Readings.** "More fantasy" changes the look and my stand-in names and effects,
 not the kit. The orange hat stays, as he said it should be odd in this world: it
 is now an enamelled helm. The gear belt, the two-handed hammer and its sparks
-stay. The Stun's 50% rolls on each of A1's hits, so about three attacks in four
-stun; A1's Stun lasts 1 turn (the brief names no length). The 10% of turn meter
+stay. The Stun's 25% (50% in the brief) rolls on each of A1's hits, so about
+four attacks in nine stun; A1's Stun lasts 1 turn (the brief names no length). The 10% of turn meter
 comes off once, after the last hit. A2 strikes no enemy, so nothing
 counterattacks it. "All allies" and "every ally" include him. The ally with the
 lowest max HP can be himself; a tie goes to the one lower on HP, then to the

@@ -17,7 +17,8 @@ import { ChampionDef } from '../types';
 // Decree, Earthen Surge and Master's Eye and their texts, the multipliers
 // (0.5 + 0.5; 0.7 on each enemy, the floor of the norms), the Stun's 1 turn on
 // A1, his stats (on the Heroic budget) and the lore line.
-// Read by the game: the Stun's 50% is rolled on each of A1's hits and the 10% of
+// His word the same day: "lower chance of stun to 25% instead of 50% on a1".
+// Read by the game: the Stun's 25% is rolled on each of A1's hits and the 10% of
 // turn meter comes off once, after the last hit; A2 strikes no enemy, so nothing
 // counterattacks it; "all allies" and "every ally" include him; the ally with the
 // lowest max HP can be himself, a tie goes to the one lower on HP, then to the
@@ -37,10 +38,10 @@ export const chiefEngineerCj: ChampionDef = {
   skills: [
     {
       id: 'mending_blows', name: 'Mending Blows', tag: 'Single enemy', slot: 1, cooldown: 0,
-      desc: 'Two blows of the hammer on one enemy, each with a 50% chance of Stun for 1 turn. Takes 10% of its Turn Meter.',
+      desc: 'Two blows of the hammer on one enemy, each with a 25% chance of Stun for 1 turn. Takes 10% of its Turn Meter.',
       target: 'enemy', anim: 'attack1', approach: 'melee',
       hits: [{ mult: 0.5, fx: 'jolt_blow' }, { mult: 0.5, fx: 'jolt_slam' }],
-      statuses: [{ status: 'stun', turns: 1, chance: 0.5, to: 'targets', perHit: true }],
+      statuses: [{ status: 'stun', turns: 1, chance: 0.25, to: 'targets', perHit: true }],
       tmTargets: -10,
       shake: 2,
       ai: { priority: 1 },
