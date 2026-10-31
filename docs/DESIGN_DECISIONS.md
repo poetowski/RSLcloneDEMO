@@ -90,6 +90,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Town Guard, a Common Tank of the Azure Crown; the worksheet's recommended options approved | 41 |
 | 2026-10-31 | The Town Guard approved as built: his art, the names Watch Cut and Shield Check, the lore line | 41 |
 | 2026-10-31 | The Last Riter, a Common Support of the Azure Crown; the worksheet's recommended options approved | 42 |
+| 2026-10-31 | The Last Riter's hood made deep, to cover her face | 42 |
 
 ---
 
@@ -3353,13 +3354,23 @@ ally with the lowest max HP other than the actor while anyone else stands
 **As built:** a priestess: a dark-blue dress to the floor with a small gold crown on
 the chest and a white sash, the white undergown at the hem and in wide sleeves with
 dark-blue cuffs; a big yellow cope down her back nearly to the ground, its yellow over
-her shoulders with a gold edge, and its hood up, her face in its shadow, brown hair
-under the brim; in her hands a gold casket with bronze bands and a pitched lid, pale
+her shoulders with a gold edge, and its hood deep over her head, its rim forward
+over her brow and down past her cheek to the throat, edged in gold, so her eyes lie in
+its shadow and only the tip of her nose, her lips and her chin show; in her hands a gold casket with bronze bands and a pitched lid, pale
 smoke curling from it. Incense Veil: she lifts the casket to her bowed face and smoke
 rises round her in a slow column with a few gold motes. Last Unction: she opens the
 lid and holds the casket out; smoke drifts over the enemy, settles and sinks, gold
 motes falling through it. Victory: the casket raised before her face, the smoke tall.
 Death: she kneels, the casket falls beside her, she lies with the cope along her.
+
+Shown the first build, whose hood framed her face and showed her hair, Jakub said:
+
+```
+I don't like how hare hoody and doesn't cover face. Do it
+```
+
+read as: the hood made deep, so that it covers her face (built as the Necromancer's
+is: her eyes in its shadow, no hair showing).
 
 What the game fills in (stand-ins, listed in CLAUDE.md): the names Incense Veil and
 Last Unction and their texts, her stats (the fast option, on the Common budget, ATK at

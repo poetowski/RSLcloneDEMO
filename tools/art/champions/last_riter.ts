@@ -34,7 +34,7 @@ const D: Dims = {
   hipF: 1.4,
 };
 
-const SK = MAT.skinLight, WC = MAT.whiteCloth, IN = MAT.indigo, YC = MAT.yellowCloth, GD = MAT.gold, BR = MAT.bronze, HR = MAT.hairBrown;
+const SK = MAT.skinLight, WC = MAT.whiteCloth, IN = MAT.indigo, YC = MAT.yellowCloth, GD = MAT.gold, BR = MAT.bronze;
 /** The olibanum's smoke: the pale greys of white cloth, lightest where it leaves the casket. */
 const SMOKE = [WC.ramp[1], WC.ramp[2], WC.ramp[2], WC.ramp[3], WC.ramp[4]];
 
@@ -165,24 +165,33 @@ function hoodBack(d: Draw, s: Skel, z: number) {
   );
 }
 
+/**
+ * Her head deep in the hood: its rim comes forward over her brow and down past
+ * her cheek to the throat, so her eyes lie in its shadow; of her face only the
+ * tip of the nose, the lips and the chin catch the light.
+ */
 function head(d: Draw, s: Skel, P: Record<string, number>) {
   const H = s.H;
   d.capsule({ mat: SK, z: 37.5, group: 'neck' }, s.neck, H(0, -4), 2.2, 2.0);
   // the undergown's white collar at the throat
   d.capsule({ mat: WC, z: 37.6, group: 'collar' }, s.T(19.2, -2.4), s.T(19.8, 2.2), 1.6, 1.5);
-  // the hood's shadowed inside, round her face
-  d.ellipse({ mat: YC, z: 37.7, group: 'hoodin', shade: -2, line: 'none' }, H(-0.8, 1.2), 7.0, 7.8, s.headDir - 90);
-  face(d, s, { skin: SK, z: 38, brow: HR.ramp[2], browStyle: 'calm', ear: 'none', mouth: P.call ? 'shout' : 'line', lip: ACCENT.lipRose, rx: 5.6, ry: 6.3, profile: 'soft', lash: ACCENT.kohl });
-  // brown hair under the hood's brim
-  d.poly({ mat: HR, z: 38.8, group: 'hair', line: 'none' }, [H(5.0, 5.2), H(2.6, 7.4), H(-1.2, 8.0), H(-3.8, 6.4), H(-3.6, 2.4), H(-1.6, 4.6), H(2.0, 5.0)], { kind: 'dome', c: H(0, 5), r: 6, bevel: 0.8 });
-  // the hood's brim framing her face: over the brow, round the back of the cheek
-  d.ribbon(
-    { mat: YC, z: 39, group: 'hood', line: 'soft' },
-    [H(6.8, 6.4), H(4.2, 9.4), H(-0.6, 10.6), H(-4.8, 9.2), H(-6.4, 4.0), H(-6.4, -2.0), H(-4.6, -7.0)],
-    [1.6, 2.0, 2.2, 2.2, 2.0, 1.8, 1.4],
+  face(d, s, { skin: SK, z: 38, browStyle: 'none', ear: 'none', mouth: P.call ? 'shout' : 'line', lip: ACCENT.lipRose, rx: 5.6, ry: 6.3, profile: 'soft' });
+  // the hood's shadow over her brow and eyes
+  d.poly(
+    { mat: YC, z: 38.6, group: 'hoodshade', shade: -3, line: 'none' },
+    [H(7.6, 3.2), H(7.4, 1.4), H(6.2, 0.2), H(3.6, -0.4), H(0.6, 0.4), H(0.2, 3.6)],
+    { kind: 'flat', n: [0, 0, 1] },
   );
+  // the hood: over the crown and the back of the head, its rim forward over the brow and down past the cheek to the throat
+  d.poly(
+    { mat: YC, z: 39, group: 'hood', tex: foldTex(5, 0.6, 0.7) },
+    [H(8.4, 4.0), H(7.6, 2.8), H(4.8, 2.2), H(1.8, 1.2), H(0.4, -2.2), H(0.2, -5.8), H(-0.6, -8.6), H(-3.8, -8.8), H(-8.0, -5.0), H(-9.8, 1.0), H(-9.0, 6.6), H(-5.4, 10.4), H(-0.2, 11.2), H(4.8, 9.2), H(7.6, 6.4)],
+    { kind: 'dome', c: H(-1.2, 2.4), r: 10.5, bevel: 1.2 },
+  );
+  // the rim of the hood, edged in gold like the cope, along the opening
+  d.ribbon({ mat: GD, z: 39.1, group: 'hood', line: 'none' }, [H(8.2, 3.8), H(5.4, 2.6), H(2.4, 1.6), H(0.8, -1.8), H(0.6, -5.6)], [0.55, 0.6, 0.6, 0.55, 0.5]);
   // a seam down the crown of the hood
-  d.line({ mat: YC, z: 39.1, group: 'hood', line: 'none' }, H(-0.6, 11.4), H(-6.8, 8.0), YC.ramp[2]);
+  d.line({ mat: YC, z: 39.15, group: 'hood', line: 'none' }, H(1.0, 10.6), H(-7.4, 6.0), YC.ramp[2]);
 }
 
 /**
