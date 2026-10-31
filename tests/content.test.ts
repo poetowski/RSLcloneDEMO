@@ -335,13 +335,13 @@ describe('design decisions', () => {
     expect(c?.passive && [c.passive.kind, c.passive.statuses]).toEqual(['brace', [{ status: 'def_up', turns: 1 }]]);
   });
 
-  it('has Dead Knight Amstron of his brief: a Heroic Tank of the Ashveil Reign, Ember; an A1 with Slow for 1 turn; an A2 with ATK Down and DEF Down for 2 turns and a 50% chance of Stun for 1, cooldown 3; an A3 of DEF Up for 2 turns, a heal of 15% of each ally\'s max HP and a Shield of 20% of his max HP for 2 turns on all allies, cooldown 4; a passive of immunity to DEF Down', () => {
+  it('has Dead Knight Amstron of his brief: a Heroic Tank of the Ashveil Reign, Ember; an A1 with Slow for 1 turn; an A2 with ATK Down and DEF Down for 2 turns and a 40% chance of Stun for 1 (50% in the brief), cooldown 3; an A3 of DEF Up for 2 turns, a heal of 15% of each ally\'s max HP and a Shield of 20% of his max HP for 2 turns on all allies, cooldown 4; a passive of immunity to DEF Down', () => {
     const c = CHAMPIONS.find((x) => x.id === 'dead_knight_amstron');
     expect(c && [c.name, c.rarity, c.role, c.faction, c.affinity]).toEqual(['Dead Knight Amstron', 'heroic', 'Tank', 'ashveil_reign', 'ember']);
     expect(c?.skills).toHaveLength(3);
     const [a1, a2, a3] = c?.skills ?? [];
     expect(a1 && [a1.slot, a1.target, a1.statuses, totalMult(a1) > 0]).toEqual([1, 'enemy', [{ status: 'spd_down', turns: 1, to: 'targets' }], true]);
-    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses, totalMult(a2) > 0]).toEqual([2, 'enemy', 3, [{ status: 'atk_down', turns: 2, to: 'targets' }, { status: 'def_down', turns: 2, to: 'targets' }, { status: 'stun', turns: 1, chance: 0.5, to: 'targets' }], true]);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses, totalMult(a2) > 0]).toEqual([2, 'enemy', 3, [{ status: 'atk_down', turns: 2, to: 'targets' }, { status: 'def_down', turns: 2, to: 'targets' }, { status: 'stun', turns: 1, chance: 0.4, to: 'targets' }], true]);
     expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.statuses, a3.healAllies, a3.healOf, totalMult(a3)]).toEqual([3, 'allies', 4, [{ status: 'def_up', turns: 2, to: 'allies' }, { status: 'shield', turns: 2, value: 0.2, to: 'allies' }], 0.15, undefined, 0]);
     expect(c?.passive && [c.passive.kind, c.passive.immuneTo]).toEqual(['immune', 'def_down']);
   });

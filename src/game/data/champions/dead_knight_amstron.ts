@@ -9,6 +9,7 @@ import { ChampionDef } from '../types';
 // allies DEFENSE UP for 2 turns, heal every ally by 15% of their MAX HP and place
 // shield on each ally for 2 turns valued at 20% of this champion max hp. CD 4
 // turns. A4 passive - This champion is immune to DEFENSE DOWN debuff."
+// His word the same day: "A2 lower amstron chance for stun to 40%".
 // Stand-ins until Jakub sets them: the names Hobbling Thrust, Grave Pierce, Last
 // Bastion and Unbreached Plate and their texts, the multipliers (1.0; 1.2), his
 // stats (on the Heroic budget) and the lore line.
@@ -37,13 +38,13 @@ export const deadKnightAmstron: ChampionDef = {
     },
     {
       id: 'grave_pierce', name: 'Grave Pierce', tag: 'Single enemy', slot: 2, cooldown: 3,
-      desc: 'The spear driven down through one enemy: places ATK Down and DEF Down on it for 2 turns, with a 50% chance of Stun for 1 turn.',
+      desc: 'The spear driven down through one enemy: places ATK Down and DEF Down on it for 2 turns, with a 40% chance of Stun for 1 turn.',
       target: 'enemy', anim: 'attack2', approach: 'melee',
       hits: [{ mult: 1.2, fx: 'grave_pierce' }],
       statuses: [
         { status: 'atk_down', turns: 2, to: 'targets' },
         { status: 'def_down', turns: 2, to: 'targets' },
-        { status: 'stun', turns: 1, chance: 0.5, to: 'targets' },
+        { status: 'stun', turns: 1, chance: 0.4, to: 'targets' },
       ],
       shake: 2,
       ai: { priority: 2 },

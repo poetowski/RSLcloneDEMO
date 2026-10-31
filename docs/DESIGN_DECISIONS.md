@@ -84,6 +84,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Forest Gargoyle, a Heroic Tank, read as the Court of Root's | 38 |
 | 2026-10-31 | The Forest Gargoyle's affinity: Tide | 38 |
 | 2026-10-31 | Dead Knight Amstron, a Heroic Tank of the Ashveil Reign | 39 |
+| 2026-10-31 | Dead Knight Amstron's A2: a 40% chance of Stun (50% in the brief) | 39 |
 
 ---
 
@@ -3161,10 +3162,16 @@ A3 - Grant all allies DEFENSE UP for 2 turns, heal every ally by 15% of their MA
 A4 passive - This champion is immune to DEFENSE DOWN debuff.
 ```
 
+and, once he was built:
+
+```
+A2 lower amstron chance for stun to 40%.
+```
+
 The Ashveil Reign's first Heroic, the roster's fourth.
 
 **Readings.** SPEED DOWN, ATTACK DOWN and DEFENSE DOWN are Slow, ATK Down and DEF
-Down; they are certain but meet RES like every debuff, and the Stun rolls its 50%
+Down; they are certain but meet RES like every debuff, and the Stun rolls its 40%
 against RES too. A3 strikes no one. "All allies" and "every ally" include him; each
 heal is a share of that ally's own max HP, each Shield a share of his. The AI keeps
 A3 until an ally is hurt or afflicted; the player may use it at any time. "Immune"
