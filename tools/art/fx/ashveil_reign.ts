@@ -425,4 +425,63 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
       if (i >= 2) sparks(b, cx, cy, 8, 16, (i - 2) / 4, SOUL, 619, -4);
     },
   },
+
+  /** Hobbling Thrust: a straight line of light driven through the target, a dull flash where it enters, red flecks thrown on. */
+  dead_thrust: {
+    w: 88, h: 52, n: 7, ms: 45, ax: 0.45, ay: 0.5, pad: [4, 6, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 40, cy = 26;
+      const reach = [0.55, 1, 1, 1, 1, 1, 1][i], heat = [1.4, 1.5, 1.2, 0.95, 0.7, 0.5, 0.3][i];
+      if (i < 5) cut(b, 4, cy, 84, cy, 0, [1.8, 2.5, 2, 1.4, 0.9][i], DULL, heat, reach);
+      if (i >= 1 && i <= 3) burst(b, cx, cy, 10, 2, [15, 11, 7][i - 1], 1.5, DULL, 0.2);
+      if (i >= 1) sparks(b, cx + 6, cy, 12, 26, (i - 1) / 5, ramps.blood, 811, 8);
+    },
+  },
+  /** Grave Pierce: the spear comes down through the target, a long heavy line from high to low, a flash and a ring where it stops. */
+  grave_pierce: {
+    w: 96, h: 104, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 4, 8, 4],
+    draw: (b, t, i) => {
+      const cx = 48, cy = 56;
+      const reach = [0.5, 1, 1, 1, 1, 1, 1, 1][i], heat = [1.5, 1.5, 1.25, 1, 0.75, 0.5, 0.35, 0.2][i];
+      if (i < 6) cut(b, 20, 8, 62, 86, 0, [2.6, 3.8, 3, 2.2, 1.5, 1][i], DULL, heat, reach);
+      if (i >= 1 && i <= 3) burst(b, cx + 4, cy, 12, 3, [20, 15, 9][i - 1], 1.8, DULL, 0.25);
+      if (i >= 1) ring(b, cx + 4, cy, 5 + i * 4, 4 + i * 3, Math.max(0.7, 2 - i * 0.25), ramps.blood, Math.max(0.2, 1.1 - i * 0.16));
+      if (i >= 1) sparks(b, cx + 4, cy, 16, 32, (i - 1) / 6, ramps.blood, 821, 20);
+    },
+  },
+  /** Last Bastion's call: a pale burst at the raised skull, rings going out from it. Additive, at his head on the `cast` event. */
+  bastion_call: {
+    w: 84, h: 72, n: 9, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      if (i < 4) burst(b, 42, 36, 12, 2, [10, 18, 14, 8][i], 1.6, DULL, 0.25);
+      for (let k = 0; k < 2; k++) {
+        const age = i - k * 3;
+        if (age < 0 || age > 5) continue;
+        ring(b, 42, 36, 6 + age * 6, 5 + age * 5, Math.max(0.6, 1.8 - age * 0.25), DULL, 1.1 - age * 0.18);
+      }
+    },
+  },
+  /** Last Bastion reaches an ally: a tower shield of pale light rises before it, a white bone across it, a ring closing at its feet; it holds and fades. Anchored at the feet. */
+  bastion_ward: {
+    w: 76, h: 84, n: 12, ms: 60, ax: 0.5, ay: 1, pad: [2, 4, 3, 4],
+    draw: (b, t, i) => {
+      const cx = 38, gy = 82;
+      const up = [0.3, 0.65, 0.95, 1, 1, 1, 1, 1, 1, 1, 1, 1][i];
+      const fade = i < 7 ? 1 : [0.8, 0.6, 0.42, 0.26, 0.12][i - 7];
+      ellipseRing(b, cx, gy - 3, 24, 6, 1.3, (x, y, a) => (dith(x, y, fade * (Math.sin(a) > -0.1 ? 1 : 0.45)) ? rampDither(DULL, 3 + Math.sin(a) * 0.6, x, y) : 0));
+      const top = gy - 8 - 62 * up, x0 = cx - 13, x1 = cx + 13;
+      for (let y = Math.floor(top); y <= gy - 8; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const edge = x <= x0 + 1 || x >= x1 - 1 || y <= top + 1 || y >= gy - 10;
+          if (edge ? dith(x, y, fade) : dith(x, y, fade * 0.16)) b.set(x, y, edge ? W : DULL[2]);
+        }
+      }
+      if (up >= 1) {
+        const by = Math.round(top + 26);
+        for (let x = cx - 8; x <= cx + 8; x++) for (const dy of [-1, 0, 1]) if (dith(x, by + dy, fade)) b.set(x, by + dy, W);
+        for (const sx of [-9, 8]) for (const sy of [-3, 2]) for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) if (dith(cx + sx + dx, by + sy + dy, fade)) b.set(cx + sx + dx, by + sy + dy, W);
+      }
+      motes(b, cx, gy - 10, 20, 50, 8, t, ramps.green, 831);
+    },
+  },
 };

@@ -413,6 +413,30 @@
    82,
    40,
    40
+  ],
+  "hobbling_thrust": [
+   779,
+   82,
+   40,
+   40
+  ],
+  "grave_pierce": [
+   820,
+   82,
+   40,
+   40
+  ],
+  "last_bastion": [
+   861,
+   82,
+   40,
+   40
+  ],
+  "unbreached_plate": [
+   902,
+   82,
+   40,
+   40
   ]
  },
  "status": {
@@ -1667,6 +1691,12 @@
   ],
   "forest_gargoyle": [
    754,
+   374,
+   28,
+   28
+  ],
+  "dead_knight_amstron": [
+   783,
    374,
    28,
    28

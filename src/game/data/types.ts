@@ -167,8 +167,10 @@ export interface PassiveDef {
    *            2026-10-31)
    * brace:     at the start of each of the champion's turns, a skipped one too, it takes
    *            `statuses` (the Forest Gargoyle's Heartwood: DEF Up for 1 turn, 2026-10-31)
+   * immune:    the debuff `immuneTo` never lands on the champion (Dead Knight Amstron's
+   *            Unbreached Plate: DEF Down, 2026-10-31)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
   /** rebuke and tend: the champion's own turns the passive rests after it acts */
@@ -177,6 +179,8 @@ export interface PassiveDef {
   stat?: StatId;
   /** ward, retaliate and remedy: the chance of each answer, 0..1 */
   chance?: number;
+  /** immune: the debuff that never lands */
+  immuneTo?: StatusId;
   /** fallen: the most it adds */
   max?: number;
   /** ward: it guards only the champion itself, not its allies */

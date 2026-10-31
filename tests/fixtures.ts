@@ -186,6 +186,12 @@ export const druid = fixture('druid', {
 /** Purge: at the start of its turn every ally, itself included, loses one debuff at random. */
 export const inspector = fixture('inspector', { passive: { id: 'purge', name: 'Purge', desc: '', kind: 'purge', value: 0 } });
 
+/** Immune: DEF Down never lands on it. */
+export const unbreached = fixture('unbreached', { stats: { hp: 1700 }, passive: { id: 'immune', name: 'Immune', desc: '', kind: 'immune', value: 0, immuneTo: 'def_down' } });
+
+/** A1 strikes and places DEF Down and ATK Down, both certain. */
+export const breaker = fixture('breaker', { skills: [skill('break', 1, { statuses: [{ status: 'def_down', turns: 2, to: 'targets' }, { status: 'atk_down', turns: 2, to: 'targets' }] })] });
+
 /** Brace: at the start of its turn it takes DEF Up for 1 turn. */
 export const sentinel = fixture('sentinel', { passive: { id: 'brace', name: 'Brace', desc: '', kind: 'brace', value: 0, statuses: [{ status: 'def_up', turns: 1 }] } });
 

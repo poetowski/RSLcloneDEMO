@@ -326,13 +326,24 @@ describe('design decisions', () => {
 
   it('has the Forest Gargoyle of his brief: a Heroic Tank; an A1 with a 35% chance of Heal Block for 2 turns; an A2 on all enemies with ATK Down for 1 turn, cooldown 3; an A3 on one enemy with Slow for 2 turns that empties its Turn Meter, cooldown 4; a passive of DEF Up for 1 turn at the start of his turns', () => {
     const c = CHAMPIONS.find((x) => x.id === 'forest_gargoyle');
-    expect(c && [c.name, c.rarity, c.role]).toEqual(['Forest Gargoyle', 'heroic', 'Tank']);
+    expect(c && [c.name, c.rarity, c.role, c.affinity]).toEqual(['Forest Gargoyle', 'heroic', 'Tank', 'tide']);
     expect(c?.skills).toHaveLength(3);
     const [a1, a2, a3] = c?.skills ?? [];
     expect(a1 && [a1.slot, a1.target, a1.statuses, totalMult(a1) > 0]).toEqual([1, 'enemy', [{ status: 'heal_block', turns: 2, chance: 0.35, to: 'targets' }], true]);
     expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses, totalMult(a2) > 0]).toEqual([2, 'enemies', 3, [{ status: 'atk_down', turns: 1, to: 'targets' }], true]);
     expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.statuses, a3.tmTargets, totalMult(a3) > 0]).toEqual([3, 'enemy', 4, [{ status: 'spd_down', turns: 2, to: 'targets' }], -100, true]);
     expect(c?.passive && [c.passive.kind, c.passive.statuses]).toEqual(['brace', [{ status: 'def_up', turns: 1 }]]);
+  });
+
+  it('has Dead Knight Amstron of his brief: a Heroic Tank of the Ashveil Reign, Ember; an A1 with Slow for 1 turn; an A2 with ATK Down and DEF Down for 2 turns and a 50% chance of Stun for 1, cooldown 3; an A3 of DEF Up for 2 turns, a heal of 15% of each ally\'s max HP and a Shield of 20% of his max HP for 2 turns on all allies, cooldown 4; a passive of immunity to DEF Down', () => {
+    const c = CHAMPIONS.find((x) => x.id === 'dead_knight_amstron');
+    expect(c && [c.name, c.rarity, c.role, c.faction, c.affinity]).toEqual(['Dead Knight Amstron', 'heroic', 'Tank', 'ashveil_reign', 'ember']);
+    expect(c?.skills).toHaveLength(3);
+    const [a1, a2, a3] = c?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, a1.statuses, totalMult(a1) > 0]).toEqual([1, 'enemy', [{ status: 'spd_down', turns: 1, to: 'targets' }], true]);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses, totalMult(a2) > 0]).toEqual([2, 'enemy', 3, [{ status: 'atk_down', turns: 2, to: 'targets' }, { status: 'def_down', turns: 2, to: 'targets' }, { status: 'stun', turns: 1, chance: 0.5, to: 'targets' }], true]);
+    expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.statuses, a3.healAllies, a3.healOf, totalMult(a3)]).toEqual([3, 'allies', 4, [{ status: 'def_up', turns: 2, to: 'allies' }, { status: 'shield', turns: 2, value: 0.2, to: 'allies' }], 0.15, undefined, 0]);
+    expect(c?.passive && [c.passive.kind, c.passive.immuneTo]).toEqual(['immune', 'def_down']);
   });
 
   it('has the Follower of his brief: a Common of the Court of Root, Damage, Tide; A1 a single-target attack, A2 a single-target attack with a 50% chance of DEF Down for 2 turns, cooldown 4', () => {
@@ -821,6 +832,7 @@ describe('summoning', () => {
     q.reliquary.recruit('paladin');
     q.reliquary.recruit('chief_engineer_cj');
     q.reliquary.recruit('forest_gargoyle');
+    q.reliquary.recruit('dead_knight_amstron');
     const odds = rarityOdds(summonPool(q));
     expect(odds.heroic).toBe(0);
     expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);

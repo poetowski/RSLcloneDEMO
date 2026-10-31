@@ -9,8 +9,8 @@ import { ChampionDef } from '../types';
 // one enemy, places SPEED DOWN for 2 turns. Also fully deplets targets turn meter.
 // CD 4 turns. motive for a3 - this can be something with being scary. passive -
 // places DEFENSE UP for 1 turn on beginning of this champion turns."
-// Stand-ins until Jakub sets them: the Court of Root and Bloom (his brief says
-// "affinity = root", which is no affinity and names no faction), the names Splinter
+// His word the same day: "make gargoyle affinity tide". Stand-ins until Jakub sets
+// them: the Court of Root (his brief's "affinity = root" read as it), the names Splinter
 // Talon, Razor Gale, Graven Dread and Heartwood and their texts, the multipliers
 // (1.0; 0.6 on each enemy; 1.3), his stats (on the Heroic budget) and the lore line.
 // Read by the game: "stop regeneration" is Heal Block, which stops Regen and every
@@ -23,7 +23,7 @@ export const forestGargoyle: ChampionDef = {
   name: 'Forest Gargoyle',
   role: 'Tank',
   rarity: 'heroic',
-  affinity: 'bloom',
+  affinity: 'tide',
   faction: 'court_of_root',
   color: '#85bb5c',
   stats: { hp: 1650, atk: 90, def: 78, spd: 90, crit: 0.025, critDmg: 1, acc: 0, res: 0 },

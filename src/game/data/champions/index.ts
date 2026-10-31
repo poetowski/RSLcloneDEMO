@@ -1,6 +1,6 @@
 // Champion registry. Adding a champion = one data module here + one art module
 // in tools/art/champions/ (see .claude/skills/new-champion). The roster is
-// Jakub's (docs/DESIGN_DECISIONS.md sections 4, 8, 12-34, 37 and 38): the starter,
+// Jakub's (docs/DESIGN_DECISIONS.md sections 4, 8, 12-34 and 37-39): the starter,
 // Captain Gareth; the Rime Scholar, who joins after the first battle; the
 // Skirmisher, the Lineholder and the Quartermaster, Commons of the Azure Crown;
 // the Dominion Medic, the Bloodhound and the Enforcer, Commons of the Sanguine
@@ -11,8 +11,8 @@
 // Skeleton, the Rot Hulk and the Bellringer, Commons of the Ashveil Reign, and
 // the Necromancer, the Automated Soul and Irving Wellbington, its Elites; and
 // the Paladin, the Azure Crown's Heroic and the roster's first, Chief
-// Engineer CJ, the Sanguine Dominion's, and the Forest Gargoyle, the Court of
-// Root's; everything else waits for his design.
+// Engineer CJ, the Sanguine Dominion's, the Forest Gargoyle, the Court of
+// Root's, and Dead Knight Amstron, the Ashveil Reign's; everything else waits for his design.
 import { ChampionDef } from '../types';
 import { associate } from './associate';
 import { automatedSoul } from './automated_soul';
@@ -22,6 +22,7 @@ import { blackRhino } from './black_rhino';
 import { bloodhound } from './bloodhound';
 import { captainGareth } from './captain_gareth';
 import { chiefEngineerCj } from './chief_engineer_cj';
+import { deadKnightAmstron } from './dead_knight_amstron';
 import { dominionMedic } from './dominion_medic';
 import { emissaryHandlings } from './emissary_handlings';
 import { enforcer } from './enforcer';
@@ -45,7 +46,7 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron,
 ];
 
 const byId = new Map(CHAMPIONS.map((c) => [c.id, c]));
@@ -56,4 +57,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, irvingWellbington, jungleHerder, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, skeleton, skirmisher, walkingBush, wildSpeaker };
+export { associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, irvingWellbington, jungleHerder, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, skeleton, skirmisher, walkingBush, wildSpeaker };

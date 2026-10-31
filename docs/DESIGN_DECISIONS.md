@@ -82,6 +82,8 @@ Section 7 lists what is not decided.
 | 2026-10-31 | Chief Engineer CJ, a Heroic Tank of the Sanguine Dominion, made more fantasy and without the words on his brief's suit | 37 |
 | 2026-10-31 | Chief Engineer CJ's A1: a 25% chance of Stun on each hit (50% in the brief); his A3's Stun: 1 turn (2 in the brief) | 37 |
 | 2026-10-31 | The Forest Gargoyle, a Heroic Tank, read as the Court of Root's | 38 |
+| 2026-10-31 | The Forest Gargoyle's affinity: Tide | 38 |
+| 2026-10-31 | Dead Knight Amstron, a Heroic Tank of the Ashveil Reign | 39 |
 
 ---
 
@@ -3099,11 +3101,16 @@ A3 - attacks one enemy, places SPEED DOWN for 2 turns. Also fully deplets target
 passive - places DEFENSE UP for 1 turn on beginning of this champion turns.
 ```
 
-The third Heroic of the roster.
+and, with the next brief:
+
+```
+make gargoyle affinity tide.
+```
+
+The third Heroic of the roster. He is Tide, on Jakub's word.
 
 **Readings.** "affinity = root" names no affinity (Ember, Bloom, Tide) and the brief
-names no faction, so "root" is read as the Court of Root, and his affinity is a
-stand-in, Bloom. "Class = TANK" is the Tank role. "Stop regeneration" is Heal Block,
+names no faction, so "root" is read as the Court of Root. "Class = TANK" is the Tank role. "Stop regeneration" is Heal Block,
 which stops Regen and every other heal. ATTACK DOWN and SPEED DOWN are ATK Down and
 Slow; they are certain but, like every debuff, meet RES. A3's hit comes first, then
 the Slow, then the target's turn meter goes to nothing. The passive's DEF Up is on
@@ -3129,9 +3136,54 @@ his head, the eyes kindle, the wings open a little, and it all sets again. Death
 eyes go out and the wood splits; he tips over all of a piece like a statue pulled
 down and lies on his face, leaves coming down round him.
 
-What the game fills in (stand-ins, listed in CLAUDE.md): the faction and the affinity,
-the names Splinter Talon, Razor Gale, Graven Dread and Heartwood and their texts, the
+What the game fills in (stand-ins, listed in CLAUDE.md): the faction, the names
+Splinter Talon, Razor Gale, Graven Dread and Heartwood and their texts, the
 multipliers (1.0; 0.6 on each enemy; 1.3), his stats (on the Heroic budget: HP 1650,
 ATK 90, DEF 78, SPD 90), the lore line and every detail of his art and effects above.
 He is summoned (section 36), a third Heroic in that pool, and stands in the Verdant
 Grove on his page and in his demos, like the Court's others.
+
+## 39. Dead Knight Amstron (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+also i want new champion.
+rarity HEROIC
+class TANK
+affinity EMBER.
+faction ashveil reign
+name "Dead Knight Amstron"
+design = full plate armor in red and crimson colors. big shoulders. no helmet, only skull. wields spear and tower shield with white emblems.
+kit - A1 - attack 1 target, place SPEED DOWN for 1 turn.
+A2 - attack 1 target, place ATTACK DOWN and DEFENSE DOWN for 2 turns. has 50% chance to STUN target for 1 turn. CD 3 turns.
+A3 - Grant all allies DEFENSE UP for 2 turns, heal every ally by 15% of their MAX HP and place shield on each ally for 2 turns valued at 20% of this champion max hp. CD 4 turns.
+A4 passive - This champion is immune to DEFENSE DOWN debuff.
+```
+
+The Ashveil Reign's first Heroic, the roster's fourth.
+
+**Readings.** SPEED DOWN, ATTACK DOWN and DEFENSE DOWN are Slow, ATK Down and DEF
+Down; they are certain but meet RES like every debuff, and the Stun rolls its 50%
+against RES too. A3 strikes no one. "All allies" and "every ally" include him; each
+heal is a share of that ally's own max HP, each Shield a share of his. The AI keeps
+A3 until an ally is hurt or afflicted; the player may use it at any time. "Immune"
+means DEF Down never lands on him, no roll, shown as IMMUNE.
+
+**As built:** a tall dead knight, closed in plate from the gorget to the sabatons,
+deep crimson edged in bright scarlet, very wide pauldrons of three lames; above the
+gorget the neck's bones and a bare skull with a pale light in its socket. On his far
+arm a tall tower shield, crimson in a scarlet rim, with two white emblems: a skull,
+and under it the Reign's white bone. In his near hand a long spear with a leaf blade
+and a scarlet tassel, its butt on the ground at rest. Hobbling Thrust: drawn back
+level, then driven straight in. Grave Pierce: the spear reversed high behind the
+skull, then driven down with his whole weight. Last Bastion: the shield grounded, the
+spear raised, a pale burst at the skull, and a tower shield of pale light with the
+white bone rising before each ally. Victory: the spear raised, the jaw dropped. Death:
+what held him gives way, the plate comes down in a heap, the skull rolling clear.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Hobbling Thrust,
+Grave Pierce, Last Bastion and Unbreached Plate and their texts, the multipliers (1.0;
+1.2), his stats (on the Heroic budget: HP 1560, ATK 94, DEF 78, SPD 94), the lore line
+and every detail of his art and effects above, the choice of skull and bone for the
+emblems among them. He is summoned (section 36), a fourth Heroic in that pool.

@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
+import { balm, bannerman, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -581,6 +581,15 @@ describe('statuses', () => {
     st = b.startTurn(h);
     expect(st.skip).toBe(true);
     expect(st.events.some((e) => e.kind === 'passive')).toBe(true);
+  });
+
+  it('turns away the one debuff it names with Immune, whatever its RES, and takes the others', () => {
+    const b = new Battle(combatants([breaker]), combatants([unbreached]), { seed: 5 });
+    const r = b.useSkill(b.get('p0'), breaker.skills[0], 'e0');
+    expect(b.has(b.get('e0'), 'def_down')).toBe(false);
+    expect(b.has(b.get('e0'), 'atk_down')).toBe(true);
+    const turned = r.events.filter((e) => e.kind === 'resist');
+    expect(turned.length === 1 && turned[0].kind === 'resist' && [turned[0].status, turned[0].immune]).toEqual(['def_down', true]);
   });
 
   it('answers a critical hit on its holder with Defy: Taunt on itself and a heal of a share of its max HP, once per skill, while it stands', () => {

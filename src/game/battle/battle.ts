@@ -56,7 +56,8 @@ export type BattleEvent =
   | { kind: 'blocked'; target: string; hit: number }
   /** `hit` -1: placed before the skill's first hit (`StatusApp.before`) */
   | { kind: 'status'; target: string; status: StatusId; turns: number; hit: number }
-  | { kind: 'resist'; target: string; status: StatusId; hit: number }
+  /** `immune`: a passive turned it away, whatever the chance */
+  | { kind: 'resist'; target: string; status: StatusId; hit: number; immune?: boolean }
   | { kind: 'expire'; target: string; status: StatusId; hit: number }
   | { kind: 'cleanse'; target: string; status: StatusId; hit: number }
   | { kind: 'dispel'; target: string; status: StatusId; hit: number }
@@ -462,6 +463,11 @@ export class Battle {
   }
 
   private tryApply(actor: Unit, r: Unit, status: StatusId, turns: number, chance: number | undefined, value: number | undefined, hit: number, events: BattleEvent[]) {
+    // a passive may turn a debuff away outright, no roll (Dead Knight Amstron's Unbreached Plate)
+    if (r.champion.passive?.kind === 'immune' && r.champion.passive.immuneTo === status) {
+      events.push({ kind: 'resist', target: r.uid, status, hit, immune: true });
+      return;
+    }
     // a debuff on an enemy meets its RES; a certain one rolls only when RES cuts it
     const land = (chance ?? 1) * (!STATUSES[status].buff && r.team !== actor.team ? landShare(actor.stats.acc, r.stats.res) : 1);
     if ((chance !== undefined || land < 1) && !this.rng.chance(land)) {
