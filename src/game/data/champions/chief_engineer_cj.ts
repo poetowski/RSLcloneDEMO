@@ -17,7 +17,8 @@ import { ChampionDef } from '../types';
 // Decree, Earthen Surge and Master's Eye and their texts, the multipliers
 // (0.5 + 0.5; 0.7 on each enemy, the floor of the norms), the Stun's 1 turn on
 // A1, his stats (on the Heroic budget) and the lore line.
-// His word the same day: "lower chance of stun to 25% instead of 50% on a1".
+// His word the same day: "lower chance of stun to 25% instead of 50% on a1", then
+// of A3's Stun "lower that stun to 1 turn only" (2 turns in the brief).
 // Read by the game: the Stun's 25% is rolled on each of A1's hits and the 10% of
 // turn meter comes off once, after the last hit; A2 strikes no enemy, so nothing
 // counterattacks it; "all allies" and "every ally" include him; the ally with the
@@ -62,11 +63,11 @@ export const chiefEngineerCj: ChampionDef = {
     },
     {
       id: 'earthen_surge', name: 'Earthen Surge', tag: 'All enemies', slot: 3, cooldown: 4,
-      desc: 'Drives the hammer into the ground and the charge runs through all enemies: each has a 35% chance of Stun for 2 turns. Places a Shield worth 15% of his max HP on the ally with the lowest max HP for 2 turns.',
+      desc: 'Drives the hammer into the ground and the charge runs through all enemies: each has a 35% chance of Stun for 1 turn. Places a Shield worth 15% of his max HP on the ally with the lowest max HP for 2 turns.',
       target: 'enemies', anim: 'attack3', approach: 'none',
       hits: [{ mult: 0.7, fx: 'earth_surge' }],
       statuses: [
-        { status: 'stun', turns: 2, chance: 0.35, to: 'targets' },
+        { status: 'stun', turns: 1, chance: 0.35, to: 'targets' },
         { status: 'shield', turns: 2, value: 0.15, to: 'lowestMaxHp' },
       ],
       allyFx: 'surge_plate',

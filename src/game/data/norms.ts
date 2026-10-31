@@ -44,8 +44,8 @@ export const SKILL_NORMS: Record<1 | 2 | 3, { cooldown: [number, number]; single
 
 /** Status application norms: durations in turns. */
 export const STATUS_NORMS = {
-  /** hard control (stun, freeze) never lasts longer than this; 2: Jakub's Chief Engineer CJ's Earthen Surge (2026-10-31), a 35% chance on each enemy */
-  maxControlTurns: 2,
+  /** hard control (stun, freeze) never lasts longer than this */
+  maxControlTurns: 1,
   /** any other status */
   maxTurns: 3,
   /** a guaranteed (chance 1) hard control effect is only allowed on A3 */

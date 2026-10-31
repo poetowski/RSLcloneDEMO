@@ -112,7 +112,7 @@ export const CHAPTERS: Chapter[] = [
     title: 'Crowd Control',
     icon: 'status_stun',
     blocks: [
-      { kind: 'p', text: 'Control effects take turns away. They are the strongest debuffs in the game, so nearly all last a single turn (Chief Engineer CJ\'s Earthen Surge, a chance on each enemy, lasts two), and only an A3 (the Automated Soul\'s Pinning Shot), or a passive answering a blow, may place one with certainty.' },
+      { kind: 'p', text: 'Control effects take turns away. They are the strongest debuffs in the game, so they always last a single turn, and only an A3 (the Automated Soul\'s Pinning Shot), or a passive answering a blow, may place one with certainty.' },
       { kind: 'statuses', ids: ['stun', 'freeze'] },
       { kind: 'figure', id: 'duration' },
       { kind: 'p', text: 'A controlled champion still counts down its effects when its turn is skipped, and cannot counterattack. Control on the enemy\'s fastest champion is usually worth more than raw damage.' },

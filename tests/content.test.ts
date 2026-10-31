@@ -313,14 +313,14 @@ describe('design decisions', () => {
     expect(w?.passive && [w.passive.kind, w.passive.value, w.passive.statuses]).toEqual(['defy', 0.2, [{ status: 'taunt', turns: 1 }]]);
   });
 
-  it('has Chief Engineer CJ of his brief: a Heroic Tank of the Sanguine Dominion, Bloom; an A1 of two hits, a 25% chance of Stun on each (50% in the brief) and 10% of the Turn Meter; an A2 of DEF Up for 2 turns and Regen for 1 on all allies and 7% of every enemy\'s Turn Meter, cooldown 4; an A3 on all enemies, a 35% chance of Stun for 2 turns on each and a Shield of 15% of his max HP for 2 turns on the ally with the lowest max HP, cooldown 4; a passive lifting one random debuff from every ally at the start of his turn', () => {
+  it('has Chief Engineer CJ of his brief: a Heroic Tank of the Sanguine Dominion, Bloom; an A1 of two hits, a 25% chance of Stun on each (50% in the brief) and 10% of the Turn Meter; an A2 of DEF Up for 2 turns and Regen for 1 on all allies and 7% of every enemy\'s Turn Meter, cooldown 4; an A3 on all enemies, a 35% chance of Stun for 1 turn on each (2 in the brief) and a Shield of 15% of his max HP for 2 turns on the ally with the lowest max HP, cooldown 4; a passive lifting one random debuff from every ally at the start of his turn', () => {
     const c = CHAMPIONS.find((x) => x.id === 'chief_engineer_cj');
     expect(c && [c.name, c.rarity, c.role, c.faction, c.affinity]).toEqual(['Chief Engineer CJ', 'heroic', 'Tank', 'sanguine_dominion', 'bloom']);
     expect(c?.skills).toHaveLength(3);
     const [a1, a2, a3] = c?.skills ?? [];
     expect(a1 && [a1.slot, a1.target, a1.hits.length, a1.statuses, a1.tmTargets]).toEqual([1, 'enemy', 2, [{ status: 'stun', turns: 1, chance: 0.25, to: 'targets', perHit: true }], -10]);
     expect(a2 && [a2.slot, a2.target, a2.cooldown, totalMult(a2), a2.statuses, a2.tmTargets]).toEqual([2, 'enemies', 4, 0, [{ status: 'def_up', turns: 2, to: 'allies' }, { status: 'regen', turns: 1, to: 'allies' }], -7]);
-    expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.statuses, totalMult(a3) > 0]).toEqual([3, 'enemies', 4, [{ status: 'stun', turns: 2, chance: 0.35, to: 'targets' }, { status: 'shield', turns: 2, value: 0.15, to: 'lowestMaxHp' }], true]);
+    expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.statuses, totalMult(a3) > 0]).toEqual([3, 'enemies', 4, [{ status: 'stun', turns: 1, chance: 0.35, to: 'targets' }, { status: 'shield', turns: 2, value: 0.15, to: 'lowestMaxHp' }], true]);
     expect(c?.passive?.kind).toBe('purge');
   });
 
