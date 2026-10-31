@@ -5,9 +5,10 @@ import { ChampionDef } from '../types';
 // recommended options): a Common Support of the Sanguine Dominion, Tide (his
 // "you choose for optimizing": Tide strikes Ember, the roster's commonest,
 // strong); a farmer with a huge sheaf of golden wheat. One skill: an A1 on
-// one enemy that takes 20% of its Turn Meter. No A2, no passive. Stand-ins
-// until Jakub sets them: the skill's name and text, A1's 1.0, the stats (the
-// sturdy option, on the Common budget) and the lore line. He is summoned.
+// one enemy that takes 20% of its Turn Meter. No A2, no passive. Jakub
+// approved the affinity, the name, the lore line and the art as shown
+// (2026-10-31); the text, A1's 1.0 and the stats (the sturdy option, on the
+// Common budget) wait for his balance. He is summoned.
 export const harvestSpecialist: ChampionDef = {
   id: 'harvest_specialist',
   name: 'Harvest Specialist',

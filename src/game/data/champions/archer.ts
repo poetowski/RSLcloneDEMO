@@ -4,10 +4,10 @@ import { ChampionDef } from '../types';
 // the worksheet's recommended options): a Common Damage of the Sanguine
 // Dominion, Bloom (abstract: it sets nothing in his look); a lean hunter with
 // a short bow in a hunting vest, no helmet, bald with a goatee. One skill: an
-// A1 on one enemy that ignores 15% of its Defense. No A2, no passive.
-// Stand-ins until Jakub sets them: the skill's name and text, A1's 1.0, the
-// stats (the fast option, on the Common budget) and the lore line. He is
-// summoned.
+// A1 on one enemy that ignores 15% of its Defense. No A2, no passive. Jakub
+// approved the name, the lore line and the art as shown (2026-10-31); the
+// text, A1's 1.0 and the stats (the fast option, on the Common budget) wait
+// for his balance. He is summoned.
 export const archer: ChampionDef = {
   id: 'archer',
   name: 'Archer',

@@ -7,8 +7,9 @@ import { ChampionDef } from '../types';
 // is never summoned and is not in the collection (ENEMIES in index.ts). An A1
 // on one enemy, and a passive: when an enemy skill damages him, a 25% chance
 // of DEF Up on himself for 2 turns, then a rest of 1 of his turns, ready from
-// the start. Stand-ins until Jakub sets them: the names and texts, A1's 1.0,
-// the stats (the sturdy option, on the Common budget) and the lore line.
+// the start. Jakub approved the names, the lore line and the art as shown
+// (2026-10-31); the texts, A1's 1.0, the stats (the sturdy option, on the
+// Common budget) and the stages he fights in wait for his balance.
 export const juniorWard: ChampionDef = {
   id: 'junior_ward',
   name: 'Junior Ward',

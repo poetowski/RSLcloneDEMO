@@ -95,6 +95,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Archer, a Common Damage of the Sanguine Dominion; the worksheet's recommended options approved | 43 |
 | 2026-10-31 | The Junior Ward, a Common Tank of the Sanguine Dominion and the game's first enemy only, fought in 2-1 and 2-4; the worksheet's recommended options approved | 3-5, 44 |
 | 2026-10-31 | The Harvest Specialist, a Common Support of the Sanguine Dominion; Tide, my choice on his word; the golden wheat and the sturdy stats on his word, the rest of the worksheet's recommended options | 45 |
+| 2026-10-31 | The Archer, the Junior Ward and the Harvest Specialist approved as built: their art, names and lore lines, and the Harvest Specialist's Tide | 43-45 |
 
 ---
 
@@ -3433,7 +3434,16 @@ nocked, drawn to his face and held a beat with a hard look, loosed; it flies wit
 fletching and lands as a short line of light driven through, a dull flash and chips.
 Victory: the bow lifted high. Death: he kneels and falls, the bow beside him.
 
-What the game fills in (stand-ins, listed in CLAUDE.md): the skill's name (Piercing
+Shown the previews with the name Piercing Shot and the lore line, Jakub answered (for the Archer, the
+Junior Ward and the Harvest Specialist together):
+
+```
+All good commit merge push
+```
+
+so the art, the name Piercing Shot and the lore line are his.
+
+What the game filled in before that (listed in CLAUDE.md): the skill's name (Piercing
 Shot) and text, A1's 1.0, his stats (the fast option, on the Common budget: HP 960, ATK
 112, DEF 56, SPD 112, CRIT 4%, score 397), the lore line ("A hunter of the Sanguine
 Dominion who learned to find the soft place under a beast's hide, and now finds it under
@@ -3494,7 +3504,16 @@ of the two Followers, and in 2-4 in place of the Bloodhound (a Common Tank of th
 Dominion too). 2-1 got easier with him (94%), so it runs at 1.26 (was 1.08; 88%); 2-4
 stayed in its band (82%).
 
-What the game fills in (stand-ins, listed in CLAUDE.md): the names Long Thrust and Hold
+Shown the previews with the names Long Thrust and Hold Fast and the lore line, Jakub answered (for the Archer, the
+Junior Ward and the Harvest Specialist together):
+
+```
+All good commit merge push
+```
+
+so the art, the names Long Thrust and Hold Fast and the lore line are his.
+
+What the game filled in before that (listed in CLAUDE.md): the names Long Thrust and Hold
 Fast and their texts, A1's 1.0, his stats (the sturdy option, on the Common budget: HP
 1380, ATK 80, DEF 68, SPD 94, CRIT 2.5%, score 396), the lore line ("A junior of the
 Sanguine Dominion's ward, tall for his years and given a spear longer than he is; he
@@ -3544,7 +3563,16 @@ like a flail, a gold streak behind it; it lands in a dull flash with golden grai
 out and chaff drifting down over the target. Victory: the sheaf raised high. Death: he
 kneels, the sheaf falls beside him.
 
-What the game fills in (stand-ins, listed in CLAUDE.md): the affinity (Tide, my choice
+Shown the previews with the name Threshing Blow and the lore line, Jakub answered (for the Archer, the
+Junior Ward and the Harvest Specialist together):
+
+```
+All good commit merge push
+```
+
+so the art, the name Threshing Blow and the lore line are his, with Tide for his affinity.
+
+What the game filled in before that (listed in CLAUDE.md): the affinity (Tide, my choice
 on his word), the skill's name (Threshing Blow) and text, A1's 1.0, his stats (the
 sturdy option, on the Common budget: HP 1320, ATK 88, DEF 66, SPD 98, CRIT 2.5%, score
 400), the lore line ("A harvest specialist of the Sanguine Dominion who feeds its
