@@ -86,6 +86,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | Dead Knight Amstron, a Heroic Tank of the Ashveil Reign | 39 |
 | 2026-10-31 | Dead Knight Amstron's A2: a 40% chance of Stun (50% in the brief) | 39 |
 | 2026-10-31 | The Strongman, a Common Damage of the Azure Crown; the worksheet's recommended options approved | 40 |
+| 2026-10-31 | The Strongman approved as built: his art, the names Stone Slam and Gather Strength, the lore line | 40 |
 
 ---
 
@@ -3231,10 +3232,20 @@ buckle; charcoal breeches and brown boots. Stone Slam: the stone raised overhead
 then brought down before him. Gather Strength: he crouches, then heaves the stone up
 before his face with a shout. Victory: the stone raised overhead.
 
-What the game fills in (stand-ins, listed in CLAUDE.md): the names Stone Slam and
-Gather Strength and their texts, A1's 1.0, his stats (the heavy option, on the Common
-budget: HP 1080, ATK 118, DEF 56, SPD 100, CRIT 3.5%, score 396), the lore line and
-every detail of his art and effects above (the stone's grey, the belt's buckle, the
+Shown to Jakub in previews (key frames, Stone Slam in battle, the summon ceremony,
+the skill icons) with the names and the lore line, he answered:
+
+```
+Approve
+```
+
+so the art, the names Stone Slam and Gather Strength and the lore line are his: "A
+quarry-born strongman of the Azure Crown, who lifts whatever the road puts in his way
+and carries the heaviest stone he has found as proof of his strength."
+
+What the game filled in before that (listed in CLAUDE.md): the skills' texts, A1's
+1.0, his stats (the heavy option, on the Common budget: HP 1080, ATK 118, DEF 56, SPD
+100, CRIT 3.5%, score 396), and every detail of his art and effects above (the stone's grey, the belt's buckle, the
 hair, the breeches; Gareth's `heavy_blow` for the slam and Brace's dust for the
 buff). He is summoned (section 36), a thirteenth Common in that pool; with him in it,
 1-5 runs at 0.88 and 2-1 to 2-4 at 1.08, 0.74, 0.94 and 1.04.

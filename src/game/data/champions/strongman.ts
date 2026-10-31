@@ -4,10 +4,9 @@ import { ChampionDef } from '../types';
 // options): a Common Damage of the Azure Crown, Tide (abstract: it sets
 // nothing in his look), a naked strong man who lifts a heavy stone. One A1
 // that brings the stone down on one enemy, and an A2 that raises his own
-// Attack for 2 turns. No passive. Stand-ins until Jakub sets them: the names
-// and texts of both skills, the multipliers (1.0; the A2 is pure buff), the
-// stats (the heavy option, on the Common budget), the lore line, and the stage
-// that brings him (not yet chosen).
+// Attack for 2 turns. No passive. Jakub approved the names, the lore line and
+// the art as shown (2026-10-31); the texts, A1's 1.0 and the stats (the heavy
+// option, on the Common budget) wait for his balance. He is summoned.
 export const strongman: ChampionDef = {
   id: 'strongman',
   name: 'Strongman',
