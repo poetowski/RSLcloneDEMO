@@ -91,6 +91,8 @@ export const MAT = {
   copper: m('copper', 'metal', ['#260d06', '#5a2110', '#8e3f1c', '#c0632c', '#e8934e', '#ffd6a8']),
   /** white cloth, cool and crisp: the stripes of the Associate's azure robe */
   whiteCloth: m('whiteCloth', 'cloth', ['#1c2234', '#4a5674', '#8a96b4', '#c8d2e6', '#eef2fa', '#ffffff']),
+  /** straw and ripe wheat: the Harvest Specialist's hat and sheaf */
+  straw: m('straw', 'matte', ['#2e1c0c', '#5c3a14', '#946222', '#cf9a3a', '#efcb6a', '#fff0a8']),
   /** a warm yellow cloth: the Last Riter's cope and hood */
   yellowCloth: m('yellowCloth', 'cloth', ['#2a1606', '#5c360c', '#966016', '#cf9424', '#efc444', '#fff0a0']),
 

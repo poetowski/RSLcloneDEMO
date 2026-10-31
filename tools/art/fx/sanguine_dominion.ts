@@ -631,4 +631,24 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
       if (i >= 1) sparks(b, cx + 4, cy, 9, 24, (i - 1) / 6, DULL, 607, 10);
     },
   },
+  /** Threshing Blow: the sheaf lands in a dull flash, golden grain flung out and chaff drifting down over the target, clinging. */
+  chaff_burst: {
+    w: 72, h: 64, n: 9, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 6, 6, 6],
+    draw: (b, t, i) => {
+      const cx = 36, cy = 30;
+      if (i >= 0 && i < 3) burst(b, cx, cy, 8, [2, 3, 2][i], [10, 14, 9][i], [2.2, 2.4, 1.6][i], DULL, 0.2);
+      if (i >= 1) sparks(b, cx, cy, 16, 26, (i - 1) / 8, ramps.gold, 701, 14);
+      // chaff: pale husks drifting down and settling round the target
+      const r = rng(709);
+      for (let k = 0; k < 14; k++) {
+        const x0 = cx + (r() - 0.5) * 40, y0 = cy - 14 + (r() - 0.5) * 16, ph = r();
+        const tt = Math.max(0, Math.min(1, t * 1.3 - ph * 0.3));
+        if (tt <= 0) continue;
+        const x = Math.round(x0 + Math.sin(tt * 6 + k) * 3), y = Math.round(y0 + tt * 26);
+        if (!dith(x, y, 1 - tt * 0.7)) continue;
+        b.set(x, y, ramps.gold[tt < 0.5 ? 4 : 3]);
+        if (k % 2) b.set(x + 1, y, ramps.sand[3]);
+      }
+    },
+  },
 };

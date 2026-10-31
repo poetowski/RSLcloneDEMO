@@ -12,6 +12,7 @@ import { dominionMedic } from './dominion_medic.ts';
 import { enforcer } from './enforcer.ts';
 import { follower } from './follower.ts';
 import { groveKeeper } from './grove_keeper.ts';
+import { harvestSpecialist } from './harvest_specialist.ts';
 import { irvingWellbington } from './irving_wellbington.ts';
 import { emissaryHandlings } from './emissary_handlings.ts';
 import { jungleHerder } from './jungle_herder.ts';
@@ -35,7 +36,7 @@ import { walkingBush } from './walking_bush.ts';
 import { wildSpeaker } from './wild_speaker.ts';
 
 export const CHAMPION_ART: Record<string, ChampionArt> = {
-  captain_gareth: captainGareth, rime_scholar: rimeScholar, follower, skirmisher, strongman, town_guard: townGuard, last_riter: lastRiter, archer, junior_ward: juniorWard, dominion_medic: dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
+  captain_gareth: captainGareth, rime_scholar: rimeScholar, follower, skirmisher, strongman, town_guard: townGuard, last_riter: lastRiter, archer, harvest_specialist: harvestSpecialist, junior_ward: juniorWard, dominion_medic: dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
   walking_bush: walkingBush, wild_speaker: wildSpeaker, jungle_herder: jungleHerder, associate, emissary_handlings: emissaryHandlings, black_rhino: blackRhino, red_cloak: redCloak, grove_keeper: groveKeeper, big_ears: bigEars, skeleton, rot_hulk: rotHulk, bellringer, necromancer, automated_soul: automatedSoul, irving_wellbington: irvingWellbington, paladin, chief_engineer_cj: chiefEngineerCj, forest_gargoyle: forestGargoyle, dead_knight_amstron: deadKnightAmstron,
 };
 

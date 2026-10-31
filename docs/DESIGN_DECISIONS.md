@@ -94,6 +94,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Last Riter approved as built: her art, the names Incense Veil and Last Unction, the lore line | 42 |
 | 2026-10-31 | The Archer, a Common Damage of the Sanguine Dominion; the worksheet's recommended options approved | 43 |
 | 2026-10-31 | The Junior Ward, a Common Tank of the Sanguine Dominion and the game's first enemy only, fought in 2-1 and 2-4; the worksheet's recommended options approved | 3-5, 44 |
+| 2026-10-31 | The Harvest Specialist, a Common Support of the Sanguine Dominion; Tide, my choice on his word; the golden wheat and the sturdy stats on his word, the rest of the worksheet's recommended options | 45 |
 
 ---
 
@@ -3499,3 +3500,55 @@ Fast and their texts, A1's 1.0, his stats (the sturdy option, on the Common budg
 Sanguine Dominion's ward, tall for his years and given a spear longer than he is; he
 has not lost a fight yet, and has not fought many.") and every detail of his art and
 effects above.
+
+## 45. The Harvest Specialist (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion.
+Sanguine dominion
+Rarity common
+Class support
+Affinity you choose for optimizing
+Name Harvest Specialist
+design farmer guy holding big crops.
+Kit A1 attack target single. Remove 20% of target turn meter.
+```
+
+and, to the worksheet that followed (the affinity, quick stats or sturdy ones, the
+crops, the A1's multiplier and name, how the drain reads, the kit's size, the lore
+line):
+
+```
+Golden wheat. Sturdy support. Go
+```
+
+read as the sheaf of golden wheat, the sturdy stats, and a yes to every other
+recommended option.
+
+**Readings.** "Affinity you choose for optimizing": Tide, as Tide strikes Ember strong
+and Ember is the roster's commonest affinity (12 of 32); it is weak only to Bloom, and
+it evens the Dominion's spread (Ember 2, Bloom 4, Tide 3). "Big crops" is a huge sheaf of
+golden wheat, swung like a flail. "Remove 20% of target turn meter" is certain, with no
+RES roll, as every drain in the game is, after the hit (a target the hit fells loses
+nothing). The kit is the A1 alone: no A2, no passive.
+
+**As built:** a weathered farmer: a wide straw hat with a red band and a small red
+hexagon pinned to it, a rough linen shirt with its sleeves rolled, a dark-red waistcoat
+with straw-coloured buttons, a plain belt, brown trousers, work boots, a sun-browned
+face and a short brown beard; the sheaf, taller than his arm, a thick bundle of stalks
+bound twice with red twine near the grip, fanning to a crown of heavy ears with awns,
+carried over his shoulder. Threshing Blow: the sheaf off his shoulder, high, and down
+like a flail, a gold streak behind it; it lands in a dull flash with golden grain flung
+out and chaff drifting down over the target. Victory: the sheaf raised high. Death: he
+kneels, the sheaf falls beside him.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the affinity (Tide, my choice
+on his word), the skill's name (Threshing Blow) and text, A1's 1.0, his stats (the
+sturdy option, on the Common budget: HP 1320, ATK 88, DEF 66, SPD 98, CRIT 2.5%, score
+400), the lore line ("A harvest specialist of the Sanguine Dominion who feeds its
+armies, and knows that a field cut at the right hour holds an enemy back better than a
+wall.") and every detail of his art and effects above (`straw`, a new material, for the
+hat and the wheat). He is summoned (section 36), a seventeenth Common in that pool;
+with him in it 2-3 rose to the top of its band (92%), so it runs at 0.98 (was 0.94).

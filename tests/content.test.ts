@@ -883,7 +883,7 @@ describe('summoning', () => {
     const chance = wishChance(pool, wish);
     expect(chance).toBeGreaterThan(wishChance(pool, wish, false));
     expect(chance).toBeLessThan(1);
-    expect(plain.get('wild_speaker')).toBeCloseTo(0.7 / 16, 9);
+    expect(plain.get('wild_speaker')).toBeCloseTo(0.7 / 17, 9);
     expect(wishChance(pool, {})).toBe(0);
   });
 

@@ -30,6 +30,7 @@ import { enforcer } from './enforcer';
 import { follower } from './follower';
 import { forestGargoyle } from './forest_gargoyle';
 import { groveKeeper } from './grove_keeper';
+import { harvestSpecialist } from './harvest_specialist';
 import { irvingWellbington } from './irving_wellbington';
 import { jungleHerder } from './jungle_herder';
 import { juniorWard } from './junior_ward';
@@ -51,7 +52,7 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist,
 ];
 
 /**
@@ -71,4 +72,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { archer, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };
+export { archer, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, harvestSpecialist, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };
