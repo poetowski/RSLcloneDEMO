@@ -91,6 +91,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Town Guard approved as built: his art, the names Watch Cut and Shield Check, the lore line | 41 |
 | 2026-10-31 | The Last Riter, a Common Support of the Azure Crown; the worksheet's recommended options approved | 42 |
 | 2026-10-31 | The Last Riter's hood made deep, to cover her face | 42 |
+| 2026-10-31 | The Last Riter approved as built: her art, the names Incense Veil and Last Unction, the lore line | 42 |
 
 ---
 
@@ -3370,10 +3371,15 @@ I don't like how hare hoody and doesn't cover face. Do it
 ```
 
 read as: the hood made deep, so that it covers her face (built as the Necromancer's
-is: her eyes in its shadow, no hair showing).
+is: her eyes in its shadow, no hair showing). Shown it, he answered:
 
-What the game fills in (stand-ins, listed in CLAUDE.md): the names Incense Veil and
-Last Unction and their texts, her stats (the fast option, on the Common budget, ATK at
+```
+All good now
+```
+
+so the art, the names Incense Veil and Last Unction and the lore line are his.
+
+What the game filled in before that (listed in CLAUDE.md): the skills' texts, her stats (the fast option, on the Common budget, ATK at
 the floor: HP 1260, ATK 70, DEF 64, SPD 110, CRIT 2.5%, score 387), the lore line ("A
 rite-keeper of the Azure Crown who walks behind its soldiers with a casket of olibanum
 and says the last rites over those who fall; where her smoke drifts, the dying stand a

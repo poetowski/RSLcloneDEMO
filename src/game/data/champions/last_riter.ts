@@ -7,9 +7,10 @@ import { ChampionDef } from '../types';
 // with its hood up, an ornate casket of olibanum in her hands. She never
 // strikes: an A1 that heals her and shields the ally with the lowest max HP
 // but her, and an A2 that takes 75% of one enemy's turn meter and heals that
-// same ally, cooldown 4. No passive. Stand-ins until Jakub sets them: the
-// names and texts of both skills, the stats (the fast option, on the Common
-// budget, ATK at the floor) and the lore line. She is summoned.
+// same ally, cooldown 4. No passive. Jakub approved the names, the lore line
+// and the art as shown (2026-10-31, the hood deep over her face on his word);
+// the texts and the stats (the fast option, on the Common budget, ATK at the
+// floor) wait for his balance. She is summoned.
 export const lastRiter: ChampionDef = {
   id: 'last_riter',
   name: 'Last Riter',
