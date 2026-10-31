@@ -87,6 +87,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | Dead Knight Amstron's A2: a 40% chance of Stun (50% in the brief) | 39 |
 | 2026-10-31 | The Strongman, a Common Damage of the Azure Crown; the worksheet's recommended options approved | 40 |
 | 2026-10-31 | The Strongman approved as built: his art, the names Stone Slam and Gather Strength, the lore line | 40 |
+| 2026-10-31 | The Town Guard, a Common Tank of the Azure Crown; the worksheet's recommended options approved | 41 |
 
 ---
 
@@ -3249,3 +3250,51 @@ What the game filled in before that (listed in CLAUDE.md): the skills' texts, A1
 hair, the breeches; Gareth's `heavy_blow` for the slam and Brace's dust for the
 buff). He is summoned (section 36), a thirteenth Common in that pool; with him in it,
 1-5 runs at 0.88 and 2-1 to 2-4 at 1.08, 0.74, 0.94 and 1.04.
+
+## 41. The Town Guard (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion.
+Rarity common
+Faction azure crown
+Class tank
+Affinity ember.
+Name Town Guard
+Design light armour, sword and round shield. Boots. No helmet. Long blonde hair male.
+Kit A1 - damage 1 enemy
+A2 - damage 1 enemy and has 50% chance to debuffs target with attack down for 1 turn. Cd 3 turns
+```
+
+and, to the worksheet that followed (sturdy stats or a fighting guard's, names, A2's
+multiplier, the look, the lore line), each with a recommended option:
+
+```
+Go
+```
+
+read as a yes to every recommended option.
+
+**Readings.** "Class tank" is the Tank role. "Attack down" is ATK Down (-25%), placed
+after the hit at a 50% chance that meets RES like every debuff. No Taunt, so the AI
+mostly aims past him until his allies are low (MDA T20). No passive.
+
+**As built:** a guard in light gear, not the Paladin's plate: a padded blue tabard
+over a leather jerkin, the Crown's small gold crown on the chest, leather sleeves
+with dark bracers, a belt with an iron buckle, charcoal breeches and tall brown boots;
+straight blonde hair to the shoulders, an ordinary face, no helmet. A plain round
+shield of wooden planks in an iron rim with an iron boss on the far arm, a straight
+arming sword in the near hand. Watch Cut: the sword raised high and cut down, a plain
+white streak. Shield Check: the shield drawn in, then driven forward rim first into a
+dull flash. Victory: the sword raised. Death: he kneels and falls on his back, the
+shield beside him.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the names Watch Cut and
+Shield Check and their texts, the multipliers (1.0, 1.3), his stats (the sturdy
+option, on the Common budget: HP 1320, ATK 82, DEF 70, SPD 94, CRIT 2.5%, score
+397), the lore line ("A town guard of the Azure Crown, who kept the gate of a quiet
+market town until the Loom broke and the road brought war to it.") and every detail
+of his art and effects above (Gareth's `sword_cut` for the cut, the Lineholder's
+`mace_blow` for the shield). He is summoned (section 36), a fourteenth Common in that
+pool; with him in it every stage stayed in its band.
