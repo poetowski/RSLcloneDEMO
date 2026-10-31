@@ -115,6 +115,8 @@ export interface SkillDef {
   tmLowestAlly?: number;
   /** the actor ends the turn with this much turn meter instead of 0 */
   selfTm?: number;
+  /** its hits ignore this share of the target's Defense as it stands in battle, after DEF Up and DEF Down (the Archer's Piercing Shot: 0.15) */
+  ignoreDef?: number;
   /** bonus damage when the target is below a HP fraction */
   execute?: { below: number; mult: number };
   /** presentation */
@@ -181,7 +183,7 @@ export interface PassiveDef {
   kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
-  /** rebuke and tend: the champion's own turns the passive rests after it acts */
+  /** rebuke, tend and ward: the champion's own turns the passive rests after it acts (a ward is ready from the start) */
   cooldown?: number;
   /** stat and fallen: the stat it raises */
   stat?: StatId;

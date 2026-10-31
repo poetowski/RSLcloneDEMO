@@ -173,8 +173,8 @@ export const LOCATIONS: LocationDef[] = [
       {
         id: '2-1',
         blurb: APPROACH,
-        enemies: [{ champion: 'follower' }, { champion: 'follower' }],
-        power: 1.08,
+        enemies: [{ champion: 'junior_ward' }, { champion: 'follower' }],
+        power: 1.26,
       },
       {
         id: '2-2',
@@ -186,19 +186,19 @@ export const LOCATIONS: LocationDef[] = [
         id: '2-3',
         blurb: ARRIVAL,
         enemies: [{ champion: 'lineholder' }, { champion: 'follower' }, { champion: 'quartermaster' }],
-        power: 0.94,
+        power: 0.98,
       },
       {
         id: '2-4',
         blurb: ARRIVAL,
-        enemies: [{ champion: 'bloodhound' }, { champion: 'follower' }, { champion: 'dominion_medic' }],
+        enemies: [{ champion: 'junior_ward' }, { champion: 'follower' }, { champion: 'dominion_medic' }],
         power: 1.04,
       },
       {
         id: '2-5',
         blurb: CONTEST,
         enemies: [{ champion: 'enforcer' }, { champion: 'skirmisher' }, { champion: 'follower' }],
-        power: 0.82,
+        power: 0.86,
       },
       {
         id: '2-6',

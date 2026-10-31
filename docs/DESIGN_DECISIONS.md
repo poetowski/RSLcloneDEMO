@@ -92,6 +92,10 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Last Riter, a Common Support of the Azure Crown; the worksheet's recommended options approved | 42 |
 | 2026-10-31 | The Last Riter's hood made deep, to cover her face | 42 |
 | 2026-10-31 | The Last Riter approved as built: her art, the names Incense Veil and Last Unction, the lore line | 42 |
+| 2026-10-31 | The Archer, a Common Damage of the Sanguine Dominion; the worksheet's recommended options approved | 43 |
+| 2026-10-31 | The Junior Ward, a Common Tank of the Sanguine Dominion and the game's first enemy only, fought in 2-1 and 2-4; the worksheet's recommended options approved | 3-5, 44 |
+| 2026-10-31 | The Harvest Specialist, a Common Support of the Sanguine Dominion; Tide, my choice on his word; the golden wheat and the sturdy stats on his word, the rest of the worksheet's recommended options | 45 |
+| 2026-10-31 | The Archer, the Junior Ward and the Harvest Specialist approved as built: their art, names and lore lines, and the Harvest Specialist's Tide | 43-45 |
 
 ---
 
@@ -3386,3 +3390,193 @@ and says the last rites over those who fall; where her smoke drifts, the dying s
 little longer.") and every detail of her art and effects above (`yellowCloth`, a new
 material, for the cope). She is summoned (section 36), a fifteenth Common in that
 pool; with her in it 1-6 fell under its band (53%), so it runs at 0.86 (was 0.90).
+
+## 43. The Archer (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion.
+Bloom affinity
+Faction sanguine dominion.
+Class damage
+Common rarity
+Name Archer
+Design short bow archer in hunting vest no helmet. Bald buy with goatee.
+Kit A1 attack one target and ignore 15% of target defense.
+```
+
+and, to the worksheet that followed (fast stats or heavier ones, the skill's name, how
+the 15% is read, the kit's size, the look, the lore line), each with a recommended
+option:
+
+```
+Go
+```
+
+read as a yes to every recommended option.
+
+**Readings.** "Class damage" is the Damage role; "bald buy" a bald guy. The kit is the
+A1 alone, as the brief names nothing else (like the Skirmisher's): no A2, no passive.
+"Ignore 15% of target defense" takes 15% off the target's Defense as it stands in
+battle, after DEF Up and DEF Down, for that arrow: it strikes as if the target had 85%
+of its DEF, about 18% more damage at any DEF.
+
+**New rule.** A skill's `ignoreDef` (MECHANICS_GUIDE.md, the Academy, DDD INV-C29).
+
+**As built:** a lean hunter, not Red Cloak (the Dominion's other bald man with a goatee,
+in plate with a cloak and a zweihander): a vest of brown leather laced down the front
+over a dark-red shirt, its sleeves rolled to the elbow, a small red hexagon badge on the
+vest, a leather bracer on his bow arm, a belt with an iron buckle, dark breeches, brown
+boots; a quiver of red-fletched arrows on his back; a short recurve bow of dark wood; a
+bald, tanned head with a shine on the crown, a dark goatee. Piercing Shot: an arrow
+nocked, drawn to his face and held a beat with a hard look, loosed; it flies with red
+fletching and lands as a short line of light driven through, a dull flash and chips.
+Victory: the bow lifted high. Death: he kneels and falls, the bow beside him.
+
+Shown the previews with the name Piercing Shot and the lore line, Jakub answered (for the Archer, the
+Junior Ward and the Harvest Specialist together):
+
+```
+All good commit merge push
+```
+
+so the art, the name Piercing Shot and the lore line are his.
+
+What the game filled in before that (listed in CLAUDE.md): the skill's name (Piercing
+Shot) and text, A1's 1.0, his stats (the fast option, on the Common budget: HP 960, ATK
+112, DEF 56, SPD 112, CRIT 4%, score 397), the lore line ("A hunter of the Sanguine
+Dominion who learned to find the soft place under a beast's hide, and now finds it under
+armour.") and every detail of his art and effects above. He is summoned (section 36), a
+sixteenth Common in that pool; with him in it 2-5 rose over its band (93%), so it runs
+at 0.86 (was 0.82).
+
+## 44. The Junior Ward (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new enemy.
+Sanguine dominion
+Rarity common
+Role tank
+Affinity bloom.
+Name Junior Ward
+Design young tall man holding long spear. Wearing black tunic. Naked arms.
+Kit A1 attack single target.
+A2 passive - when hit, has 25% chance to place defense up on himself for 2 turns. CD 1turn, so this can be used every other turn. can be used on first turn as well.
+```
+
+and, to the worksheet that followed (enemy only or also summoned, the stages he fights
+in, sturdy stats or lighter ones, names, how the passive reads, the look, the lore
+line), each with a recommended option:
+
+```
+Go
+```
+
+read as a yes to every recommended option.
+
+**Readings.** "New enemy" is an enemy only, the game's first: he fights only on the
+enemy side of stages and is never summoned, collected or put in a team. His "A2
+passive" is his passive (as the Skeleton's was); he has no A2. "When hit" is an enemy
+skill that damages him and leaves him standing, answered once per skill, with a 25%
+chance of DEF Up for 2 turns (placed on him, it covers his next two turns). "CD 1 turn"
+is a rest of 1 of his own turns after it answers, so it answers at most every other
+turn of his; "can be used on first turn as well" is ready from the start of the
+battle. He has no Taunt.
+
+**New rules.** A ward with a `cooldown` (MECHANICS_GUIDE.md, the Academy, DDD
+INV-C30); enemies only, `ENEMIES` (DDD INV-C31).
+
+**As built:** a tall young man, taller than the Town Guard: a black sleeveless tunic to
+mid-thigh, belted with a red sash knotted at his side, a small red hexagon on the
+chest; bare arms; dark-brown breeches and plain leather boots; short brown hair and a
+clean-shaven, young face; a spear longer than he is, an ash shaft, an iron butt, a
+red binding under a leaf-shaped head of steel, held upright in his near hand, its butt
+on the ground. Long Thrust: the spear drawn back level at his hip, then a lunge that
+drives it straight in, landing as Dead Knight Amstron's plain lance of light. Hold
+Fast: the Lineholder's ring of dust at his feet. Victory: the spear raised high.
+Death: he kneels on the spear, it falls away, he goes down.
+
+**Where he fights** (stand-ins; stages' enemies wait for Jakub): in 2-1 in place of one
+of the two Followers, and in 2-4 in place of the Bloodhound (a Common Tank of the
+Dominion too). 2-1 got easier with him (94%), so it runs at 1.26 (was 1.08; 88%); 2-4
+stayed in its band (82%).
+
+Shown the previews with the names Long Thrust and Hold Fast and the lore line, Jakub answered (for the Archer, the
+Junior Ward and the Harvest Specialist together):
+
+```
+All good commit merge push
+```
+
+so the art, the names Long Thrust and Hold Fast and the lore line are his.
+
+What the game filled in before that (listed in CLAUDE.md): the names Long Thrust and Hold
+Fast and their texts, A1's 1.0, his stats (the sturdy option, on the Common budget: HP
+1380, ATK 80, DEF 68, SPD 94, CRIT 2.5%, score 396), the lore line ("A junior of the
+Sanguine Dominion's ward, tall for his years and given a spear longer than he is; he
+has not lost a fight yet, and has not fought many.") and every detail of his art and
+effects above.
+
+## 45. The Harvest Specialist (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion.
+Sanguine dominion
+Rarity common
+Class support
+Affinity you choose for optimizing
+Name Harvest Specialist
+design farmer guy holding big crops.
+Kit A1 attack target single. Remove 20% of target turn meter.
+```
+
+and, to the worksheet that followed (the affinity, quick stats or sturdy ones, the
+crops, the A1's multiplier and name, how the drain reads, the kit's size, the lore
+line):
+
+```
+Golden wheat. Sturdy support. Go
+```
+
+read as the sheaf of golden wheat, the sturdy stats, and a yes to every other
+recommended option.
+
+**Readings.** "Affinity you choose for optimizing": Tide, as Tide strikes Ember strong
+and Ember is the roster's commonest affinity (12 of 32); it is weak only to Bloom, and
+it evens the Dominion's spread (Ember 2, Bloom 4, Tide 3). "Big crops" is a huge sheaf of
+golden wheat, swung like a flail. "Remove 20% of target turn meter" is certain, with no
+RES roll, as every drain in the game is, after the hit (a target the hit fells loses
+nothing). The kit is the A1 alone: no A2, no passive.
+
+**As built:** a weathered farmer: a wide straw hat with a red band and a small red
+hexagon pinned to it, a rough linen shirt with its sleeves rolled, a dark-red waistcoat
+with straw-coloured buttons, a plain belt, brown trousers, work boots, a sun-browned
+face and a short brown beard; the sheaf, taller than his arm, a thick bundle of stalks
+bound twice with red twine near the grip, fanning to a crown of heavy ears with awns,
+carried over his shoulder. Threshing Blow: the sheaf off his shoulder, high, and down
+like a flail, a gold streak behind it; it lands in a dull flash with golden grain flung
+out and chaff drifting down over the target. Victory: the sheaf raised high. Death: he
+kneels, the sheaf falls beside him.
+
+Shown the previews with the name Threshing Blow and the lore line, Jakub answered (for the Archer, the
+Junior Ward and the Harvest Specialist together):
+
+```
+All good commit merge push
+```
+
+so the art, the name Threshing Blow and the lore line are his, with Tide for his affinity.
+
+What the game filled in before that (listed in CLAUDE.md): the affinity (Tide, my choice
+on his word), the skill's name (Threshing Blow) and text, A1's 1.0, his stats (the
+sturdy option, on the Common budget: HP 1320, ATK 88, DEF 66, SPD 98, CRIT 2.5%, score
+400), the lore line ("A harvest specialist of the Sanguine Dominion who feeds its
+armies, and knows that a field cut at the right hour holds an enemy back better than a
+wall.") and every detail of his art and effects above (`straw`, a new material, for the
+hat and the wheat). He is summoned (section 36), a seventeenth Common in that pool;
+with him in it 2-3 rose to the top of its band (92%), so it runs at 0.98 (was 0.94).

@@ -19,7 +19,7 @@ import { combatants, Combatant } from '../src/game/battle/battle';
 import { simulate } from '../src/game/battle/sim';
 import { BOSS_HP, LOCATIONS, STARTERS } from '../src/game/data/campaign';
 import { JOURNEY } from '../src/game/data/challenges';
-import { CHAMPIONS, champion } from '../src/game/data/champions';
+import { ALL_CHAMPIONS, CHAMPIONS, champion } from '../src/game/data/champions';
 import { auditChampion, budgetDelta, RARITY_BUDGET, statScore } from '../src/game/data/norms';
 import { FRAGMENTS_PER_SHARD } from '../src/game/data/summoning';
 import { ChampionDef } from '../src/game/data/types';
@@ -66,13 +66,13 @@ function pickTeam(r: () => number, pool: ChampionDef[], size: number, must?: Cha
 }
 
 console.log('\n== 1. Stat budget (score vs rarity target, tolerance 5%) ==');
-for (const c of CHAMPIONS) {
+for (const c of ALL_CHAMPIONS) {
   const d = budgetDelta(c);
   console.log(`${flag(Math.abs(d) <= 0.05)} ${c.id.padEnd(12)} ${c.rarity.padEnd(10)} score ${statScore(c.stats).toFixed(0)} / ${RARITY_BUDGET[c.rarity]}  (${d >= 0 ? '+' : ''}${(d * 100).toFixed(1)}%)`);
 }
 
 console.log('\n== 2. Kit norms ==');
-for (const c of CHAMPIONS) {
+for (const c of ALL_CHAMPIONS) {
   const issues = auditChampion(c).filter((x) => !x.startsWith('stat score'));
   console.log(`${flag(issues.length === 0)} ${c.id.padEnd(12)} ${issues.length ? issues.join('; ') : 'within norms'}`);
 }

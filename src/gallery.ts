@@ -1,7 +1,7 @@
 // Sprite gallery: plays every champion animation, effect and icon from the
 // generated atlases so the art can be reviewed without starting a battle.
 import './gallery.css';
-import { CHAMPIONS } from './game/data/champions';
+import { ALL_CHAMPIONS as CHAMPIONS } from './game/data/champions';
 import { FACTIONS, RARITIES } from './game/data/meta';
 import { ZONES } from './game/data/zones';
 import { Assets, loadAssets } from './game/view/assets';

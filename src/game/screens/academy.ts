@@ -5,7 +5,7 @@
 // skill in the arena.
 import { H, W } from '../../engine/screen';
 import { App } from '../app';
-import { champion, CHAMPIONS } from '../data/champions';
+import { ALL_CHAMPIONS, champion, CHAMPIONS } from '../data/champions';
 import { Block, Chapter, chapter, CHAPTERS, FigureId } from '../data/codex';
 import { AFFINITIES, RARITIES, ROLES } from '../data/meta';
 import { STATUSES } from '../data/statuses';
@@ -355,7 +355,7 @@ export class AcademyScreen extends BaseScreen {
 }
 
 function ownerOf(skill: string): string {
-  const owner = CHAMPIONS.find((c) => c.skills.some((s) => s.id === skill));
+  const owner = ALL_CHAMPIONS.find((c) => c.skills.some((s) => s.id === skill));
   if (!owner) throw new Error('no owner for ' + skill);
   return owner.id;
 }

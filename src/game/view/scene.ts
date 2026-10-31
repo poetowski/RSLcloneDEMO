@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare', 'grudge_runes', 'searing_cut', 'beacon_flare', 'beacon_glare', 'beacon_ward', 'trial_blaze', 'trial_flames', 'jolt_blow', 'jolt_slam', 'decree_sigil', 'decree_lull', 'decree_ward', 'earth_surge', 'surge_plate', 'eye_cleared', 'talon_rend', 'leaf_gale', 'dread_howl', 'heartwood_set', 'dead_thrust', 'grave_pierce', 'bastion_call', 'bastion_ward']);
+const ADDITIVE = new Set(['hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare', 'grudge_runes', 'searing_cut', 'beacon_flare', 'beacon_glare', 'beacon_ward', 'trial_blaze', 'trial_flames', 'jolt_blow', 'jolt_slam', 'decree_sigil', 'decree_lull', 'decree_ward', 'earth_surge', 'surge_plate', 'eye_cleared', 'talon_rend', 'leaf_gale', 'dread_howl', 'heartwood_set', 'dead_thrust', 'grave_pierce', 'bastion_call', 'bastion_ward', 'pierce_shot']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -540,7 +540,7 @@ export class BattleScene {
           // the Automated Soul's Pinning Shot: the pale light of his gorget streaming off the arrow
           pinning_arrow: ['#f4ecd6', '#aca292', '#4a433f'],
         };
-        const arcs: Record<string, number> = { grave_orb: 14, sun_javelin: 10, dart: 4, mote_bolt: 6, grave_bolt: 8, soul_arrow: 8, pinning_arrow: 3 };
+        const arcs: Record<string, number> = { hunt_arrow: 6, grave_orb: 14, sun_javelin: 10, dart: 4, mote_bolt: 6, grave_bolt: 8, soul_arrow: 8, pinning_arrow: 3 };
         const slow = skill.projectile === 'ice_shard' || skill.projectile === 'grave_orb' || skill.projectile === 'sound_ring';
         for (const t of targets) {
           pendings.push(this.fx.projectile(skill.projectile, from, t.chest(), { speed: slow ? 440 : 620, arc: skill.projectile.startsWith('arrow') ? 8 : arcs[skill.projectile] ?? 0, trail: trails[skill.projectile], rotate: skill.projectile !== 'sun_orb' }).then(() => groupFx(t)));

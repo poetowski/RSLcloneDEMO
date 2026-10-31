@@ -3,7 +3,7 @@ import { H, Screen as Canvas, W } from './engine/screen';
 import { App } from './game/app';
 import { newArchivist, recordClear, saveArchivist, stockSample, tutorialDue, unlockEverything } from './game/archivist';
 import { ChallengeTab } from './game/data/challenges';
-import { CHAMPIONS } from './game/data/champions';
+import { ALL_CHAMPIONS, CHAMPIONS } from './game/data/champions';
 import { allStages, STARTERS } from './game/data/campaign';
 import { ZONES } from './game/data/zones';
 import { AcademyScreen } from './game/screens/academy';
@@ -42,7 +42,7 @@ async function boot() {
   drawLoading();
 
   const assets = await loadAssets(
-    CHAMPIONS.map((c) => c.id),
+    ALL_CHAMPIONS.map((c) => c.id),
     ZONES.map((z) => z.id),
     (k) => (progress = k),
   );

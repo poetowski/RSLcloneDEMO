@@ -226,3 +226,11 @@ export const riter = fixture('riter', {
     skill('unction', 2, { cooldown: 4, approach: 'none', hits: [{ mult: 0 }], tmTargets: -75, healLowest: 0.3 }),
   ],
 });
+
+/** A1 ignores 15% of the target's Defense. */
+export const piercer = fixture('piercer', { skills: [skill('pierce', 1, { ignoreDef: 0.15 })] });
+
+/** A ward of its holder alone that always answers with DEF Up for 2 turns, then rests 1 of its turns. */
+export const holdfast = fixture('holdfast', {
+  passive: { id: 'holdfast', name: 'Hold Fast', desc: '', kind: 'ward', self: true, value: 0, cooldown: 1, statuses: [{ status: 'def_up', turns: 2 }] },
+});

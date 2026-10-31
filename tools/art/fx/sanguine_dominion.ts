@@ -19,8 +19,8 @@
 // a plate of the Dominion's hexagon for his Shield; a green star for an affliction lifted.
 // Never their affinity (affinities are abstract, Jakub, 2026-10-11). Light
 // effects are additive in src/game/view/scene.ts.
-import { ACCENT } from '../palette.ts';
-import { disc, dith, ellipseFill, ellipseRing, rampDither } from '../paint.ts';
+import { ACCENT, MAT } from '../palette.ts';
+import { disc, dith, ellipseFill, ellipseRing, line, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng, withAlpha } from '../raster.ts';
 import { burst, cut, FxDef, motes, ramps, ring, shard, sparks, W } from './kit.ts';
 
@@ -56,6 +56,17 @@ function flake(b: Bitmap, x: number, y: number, r: number, core: RGBA = W, arm: 
     const a = (k / 6) * Math.PI * 2 + Math.PI / 6;
     for (let s = 1; s <= r; s++) b.set(Math.round(x + Math.cos(a) * s), Math.round(y + Math.sin(a) * s), s === 1 ? core : arm);
   }
+}
+
+
+/** The Archer's arrows: a shaft of plain wood, an iron head, red fletching (screen space, flying right). */
+const AWOOD = MAT.wood.ramp, AIRON = MAT.iron.ramp, AFLETCH = MAT.red.ramp;
+function huntArrow(b: Bitmap, x0: number, x1: number, y: number) {
+  line(b, x0 + 1, y, x1 - 5, y, AWOOD[4]);
+  b.set(x0, y, AWOOD[2]);
+  polyFill(b, [[x1 - 6, y - 2.5], [x1 + 0.5, y], [x1 - 6, y + 2.5], [x1 - 4.5, y]], (_px, py) => AIRON[py < y ? 5 : 3]);
+  b.set(x0 + 1, y - 1, AFLETCH[4]); b.set(x0 + 2, y - 1, AFLETCH[4]); b.set(x0 + 3, y - 1, AFLETCH[3]);
+  b.set(x0 + 1, y + 1, AFLETCH[3]); b.set(x0 + 2, y + 1, AFLETCH[2]); b.set(x0 + 3, y + 1, AFLETCH[2]);
 }
 
 export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
@@ -602,6 +613,41 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
             if (dith(x, y, fade * (1 - q / len))) b.set(x, y, rampDither(DULL, 3.2 - q * 0.4, x, y));
           }
         }
+      }
+    },
+  },
+  /** The Archer's arrow in flight. */
+  hunt_arrow: {
+    w: 24, h: 7, n: 1, ms: 100, ax: 0.8, ay: 0.5, loop: true,
+    draw: (b) => huntArrow(b, 1, 23, 3),
+  },
+  /** Piercing Shot: the arrow punches in, a short line of light driven through, a dull flash and chips flung out behind. */
+  pierce_shot: {
+    w: 64, h: 48, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 6, 6],
+    draw: (b, t, i) => {
+      const cx = 30, cy = 24;
+      if (i < 4) cut(b, cx - 14 + i * 2, cy, cx + 14 + i * 4, cy, 0, [2.4, 3, 2.2, 1.2][i], DULL, [1.3, 1.2, 0.9, 0.6][i], 1);
+      if (i >= 1 && i < 5) burst(b, cx, cy, 8, [2, 3, 3, 2][i - 1], [10, 15, 12, 8][i - 1], [2.2, 2.6, 2, 1.4][i - 1], DULL, 0.3);
+      if (i >= 1) sparks(b, cx + 4, cy, 9, 24, (i - 1) / 6, DULL, 607, 10);
+    },
+  },
+  /** Threshing Blow: the sheaf lands in a dull flash, golden grain flung out and chaff drifting down over the target, clinging. */
+  chaff_burst: {
+    w: 72, h: 64, n: 9, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 6, 6, 6],
+    draw: (b, t, i) => {
+      const cx = 36, cy = 30;
+      if (i >= 0 && i < 3) burst(b, cx, cy, 8, [2, 3, 2][i], [10, 14, 9][i], [2.2, 2.4, 1.6][i], DULL, 0.2);
+      if (i >= 1) sparks(b, cx, cy, 16, 26, (i - 1) / 8, ramps.gold, 701, 14);
+      // chaff: pale husks drifting down and settling round the target
+      const r = rng(709);
+      for (let k = 0; k < 14; k++) {
+        const x0 = cx + (r() - 0.5) * 40, y0 = cy - 14 + (r() - 0.5) * 16, ph = r();
+        const tt = Math.max(0, Math.min(1, t * 1.3 - ph * 0.3));
+        if (tt <= 0) continue;
+        const x = Math.round(x0 + Math.sin(tt * 6 + k) * 3), y = Math.round(y0 + tt * 26);
+        if (!dith(x, y, 1 - tt * 0.7)) continue;
+        b.set(x, y, ramps.gold[tt < 0.5 ? 4 : 3]);
+        if (k % 2) b.set(x + 1, y, ramps.sand[3]);
       }
     },
   },
