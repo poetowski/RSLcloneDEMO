@@ -85,6 +85,13 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Forest Gargoyle's affinity: Tide | 38 |
 | 2026-10-31 | Dead Knight Amstron, a Heroic Tank of the Ashveil Reign | 39 |
 | 2026-10-31 | Dead Knight Amstron's A2: a 40% chance of Stun (50% in the brief) | 39 |
+| 2026-10-31 | The Strongman, a Common Damage of the Azure Crown; the worksheet's recommended options approved | 40 |
+| 2026-10-31 | The Strongman approved as built: his art, the names Stone Slam and Gather Strength, the lore line | 40 |
+| 2026-10-31 | The Town Guard, a Common Tank of the Azure Crown; the worksheet's recommended options approved | 41 |
+| 2026-10-31 | The Town Guard approved as built: his art, the names Watch Cut and Shield Check, the lore line | 41 |
+| 2026-10-31 | The Last Riter, a Common Support of the Azure Crown; the worksheet's recommended options approved | 42 |
+| 2026-10-31 | The Last Riter's hood made deep, to cover her face | 42 |
+| 2026-10-31 | The Last Riter approved as built: her art, the names Incense Veil and Last Unction, the lore line | 42 |
 
 ---
 
@@ -3194,3 +3201,188 @@ Grave Pierce, Last Bastion and Unbreached Plate and their texts, the multipliers
 1.2), his stats (on the Heroic budget: HP 1560, ATK 94, DEF 78, SPD 94), the lore line
 and every detail of his art and effects above, the choice of skull and bone for the
 emblems among them. He is summoned (section 36), a fourth Heroic in that pool.
+
+## 40. The Strongman (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion.
+Rarity common
+Azure crown
+Class damage
+Tide affinity
+Name Strongman
+Design naked torso strong man holding heavy stone. Blue wide belt.
+Kit A1 damage 1 target
+A2 buff this champion with attack up for 2 turns. 3 cd.
+```
+
+and, to the worksheet that followed (heavy stats or a striker's, names, A1's
+multiplier, a pure-buff A2, no passive), each with a recommended option:
+
+```
+Go
+```
+
+read as a yes to every recommended option.
+
+**Readings.** "Class damage" is the Damage role. "Attack up" is ATK Up (+25%); placed
+on himself, it starts counting at his next turn, so it covers two of them (like the
+Lineholder's Brace). A2 strikes no one. No passive.
+
+**As built:** a broad man bare to the waist, cropped dark hair, no helmet, a big grey
+boulder held in both hands before his chest; a wide belt of bright blue with an iron
+buckle; charcoal breeches and brown boots. Stone Slam: the stone raised overhead,
+then brought down before him. Gather Strength: he crouches, then heaves the stone up
+before his face with a shout. Victory: the stone raised overhead.
+
+Shown to Jakub in previews (key frames, Stone Slam in battle, the summon ceremony,
+the skill icons) with the names and the lore line, he answered:
+
+```
+Approve
+```
+
+so the art, the names Stone Slam and Gather Strength and the lore line are his: "A
+quarry-born strongman of the Azure Crown, who lifts whatever the road puts in his way
+and carries the heaviest stone he has found as proof of his strength."
+
+What the game filled in before that (listed in CLAUDE.md): the skills' texts, A1's
+1.0, his stats (the heavy option, on the Common budget: HP 1080, ATK 118, DEF 56, SPD
+100, CRIT 3.5%, score 396), and every detail of his art and effects above (the stone's grey, the belt's buckle, the
+hair, the breeches; Gareth's `heavy_blow` for the slam and Brace's dust for the
+buff). He is summoned (section 36), a thirteenth Common in that pool; with him in it,
+1-5 runs at 0.88 and 2-1 to 2-4 at 1.08, 0.74, 0.94 and 1.04.
+
+## 41. The Town Guard (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion.
+Rarity common
+Faction azure crown
+Class tank
+Affinity ember.
+Name Town Guard
+Design light armour, sword and round shield. Boots. No helmet. Long blonde hair male.
+Kit A1 - damage 1 enemy
+A2 - damage 1 enemy and has 50% chance to debuffs target with attack down for 1 turn. Cd 3 turns
+```
+
+and, to the worksheet that followed (sturdy stats or a fighting guard's, names, A2's
+multiplier, the look, the lore line), each with a recommended option:
+
+```
+Go
+```
+
+read as a yes to every recommended option.
+
+**Readings.** "Class tank" is the Tank role. "Attack down" is ATK Down (-25%), placed
+after the hit at a 50% chance that meets RES like every debuff. No Taunt, so the AI
+mostly aims past him until his allies are low (MDA T20). No passive.
+
+**As built:** a guard in light gear, not the Paladin's plate: a padded blue tabard
+over a leather jerkin, the Crown's small gold crown on the chest, leather sleeves
+with dark bracers, a belt with an iron buckle, charcoal breeches and tall brown boots;
+straight blonde hair to the shoulders, an ordinary face, no helmet. A plain round
+shield of wooden planks in an iron rim with an iron boss on the far arm, a straight
+arming sword in the near hand. Watch Cut: the sword raised high and cut down, a plain
+white streak. Shield Check: the shield drawn in, then driven forward rim first into a
+dull flash. Victory: the sword raised. Death: he kneels and falls on his back, the
+shield beside him.
+
+Shown to Jakub in previews (his champion page, key frames, Shield Check in battle)
+with the names and the lore line, he answered:
+
+```
+Go
+```
+
+so the art, the names Watch Cut and Shield Check and the lore line are his: "A town
+guard of the Azure Crown, who kept the gate of a quiet market town until the Loom
+broke and the road brought war to it."
+
+What the game filled in before that (listed in CLAUDE.md): the skills' texts, the
+multipliers (1.0, 1.3), his stats (the sturdy option, on the Common budget: HP 1320,
+ATK 82, DEF 70, SPD 94, CRIT 2.5%, score 397), and every detail of his art and
+effects above (Gareth's `sword_cut` for the cut, the Lineholder's
+`mace_blow` for the shield). He is summoned (section 36), a fourteenth Common in that
+pool; with him in it every stage stayed in its band.
+
+## 42. The Last Riter (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion
+Name "Last Riter"
+Azure crown
+Rarity common
+Support role
+Affinity ember
+Design white dressed with yellow big exalter cloak and hoody. Female. Dark blue dress and small crown on it yellow. Holds olibanum in ornate box.
+A1 heal himself by 10% of his max hp. Also grant the ally with lowest max hp shield for 1 turn values by same value as the heal.
+A2 decrease target enemy turn meter by 75%. Heal the ally with lowest max hp by 30% of this champion max hp. CD 4.
+```
+
+and, to the worksheet that followed (fast stats or sturdy ones, names, the readings of
+the design, who "the ally with the lowest max HP" is, whether the drain rolls against
+RES, the lore line), each with a recommended option:
+
+```
+Go
+```
+
+read as a yes to every recommended option.
+
+**Readings.** "Heal himself" is herself. "The ally with lowest max hp" is the living
+ally with the lowest max HP other than her while anyone else stands (alone, herself),
+as the Bellringer's shield is someone else's; it is the same ally for the Shield and
+the heal. The Shield is worth 10% of her max HP, the same as her heal. The 75% is of a
+full turn meter and certain, with no RES roll, as Chief Engineer CJ's and the Forest
+Gargoyle's are; a meter under it empties. A2 strikes no one, nor does A1. No passive.
+"White dressed ... dark blue dress" is a white undergown under a dark-blue dress;
+"exalter cloak" a ceremonial cope; "hoody" its hood, up. "Olibanum in ornate box" a gold
+casket of frankincense, smoking.
+
+**New rule.** A status `to: 'lowestMaxHpOther'` and a skill's `healLowest` reach the
+ally with the lowest max HP other than the actor while anyone else stands
+(MECHANICS_GUIDE.md, the Academy, DDD INV-C28).
+
+**As built:** a priestess: a dark-blue dress to the floor with a small gold crown on
+the chest and a white sash, the white undergown at the hem and in wide sleeves with
+dark-blue cuffs; a big yellow cope down her back nearly to the ground, its yellow over
+her shoulders with a gold edge, and its hood deep over her head, its rim forward
+over her brow and down past her cheek to the throat, edged in gold, so her eyes lie in
+its shadow and only the tip of her nose, her lips and her chin show; in her hands a gold casket with bronze bands and a pitched lid, pale
+smoke curling from it. Incense Veil: she lifts the casket to her bowed face and smoke
+rises round her in a slow column with a few gold motes. Last Unction: she opens the
+lid and holds the casket out; smoke drifts over the enemy, settles and sinks, gold
+motes falling through it. Victory: the casket raised before her face, the smoke tall.
+Death: she kneels, the casket falls beside her, she lies with the cope along her.
+
+Shown the first build, whose hood framed her face and showed her hair, Jakub said:
+
+```
+I don't like how hare hoody and doesn't cover face. Do it
+```
+
+read as: the hood made deep, so that it covers her face (built as the Necromancer's
+is: her eyes in its shadow, no hair showing). Shown it, he answered:
+
+```
+All good now
+```
+
+so the art, the names Incense Veil and Last Unction and the lore line are his.
+
+What the game filled in before that (listed in CLAUDE.md): the skills' texts, her stats (the fast option, on the Common budget, ATK at
+the floor: HP 1260, ATK 70, DEF 64, SPD 110, CRIT 2.5%, score 387), the lore line ("A
+rite-keeper of the Azure Crown who walks behind its soldiers with a casket of olibanum
+and says the last rites over those who fall; where her smoke drifts, the dying stand a
+little longer.") and every detail of her art and effects above (`yellowCloth`, a new
+material, for the cope). She is summoned (section 36), a fifteenth Common in that
+pool; with her in it 1-6 fell under its band (53%), so it runs at 0.86 (was 0.90).

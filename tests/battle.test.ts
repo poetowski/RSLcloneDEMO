@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
+import { balm, bannerman, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -514,6 +514,35 @@ describe('statuses', () => {
     b.useSkill(b.get('p0'), skill(low, 'fault'));
     expect(b.has(b.get('p0'), 'shield')).toBe(true);
     expect(b.has(b.get('p1'), 'shield')).toBe(false);
+  });
+
+  it('shields and heals the ally with the lowest max HP but the actor, while anyone else stands', () => {
+    // the actor is the lowest: the next lowest, not she, takes the Shield, and she heals herself
+    let b = new Battle(combatants([{ ...riter, stats: { ...riter.stats, hp: 900 } }, { ...striker, stats: { ...striker.stats, hp: 1000 } }, { ...twin, stats: { ...twin.stats, hp: 1500 } }]), combatants([cleaver]), { seed: 5 });
+    const r = b.get('p0');
+    r.hp = 500;
+    b.useSkill(r, skill(riter, 'veil'));
+    expect(r.hp).toBe(500 + Math.round(900 * 0.1));
+    expect(b.get('p1').statuses.find((s) => s.id === 'shield')?.value).toBe(Math.round(900 * 0.1));
+    expect(b.has(r, 'shield') || b.has(b.get('p2'), 'shield')).toBe(false);
+    // alone, the Shield is hers
+    b = new Battle(combatants([riter]), combatants([cleaver]), { seed: 5 });
+    b.useSkill(b.get('p0'), skill(riter, 'veil'));
+    expect(b.has(b.get('p0'), 'shield')).toBe(true);
+    // A2 strikes nobody, takes 75 of the target's meter, and heals the same ally by 30% of her max HP
+    b = new Battle(combatants([riter, { ...striker, stats: { ...striker.stats, hp: 1000 } }]), combatants([cleaver]), { seed: 5 });
+    const foe = b.get('e0'), low = b.get('p1');
+    foe.tm = 90;
+    low.hp = 100;
+    const hpFoe = foe.hp;
+    b.useSkill(b.get('p0'), skill(riter, 'unction'), 'e0');
+    expect([foe.hp, foe.tm]).toEqual([hpFoe, 15]);
+    expect(low.hp).toBe(100 + Math.round(1260 * 0.3));
+    // a meter under 75 empties
+    b = new Battle(combatants([riter]), combatants([cleaver]), { seed: 5 });
+    b.get('e0').tm = 40;
+    b.useSkill(b.get('p0'), skill(riter, 'unction'), 'e0');
+    expect(b.get('e0').tm).toBe(0);
   });
 
   it("lifts one random debuff from every ally at the start of its holder's turn with Purge, before the ticks", () => {
