@@ -198,7 +198,7 @@ export const LOCATIONS: LocationDef[] = [
         id: '2-5',
         blurb: CONTEST,
         enemies: [{ champion: 'enforcer' }, { champion: 'skirmisher' }, { champion: 'follower' }],
-        power: 0.82,
+        power: 0.86,
       },
       {
         id: '2-6',

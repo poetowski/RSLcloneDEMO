@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
+import { balm, bannerman, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -514,6 +514,22 @@ describe('statuses', () => {
     b.useSkill(b.get('p0'), skill(low, 'fault'));
     expect(b.has(b.get('p0'), 'shield')).toBe(true);
     expect(b.has(b.get('p1'), 'shield')).toBe(false);
+  });
+
+  it("ignores a share of the target's Defense as it stands in battle", () => {
+    // the same seed rolls the same crit and spread: only the Defense differs
+    const hit = (c: ChampionDef, id: string, defDown = false) => {
+      const b = new Battle(combatants([c]), combatants([{ ...striker, stats: { ...striker.stats, def: 80, crit: 0 } }]), { seed: 9 });
+      const a = b.get('p0'), t = b.get('e0');
+      a.stats = { ...a.stats, crit: 0 };
+      if (defDown) b.addStatus(t, 'def_down', 2, 0, 'p0');
+      return b.rollDamage(a, t, skill(c, id), 1).amount;
+    };
+    const plain = hit(striker, 'striker_a1'), pierced = hit(piercer, 'pierce');
+    expect(pierced / plain).toBeCloseTo(1 / 0.85, 1);
+    // it comes off the Defense after DEF Down, so the two multiply
+    expect(hit(piercer, 'pierce', true) / hit(striker, 'striker_a1', true)).toBeCloseTo(1 / 0.85, 1);
+    expect(hit(piercer, 'pierce', true)).toBeGreaterThan(pierced);
   });
 
   it('shields and heals the ally with the lowest max HP but the actor, while anyone else stands', () => {

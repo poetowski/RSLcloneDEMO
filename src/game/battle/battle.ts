@@ -500,7 +500,8 @@ export class Battle {
     const crit = this.rng.chance(this.critRate(a));
     const edge = affinityEdge(a.champion.affinity, t.champion.affinity);
     let dmg = this.attack(a) * mult * DAMAGE_SCALE;
-    dmg *= DEF_SCALE / this.defense(t);
+    // a skill can ignore a share of the target's Defense as it stands in battle (the Archer's Piercing Shot)
+    dmg *= DEF_SCALE / (this.defense(t) * (1 - (s.ignoreDef ?? 0)));
     dmg *= 1 + edge * AFFINITY_BONUS;
     if (s.execute && t.hp / t.maxHp < s.execute.below) dmg *= s.execute.mult;
     // a critical hit adds the attacker's critical damage (1 = +100%: double damage)

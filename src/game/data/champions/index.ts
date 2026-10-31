@@ -14,6 +14,7 @@
 // Engineer CJ, the Sanguine Dominion's, the Forest Gargoyle, the Court of
 // Root's, and Dead Knight Amstron, the Ashveil Reign's; everything else waits for his design.
 import { ChampionDef } from '../types';
+import { archer } from './archer';
 import { associate } from './associate';
 import { automatedSoul } from './automated_soul';
 import { bellringer } from './bellringer';
@@ -49,7 +50,7 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer,
 ];
 
 const byId = new Map(CHAMPIONS.map((c) => [c.id, c]));
@@ -60,4 +61,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, irvingWellbington, jungleHerder, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };
+export { archer, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, irvingWellbington, jungleHerder, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };

@@ -409,6 +409,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C26 | A status marked `before` is placed on its recipients before the skill's first hit (event hit -1), so the skill's own hits carry it; it counts like any status placed on its holder's own turn, and it reaches each unit once per skill like any other | code (`Battle.useSkill`); test |
 | INV-C27 | A defy answers an enemy skill that landed a critical hit on its holder and left it standing, once per skill, after the skill's last hit: the holder takes its statuses and heals by its share of max HP (Heal Block stops the heal); a crit that fells the holder, or a hit that is not critical, never wakes it | code (`Battle.defy`), norms; test |
 | INV-C28 | A status `to: 'lowestMaxHpOther'` and a `healLowest` heal reach the living ally with the lowest max HP other than the actor while anyone else stands (ties: the lower HP share, then the front); alone, the actor. The heal is a share of the actor's max HP, on the last hit, and Heal Block stops it | `battle.test.ts` (shields and heals the ally with the lowest max HP but the actor) |
+| INV-C29 | A skill with `ignoreDef` deals its hits as if the target's Defense, after DEF Up and DEF Down, were `1 - ignoreDef` of it; nothing else about the hit changes | `battle.test.ts` (ignores a share of the target's Defense) |
 
 ### 6.2 Catalog
 

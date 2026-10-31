@@ -226,3 +226,6 @@ export const riter = fixture('riter', {
     skill('unction', 2, { cooldown: 4, approach: 'none', hits: [{ mult: 0 }], tmTargets: -75, healLowest: 0.3 }),
   ],
 });
+
+/** A1 ignores 15% of the target's Defense. */
+export const piercer = fixture('piercer', { skills: [skill('pierce', 1, { ignoreDef: 0.15 })] });

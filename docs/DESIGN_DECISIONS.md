@@ -92,6 +92,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Last Riter, a Common Support of the Azure Crown; the worksheet's recommended options approved | 42 |
 | 2026-10-31 | The Last Riter's hood made deep, to cover her face | 42 |
 | 2026-10-31 | The Last Riter approved as built: her art, the names Incense Veil and Last Unction, the lore line | 42 |
+| 2026-10-31 | The Archer, a Common Damage of the Sanguine Dominion; the worksheet's recommended options approved | 43 |
 
 ---
 
@@ -3386,3 +3387,54 @@ and says the last rites over those who fall; where her smoke drifts, the dying s
 little longer.") and every detail of her art and effects above (`yellowCloth`, a new
 material, for the cope). She is summoned (section 36), a fifteenth Common in that
 pool; with her in it 1-6 fell under its band (53%), so it runs at 0.86 (was 0.90).
+
+## 43. The Archer (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion.
+Bloom affinity
+Faction sanguine dominion.
+Class damage
+Common rarity
+Name Archer
+Design short bow archer in hunting vest no helmet. Bald buy with goatee.
+Kit A1 attack one target and ignore 15% of target defense.
+```
+
+and, to the worksheet that followed (fast stats or heavier ones, the skill's name, how
+the 15% is read, the kit's size, the look, the lore line), each with a recommended
+option:
+
+```
+Go
+```
+
+read as a yes to every recommended option.
+
+**Readings.** "Class damage" is the Damage role; "bald buy" a bald guy. The kit is the
+A1 alone, as the brief names nothing else (like the Skirmisher's): no A2, no passive.
+"Ignore 15% of target defense" takes 15% off the target's Defense as it stands in
+battle, after DEF Up and DEF Down, for that arrow: it strikes as if the target had 85%
+of its DEF, about 18% more damage at any DEF.
+
+**New rule.** A skill's `ignoreDef` (MECHANICS_GUIDE.md, the Academy, DDD INV-C29).
+
+**As built:** a lean hunter, not Red Cloak (the Dominion's other bald man with a goatee,
+in plate with a cloak and a zweihander): a vest of brown leather laced down the front
+over a dark-red shirt, its sleeves rolled to the elbow, a small red hexagon badge on the
+vest, a leather bracer on his bow arm, a belt with an iron buckle, dark breeches, brown
+boots; a quiver of red-fletched arrows on his back; a short recurve bow of dark wood; a
+bald, tanned head with a shine on the crown, a dark goatee. Piercing Shot: an arrow
+nocked, drawn to his face and held a beat with a hard look, loosed; it flies with red
+fletching and lands as a short line of light driven through, a dull flash and chips.
+Victory: the bow lifted high. Death: he kneels and falls, the bow beside him.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the skill's name (Piercing
+Shot) and text, A1's 1.0, his stats (the fast option, on the Common budget: HP 960, ATK
+112, DEF 56, SPD 112, CRIT 4%, score 397), the lore line ("A hunter of the Sanguine
+Dominion who learned to find the soft place under a beast's hide, and now finds it under
+armour.") and every detail of his art and effects above. He is summoned (section 36), a
+sixteenth Common in that pool; with him in it 2-5 rose over its band (93%), so it runs
+at 0.86 (was 0.82).
