@@ -248,6 +248,7 @@ export class Battle {
     this.acting = u;
     const events: BattleEvent[] = [];
     this.purge(u, events);
+    this.brace(u, events);
     if (this.has(u, 'poison')) this.applyDamage(u, Math.round(u.maxHp * POISON_PCT), false, 0, 0, events, 'poison');
     if (u.alive && this.has(u, 'burn')) this.applyDamage(u, Math.round(u.maxHp * BURN_PCT), false, 0, 0, events, 'burn');
     if (u.alive && this.has(u, 'regen')) this.heal(u, Math.round(u.maxHp * REGEN_PCT), 0, events);
@@ -586,6 +587,19 @@ export class Battle {
       events.push({ kind: 'cleanse', target: a.uid, status: deb.id, hit: 0 });
       woke = true;
     }
+  }
+
+  /**
+   * Brace (passive): at the start of its holder's turn, a skipped one too, the
+   * holder takes the passive's statuses (the Forest Gargoyle's Heartwood: DEF Up
+   * for 1 turn). Placed on its own turn a status lasts until its next one, where
+   * the passive places it again, so it never lapses.
+   */
+  private brace(u: Unit, events: BattleEvent[]) {
+    const p = u.champion.passive;
+    if (p?.kind !== 'brace') return;
+    events.push({ kind: 'passive', target: u.uid, name: p.name, hit: 0, effect: 'brace', source: u.uid });
+    for (const st of p.statuses ?? []) this.tryApply(u, u, st.status, st.turns, undefined, undefined, 0, events);
   }
 
   /**

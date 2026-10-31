@@ -186,6 +186,9 @@ export const druid = fixture('druid', {
 /** Purge: at the start of its turn every ally, itself included, loses one debuff at random. */
 export const inspector = fixture('inspector', { passive: { id: 'purge', name: 'Purge', desc: '', kind: 'purge', value: 0 } });
 
+/** Brace: at the start of its turn it takes DEF Up for 1 turn. */
+export const sentinel = fixture('sentinel', { passive: { id: 'brace', name: 'Brace', desc: '', kind: 'brace', value: 0, statuses: [{ status: 'def_up', turns: 1 }] } });
+
 /** A1 strikes twice, a chance of Stun on each hit, and takes 10% of the target's turn meter; A3 on every enemy, a chance of a 2-turn Stun on each, with a Shield of 15% of its max HP on the ally with the lowest max HP. */
 export const foreman = (stun: number) =>
   fixture(`foreman_${stun}`, {

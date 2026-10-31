@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { CHAMPIONS } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
+import { balm, bannerman, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, raiser, rebuker, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -561,6 +561,26 @@ describe('statuses', () => {
     b.addStatus(b.get('e0'), 'poison', 3, 0, 'p0');
     b.startTurn(b.get('p0'));
     expect(b.has(b.get('e0'), 'poison')).toBe(true);
+  });
+
+  it("gives its holder a status at the start of each of its turns with Brace, so a 1-turn DEF Up never lapses, a skipped turn included", () => {
+    const b = new Battle(combatants([sentinel]), combatants([cleaver]), { seed: 5 });
+    const h = b.get('p0');
+    expect(b.has(h, 'def_up')).toBe(false);
+    let st = b.startTurn(h);
+    expect(st.events.map((e) => e.kind)).toEqual(['passive', 'status']);
+    expect(b.has(h, 'def_up')).toBe(true);
+    // it lasts until its next turn, through the enemy's between them
+    b.endTurn(h);
+    expect(b.has(h, 'def_up')).toBe(true);
+    b.startTurn(h);
+    b.endTurn(h);
+    expect(h.statuses.filter((s) => s.id === 'def_up').length).toBe(1);
+    // a Stunned holder still takes it, and still loses the turn
+    b.addStatus(h, 'stun', 1, 0, 'e0');
+    st = b.startTurn(h);
+    expect(st.skip).toBe(true);
+    expect(st.events.some((e) => e.kind === 'passive')).toBe(true);
   });
 
   it('answers a critical hit on its holder with Defy: Taunt on itself and a heal of a share of its max HP, once per skill, while it stands', () => {

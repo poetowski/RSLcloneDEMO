@@ -81,6 +81,7 @@ Section 7 lists what is not decided.
 | 2026-10-25 | The Journey reordered: Weave a Spool second, Beat Campaign 1-3 third, the two swapping rewards, so the second quest still gives the 100 fragments | 7, 35, 36 |
 | 2026-10-31 | Chief Engineer CJ, a Heroic Tank of the Sanguine Dominion, made more fantasy and without the words on his brief's suit | 37 |
 | 2026-10-31 | Chief Engineer CJ's A1: a 25% chance of Stun on each hit (50% in the brief); his A3's Stun: 1 turn (2 in the brief) | 37 |
+| 2026-10-31 | The Forest Gargoyle, a Heroic Tank, read as the Court of Root's | 38 |
 
 ---
 
@@ -3080,3 +3081,57 @@ Master's Decree, Earthen Surge and Master's Eye and their texts, the multipliers
 budget: HP 1600, ATK 90, DEF 74, SPD 92), the lore line, and every detail of his
 art and effects above. Like every champion but the Rime Scholar he is summoned
 (section 36), a second Heroic in that pool.
+
+## 38. The Forest Gargoyle (received 2026-10-31)
+
+Jakub's brief, verbatim:
+
+```
+now i want you to generate new champion.
+rarity = HEROIC
+name = Forest Gargoyle
+class = TANK
+affinity = root
+design = gargoyle carved from wood instead of stone material. almost does not move. on idle it can even be static with one small tick of head. winged creature. features are sharp leaves.
+kit = A1 - attacks 1 enemy. 35% chance to place stop regeneration for 2 turns on target.
+A2 - attacks all enemies, place ATTACK DOWN for 1 turn. CD 3 turns.
+A3 - attacks one enemy, places SPEED DOWN for 2 turns. Also fully deplets targets turn meter. CD 4 turns. motive for a3 - this can be something with being scary.
+passive - places DEFENSE UP for 1 turn on beginning of this champion turns.
+```
+
+The third Heroic of the roster.
+
+**Readings.** "affinity = root" names no affinity (Ember, Bloom, Tide) and the brief
+names no faction, so "root" is read as the Court of Root, and his affinity is a
+stand-in, Bloom. "Class = TANK" is the Tank role. "Stop regeneration" is Heal Block,
+which stops Regen and every other heal. ATTACK DOWN and SPEED DOWN are ATK Down and
+Slow; they are certain but, like every debuff, meet RES. A3's hit comes first, then
+the Slow, then the target's turn meter goes to nothing. The passive's DEF Up is on
+himself, at the start of his turn, a skipped one too; placed on his own turn it
+lasts until his next, so it never lapses, and it is shown each turn.
+
+**As built:** a gargoyle in weathered old wood, its grain, knots and chisel cuts
+showing, squatting on his haunches with his hands on his knees, a snarling horned
+head thrust forward, black horns, talons and thorns, bone fangs, a dim ember for an
+eye. Two wings folded behind him, wrists above his shoulders, on bones of wood with
+a dark skin between them; a long tail. Everything that would be a spine, an ear, a
+crest or a fin is a sharp green leaf: along his back, at his shoulder, elbow and
+knee, on every finger of the wings, at the end of the tail. Idle: one pose, nothing
+moves; once in a loop of nearly six seconds the head ticks up, holds, and ticks back.
+Run: he glides, stiff, feet off the ground, a slow beat of the wings. Splinter Talon:
+nothing, then the arm is up, then it has come down: three rakes and chips of wood.
+Razor Gale: the wings drawn high, one beat forward, sharp leaves fly and cut through
+each enemy. Graven Dread: he runs up and rears to his full height, wings thrown wide,
+jaw dropped, eyes blazing, heavy rings of sound going out; he holds it, then is on
+the enemy, and his face looms huge over it, burning-eyed, swelling and fading.
+Heartwood: its name over him and a ring of grain closing round him. Victory: he lifts
+his head, the eyes kindle, the wings open a little, and it all sets again. Death: the
+eyes go out and the wood splits; he tips over all of a piece like a statue pulled
+down and lies on his face, leaves coming down round him.
+
+What the game fills in (stand-ins, listed in CLAUDE.md): the faction and the affinity,
+the names Splinter Talon, Razor Gale, Graven Dread and Heartwood and their texts, the
+multipliers (1.0; 0.6 on each enemy; 1.3), his stats (on the Heroic budget: HP 1650,
+ATK 90, DEF 78, SPD 90), the lore line and every detail of his art and effects above.
+He is summoned (section 36), a third Heroic in that pool, and stands in the Verdant
+Grove on his page and in his demos, like the Court's others.

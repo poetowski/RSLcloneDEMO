@@ -144,7 +144,7 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'h', text: 'Passives that shield' },
       { kind: 'p', text: "A passive can give allies Shields. The Jungle Herder's Herder's Ward shields the ally with the lowest max HP, himself included, at the end of every second turn of his. Emissary Handlings' Unbroken Flag has a chance to shield an ally an enemy has just struck, after the hit. The Black Rhino's Thick Hide shields only himself, after every enemy attack that hits him. Protect the frail, and strike the shielded last." },
       { kind: 'h', text: 'Passives that soothe' },
-      { kind: 'p', text: "A passive can answer an affliction. The Grove Keeper's Keeper's Balm: whenever an enemy places a debuff on an ally, himself included, a 35% chance to give that ally Regen for 1 turn. Heal Block still stops what the Regen heals. Chief Engineer CJ's Master's Eye acts before anything else on his turn: one random debuff comes off every ally, himself included, and if that is a lone Stun on him he keeps his turn." },
+      { kind: 'p', text: "A passive can answer an affliction. The Grove Keeper's Keeper's Balm: whenever an enemy places a debuff on an ally, himself included, a 35% chance to give that ally Regen for 1 turn. Heal Block still stops what the Regen heals. Chief Engineer CJ's Master's Eye acts before anything else on his turn: one random debuff comes off every ally, himself included, and if that is a lone Stun on him he keeps his turn. The Forest Gargoyle's Heartwood gives him DEF Up for 1 turn at the start of each of his turns, so it never lapses." },
     ],
   },
   {

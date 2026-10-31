@@ -104,6 +104,7 @@ export function auditChampion(c: ChampionDef): string[] {
   // debuff, only helps (a debuff would answer itself)
   if (p?.kind === 'fallen' && (!p.stat || !p.max)) out.push(`${p.id}: a fallen passive needs a stat and a cap`);
   if (p?.kind === 'purge' && (p.statuses?.length || p.value)) out.push(`${p.id}: a purge passive only lifts debuffs`);
+  if (p?.kind === 'brace' && (!p.statuses?.length || p.statuses.some((st) => !STATUSES[st.status].buff))) out.push(`${p.id}: a brace passive gives its holder buffs`);
   if ((p?.kind === 'tend' || p?.kind === 'ward' || p?.kind === 'retaliate' || p?.kind === 'remedy') && !p.statuses?.length) out.push(`${p.id}: a ${p.kind} passive needs statuses`);
   if (p?.chance !== undefined && !(p.chance > 0 && p.chance <= 1)) out.push(`${p.id}: a chance of ${p.chance}`);
   if (p?.kind === 'retaliate' && p.statuses?.some((st) => STATUSES[st.status].buff)) out.push(`${p.id}: a retaliation places debuffs`);

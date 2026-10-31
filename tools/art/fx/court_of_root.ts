@@ -18,12 +18,16 @@
 // home to him as green motes; his Cleansing Rite: leaves and green light
 // whirling up round an ally, carrying the afflictions off as violet motes that
 // fade; his Keeper's Balm: a sprig of green light sprouting at an ally's feet.
+// The Forest Gargoyle's Splinter Talon: three rakes of a claw, chips of wood; his
+// Razor Gale: sharp leaves flying through the target; his Graven Dread: his face
+// looming huge over the enemy, its eyes alight, as its meter drains away; his
+// Heartwood: a ring of grain closing round him.
 // Neutral light, dust, their own wood, the bell's bronze, the darts' poison
 // and the grove's green, never their affinities (affinities are abstract,
 // Jakub, 2026-10-11). Light effects are additive in src/game/view/scene.ts.
 import { disc, dith, ellipseRing, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng, withAlpha } from '../raster.ts';
-import { burst, crescent, cut, FxDef, motes, ramps, ring, soundRings, sparks, W } from './kit.ts';
+import { burst, crescent, cut, FxDef, motes, ramps, ring, shard, soundRings, sparks, W } from './kit.ts';
 
 const DU = ramps.dust;
 /** A dull flash: grey to white, no hue of its own. */
@@ -78,6 +82,20 @@ function tear(b: Bitmap, x0: number, y0: number, x1: number, y1: number, thick: 
       const x = Math.round(bx + nx * o), y = Math.round(by + ny * o);
       const k = 1 - Math.abs(o) / Math.max(0.5, w);
       b.set(x, y, rampDither(DULL, Math.min(4, (1.2 + k * 2.6) * heat), x, y));
+    }
+  }
+}
+
+/** A sharp leaf from (x, y) along `a` (radians): a long point, its rib dark, `k` thins it away. */
+function sharpLeaf(b: Bitmap, x: number, y: number, a: number, len: number, w: number, k = 1) {
+  const G = ramps.green;
+  const ca = Math.cos(a), sa = Math.sin(a);
+  for (let u = 0; u <= len; u += 0.5) {
+    const hw = u < len * 0.32 ? (u / (len * 0.32)) * w : ((len - u) / (len * 0.68)) * w;
+    for (let v = -hw; v <= hw; v += 0.5) {
+      const px = Math.round(x + ca * u - sa * v), py = Math.round(y + sa * u + ca * v);
+      if (!dith(px, py, k)) continue;
+      b.set(px, py, Math.abs(v) < 0.4 ? G[0] : v < 0 ? G[3] : G[2]);
     }
   }
 }
@@ -438,6 +456,107 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
       }
       ellipseRing(b, cx, gy - 2, 6 + t * 10, 2 + t * 1.6, 1.1, (x, y, a) => (dith(x, y, fade * (1 - t * 0.6)) ? rampDither(GN, 2.4 + Math.sin(a) * 0.6, x, y) : 0));
       motes(b, cx, gy - 4, 26, 40, 7, t, GN, 373);
+    },
+  },
+
+  /** Splinter Talon: three rakes of a claw from high to low, a dull flash, chips of wood flying. */
+  talon_rend: {
+    w: 88, h: 88, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 4, 8, 4],
+    draw: (b, t, i) => {
+      const reach = [0.5, 0.9, 1, 1, 1, 1, 1][i], heat = [1.45, 1.4, 1.15, 0.9, 0.65, 0.45, 0.3][i], th = [2.6, 3.4, 2.8, 2.1, 1.5, 1, 0.8][i];
+      if (i < 6) for (const k of [-13, 0, 13]) cut(b, 22 + k, 12, 62 + k, 74, -4, th, DULL, heat, reach);
+      if (i === 1 || i === 2) burst(b, 44, 44, 10, 2, [15, 10][i - 1], 1.5, DULL, 0.35);
+      if (i >= 1) sparks(b, 44, 44, 16, 32, (i - 1) / 5, ramps.wood, 701, 24);
+    },
+  },
+  /** Razor Gale's beat: sharp leaves thrown forward from him in a fan. Additive, at his head on the `cast` event. */
+  leaf_gale: {
+    w: 136, h: 108, n: 8, ms: 55, ax: 0.16, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const r = rng(711);
+      for (let k = 0; k < 9; k++) {
+        const a = -0.5 + r() * 1, sp = 0.7 + r() * 0.3, len = 10 + r() * 6;
+        const d = 10 + (t + 0.12) * 96 * sp;
+        sharpLeaf(b, 22 + Math.cos(a) * d, 54 + Math.sin(a) * d * 0.9, a, len, 2.6, 1 - t * 0.6);
+      }
+    },
+  },
+  /** Razor Gale reaches an enemy: sharp leaves cut through it from the side, thin white cuts left behind them. */
+  razor_leaves: {
+    w: 112, h: 84, n: 9, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 4, 4, 2],
+    draw: (b, t, i) => {
+      const r = rng(721);
+      for (let k = 0; k < 8; k++) {
+        const y = 14 + r() * 54, sp = 0.6 + r() * 0.25, x0 = 4 + r() * 12, tilt = (r() - 0.5) * 0.4, len = 12 + r() * 6;
+        const x = x0 + t * 96 * sp;
+        sharpLeaf(b, x, y + tilt * x * 0.2, tilt, len, 3, 1 - t * 0.3);
+        for (let q = 1; q < 14; q++) {
+          const xx = Math.round(x - q), yy = Math.round(y + tilt * (x - q) * 0.2);
+          if (xx >= 0 && dith(xx, yy, 1 - q / 14)) b.set(xx, yy, q < 5 ? W : DULL[2]);
+        }
+      }
+      if (i >= 2) sparks(b, 56, 42, 10, 26, (i - 2) / 6, ramps.green, 727, 12);
+    },
+  },
+  /** Graven Dread's cry: heavy dull rings opening from him, out and forward, as he holds the pose. Additive, at his head on the `cast` event. */
+  dread_howl: {
+    w: 116, h: 92, n: 12, ms: 65, ax: 0.2, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 23, cy = 46;
+      for (let k = 0; k < 3; k++) {
+        const age = i - k * 3;
+        if (age < 0 || age > 8) continue;
+        const r = 6 + age * 9, fade = 1 - age / 8.5;
+        for (let deg = -62; deg <= 62; deg += 1.2) {
+          const a = (deg * Math.PI) / 180, edge = 1 - Math.abs(deg) / 66;
+          const x = Math.round(cx + Math.cos(a) * r), y = Math.round(cy + Math.sin(a) * r);
+          if (dith(x, y, Math.min(1, fade * 1.3) * (0.35 + edge * 0.7))) b.set(x, y, rampDither(DULL, Math.min(4, 1 + edge * 2 + fade), x, y));
+        }
+      }
+    },
+  },
+  /**
+   * Graven Dread lands: his face looms huge over the enemy, carved wood and burning
+   * eyes, swelling and fading while motes of its meter sink away. At its chest,
+   * drawn as solid wood, not light.
+   */
+  dread_mask: {
+    w: 132, h: 132, n: 13, ms: 60, ax: 0.5, ay: 0.55, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const WD = ramps.wood;
+      const cx = 66, cy = 58;
+      const s = [0.7, 1, 1.25, 1.32, 1.35, 1.38, 1.4, 1.42, 1.44, 1.46, 1.48, 1.5, 1.52][i];
+      const fade = i < 6 ? [0.6, 0.9, 1, 1, 1, 1][i] : [0.8, 0.6, 0.45, 0.3, 0.2, 0.12, 0.06][i - 6];
+      for (const side of [-1, 1]) shard(b, cx + side * 16 * s, cy - 18 * s, cx + side * 36 * s, cy - 36 * s, 4 * s, WD);
+      for (let y = -24; y <= 30; y++) {
+        const q = (y + 24) / 54;
+        const hw = (q < 0.35 ? 18 + q * 22 : 26 - (q - 0.35) * 30) * s;
+        const yy = Math.round(cy + y * s);
+        for (let x = -hw; x <= hw; x++) {
+          const xx = Math.round(cx + x);
+          if (!dith(xx, yy, fade)) continue;
+          // the brow's cut and the sockets, the mouth's black gap with its fangs, the rest wood with its grain
+          const nx = Math.abs(x) / s;
+          const sock = y > -12 && y < -2 && nx > 4 && nx < 19 && y > -12 + (19 - nx) * 0.28;
+          const mouth = y > 8 && y < 24 && nx < 16 - (y - 8) * 0.25;
+          const fang = mouth && y < 15 && Math.floor(nx / 4) % 2 === 0;
+          const grain = Math.sin(x * 0.9 + Math.sin(y * 0.3) * 2) > 0.8;
+          b.set(xx, yy, fang ? W : mouth || sock ? DU[0] : grain ? WD[1] : rampDither(WD, 2.6 - x / (hw * 2) - y * 0.012, xx, yy));
+        }
+      }
+      // the eyes burn hottest as the rest of it fades
+      const hot = Math.min(1, fade + 0.35);
+      for (const side of [-1, 1]) disc(b, cx + side * 11 * s, cy - 6 * s, 3.4 * s, (x, y, d) => (dith(x, y, hot) ? rampDither(ramps.amber, 4.4 - d * 2.4, x, y) : 0));
+    },
+  },
+  /** Heartwood: a ring of grain closes round him and sets, a few sharp leaves falling from it. At his chest. */
+  heartwood_set: {
+    w: 104, h: 84, n: 9, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const WD = ramps.wood;
+      const close = [1.3, 1.15, 1.03, 1, 1, 1, 1, 1, 1][i], fade = i < 4 ? 1 : [0.75, 0.55, 0.35, 0.2, 0.1][i - 4];
+      ellipseRing(b, 52, 42, 34 * close, 25 * close, 2, (x, y, a) => (dith(x, y, fade * (0.5 + 0.5 * Math.max(0, -Math.sin(a)))) ? rampDither(WD, 2 + fade * 1.6 - Math.sin(a) * 0.6, x, y) : 0));
+      motes(b, 52, 46, 30, -22, 6, t, ramps.green, 747);
     },
   },
 };

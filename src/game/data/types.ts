@@ -165,8 +165,10 @@ export interface PassiveDef {
    * purge:     at the start of each of the champion's turns, a skipped one too, every ally (the
    *            champion included) loses one debuff at random (Chief Engineer CJ's Master's Eye,
    *            2026-10-31)
+   * brace:     at the start of each of the champion's turns, a skipped one too, it takes
+   *            `statuses` (the Forest Gargoyle's Heartwood: DEF Up for 1 turn, 2026-10-31)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
   /** rebuke and tend: the champion's own turns the passive rests after it acts */

@@ -124,7 +124,7 @@ export const LOCATIONS: LocationDef[] = [
         id: '1-5',
         blurb: SETTLEMENT,
         enemies: [{ champion: 'captain_gareth' }, { champion: 'captain_gareth' }, { champion: 'rime_scholar' }],
-        power: 0.92,
+        power: 0.91,
       },
       {
         id: '1-6',
