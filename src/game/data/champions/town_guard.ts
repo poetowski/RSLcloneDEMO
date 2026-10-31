@@ -5,9 +5,9 @@ import { ChampionDef } from '../types';
 // Crown, Ember (abstract: it sets nothing in his look); light armour, a sword
 // and a round shield, boots, no helmet, long blonde hair. One A1 on one enemy,
 // and an A2 on one enemy with a 50% chance of ATK Down for 1 turn, cooldown 3.
-// No passive. Stand-ins until Jakub sets them: the names and texts of both
-// skills, the multipliers (1.0, 1.3), the stats (the sturdy option, on the
-// Common budget) and the lore line. He is summoned.
+// No passive. Jakub approved the names, the lore line and the art as shown
+// (2026-10-31); the texts, the multipliers (1.0, 1.3) and the stats (the
+// sturdy option, on the Common budget) wait for his balance. He is summoned.
 export const townGuard: ChampionDef = {
   id: 'town_guard',
   name: 'Town Guard',
