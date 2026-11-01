@@ -107,6 +107,9 @@ Section 7 lists what is not decided.
 | 2026-11-01 | Whole map shows only Roman numerals (names on the campaign map) | - |
 | 2026-11-01 | Zone 7, the Dead Forest: battle background, the world map extended east, ten placeholder stages | 5.10 |
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
+| 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
+| 2026-11-01 | Zone 8, the Crystal Graveyard: battle background, the world map extended east, ten placeholder stages | 5.11 |
+| 2026-11-01 | The Journey gains Beat Campaign 8-10, three spools | 57 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
@@ -1152,6 +1155,67 @@ Stand-ins until he sets them: everything his description did not name, including
 the sky, the giant and every other tree's place, the great hole's place in the arena, the stag, the
 moths, the mist, the light, the falling ash, the stages' enemies, powers and texts, the spools
 (Tranquility and Needle) and the Stardust (50 a victory).
+
+### 5.11 Zone 8 — the Crystal Graveyard (2026-11-01)
+
+Jakub, verbatim:
+
+```
+then generate area 8 eastern of area 7.
+extend world map, creeate new battle backgroun and 10 palceholder stages.
+name of area 8 = Crystal Graveyard
+description =
+
+Ground
+
+The terrain consists of dark grey and violet mineral rock, covered with thousands of small crystal fragments. Some areas have smooth reflective surfaces, while others are rough and dangerous.
+
+Crystal formations
+- Giant crystal pillars emerging vertically from the ground.
+- Broken crystal spires scattered across the landscape.
+- Large translucent formations embedded in cliffs.
+- Clusters of smaller crystals growing between rocks.
+- Ancient crystal structures partially buried underground.
+Terrain variation
+- Flat fields of crystal debris.
+- Deep cracks exposing glowing mineral veins.
+- Small rocky elevations.
+- Narrow passages between massive crystal formations.
+- Collapsed crystalline arches.
+
+Also:
+A gigantic crystal formation at the centre of the region.
+```
+
+**The battle background (`tools/art/zones/zone8.ts`).** Violet dusk, a small cold moon upper left.
+The gigantic formation stands dead centre, a sheaf of enormous crystals, seen through the passage
+between two massive dark formations on the left and right. Behind those, cliffs hold translucent
+crystal in their faces (the rock truly shows through), and a collapsed arch stands on the left. The
+arena is rock in plates under thousands of fragments, thick in the debris fields and thin where the
+champions stand. A sheet of polished rock in its middle truly mirrors the formation; rough gritty
+rock lies elsewhere. A glowing crack runs from the camera to the formation's foot, with more at the
+sides. A spire lies broken in two on the far edge; clusters grow between rocks; a small rocky rise
+stands near left; cut columns with a slipped lintel lie half buried near right.
+
+**What moves**, my reading, all slow: light breathes inside the formation, which lights the sky now
+and then (`flash`, every 16-32 s); the veins breathe; fans of split light lie on the rock and come and
+go; glints open and close on its facets and on the ground; three shards hang in the air by it; crystal
+dust hangs and kindles (a new ambient, `shards`).
+
+**The map.** 2840 wide. The ash thins out over dark rock in plates, with polished sheets, cliffs along
+the north and south edges with translucent masses in them, glowing veins, thousands of fragments,
+pillars like headstones, fallen spires, clumps between rocks, rises, three collapsed arches, three cut
+ruins. The road goes through a narrow passage between two massive formations to the node, with the
+gigantic formation above it at the centre of the region. The map uses the battle background's own
+crystal painter. Pixels west of about x 2440 are kept.
+
+**Stages 8-1 to 8-10** after 7-10, placeholders: their texts walk his description, enemies are copies
+of the roster, 8-10 a boss Chief Engineer CJ, no champion joins there.
+
+Stand-ins until he sets them: everything his description did not name, including the time of day, the
+moon, the crystals' colours (violet, ice, rose), the veins' colour, the prism fans, the hanging shards,
+the sky flash, the stages' enemies, powers and texts, the spools (Apex and Vigor) and the Stardust (55
+a victory).
 
 ## 6. Cross-cutting
 
@@ -3931,3 +3995,25 @@ The Journey's new quest gives 250 Stardust ("spawning fragments" read as Stardus
 summoning fragments). The popup, its button, the M key and `overview.png` are gone; the map is
 moved by dragging, W A S D, Shift + arrows, and the arrows jump between areas as before. A save
 that already claimed a later quest finds this one ready.
+
+## 56. The map's west end (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+in world map when player clicks left arrow or button A to move map to the west, map must be scrollable up to end of world map image so everything is visible to plaer even fracture itself, because area 1 is wider on world map and taht is ok
+```
+
+Arriving at area I with the left arrow now shows the map's west end with the whole rift, instead of
+stopping when the node came into view; another press slides to the very edge. `A` slides there too, and
+with Caps Lock as well. The right arrow does the same at the last area.
+
+## 57. Beat Campaign 8-10 (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+after this is done, create new quest beating campaign 8-10. reward is 3 spools.
+```
+
+The Journey's seventh quest, after Beat Campaign 5-10. Which three spools is a stand-in: Gilded Apex.

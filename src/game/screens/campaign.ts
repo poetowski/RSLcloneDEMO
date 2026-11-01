@@ -147,7 +147,7 @@ export class CampaignScreen extends BaseScreen {
     const slide: Record<string, [number, number]> = { w: [0, -1], a: [-1, 0], s: [0, 1], d: [1, 0] };
     const arrows: Record<string, [number, number]> = { ArrowUp: [0, -1], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowRight: [1, 0] };
     // the arrows jump between areas unless Shift is held
-    const step = slide[k] ?? (mods?.shift ? arrows[k] : undefined);
+    const step = slide[k.toLowerCase()] ?? (mods?.shift ? arrows[k] : undefined);
     if (step) {
       this.camX.by(step[0] * STEP.x);
       this.camY.by(step[1] * STEP.y);
@@ -156,9 +156,18 @@ export class CampaignScreen extends BaseScreen {
     // left and right walk the line of areas in campaign order, wherever the map has been slid
     if (k === 'ArrowLeft' || k === 'ArrowRight') {
       const i = LOCATIONS.findIndex((l) => 'loc_' + l.id === this.ui.focusId);
-      const next = LOCATIONS[Math.max(0, Math.min(LOCATIONS.length - 1, (i < 0 ? 0 : i) + (i < 0 ? 0 : k === 'ArrowLeft' ? -1 : 1)))];
+      const dir = k === 'ArrowLeft' ? -1 : 1;
+      const at = i < 0 ? 0 : Math.max(0, Math.min(LOCATIONS.length - 1, i + dir));
       this.ui.keyboard = true;
+      // at the end of the line the arrow goes on sliding, up to the end of the world: the rift lies far west of area I's node (Jakub, 2026-11-01)
+      if (at === i) {
+        this.camX.by(dir * STEP.x);
+        return;
+      }
+      const next = LOCATIONS[at];
       this.ui.focusId = 'loc_' + next.id;
+      // arriving at either end of the line, show that end of the world, not just the node
+      if (at === 0 || at === LOCATIONS.length - 1) this.centerOn(next);
       return;
     }
     super.key(k);
@@ -206,7 +215,7 @@ export class CampaignScreen extends BaseScreen {
       blit(ctx, this.a.ui.img, g, x - Math.floor(g[2] / 2), y - Math.floor(g[3] / 2));
     }
     blit(ctx, this.a.ui.img, r, x - Math.floor(r[2] / 2), y - Math.floor(r[3] / 2) - lift);
-    if (open) ui.text(ctx, loc.chapter, x, y - 9 - lift, { color: kind === 'camp_cleared' ? '#2a1404' : '#fff0b0', variant: 'display', align: 'center', outline: kind === 'camp_cleared' ? '#ffe070' : COLORS.ink });
+    if (open) ui.text(ctx, loc.chapter, x, y - 9 - lift, { color: kind === 'camp_cleared' ? '#2a1404' : '#fff0b0', variant: loc.chapter.length > 3 ? 'bold' : 'display', align: 'center', outline: kind === 'camp_cleared' ? '#ffe070' : COLORS.ink });
     this.banner(ctx, loc, x, y + 19);
     const status = this.statusOf(loc);
     const [won, all] = this.starsOf(loc);

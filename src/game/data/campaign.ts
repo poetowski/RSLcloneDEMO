@@ -49,7 +49,7 @@ import { LocationDef, StageDef } from './types';
  * area by area: a new area widens it by its stretch, and everything west of the
  * stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 2520, h: 360 };
+export const WORLD_MAP = { w: 2840, h: 360 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];
@@ -88,6 +88,15 @@ const ASHFALL = 'Thick layers of grey and black ash, fallen branches reduced to 
 const ROOTS = 'Burnt roots protrude from cracked soil, among occasional patches of pale, dead grass.';
 const HOLES = 'Deep holes where enormous trees once stood.';
 const PEACE = 'It is weirdly peaceful here.';
+// Zone 8: Jakub's description of the Crystal Graveyard (2026-11-01), from the debris fields to the formation at its centre
+const FRAGMENTS = 'Dark grey and violet mineral rock, covered with thousands of small crystal fragments.';
+const PILLARS = 'Giant crystal pillars emerge vertically from the ground; broken spires lie scattered across the landscape.';
+const SMOOTH = 'Some surfaces are smooth and reflective, others rough and dangerous.';
+const CLIFFS = 'Large translucent formations sit embedded in the cliffs; smaller crystals cluster between the rocks.';
+const BURIED = 'Ancient crystal structures lie partially buried underground.';
+const CRACKS = 'Deep cracks expose glowing mineral veins.';
+const PASSAGES = 'Narrow passages run between massive formations, under collapsed crystalline arches.';
+const FORMATION = 'A gigantic crystal formation stands at the centre of the region.';
 // Zone 5: Jakub's description of the Snowy Mesa (2026-10-19), from the mesa's top to the arbiter on it
 const MESA_TOP = 'The top of a snow-capped tabletop mountain.';
 const MESAS = 'Many more tabletop mountains all round, all connected with many candles.';
@@ -511,6 +520,30 @@ export const LOCATIONS: LocationDef[] = [
       { id: '7-8', blurb: HOLES, enemies: [{ champion: 'dead_knight_amstron' }, { champion: 'skeleton' }, { champion: 'gravedigger' }], power: 0.76 },
       { id: '7-9', blurb: PEACE, enemies: [{ champion: 'chief_engineer_cj' }, { champion: 'necromancer' }, { champion: 'automated_soul' }], power: 0.58 },
       { id: '7-10', blurb: `${PEACE} The last stage of the area.`, enemies: [{ champion: 'forest_gargoyle', boss: true }, { champion: 'grove_keeper' }, { champion: 'red_cloak' }], power: 0.68 },
+    ],
+  },
+  {
+    // Zone 8, named and described by Jakub (2026-11-01, DESIGN_DECISIONS.md 5.11); he asked for ten placeholder
+    // stages, whose enemies, powers and texts are stand-ins; no champion joins there
+    id: 'zone8',
+    chapter: 'VIII',
+    name: 'Crystal Graveyard',
+    zone: 'zone8',
+    blurb: 'East of the Dead Forest the ash ends on dark violet rock: a land littered with broken crystal, its pillars standing like headstones round one gigantic formation.',
+    requires: '7-10',
+    map: { x: 2690, y: 200 },
+    patterns: ['pattern_apex', 'pattern_vigor'],
+    stages: [
+      { id: '8-1', blurb: FRAGMENTS, enemies: [{ champion: 'sentry' }, { champion: 'archer' }, { champion: 'harvest_specialist' }], power: 0.86 },
+      { id: '8-2', blurb: PILLARS, enemies: [{ champion: 'town_guard' }, { champion: 'strongman' }, { champion: 'dominion_medic' }], power: 1 },
+      { id: '8-3', blurb: SMOOTH, enemies: [{ champion: 'lineholder' }, { champion: 'skirmisher' }, { champion: 'quartermaster' }], power: 0.96 },
+      { id: '8-4', blurb: CLIFFS, enemies: [{ champion: 'enforcer' }, { champion: 'bloodhound' }, { champion: 'last_riter' }], power: 1.04 },
+      { id: '8-5', blurb: BURIED, enemies: [{ champion: 'automated_soul' }, { champion: 'associate' }, { champion: 'emissary_handlings' }], power: 0.76 },
+      { id: '8-6', blurb: CRACKS, enemies: [{ champion: 'red_cloak' }, { champion: 'necromancer' }, { champion: 'irving_wellbington' }], power: 0.76 },
+      { id: '8-7', blurb: PASSAGES, enemies: [{ champion: 'black_rhino' }, { champion: 'big_ears' }, { champion: 'grove_keeper' }], power: 0.76 },
+      { id: '8-8', blurb: PASSAGES, enemies: [{ champion: 'forest_gargoyle' }, { champion: 'jungle_herder' }, { champion: 'wild_speaker' }], power: 0.76 },
+      { id: '8-9', blurb: FORMATION, enemies: [{ champion: 'dead_knight_amstron' }, { champion: 'automated_soul' }, { champion: 'necromancer' }], power: 0.54 },
+      { id: '8-10', blurb: `${FORMATION} The last stage of the area.`, enemies: [{ champion: 'chief_engineer_cj', boss: true }, { champion: 'associate' }, { champion: 'grove_keeper' }], power: 0.66 },
     ],
   },
 ];

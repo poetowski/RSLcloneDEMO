@@ -58,6 +58,8 @@ const MOTH_TONES: [string, string][] = [
 
 /** How many flakes of ash hang in the air at once (ambient 'ash'). */
 const ASH = 44;
+/** How many motes of crystal dust hang in the air at once (ambient 'shards'). */
+const SHARDS = 40;
 
 /** Wings open, half raised, closed: W wing, E its dark tips, B the body. */
 const BUTTERFLY_FRAMES = [
@@ -135,7 +137,7 @@ export class ZoneView {
     this.tilesLayer = this.bakeTiles();
     this.light = makeGlow(64, 40, def.glow);
     this.vignette = makeVignette();
-    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'seeds' ? SEEDS : def.ambient === 'flurries' ? FLURRIES : def.ambient === 'ash' ? ASH : def.ambient === 'spores' ? 0 : 70;
+    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'seeds' ? SEEDS : def.ambient === 'flurries' ? FLURRIES : def.ambient === 'ash' ? ASH : def.ambient === 'shards' ? SHARDS : def.ambient === 'spores' ? 0 : 70;
     for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
     if (def.ambient === 'spores') {
       this.sporeHalos = SPORE_HALO.map((c) => [makeHalo(6, c), makeHalo(9, c)]);
@@ -213,6 +215,27 @@ export class ZoneView {
   }
 
   private spawnAmbient(x = -4, y = -4) {
+    if (this.def.ambient === 'shards') {
+      // crystal dust hanging in the air: hardly moving, kindling and going out, a few close to the camera
+      const near = Math.random() < 0.15;
+      const life = 7000 + Math.random() * 9000;
+      const hue = Math.random();
+      const fade = hue < 0.6 ? ['#3e2670', '#8c6cc8', '#ece4fa', '#ffffff', '#ccbcec', '#6e4cae'] : hue < 0.85 ? ['#183c5c', '#4894b2', '#c4e8f0', '#ffffff', '#98d0e0', '#2f7496'] : ['#4e1e52', '#ac58a2', '#f0c8e6', '#ffffff', '#dea2d2', '#8c3e88'];
+      this.ambient.add({
+        x: x < 0 ? Math.random() * W : x,
+        y: y < 0 ? 40 + Math.random() * (H - 50) : y,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.6) * 2,
+        life: x < 0 ? life : Math.random() * life,
+        max: life,
+        size: near ? 2 : 1,
+        color: fade[0],
+        fade,
+        sway: 2 + Math.random() * 3,
+        additive: true,
+      });
+      return;
+    }
     if (this.def.ambient === 'ash') {
       // ash coming down through still air, slower than snow, each flake turning over as it falls: pale side, dark side; a few close to the camera
       const near = Math.random() < 0.2;
@@ -444,7 +467,7 @@ export class ZoneView {
     amb.update(dt * speedUp);
     for (const p of amb.list) if (p.y > H + 4 || p.y < -6 || p.x > W + 8 || p.x < -60) p.life = 0;
     // the spores are their own system (spawnSpore), not particles
-    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'seeds' ? SEEDS : this.def.ambient === 'flurries' ? FLURRIES : this.def.ambient === 'ash' ? ASH : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
+    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'seeds' ? SEEDS : this.def.ambient === 'flurries' ? FLURRIES : this.def.ambient === 'ash' ? ASH : this.def.ambient === 'shards' ? SHARDS : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
     while (amb.list.length < target) this.spawnAmbient();
     if (this.def.ambient === 'sand') {
       // every few seconds a gust sweeps a veil of sand across the arena

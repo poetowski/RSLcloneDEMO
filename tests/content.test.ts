@@ -495,7 +495,7 @@ describe('design decisions', () => {
     expect(LOCATIONS[0].stages).toHaveLength(10);
   });
 
-  it('names the areas as Jakub did, the Dead Forest the easternmost with ten placeholder stages after 6-10', () => {
+  it('names the areas as Jakub did, the Crystal Graveyard the easternmost with ten placeholder stages after 7-10', () => {
     expect(LOCATIONS.map((l) => [l.chapter, l.name, l.zone])).toEqual([
       ['I', 'Fracture Reach', 'zone1'],
       ['II', 'Verdant Grove', 'zone2'],
@@ -504,6 +504,7 @@ describe('design decisions', () => {
       ['V', 'Snowy Mesa', 'zone5'],
       ['VI', 'Golden Expanse', 'zone6'],
       ['VII', 'Dead Forest', 'zone7'],
+      ['VIII', 'Crystal Graveyard', 'zone8'],
     ]);
     const scars = LOCATIONS[3];
     expect([scars.requires, scars.stages.map((s) => s.id)]).toEqual(['3-10', ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6', '4-7', '4-8', '4-9', '4-10']]);
@@ -515,6 +516,9 @@ describe('design decisions', () => {
     const forest = LOCATIONS[6];
     expect([forest.requires, forest.stages.map((s) => s.id)]).toEqual(['6-10', ['7-1', '7-2', '7-3', '7-4', '7-5', '7-6', '7-7', '7-8', '7-9', '7-10']]);
     expect(forest.stages.filter((s) => s.recruit)).toEqual([]);
+    const graveyard = LOCATIONS[7];
+    expect([graveyard.requires, graveyard.stages.map((s) => s.id)]).toEqual(['7-10', ['8-1', '8-2', '8-3', '8-4', '8-5', '8-6', '8-7', '8-8', '8-9', '8-10']]);
+    expect(graveyard.stages.filter((s) => s.recruit)).toEqual([]);
     // none of its stages brings a champion: since 2026-11-01 the Paladin is the Journey's reward for 5-10
     expect(mesa.stages.filter((s) => s.recruit)).toEqual([]);
   });
@@ -704,7 +708,7 @@ describe('challenges and the tutorial', () => {
     expect(JOURNEY[0].title).toBe('Finish Tutorial');
     // Jakub, 2026-10-25: "new journey quest: beat campaign 1-3. reward can be 100 summoning fragments", then
     // "swap quests: weave a spool make sooner and after that make beat campaign 1-3 ... swap also rewards"
-    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3', 'Beat Campaign 1-10', 'Beat Campaign 3-10', 'Beat Campaign 5-10']);
+    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3', 'Beat Campaign 1-10', 'Beat Campaign 3-10', 'Beat Campaign 5-10', 'Beat Campaign 8-10']);
     expect([JOURNEY[1].goal, JOURNEY[1].reward]).toEqual([{ kind: 'weave' }, { kind: 'fragments', amount: 100 }]);
     expect([JOURNEY[2].goal, JOURNEY[2].reward.kind]).toEqual([{ kind: 'stage', stage: '1-3' }, 'spool']);
   });
@@ -769,6 +773,15 @@ describe('challenges and the tutorial', () => {
     expect(questState(p, fifth)).toBe('ready');
     expect(claimQuest(p, fifth.id)).toEqual({ kind: 'champion', champion: 'paladin', already: false });
     expect(p.reliquary.has('paladin')).toBe(true);
+    // Beat Campaign 8-10 waits for its stage, then gives its three spools
+    const last = JOURNEY[6];
+    expect(questState(p, last)).toBe('open');
+    for (const s of allStages().slice(0, 80)) recordClear(p, s.id, 2);
+    expect(questState(p, last)).toBe('ready');
+    const spoolsBefore = p.reliquary.spools().length;
+    const three = claimQuest(p, last.id);
+    expect(three?.kind === 'spool' && three.more?.length).toBe(2);
+    expect(p.reliquary.spools()).toHaveLength(spoolsBefore + 3);
     expect(currentQuest(p)).toBeUndefined();
   });
 
@@ -855,7 +868,7 @@ describe('summoning', () => {
     expect(p.fragments).toBe(won.fragments);
     // the first battle alone stays short of a summon: the third champion comes with the Journey's Stardust (his design)
     expect(fragmentDrop('1-1', 3)).toBeLessThan(FRAGMENTS_PER_SHARD);
-    expect(JOURNEY.flatMap((q) => (q.reward.kind === 'fragments' ? [q.reward.amount] : []))).toEqual([FRAGMENTS_PER_SHARD]);
+    expect(JOURNEY.flatMap((q) => (q.reward.kind === 'fragments' ? [q.reward.amount] : []))).toEqual([FRAGMENTS_PER_SHARD, 250]);
   });
 
   it('merges 100 Stardust into a Soulstar, and spends a Soulstar on a champion not yet owned', () => {

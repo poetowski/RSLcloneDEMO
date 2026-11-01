@@ -26,7 +26,7 @@ export const SUMMONING = {
 export const FRAGMENTS_PER_SHARD = 100;
 
 /** Fragments a campaign victory finds: by area, in the campaign's order; three stars find `flawless` more (stand-ins). */
-export const FRAGMENT_DROPS = { byArea: [20, 25, 30, 35, 40, 45, 50], flawless: 10 };
+export const FRAGMENT_DROPS = { byArea: [20, 25, 30, 35, 40, 45, 50, 55], flawless: 10 };
 
 /** The odds of each rarity on a summon (his). */
 export const SUMMON_ODDS: Record<Rarity, number> = { common: 0.7, elite: 0.25, heroic: 0.05, mythic: 0 };

@@ -289,9 +289,10 @@ export interface ZoneDef {
    * seeds: feather-grass seeds sailing on the steppe wind (Earth Scars), or
    * flurries: snow blown in from the right ahead of a storm, thinning out as it
    * goes (the Snowy Mesa); ash: ash coming down through still air, slower than
-   * snow, each flake turning over as it falls (the Dead Forest)
+   * snow, each flake turning over as it falls (the Dead Forest); shards: crystal dust hanging in
+   * the air, kindling and going out (the Crystal Graveyard)
    */
-  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen' | 'spores' | 'seeds' | 'flurries' | 'ash';
+  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen' | 'spores' | 'seeds' | 'flurries' | 'ash' | 'shards';
   /** color of brazier light pools */
   glow: [number, number, number];
   /** unit shadows: offset away from the key light and horizontal stretch */

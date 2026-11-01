@@ -28,7 +28,10 @@
 // half-buried ruins and skeletons, strange lights under the sand. Beyond it
 // (2026-11-01) the sand gives out over blackened earth and the Dead Forest (Zone 7)
 // begins: grey ash, cracked soil, a forest burned to its bones, every tree a hand
-// reaching up, the great holes where the biggest once stood, mist lying still.
+// reaching up, the great holes where the biggest once stood, mist lying still. Beyond
+// it (2026-11-01) the ash ends on dark violet rock and the Crystal Graveyard (Zone 8)
+// begins: thousands of fragments, pillars, broken spires, glowing veins, and at the
+// centre of the region one gigantic formation.
 //
 // Everything is drawn in world pixels, and every random choice is a hash of
 // its position, so the map grows east area by area: widen WORLD_MAP by the new
@@ -39,6 +42,7 @@ import path from 'node:path';
 import { LOCATIONS, WORLD_MAP } from '../../src/game/data/campaign.ts';
 import { dith, ellipseFill, outline, polyFill, rampDither } from './paint.ts';
 import { A, B, Bitmap, G, hash2, hex, mix, R, RGBA, rgba } from './raster.ts';
+import { cluster, CRYS, GROUND as ROCKM, ICE, prism, rock, ROSE, STONEWORK, VEIN } from './zones/zone8.ts';
 
 const W = WORLD_MAP.w, H = WORLD_MAP.h;
 type P = [number, number];
@@ -231,7 +235,7 @@ const NODES = LOCATIONS.map((l): P => [l.map.x, l.map.y]);
 
 /** The road: the old road ends at the far lip, takes up again on this side, and runs through every node to the east edge (through the hills' pass). */
 const ROAD_FAR = curve([[-10, 318], [40, 322], [96, 334], [150, 332], [186, 324]]);
-const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [2252, 200], [2306, 190], [2352, 198], NODES[6], [2442, 186], [W + 12, 194]]);
+const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [2252, 200], [2306, 190], [2352, 198], NODES[6], [2442, 186], [2532, 194], [2596, 200], [2640, 208], NODES[7], [2762, 200], [W + 12, 196]]);
 /** the road's bridges of rope over the gulf: from the brink to the arbiter's mesa, and on east toward the storm */
 const MESA_BRIDGES: [P, P, number][] = [
   [[1626, 188], [1714, 197], 5],
@@ -497,6 +501,8 @@ function farGround(x: number, y: number, light: number): RGBA {
 
 function groundAt(x: number, y: number): RGBA {
   // the Dead Forest, the sand thinning out over its black earth
+  // the Crystal Graveyard, the ash thinning out over its rock
+  if (x >= CRYS_W && crysK(x, y) > 0.14 + vnoise(x, y, 7, 1703) * 0.72) return crysGround(x, y);
   if (x >= DEAD_W) {
     const k = deadK(x, y);
     if (k > 0.14 + vnoise(x, y, 7, 1601) * 0.72) return deadGround(x, y);
@@ -1222,6 +1228,11 @@ function road(b: Bitmap, pts: P[]) {
         if (d > 2.4) continue;
         const X = Math.round(x + dx), Y = Math.round(y + dy);
         if (!inBounds(X, Y) || sdAt(X, Y) < 0 || inRiver(X, Y) > 0) continue;
+        if (X >= CRYS_W && crysK(X, Y) > 0.5) {
+          // through the Graveyard a track of crushed crystal, paler than the rock, dark along its sides
+          if (d <= 2.3) b.set(X, Y, rampDither(ROCKM, d > 1.6 ? 1.6 : 9.2 + (hash2(X, Y, 1704) - 0.5) * 1.6, X, Y));
+          continue;
+        }
         if (X >= DEAD_W && deadK(X, Y) > 0.5) {
           // through the Dead Forest an old road: pale fresh ash between two dark ruts, drifted over in places
           if (vnoise(X, Y, 19, 1603) > 0.84) continue;
@@ -2627,6 +2638,7 @@ function renderWorld(): Bitmap {
   mesaOverlays(b);
   expanseOverlays(b);
   deadOverlays(b);
+  crysOverlays(b);
   compass(b, W - 40, H - 44);
   frame(b);
   return b;
@@ -3097,7 +3109,7 @@ function deadOverlays(b: Bitmap) {
   for (let gy = 2; gy < H; gy += 4) {
     for (let gx = DEAD_W; gx < W; gx += 4) {
       const x = gx + Math.floor(hash2(gx, gy, 1661) * 4), y = gy + Math.floor(hash2(gx, gy, 1662) * 4);
-      if (!inBounds(x, y) || deadK(x, y) < 0.8 || roadDist[idx(x, y)] < 3 || inHole(x, y, 3)) continue;
+      if (!inBounds(x, y) || deadK(x, y) < 0.8 || crysK(x, y) > 0.2 || roadDist[idx(x, y)] < 3 || inHole(x, y, 3)) continue;
       const roll = hash2(gx, gy, 1663);
       if (roll < 0.035) {
         // a stone, darkened by the heat
@@ -3128,7 +3140,7 @@ function deadOverlays(b: Bitmap) {
       if (!inBounds(x, y)) continue;
       const k = deadK(x, y);
       const off = Math.abs(y - 192) / 150;
-      const p = (0.22 + smooth(0.2, 1, off) * 0.4 + (vnoise(x, y, 54, 1673) - 0.5) * 0.7) * smooth(0.25, 0.9, k);
+      const p = (0.22 + smooth(0.2, 1, off) * 0.4 + (vnoise(x, y, 54, 1673) - 0.5) * 0.7) * smooth(0.25, 0.9, k) * (1 - smooth(0.05, 0.6, crysK(x, y)));
       if (hash2(gx, gy, 1674) > p || roadDist[idx(x, y)] < 6 || deadClear(x, y) || inHole(x, y, 6)) continue;
       const h = 12 + hash2(gx, gy, 1675) * 9 + (hash2(gx, gy, 1676) > 0.9 ? 9 : 0);
       things.push({ y, draw: () => deadHand(b, x, y, h, gx * 7919 + gy) });
@@ -3139,7 +3151,7 @@ function deadOverlays(b: Bitmap) {
     for (let gx = DEAD_W + 30; gx < W - 10; gx += 30) {
       if (hash2(gx, gy, 1677) > 0.46) continue;
       const x = gx + (hash2(gx, gy, 1678) - 0.5) * 22, y = gy + (hash2(gx, gy, 1679) - 0.5) * 18;
-      if (!inBounds(Math.round(x), Math.round(y)) || deadK(x, y) < 0.8 || deadClear(x, y) || roadDist[idx(Math.round(x), Math.round(y))] < 7 || inHole(x, y, 8)) continue;
+      if (!inBounds(Math.round(x), Math.round(y)) || deadK(x, y) < 0.8 || crysK(x, y) > 0.2 || deadClear(x, y) || roadDist[idx(Math.round(x), Math.round(y))] < 7 || inHole(x, y, 8)) continue;
       const a = (hash2(gx, gy, 1680) - 0.5) * 1.4 + (hash2(gx, gy, 1681) < 0.5 ? 0 : Math.PI), l = 10 + hash2(gx, gy, 1682) * 18;
       things.push({ y, draw: () => deadLog(b, x, y, x + Math.cos(a) * l, y + Math.sin(a) * l * 0.5, 1 + hash2(gx, gy, 1683), gx + gy) });
     }
@@ -3152,6 +3164,220 @@ function deadOverlays(b: Bitmap) {
   for (const [x, y, rx, ry] of [[2330, 150, 34, 9], [2400, 58, 40, 10], [2478, 200, 30, 8], [2366, 308, 40, 10], [2322, 90, 22, 7], [2496, 74, 20, 6], [2308, 334, 22, 6]] as const) deadMist(b, x, y, rx, ry);
   mapStag(b, 2452, 222, true);
   mapStag(b, 2464, 227, false);
+}
+
+// ---------------------------------------------------------------------------
+// The Crystal Graveyard (Zone 8, named and described by Jakub, 2026-11-01). East of
+// the forest the ash thins out over dark grey and violet rock in plates, some polished
+// and mirroring the sky, some rough, under thousands of fragments. Deep cracks show
+// glowing veins. Crystal pillars stand everywhere like headstones; broken spires lie
+// among them, with collapsed arches, cut columns half buried, small rocky rises,
+// translucent masses in the cliffs along the north and south edges. The road goes
+// through a narrow passage between two massive formations, to the gigantic formation
+// at the centre of the region, above the node. These crystals are the battle
+// background's own (`prism` in zones/zone8.ts).
+// ---------------------------------------------------------------------------
+
+const CRYS_W = 2500;
+const crysEdge = (y: number) => 2536 + 40 * vnoise(0, y, 52, 1701) + 10 * vnoise(0, y, 15, 1702);
+const crysK = (x: number, y: number) => smooth(crysEdge(y) - 22, crysEdge(y) + 22, x + (vnoise(x, y, 19, 1705) - 0.5) * 16);
+const crysClear = (x: number, y: number) => clearing(x, y, NODES[7], 70, 36);
+/** the cliffs along the north and south edges: how far into one a point is */
+const crysCliff = (x: number, y: number) => Math.max(smooth(30 + 22 * vnoise(x, 0, 47, 1706), 8, y), smooth(H - 26 - 22 * vnoise(x, 0, 43, 1707), H - 6, y));
+
+/** Which plate of rock a point is on, and how near its edge. */
+function crysPlate(x: number, y: number, cell: number, seed: number): [number, number] {
+  const p = x / cell, q = (y * 1.5) / cell;
+  const px = Math.floor(p), py = Math.floor(q);
+  let f1 = 9, f2 = 9, id = 0;
+  for (let j = -1; j <= 1; j++) {
+    for (let i = -1; i <= 1; i++) {
+      const d = Math.hypot(p - (px + i + hash2(px + i, py + j, seed)), q - (py + j + hash2(px + i, py + j, seed + 1)));
+      if (d < f1) {
+        f2 = f1;
+        f1 = d;
+        id = hash2(px + i, py + j, seed + 2);
+      } else if (d < f2) f2 = d;
+    }
+  }
+  return [f2 - f1, id];
+}
+
+const crysPolish = (x: number, y: number) => smooth(0.7, 0.8, vnoise(x, y, 30, 1708) + (vnoise(x, y, 7, 1709) - 0.5) * 0.12) * (1 - crysCliff(x, y));
+
+/** Rock in plates, each tipped its own way; polished sheets dark and clear with the sky's light in them; cliffs in strata toward the edges. */
+function crysGround(x: number, y: number): RGBA {
+  const cliff = crysCliff(x, y);
+  if (cliff > 0.3) {
+    const slab = Math.floor(x / 11 + n2(y, 19) * 1.6);
+    const v = 1.8 + hash2(slab, 0, 1711) * 3 + (Math.sin((y + x * 0.2) * 0.7) > 0.7 ? -0.8 : 0) + (hash2(x, y, 1712) - 0.5) * 0.5;
+    return rampDither(ROCKM, clamp(v, 0, ROCKM.length - 1), x, y);
+  }
+  const [e, id] = crysPlate(x, y, 22, 1713);
+  let v = 4.6 + (id - 0.5) * 2 + (vnoise(x, y, 90, 1716) - 0.5) * 1.4;
+  if (e < 0.05) v -= 2.4;
+  else if (e < 0.11) v += 0.8;
+  const pol = crysPolish(x, y);
+  if (pol > 0.4) {
+    // a mirror: nearly black, thin streaks of the sky's violet lying in it, its rim catching the light
+    const sheen = Math.sin((x * 0.9 + y * 0.45) * 0.34 + vnoise(x, y, 17, 1717) * 5);
+    if (pol < 0.62) return rampDither(ROCKM, 6.4, x, y);
+    return rampDither(CRYS, clamp(1 + (sheen > 0.88 ? 2.4 : sheen > 0.66 ? 0.9 : 0) + (hash2(x, y, 1718) - 0.5) * 0.2, 0, CRYS.length - 1), x, y);
+  }
+  v += (vnoise(x, y * 1.4, 4, 1719) - 0.5) * 1.5 + (hash2(x, y, 1720) - 0.5) * 0.5;
+  return rampDither(ROCKM, clamp(v, 0, ROCKM.length - 1), x, y);
+}
+const n2 = (v: number, s: number) => vnoise(0, v, s, 1721);
+
+/** A deep crack showing a glowing vein: a wandering line, dark lips, the vein bright inside it, its light on the rock each side. */
+function crysVein(b: Bitmap, x0: number, y0: number, x1: number, y1: number, w: number, seed: number) {
+  const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0));
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    const x = x0 + (x1 - x0) * t + (vnoise(i, 0, 17, seed) - 0.5) * 22 * Math.sin(t * Math.PI) + (vnoise(i, 0, 5, seed + 1) - 0.5) * 5;
+    const y = y0 + (y1 - y0) * t + (vnoise(i, 0, 13, seed + 2) - 0.5) * 8 * Math.sin(t * Math.PI);
+    const hw = w * (0.45 + Math.sin(t * Math.PI) * 0.6);
+    for (let dy = -4; dy <= 4; dy++) {
+      for (let dx = -4; dx <= 4; dx++) {
+        const X = Math.round(x + dx), Y = Math.round(y + dy);
+        if (!inBounds(X, Y)) continue;
+        const d = Math.hypot(dx, dy * 1.3);
+        if (d <= Math.max(1.3, hw * 0.62)) b.set(X, Y, VEIN[d < 0.8 ? 4 : 3]);
+        else if (d <= hw + 0.6) b.set(X, Y, ROCKM[0]);
+        else if (d < hw + 3.6) b.set(X, Y, mix(b.get(X, Y), VEIN[2], 0.34 * (1 - (d - hw) / 3.6)));
+      }
+    }
+  }
+}
+
+/** A foot-shadow thrown from a crystal down and to the right. */
+const crysShadow = (b: Bitmap, x: number, y: number, h: number) => deadShadow(b, x, y, h * 0.7, 2);
+
+/** A collapsed arch: two thick legs and the curve of its span, broken off halfway across; a length of it lying below. */
+function mapArch(b: Bitmap, cx: number, by: number, s: number, seed: number) {
+  crysShadow(b, cx, by, 24 * s);
+  prism(b, { x: cx + 12 * s, y: by + 1, h: 15 * s, w: 3.4 * s, lean: -0.08, seed: seed + 1, broken: true, bright: -1.2 });
+  prism(b, { x: cx - 12 * s, y: by, h: 24 * s, w: 3.6 * s, lean: 0.04, seed, broken: true, bright: -1.2 });
+  for (let i = 0; i <= 26; i++) {
+    const t = i / 26, a = Math.PI - t * 1.7;
+    const x = cx + Math.cos(a) * 12 * s, y = by - 22 * s - Math.sin(a) * 11 * s;
+    ellipseFill(b, x, y, 2.8 * s, 2.8 * s, (px, py) => rampDither(CRYS, clamp(3.4 - ((px - x) + (py - y)) * (1 / s), 0, CRYS.length - 1), px, py));
+  }
+  prism(b, { x: cx - 4 * s, y: by + 3, h: 12 * s, w: 2.6 * s, lean: 1.36, seed: seed + 3, broken: true, bright: -1.4 });
+}
+
+/** Cut columns half buried, ringed with carving, too even to have grown. */
+function mapRuin(b: Bitmap, cx: number, by: number, seed: number) {
+  [13, 8, 15, 5, 10].forEach((h, k) => {
+    const x = cx - 14 + k * 7;
+    for (let y = by - h; y <= by; y++) {
+      const ring = (by - y) % 5 === 0 ? 1 : 0;
+      b.set(x - 1, y, STONEWORK[4 + ring]);
+      b.set(x, y, STONEWORK[3 + ring]);
+      b.set(x + 1, y, STONEWORK[1 + ring]);
+    }
+    b.set(x, by - h - 1, STONEWORK[6]);
+    b.set(x - 1, by - h - 1, STONEWORK[5]);
+    b.set(x + 1, by - h - 1, STONEWORK[4]);
+  });
+  ellipseFill(b, cx, by + 1, 22, 3.4, (x, y, d) => (dith(x, y, (1 - d) * 2.4) ? rampDither(ROCKM, 6.4 + (hash2(x, y, seed) - 0.5), x, y) : b.get(x, y)));
+}
+
+/** Everything standing in the Graveyard. */
+function crysOverlays(b: Bitmap) {
+  const node = NODES[7];
+  const ramps = [CRYS, CRYS, CRYS, ICE, ROSE];
+  const rampAt = (k: number) => ramps[Math.floor(k * ramps.length)];
+  // the veins first, under everything
+  for (const [x0, y0, x1, y1, w, seed] of [[2560, 92, 2650, 150, 2.6, 1731], [2750, 110, 2806, 56, 2.2, 1732], [2720, 240, 2800, 318, 3, 1733], [2580, 306, 2660, 252, 2.6, 1734], [2610, 44, 2672, 74, 1.8, 1735], [2652, 330, 2710, 286, 2, 1736]] as const) crysVein(b, x0, y0, x1, y1, w, seed);
+  // the thousands of fragments
+  for (let gy = 1; gy < H; gy += 3) {
+    for (let gx = CRYS_W; gx < W; gx += 3) {
+      const x = gx + Math.floor(hash2(gx, gy, 1741) * 3), y = gy + Math.floor(hash2(gx, gy, 1742) * 3);
+      if (!inBounds(x, y) || crysK(x, y) < 0.7 || roadDist[idx(x, y)] < 2.5 || crysPolish(x, y) > 0.3) continue;
+      const field = vnoise(x, y, 34, 1743);
+      if (hash2(gx, gy, 1744) > 0.08 + smooth(0.44, 0.66, field) * 0.5) continue;
+      const R0 = rampAt(hash2(gx, gy, 1745));
+      if (hash2(gx, gy, 1746) > 0.9) {
+        b.set(x, y, R0[8]);
+        b.set(x, y + 1, R0[4]);
+        b.set(x + 1, y + 1, R0[2]);
+      } else b.set(x, y, R0[3 + Math.floor(hash2(gx, gy, 1747) * 4)]);
+    }
+  }
+  // the translucent masses in the cliffs
+  for (const [x, y, h, seed] of [[2582, 30, 26, 1751], [2660, 22, 20, 1752], [2780, 30, 26, 1753], [2600, 356, 28, 1754], [2740, 356, 24, 1755], [2806, 352, 22, 1756]] as const) {
+    for (let k = -1; k <= 1; k++) prism(b, { x: x + k * 8, y: y + Math.abs(k) * 2, h: h * (1 - Math.abs(k) * 0.3), w: 4.4, lean: k * 0.3, seed: seed + k, ramp: rampAt(hash2(seed, 1, 1757)), clear: 0.5, core: 1.6, bright: -0.5 });
+  }
+  // what stands, back to front
+  const things: { y: number; draw: () => void }[] = [];
+  // the rocks and the pillars, thick away from the road, like headstones
+  for (let gy = 34; gy < H - 22; gy += 13) {
+    for (let gx = CRYS_W + 20; gx < W - 6; gx += 17) {
+      const x = Math.round(gx + (hash2(gx, gy, 1761) - 0.5) * 13), y = Math.round(gy + (hash2(gx, gy, 1762) - 0.5) * 10);
+      if (!inBounds(x, y) || crysK(x, y) < 0.8 || roadDist[idx(x, y)] < 9 || crysClear(x, y) || crysPolish(x, y) > 0.3) continue;
+      const roll = hash2(gx, gy, 1763);
+      const h = 9 + hash2(gx, gy, 1764) * 15 + (hash2(gx, gy, 1765) > 0.88 ? 14 : 0), seed = gx * 31 + gy;
+      const R0 = rampAt(hash2(gx, gy, 1766));
+      if (roll < 0.3) {
+        // a pillar
+        things.push({ y, draw: () => {
+          crysShadow(b, x, y, h);
+          prism(b, { x, y, h, w: 2.8 + h * 0.1, lean: (hash2(gx, gy, 1767) - 0.5) * 0.36, seed, ramp: R0, broken: hash2(gx, gy, 1768) < 0.3, bright: -1.3 });
+        } });
+      } else if (roll < 0.45) {
+        // a clump between rocks
+        things.push({ y, draw: () => {
+          crysShadow(b, x, y, h * 0.6);
+          rock(b, x - 4, y + 1, 5, 2.6, seed);
+          cluster(b, x, y, 3, h * 0.6, 1.8, 0.9, seed, R0, -0.4);
+          rock(b, x + 5, y + 2, 4, 2.2, seed + 1);
+        } });
+      } else if (roll < 0.52) {
+        // a broken spire lying where it fell
+        const dir = hash2(gx, gy, 1769) < 0.5 ? 1 : -1;
+        things.push({ y, draw: () => prism(b, { x, y, h: h * 0.9, w: 3.2, lean: dir * (1.15 + hash2(gx, gy, 1770) * 0.3), seed, ramp: R0, broken: true, bright: -1.6 }) });
+      } else if (roll < 0.66) {
+        // a small rocky rise
+        things.push({ y, draw: () => {
+          crysShadow(b, x, y, 7);
+          rock(b, x, y, 6 + h * 0.26, 3 + h * 0.12, seed, 0.6);
+        } });
+      }
+    }
+  }
+  // collapsed arches, ancient structures
+  for (const [x, y, s] of [[2622, 110, 1], [2776, 148, 1.1], [2646, 296, 0.9]] as const) things.push({ y, draw: () => mapArch(b, x, y, s, x + y) });
+  for (const [x, y] of [[2764, 266], [2588, 134], [2706, 322]] as const) things.push({ y, draw: () => mapRuin(b, x, y, x + y) });
+  // the narrow passage: two massive formations, the road between them
+  const massive = (x: number, y: number, seed: number) => things.push({ y, draw: () => {
+    crysShadow(b, x, y, 40);
+    prism(b, { x: x - 13, y, h: 34, w: 6, lean: -0.3, seed, bright: -1 });
+    prism(b, { x: x + 14, y, h: 30, w: 6, lean: 0.34, seed: seed + 1, ramp: ICE, bright: -1 });
+    prism(b, { x: x - 4, y: y + 1, h: 52, w: 8, lean: -0.05, seed: seed + 2, bright: -0.8 });
+    prism(b, { x: x + 6, y: y + 2, h: 40, w: 7, lean: 0.12, seed: seed + 3, ramp: ROSE, bright: -1, broken: true });
+    rock(b, x - 12, y + 3, 11, 4.4, seed);
+    rock(b, x + 12, y + 3, 11, 4.4, seed + 1);
+  } });
+  massive(2598, 184, 1781);
+  massive(2606, 252, 1785);
+  // the gigantic formation at the centre of the region, above the node
+  things.push({ y: node[1] - 12, draw: () => {
+    const fx = node[0], fy = node[1] - 12;
+    ellipseFill(b, fx, fy + 2, 62, 11, (x, y, d) => (dith(x, y, (1 - d) * 1.6) ? rampDither(ROCKM, 3.2 - (x - fx) * 0.02, x, y) : b.get(x, y)));
+    deadShadow(b, fx + 20, fy + 2, 60, 5);
+    const giant: [number, number, number, number, number, RGBA[]][] = [
+      [-42, 40, 7, -0.64, 0, CRYS], [44, 36, 7, 0.68, 0, CRYS], [-30, 66, 9, -0.42, 1, ICE], [33, 60, 9, 0.46, 2, CRYS],
+      [-18, 92, 11, -0.22, 3, CRYS], [20, 84, 11, 0.26, 4, ROSE], [-7, 122, 14, -0.07, 5, CRYS], [9, 106, 13, 0.1, 6, CRYS],
+      [-14, 32, 7, -0.5, 7, ICE], [15, 28, 6, 0.56, 8, CRYS], [1, 24, 6, 0.04, 9, ROSE],
+    ];
+    for (const [dx, h, w, lean, i, ramp] of giant) prism(b, { x: fx + dx, y: fy + 1, h, w, lean, seed: 1800 + i, ramp, core: h > 80 ? 2 : 0 });
+    rock(b, fx - 44, fy + 5, 18, 6, 1812, 0.5);
+    rock(b, fx + 46, fy + 5, 17, 6, 1813, 0.5);
+    rock(b, fx - 20, fy + 8, 16, 4, 1814, 0.5);
+    rock(b, fx + 22, fy + 8, 16, 4, 1815, 0.5);
+  } });
+  things.sort((p, q) => p.y - q.y).forEach((t) => t.draw());
 }
 
 /** The scrolling world. */

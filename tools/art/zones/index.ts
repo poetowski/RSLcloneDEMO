@@ -8,8 +8,9 @@ import { zone4 } from './zone4.ts';
 import { zone5 } from './zone5.ts';
 import { zone6 } from './zone6.ts';
 import { zone7 } from './zone7.ts';
+import { zone8 } from './zone8.ts';
 
-export const ZONE_ART: Record<string, ZoneArt> = { zone1, zone2, zone3, zone4, zone5, zone6, zone7 };
+export const ZONE_ART: Record<string, ZoneArt> = { zone1, zone2, zone3, zone4, zone5, zone6, zone7, zone8 };
 
 export function buildZones(out: string, only?: string) {
   for (const z of Object.values(ZONE_ART)) if (!only || only === z.id) buildZone(z, out);

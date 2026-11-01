@@ -118,6 +118,20 @@ export const ZONES: ZoneDef[] = [
     butterflies: [[258, 164], [398, 142], [322, 214]],
     moths: true,
   },
+  {
+    // Zone 8, named and described by Jakub (2026-11-01): the Crystal Graveyard, dark grey and violet mineral rock under
+    // thousands of crystal fragments, giant pillars, broken spires, glowing veins, a gigantic formation at its centre
+    id: 'zone8',
+    name: 'Crystal Graveyard',
+    ambient: 'shards',
+    // the veins' light
+    glow: [220, 170, 255],
+    // the moon stands high and cold: short, soft shadows
+    shadow: { dx: 3, stretch: 1.15 },
+    tint: { color: '#b49cff', alpha: 0.05, op: 'soft-light' },
+    // a first take: now and then the formation lights the sky, rarely
+    flash: { at: [320, 70], every: [16000, 32000], ms: 1600, colors: ['#b89cff', '#7fe0ff', '#ff9ae0'] },
+  },
 ];
 
 const byId = new Map(ZONES.map((z) => [z.id, z]));

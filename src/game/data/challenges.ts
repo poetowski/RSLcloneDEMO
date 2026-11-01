@@ -93,4 +93,12 @@ export const JOURNEY: readonly QuestDef[] = [
     goal: { kind: 'stage', stage: '5-10' },
     reward: { kind: 'champion', champion: 'paladin' },
   },
+  // his (2026-11-01): "new quest beating campaign 8-10. reward is 3 spools"; which three is a stand-in
+  {
+    id: 'beat_8_10',
+    title: 'Beat Campaign 8-10',
+    text: 'Clear stage 8-10 of the campaign, the last of the Crystal Graveyard.',
+    goal: { kind: 'stage', stage: '8-10' },
+    reward: { kind: 'spool', pattern: 'pattern_apex', grade: 2, count: 3 },
+  },
 ];
