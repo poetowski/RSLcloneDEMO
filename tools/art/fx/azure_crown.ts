@@ -27,7 +27,7 @@
 import { MAT } from '../palette.ts';
 import { disc, dith, ellipseRing, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, hash2, RGBA, rng } from '../raster.ts';
-import { burst, cut, flame, FxDef, motes, ramps, ring, sparks, W } from './kit.ts';
+import { burst, cut, flame, FxDef, motes, ramps, ring, soundRings, sparks, W } from './kit.ts';
 
 const DU = ramps.dust;
 const GO = ramps.gold;
@@ -676,6 +676,42 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
       // the crack
       if (i >= 1 && i < 6) for (const [dx, dy] of [[-7, -11], [8, -9], [-9, 8], [10, 10]]) cut(b, cx, cy, cx + dx * (1 + i * 0.1), cy + dy * (1 + i * 0.1), 0, 1, ramps.steel, 0.7, 1);
       if (i >= 1) sparks(b, cx + 4, cy, 12, 30, (i - 1) / 7, ramps.steel, 821, 22);
+    },
+  },
+  /** Hammer and Scythe, the hammer: it lands in a dull flash, sparks off iron thrown out low. */
+  ofentol_hammer: {
+    w: 68, h: 54, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 6, 6],
+    draw: (b, t, i) => {
+      const cx = 33, cy = 27;
+      if (i < 4) burst(b, cx, cy, 8, [3, 4, 4, 3][i], [12, 18, 15, 9][i], [3, 3.2, 2.2, 1.4][i], ramps.steel, 0.25);
+      if (i >= 1) sparks(b, cx, cy, 11, 26, (i - 1) / 6, ramps.gold, 831, 26);
+    },
+  },
+  /** Hammer and Scythe, the scythe: a long curved cut across, from high on the far side. */
+  ofentol_scythe: {
+    w: 78, h: 62, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 6, 6],
+    draw: (b, t, i) => {
+      if (i < 4) cut(b, 12 + i * 3, 12 + i, 62 + i, 46 - i, 10, [2, 3.4, 2.6, 1.3][i], ramps.steel, [1.2, 1.4, 1, 0.6][i], 1);
+      if (i >= 1) sparks(b, 38, 30, 6, 18, (i - 1) / 5, ramps.steel, 841, 12);
+    },
+  },
+  /** I Am Ofentol!: his roar going out in rings from his mouth. */
+  ofentol_shout: {
+    w: 110, h: 90, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [4, 6, 6, 6],
+    draw: (b, t, i) => soundRings(b, 55, 45, i, 3, 2, 5, 6, ramps.steel),
+  },
+  /** I Am Ofentol!: the cheer on each ally: golden bubbles of ale rising round them, as if somebody just bought the round. */
+  ofentol_cheer: {
+    w: 56, h: 72, n: 12, ms: 60, ax: 0.5, ay: 0.9, pad: [4, 4, 4, 4],
+    draw: (b, t) => motes(b, 28, 64, 20, 54, 12, t, ramps.gold, 851),
+  },
+  /** Overlord's Round: a plate of beaten light closing in front of the ally, sparks off it. */
+  ofentol_plate: {
+    w: 56, h: 60, n: 7, ms: 55, ax: 0.5, ay: 0.5, pad: [4, 4, 4, 4],
+    draw: (b, t, i) => {
+      const k = Math.sin((i / 6) * Math.PI);
+      ring(b, 28, 30, 10 + i * 2, 15 + i * 2, 1.8, ramps.steel, k);
+      if (i >= 1) sparks(b, 28, 30, 6, 18, (i - 1) / 6, ramps.gold, 861, 12);
     },
   },
 };

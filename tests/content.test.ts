@@ -59,6 +59,8 @@ describe('champions', () => {
         const a = atlas.anims[s.anim];
         expect(a, `${s.id} anim ${s.anim}`).toBeTruthy();
         expect(a.hits.length, `${s.id}: hit frames in ${s.anim}`).toBe(s.hits.length);
+        // the blows that always come, without the one on a chance
+        if (s.hits.some((h) => h.chance !== undefined)) expect(atlas.anims[s.animAlone ?? '']?.hits.length, `${s.id}: animAlone`).toBe(s.hits.findIndex((h) => h.chance !== undefined));
         const events = Object.values(a.events);
         if (s.approach === 'leap') expect(events, `${s.id} leap needs a jump event`).toContain('jump');
         if (s.actorFx) expect(events, `${s.id} actorFx needs a cast event`).toContain('cast');

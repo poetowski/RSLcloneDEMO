@@ -79,6 +79,8 @@ export interface SkillResult {
   events: BattleEvent[];
   /** true when this action is a counterattack */
   counter?: boolean;
+  /** how many of the skill's hits came (fewer than it has when one on a chance did not) */
+  landed: number;
   /** counterattacks triggered by this action, already resolved */
   counters: SkillResult[];
 }
@@ -359,17 +361,21 @@ export class Battle {
     // statuses placed before the first hit (hit -1), so the skill's own hits carry them (the Automated Soul's ATK Up)
     place(true, -1);
 
-    const last = skill.hits.length - 1;
+    // a hit on a chance may not come, and then neither does anything after it (Overlord Ofentol's scythe)
+    const missing = skill.hits.findIndex((h) => h.chance !== undefined && !this.rng.chance(h.chance));
+    const landing = missing < 0 ? skill.hits : skill.hits.slice(0, missing);
+    const last = landing.length - 1;
     const damaged = new Set<Unit>();
     /** the targets a critical hit of this skill landed on */
     const critOn = new Set<Unit>();
-    skill.hits.forEach((h, hi) => {
+    landing.forEach((h, hi) => {
       if (h.mult <= 0) return;
       for (const t of targets) {
         if (!t.alive) continue;
         const dmg = this.rollDamage(actor, t, skill, h.mult);
         const dealt = this.applyDamage(t, dmg.amount, dmg.crit, dmg.edge, hi, events);
         damaged.add(t);
+        if (skill.slot === 1 && t.team !== actor.team) this.struckMeter(t, hi, events);
         if (dmg.crit) critOn.add(t);
         if (dmg.crit) this.rebuke(t, actor, hi, events);
         if (skill.lifesteal && dealt > 0 && actor.alive) this.heal(actor, Math.round(dealt * skill.lifesteal), hi, events);
@@ -448,7 +454,7 @@ export class Battle {
     this.defy(actor, critOn, last, events);
     this.retaliate(actor, damaged, last, events);
 
-    const result: SkillResult = { actor: actor.uid, skill, target: primary?.uid, targets: targets.map((t) => t.uid), events, counter: asCounter, counters: [] };
+    const result: SkillResult = { actor: actor.uid, skill, target: primary?.uid, targets: targets.map((t) => t.uid), events, counter: asCounter, counters: [], landed: landing.length };
 
     // counterattacks: each damaged defender holding Counterattack answers once with A1;
     // one whose A1 strikes no enemy (the Dominion Medic's heal) has no answer to give
@@ -703,6 +709,17 @@ export class Battle {
       if (p.chance !== undefined && !this.rng.chance(p.chance)) continue;
       events.push({ kind: 'passive', target: r.uid, name: p.name, hit, effect: 'remedy', source: h.uid });
       for (const st of p.statuses ?? []) this.tryApply(h, r, st.status, st.turns, undefined, p.value, hit, events);
+    }
+  }
+
+  /** Struck meter (part of a passive): a hit of an enemy's A1 on an ally of the holder, the holder included, fills the holder's turn meter (Overlord Ofentol's Overlord's Round). */
+  private struckMeter(t: Unit, hit: number, events: BattleEvent[]) {
+    for (const h of this.allies(t)) {
+      const gain = h.champion.passive?.struckMeter;
+      if (!gain) continue;
+      const before = h.tm;
+      h.tm = Math.min(TURN_FULL, h.tm + gain);
+      if (h.tm !== before) events.push({ kind: 'tm', target: h.uid, delta: h.tm - before, hit });
     }
   }
 

@@ -111,6 +111,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | Zone 8, the Crystal Graveyard: battle background, the world map extended east, ten placeholder stages | 5.11 |
 | 2026-11-01 | The Journey gains Beat Campaign 8-10, three spools | 57 |
 | 2026-11-01 | The Crossbowman, an Elite Damage of the Azure Crown, Tide | 58 |
+| 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
@@ -4048,3 +4049,40 @@ small gold crown on his chest for the Azure Crown; the crossbow in both hands.
 
 Stand-ins: the names Guild Shot, Armour Breaker and Master's Eye, the lore, A2's multiplier, the
 stats, how the colours are shared out, A2 taken from one knee, the bolts and their effects.
+
+## 59. Overlord Ofentol (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+i want new hero.
+azure crown
+tank role
+affinity bloom if they dont have already bloom tank in faction as elite
+elite rarity
+name = Overlord Ofentol
+a bit about lore = this guy once got drunk so heavy he wanted to shout he is overlord but he called himself Ofentol. I am Ofentol! mispronounced.
+design = fatty guy with smith hammer and scythe onehanded. has dirty white tshirt and beard.
+kit = A1 hit enemy single target. 50% chance to hit again.
+A2 = place taunt on himself for 2 turns and regen for every ally including himself for 2 turns as well. CD 4 turns.
+A3 passive - when ally is debuffed, this champion place shield on that ally for 15% of thic champion max hp for 1 turn. also increase Ofentol's turn meter by 7% every time an ally is hit by enemy A1 skill, including himself.
+```
+
+The Azure Crown's Elite Tank was Emissary Handlings, Tide, so he is Bloom. HP 1380, ATK 84, DEF 70, SPD
+90, CRIT 5%, score 407, the low end of the Elite budget, because at the budget's middle he measured an
+impact of 67% (target 40-60); he stands at 61%, a point over, with the rest of his power in the kit as
+given.
+
+**Readings.** "50% chance to hit again": a hammer blow, then on the chance a second, equal swing of the
+scythe; when it does not come he does not swing at all (`animAlone`). "One-handed": the hammer in one
+hand, a short scythe in the other. "When ally is debuffed": by an enemy, himself included, once per
+debuff, no roll, as the Grove Keeper's remedy. "Every time an ally is hit by enemy A1": per hit that
+lands, so a double-hitting A1 gives 14%; also an enemy's counterattack, which is its A1; the meter's gain
+shows as +7% TURN over him.
+
+**New in the engine.** A hit may carry a `chance`, and the norms count it at its odds; a remedy passive
+may carry `struckMeter`.
+
+Stand-ins: the names Hammer and Scythe, I Am Ofentol! and Overlord's Round, the lore's wording, A1's 0.7 a
+hit, the stats, and his look past the brief (bald, ginger beard, red nose, a shirt too short for his belly,
+the Crown's blue belt), the golden ale bubbles of his cheer.

@@ -66,6 +66,8 @@ export interface HitDef {
   mult: number;
   /** effect played on every target at this hit */
   fx?: string;
+  /** 0..1: this hit lands only on the roll, and the skill's later hits with it (Overlord Ofentol's scythe: 50%); the norms count it at its odds */
+  chance?: number;
 }
 
 export interface SkillDef {
@@ -81,6 +83,8 @@ export interface SkillDef {
   approach: Approach;
   /** One entry per hit frame of the animation. */
   hits: HitDef[];
+  /** the animation when a hit with a `chance` did not land: the same blows without the swing that never came */
+  animAlone?: string;
   statuses?: StatusApp[];
   /** heal all allies by this fraction of each ally's max HP (on the last hit) */
   healAllies?: number;
@@ -198,6 +202,8 @@ export interface PassiveDef {
   max?: number;
   /** ward: it guards only the champion itself, not its allies */
   self?: boolean;
+  /** remedy: besides, every hit of an enemy's A1 on an ally, the champion included, adds this much to its turn meter (Overlord Ofentol's Overlord's Round: 7) */
+  struckMeter?: number;
   /** presentation: the effect played on the champion the passive reaches (the ally it shields, the enemy it answers) */
   fx?: string;
   /** presentation: the effect played on the champion itself as the passive acts (the Jungle Herder's bell) */

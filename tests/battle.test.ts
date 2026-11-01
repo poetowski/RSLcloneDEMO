@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { decide } from '../src/game/battle/ai';
 import { Battle, combatants, landShare } from '../src/game/battle/battle';
 import { flatten, simulate } from '../src/game/battle/sim';
-import { ALL_CHAMPIONS } from '../src/game/data/champions';
+import { ALL_CHAMPIONS, overlordOfentol } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
 import { balm, bannerman, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
@@ -928,6 +928,45 @@ describe('statuses', () => {
     expect(tick.map((e) => e.kind === 'damage' && e.dot)).toEqual(['poison']);
     b.endTurn(a);
     expect(b.has(a, 'poison')).toBe(false);
+  });
+
+  it('strikes a second time only on its chance, and a hit that does not come leaves the skill one hit short', () => {
+    let both = 0, one = 0;
+    for (let seed = 1; seed <= 200; seed++) {
+      const b = new Battle(combatants([overlordOfentol]), combatants([warden]), { seed });
+      const r = b.useSkill(b.get('p0'), overlordOfentol.skills[0], 'e0');
+      const hits = r.events.filter((e) => e.kind === 'damage');
+      expect(hits).toHaveLength(r.landed);
+      if (r.landed === 2) both++;
+      else if (r.landed === 1) one++;
+      expect(r.events.every((e) => e.hit < r.landed)).toBe(true);
+    }
+    expect(both + one).toBe(200);
+    expect(both).toBeGreaterThan(70);
+    expect(one).toBeGreaterThan(70);
+  });
+
+  it("shields an ally an enemy debuffs for 15% of the holder's max HP, and fills its meter by 7% for every hit of an enemy A1 on its side", () => {
+    const b = new Battle(combatants([overlordOfentol, striker]), combatants([warden]), { seed: 2 });
+    const holder = b.get('p0');
+    // an enemy's A2 debuffs an ally: the Shield, and no meter
+    holder.tm = 10;
+    const r = b.useSkill(b.get('e0'), skill(warden, 'dispel_strike'), 'p1');
+    expect(r.events.some((e) => e.kind === 'status' && e.status === 'shield' && e.target === 'p1')).toBe(true);
+    expect(b.get('p1').statuses.find((s) => s.id === 'shield')?.value).toBe(Math.round(holder.maxHp * 0.15));
+    expect(holder.tm).toBe(10);
+    // an enemy's A1 on an ally, then on himself
+    const a1 = b.get('e0').champion.skills[0];
+    b.useSkill(b.get('e0'), a1, 'p1');
+    expect(holder.tm).toBe(17);
+    b.useSkill(b.get('e0'), a1, 'p0');
+    expect(holder.tm).toBe(24);
+    // his own side's A1 does nothing for him, and a full meter stays full
+    b.useSkill(b.get('p1'), b.get('p1').champion.skills[0], 'e0');
+    expect(holder.tm).toBe(24);
+    holder.tm = 98;
+    b.useSkill(b.get('e0'), a1, 'p0');
+    expect(holder.tm).toBe(100);
   });
 
   it('soothes an ally an enemy debuffs, the holder included, once for each debuff that lands', () => {

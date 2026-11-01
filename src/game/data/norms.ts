@@ -53,7 +53,7 @@ export const STATUS_NORMS = {
 };
 
 export function totalMult(s: SkillDef): number {
-  return s.hits.reduce((a, h) => a + h.mult, 0);
+  return s.hits.reduce((a, h) => a + h.mult * (h.chance ?? 1), 0);
 }
 
 export function isAoe(s: SkillDef): boolean {
