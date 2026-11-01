@@ -651,4 +651,16 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
       }
     },
   },
+  /** Watch Rotation: he takes the watch, a ring of rose light at his feet and motes of it rising round him, a soft column. */
+  watch_light: {
+    w: 60, h: 84, n: 10, ms: 70, ax: 0.5, ay: 0.95, pad: [2, 4, 2, 4],
+    draw: (b, t, i) => {
+      const R = ramps.rose;
+      const cx = 30, gy = 78;
+      const rr = [6, 12, 17, 20, 22, 22, 21, 20, 18, 16][i];
+      ellipseRing(b, cx, gy, rr, rr * 0.3, 1.2, (x, y, a) => (dith(x, y, 1 - t * 0.7) ? rampDither(R, 3.2 - t * 1.2 + Math.sin(a) * 0.5, x, y) : 0));
+      motes(b, cx, gy - 4, 34, 66, 16, t, R, 811);
+      if (i >= 2 && i < 8) motes(b, cx, gy - 10, 20, 50, 8, (t * 1.4) % 1, R, 823);
+    },
+  },
 };
