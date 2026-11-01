@@ -453,9 +453,8 @@ export class CampaignScreen extends BaseScreen {
     ctx.fillRect(fx, fy + fh - 1, fw, 1);
     ctx.fillRect(fx, fy, 1, fh);
     ctx.fillRect(fx + fw - 1, fy, 1, fh);
-    // the areas, with their names above them
+    // the areas: only their Roman numerals, too many names to read at this size (Jakub, 2026-11-01); a name shows on hover
     const p = this.archivist;
-    const banner = ui.part('banner');
     for (const loc of LOCATIONS) {
       const open = locationOpen(p, loc);
       const done = loc.stages.length > 0 && loc.stages.every((s) => cleared(p, s.id));
@@ -464,7 +463,6 @@ export class CampaignScreen extends BaseScreen {
       const x = nx - Math.floor(r[2] / 2), y = ny - Math.floor(r[3] / 2);
       const id = 'ov_' + loc.id;
       const hot = ui.hot(id, x - 2, y - 2, r[2] + 4, r[3] + 4);
-      this.banner(ctx, loc, nx, y - 6 - banner[3]);
       blit(ctx, this.a.ui.img, r, x, y - (hot ? 1 : 0));
       if (open) ui.text(ctx, loc.chapter, nx, y + 6 - (hot ? 1 : 0), { color: done ? '#2a1404' : COLORS.text, align: 'center', outline: done ? '#ffe070' : COLORS.ink });
       ui.regions.push({

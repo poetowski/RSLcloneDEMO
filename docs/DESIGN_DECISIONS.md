@@ -104,6 +104,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey's fourth quest: Beat Campaign 1-10, two spools | 53 |
 | 2026-11-01 | Zone 6, the Golden Expanse: battle background, the world map extended east with a tunnel between areas 5 and 6, ten placeholder stages | 5.9 |
 | 2026-11-01 | The Journey's fifth quest: Beat Campaign 5-10, the Paladin its reward; no longer summoned | 34, 36, 54 |
+| 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
 
