@@ -2020,17 +2020,13 @@ export function buildSanctum(out: string) {
     order: defs.map((d) => d.key),
     hotspots,
     spots: [
+      // Jakub, 2026-11-01: "lets stay at 3 vs 3 in a row"; filled in this order, so a small roster still stands on both sides
       { x: 232, y: 284, facing: 'R' },
       { x: 340, y: 284, facing: 'L' },
       { x: 180, y: 278, facing: 'R' },
-      { x: 394, y: 277, facing: 'L' },
-      // Jakub, 2026-11-01: "lets try 4 on left and 5 on right", then "put the fifth on left as well"; filled in this order, so a small roster still stands on both sides
-      { x: 206, y: 264, facing: 'R' },
-      { x: 368, y: 264, facing: 'L' },
-      { x: 130, y: 270, facing: 'R' },
-      { x: 466, y: 274, facing: 'L' },
-      { x: 424, y: 260, facing: 'L' },
-      { x: 150, y: 260, facing: 'R' },
+      { x: 394, y: 278, facing: 'L' },
+      { x: 128, y: 272, facing: 'R' },
+      { x: 446, y: 272, facing: 'L' },
     ],
     twinkles: TWINKLES,
     rings: [RIM],
