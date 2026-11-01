@@ -7,9 +7,9 @@ import { ChampionDef } from '../types';
 // shoulders. An A1 on one enemy that takes 7% of its Turn Meter, and an A2,
 // no attack, cooldown 4: Regen on himself and on the ally with the lowest max
 // HP other than him for 2 turns, and he starts his next turn with 30% Turn
-// Meter. No passive. Stand-ins until Jakub sets them: the names and texts,
-// A1's 1.0, the stats (the lighter option, on the Common budget) and the lore
-// line. He is summoned.
+// Meter. No passive. Jakub approved the names, the lore line and the art as
+// shown (2026-11-01); the texts, A1's 1.0 and the stats (the lighter option,
+// on the Common budget) wait for his balance. He is summoned.
 export const sentry: ChampionDef = {
   id: 'sentry',
   name: 'Sentry',

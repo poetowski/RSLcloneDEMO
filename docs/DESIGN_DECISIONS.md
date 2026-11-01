@@ -97,6 +97,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Harvest Specialist, a Common Support of the Sanguine Dominion; Tide, my choice on his word; the golden wheat and the sturdy stats on his word, the rest of the worksheet's recommended options | 45 |
 | 2026-10-31 | The Archer, the Junior Ward and the Harvest Specialist approved as built: their art, names and lore lines, and the Harvest Specialist's Tide | 43-45 |
 | 2026-11-01 | The Sentry, a Common Tank of the Sanguine Dominion; the lighter stats and the A2's Regen on someone else on his word, the rest of the worksheet's recommended options | 46 |
+| 2026-11-01 | The Sentry approved as built: his art, the names Checkpoint Cut and Watch Rotation, the lore line | 46 |
 
 ---
 
@@ -3624,7 +3625,16 @@ white streak, landing as Gareth's cut. Watch Rotation: the sword planted point-d
 stands tall, a ring of rose light at his feet and motes of it rising. Victory: the
 sword raised in both hands. Death: he kneels and falls, the sword beside him.
 
-What the game fills in (stand-ins, listed in CLAUDE.md): the names Checkpoint Cut and
+Shown the previews with the names Checkpoint Cut and Watch Rotation and the lore line,
+Jakub answered:
+
+```
+All approved go then merge to main
+```
+
+so the art, the names and the lore line are his.
+
+What the game filled in before that (listed in CLAUDE.md): the names Checkpoint Cut and
 Watch Rotation and their texts, A1's 1.0, his stats (the lighter option, on the Common
 budget: HP 1260, ATK 82, DEF 66, SPD 100, CRIT 2.5%, score 391), the lore line ("A sentry
 of the Sanguine Dominion who walks its borders by night, and has never let anyone cross
