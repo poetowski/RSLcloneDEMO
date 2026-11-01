@@ -123,7 +123,7 @@ export class ChampionScreen extends BaseScreen {
       ui.panel(ctx, 'red', sx - 96, 54, 192, 34);
       ui.blit(ctx, 'lock', sx - 88, 64);
       ui.text(ctx, 'NOT YET RECRUITED', sx + 6, 60, { color: '#ffd0c0', variant: 'bold', align: 'center' });
-      ui.text(ctx, by.kind === 'stage' ? `Clear stage ${by.stage}` : by.kind === 'summon' ? `Summon at ${SUMMONING.place}` : '', sx + 6, 72, { color: COLORS.dim, align: 'center' });
+      ui.text(ctx, by.kind === 'stage' ? `Clear stage ${by.stage}` : by.kind === 'quest' ? `Journey: ${by.title}` : by.kind === 'summon' ? `Summon at ${SUMMONING.place}` : '', sx + 6, 72, { color: COLORS.dim, align: 'center' });
     }
     // animation preview buttons
     const anims: [string, string][] = [['IDLE', 'idle'], ['RUN', 'run'], ...c.skills.map((s, i) => [`A${i + 1}`, s.anim] as [string, string])];
@@ -468,7 +468,7 @@ export class ChampionScreen extends BaseScreen {
     if (fac.standard) cy += ui.para(ctx, `Standard: ${fac.standard}`, x, cy, w, { color: COLORS.dim }) + 6;
     else cy += 6;
     const by = joinsBy(this.c.id);
-    ui.text(ctx, by.kind === 'start' ? 'Joins you from the start.' : by.kind === 'stage' ? `Joins on the first clear of stage ${by.stage}.` : `Comes when summoned at ${SUMMONING.place}.`, x, cy, { color: COLORS.faint });
+    ui.text(ctx, by.kind === 'start' ? 'Joins you from the start.' : by.kind === 'stage' ? `Joins on the first clear of stage ${by.stage}.` : by.kind === 'quest' ? `Joins as the reward of the Journey's ${by.title}.` : `Comes when summoned at ${SUMMONING.place}.`, x, cy, { color: COLORS.faint });
   }
 
   key(k: string) {

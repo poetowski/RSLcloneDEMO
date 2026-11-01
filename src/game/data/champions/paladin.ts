@@ -3,8 +3,8 @@ import { ChampionDef } from '../types';
 // The Paladin (docs/DESIGN_DECISIONS.md section 34, Jakub's brief of
 // 2026-10-24): a Heroic of the Azure Crown, the roster's first Heroic, Tank
 // ("class = DEFENSE"), Ember (Tide in the brief, Ember on his word the same
-// day: "change his affinity to ember"); the reward of a quest line Jakub
-// designs later. A tall young knight in silver plate with wide ornate
+// day: "change his affinity to ember"); the reward of the Journey's Beat
+// Campaign 5-10 (2026-11-01, section 54), never summoned. A tall young knight in silver plate with wide ornate
 // pauldrons, bareheaded, long blonde hair; a long dark-blue cloak with three
 // white crowns; a big Swiss-shaped shield with a double cross; a wide, very
 // bright sword with flames. The kit is his: "A1 - attack one enemy. cause

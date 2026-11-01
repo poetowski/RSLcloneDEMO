@@ -156,7 +156,9 @@ for (const loc of LOCATIONS) {
     if (s.recruit && !owned.includes(s.recruit)) owned.push(s.recruit);
     dust += fragmentDrop(s.id, 1);
     JOURNEY.forEach((q, i) => {
-      if (claimedAfter[i] === stageIds.indexOf(s.id) && q.reward.kind === 'fragments') dust += q.reward.amount;
+      if (claimedAfter[i] !== stageIds.indexOf(s.id)) return;
+      if (q.reward.kind === 'fragments') dust += q.reward.amount;
+      if (q.reward.kind === 'champion' && !owned.includes(q.reward.champion)) owned.push(q.reward.champion);
     });
   });
 }

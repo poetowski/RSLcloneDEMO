@@ -30,8 +30,9 @@ export type QuestGoal = { kind: 'tutorial' } | { kind: 'stage'; stage: string } 
  * What claiming a quest gives: a spool of one Weave Pattern and grade (0
  * Ashen, 1 Silver, 2 Gilded), its main stat drawn by slot; or Stardust, the
  * fragments that merge into Soulstars. `count`: how many spools, one when absent.
+ * Or a champion: it joins only through this quest, and is never summoned.
  */
-export type QuestReward = { kind: 'spool'; pattern: PatternId; grade: 0 | 1 | 2; count?: number } | { kind: 'fragments'; amount: number };
+export type QuestReward = { kind: 'spool'; pattern: PatternId; grade: 0 | 1 | 2; count?: number } | { kind: 'fragments'; amount: number } | { kind: 'champion'; champion: string };
 
 export interface QuestDef {
   id: string;
@@ -75,5 +76,13 @@ export const JOURNEY: readonly QuestDef[] = [
     text: 'Clear stage 1-10 of the campaign, the last of the Fracture Reach.',
     goal: { kind: 'stage', stage: '1-10' },
     reward: { kind: 'spool', pattern: 'pattern_vigor', grade: 1, count: 2 },
+  },
+  // his (2026-11-01): "beat campaign 5-10. reward is Paladin hero acquired. it will get unclocked once reward collected"
+  {
+    id: 'beat_5_10',
+    title: 'Beat Campaign 5-10',
+    text: 'Clear stage 5-10 of the campaign, the last of the Snowy Mesa.',
+    goal: { kind: 'stage', stage: '5-10' },
+    reward: { kind: 'champion', champion: 'paladin' },
   },
 ];

@@ -79,11 +79,12 @@ describe('champions', () => {
   });
 
   // Jakub, 2026-10-25: "all champions are being spawned like in rsl from a special currency ... rime scholar is guaranteed champion drop from stage 1-1. this is only exception."
-  it('are all obtainable: Gareth from the start, the Rime Scholar from 1-1, every other champion summoned', () => {
+  it('are all obtainable: Gareth from the start, the Rime Scholar from 1-1, the Paladin from the Journey, every other champion summoned', () => {
     expect(allStages().filter((s) => s.recruit).map((s) => [s.id, s.recruit])).toEqual([['1-1', 'rime_scholar']]);
     const pool = summonPool(newArchivist()).map((c) => c.id);
     for (const c of CHAMPIONS) {
       if (STARTERS.includes(c.id) || c.id === 'rime_scholar') expect(pool, c.id).not.toContain(c.id);
+      else if (c.id === 'paladin') continue;
       else expect(pool, `${c.id} cannot be summoned`).toContain(c.id);
     }
   });
@@ -513,7 +514,7 @@ describe('design decisions', () => {
     const expanse = LOCATIONS[5];
     expect([expanse.requires, expanse.stages.map((s) => s.id)]).toEqual(['5-10', ['6-1', '6-2', '6-3', '6-4', '6-5', '6-6', '6-7', '6-8', '6-9', '6-10']]);
     expect(expanse.stages.filter((s) => s.recruit)).toEqual([]);
-    // none of its stages brings a champion: since summoning (2026-10-25) the Paladin is summoned like the rest
+    // none of its stages brings a champion: since 2026-11-01 the Paladin is the Journey's reward for 5-10
     expect(mesa.stages.filter((s) => s.recruit)).toEqual([]);
   });
 });
@@ -702,7 +703,7 @@ describe('challenges and the tutorial', () => {
     expect(JOURNEY[0].title).toBe('Finish Tutorial');
     // Jakub, 2026-10-25: "new journey quest: beat campaign 1-3. reward can be 100 summoning fragments", then
     // "swap quests: weave a spool make sooner and after that make beat campaign 1-3 ... swap also rewards"
-    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3', 'Beat Campaign 1-10']);
+    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3', 'Beat Campaign 1-10', 'Beat Campaign 5-10']);
     expect([JOURNEY[1].goal, JOURNEY[1].reward]).toEqual([{ kind: 'weave' }, { kind: 'fragments', amount: 100 }]);
     expect([JOURNEY[2].goal, JOURNEY[2].reward.kind]).toEqual([{ kind: 'stage', stage: '1-3' }, 'spool']);
   });
@@ -749,6 +750,15 @@ describe('challenges and the tutorial', () => {
     const won = claimQuest(p, fourth.id);
     expect(won?.kind === 'spool' && won.more?.length).toBe(1);
     expect(p.reliquary.spools()).toHaveLength(had + 2);
+    // Beat Campaign 5-10 waits for its stage, then the Paladin joins, new, and only then
+    const fifth = JOURNEY[4];
+    expect(p.reliquary.has('paladin')).toBe(false);
+    expect(questState(p, fifth)).toBe('open');
+    for (const s of allStages().slice(0, 50)) recordClear(p, s.id, 2);
+    expect(p.reliquary.has('paladin')).toBe(false);
+    expect(questState(p, fifth)).toBe('ready');
+    expect(claimQuest(p, fifth.id)).toEqual({ kind: 'champion', champion: 'paladin', already: false });
+    expect(p.reliquary.has('paladin')).toBe(true);
     expect(currentQuest(p)).toBeUndefined();
   });
 
@@ -865,12 +875,12 @@ describe('summoning', () => {
       expect(seen.has(s.champion), s.champion).toBe(false);
       seen.add(s.champion);
     }
-    expect(seen.size).toBe(CHAMPIONS.length - 2);
+    expect(seen.size).toBe(CHAMPIONS.length - 3);
+    expect(seen.has('paladin')).toBe(false);
     expect(summonPool(p)).toEqual([]);
     expect(summonsReady(p)).toBe(0);
     // with every Heroic found, the 5% goes to Common and Elite in proportion
     const q = newArchivist();
-    q.reliquary.recruit('paladin');
     q.reliquary.recruit('chief_engineer_cj');
     q.reliquary.recruit('forest_gargoyle');
     q.reliquary.recruit('dead_knight_amstron');
@@ -945,7 +955,8 @@ describe('summoning', () => {
   it('tells how each champion comes, and when the lesson on summoning is due', () => {
     expect(joinsBy(STARTERS[0])).toEqual({ kind: 'start' });
     expect(joinsBy('rime_scholar')).toEqual({ kind: 'stage', stage: '1-1' });
-    expect(joinsBy('paladin')).toEqual({ kind: 'summon' });
+    expect(joinsBy('paladin')).toEqual({ kind: 'quest', title: 'Beat Campaign 5-10' });
+    expect(joinsBy('chief_engineer_cj')).toEqual({ kind: 'summon' });
     const p = newArchivist();
     expect(summonLessonDue(p)).toBe(false);
     p.fragments = 100;

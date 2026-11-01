@@ -6,27 +6,33 @@
 // role) makes every champion it names likelier, never certain. A summon
 // brings a champion not in the Reliquary yet (a stand-in: a champion is one
 // soul, recollected once), so a rarity whose champions are all found gives
-// its share to the others; the starters and the champion a stage brings (1-1's
-// Rime Scholar) are never summoned. Rules: docs/MECHANICS_GUIDE.md 16.
+// its share to the others; the starters, the champion a stage brings (1-1's
+// Rime Scholar) and the champion a quest gives (the Paladin) are never summoned. Rules: docs/MECHANICS_GUIDE.md 16.
 import { MasterArchivist, saveArchivist } from './archivist';
 import { allStages, STARTERS } from './data/campaign';
+import { JOURNEY } from './data/challenges';
 import { CHAMPIONS } from './data/champions';
 import { FRAGMENTS_PER_SHARD, SUMMON_ODDS, Wish, WISH_WEIGHT } from './data/summoning';
 import { ChampionDef, Rarity } from './data/types';
 
 const RARITY_ORDER: readonly Rarity[] = ['common', 'elite', 'heroic', 'mythic'];
 
-/** How a champion comes to the Archivist: from the start, on a stage's first clear (1-1's Rime Scholar), or summoned. */
-export function joinsBy(id: string): { kind: 'start' } | { kind: 'stage'; stage: string } | { kind: 'summon' } {
+/** The Journey quest that gives a champion, if one does (the Paladin's). */
+const questFor = (id: string) => JOURNEY.find((q) => q.reward.kind === 'champion' && q.reward.champion === id);
+
+/** How a champion comes to the Archivist: from the start, on a stage's first clear (1-1's Rime Scholar), as a Journey quest's reward, or summoned. */
+export function joinsBy(id: string): { kind: 'start' } | { kind: 'stage'; stage: string } | { kind: 'quest'; title: string } | { kind: 'summon' } {
   if (STARTERS.includes(id)) return { kind: 'start' };
   const st = allStages().find((s) => s.recruit === id);
-  return st ? { kind: 'stage', stage: st.id } : { kind: 'summon' };
+  if (st) return { kind: 'stage', stage: st.id };
+  const q = questFor(id);
+  return q ? { kind: 'quest', title: q.title } : { kind: 'summon' };
 }
 
-/** Champions a summon can bring: every one not in the Reliquary yet, but the starters and those a stage brings. */
+/** Champions a summon can bring: every one not in the Reliquary yet, but the starters and those a stage or a quest brings. */
 export function summonPool(a: MasterArchivist): ChampionDef[] {
   const earned = new Set<string>([...STARTERS, ...allStages().flatMap((s) => (s.recruit ? [s.recruit] : []))]);
-  return CHAMPIONS.filter((c) => !earned.has(c.id) && !a.reliquary.has(c.id));
+  return CHAMPIONS.filter((c) => !earned.has(c.id) && !questFor(c.id) && !a.reliquary.has(c.id));
 }
 
 /** Whether a champion is everything the wish names (a wish of nothing names nobody). */

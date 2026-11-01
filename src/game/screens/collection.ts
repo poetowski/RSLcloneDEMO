@@ -223,7 +223,7 @@ export class CollectionScreen extends BaseScreen {
       const by = joinsBy(c.id);
       ui.blit(ctx, 'lock', x + w / 2 - 5, y + 44);
       ui.text(ctx, c.name, x + w / 2, y + 104, { color: '#8a90a0', variant: 'bold', align: 'center' });
-      ui.text(ctx, by.kind === 'stage' ? `Clear stage ${by.stage}` : by.kind === 'summon' ? 'At the Wishing Star' : 'Locked', x + w / 2, y + 117, { color: COLORS.bad, align: 'center' });
+      ui.text(ctx, by.kind === 'stage' ? `Clear stage ${by.stage}` : by.kind === 'quest' ? 'A Journey reward' : by.kind === 'summon' ? 'At the Wishing Star' : 'Locked', x + w / 2, y + 117, { color: COLORS.bad, align: 'center' });
     }
     if (isFresh(this.archivist, c.id)) ui.blit(ctx, 'new', x + w - 24, y - 3);
     if (hot) {

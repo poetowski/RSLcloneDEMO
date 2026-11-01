@@ -14,6 +14,8 @@ import { App } from '../app';
 import { frontier } from '../archivist';
 import { claimQuest, currentQuest, QuestFind, questState, QuestState } from '../challenges';
 import { zoneOf } from '../data/campaign';
+import { champion } from '../data/champions';
+import { RARITIES } from '../data/meta';
 import { CHALLENGE_TABS, ChallengeTab, JOURNEY, QuestDef } from '../data/challenges';
 import { GRADES, pattern, patternBonusText } from '../data/matrix';
 import { FRAGMENTS_PER_SHARD, SUMMONING } from '../data/summoning';
@@ -294,8 +296,10 @@ export class ChallengesScreen extends BaseScreen {
     if (q.reward.kind === 'spool') {
       ui.blit(ctx, `spool_${q.reward.pattern}_${q.reward.grade}`, x - 9, py + 4);
       if ((q.reward.count ?? 1) > 1) ui.text(ctx, `x${q.reward.count}`, x + 2, py + 17, { color: COLORS.text });
-    }
-    else {
+    } else if (q.reward.kind === 'champion') {
+      const r = this.a.ui.json.portraits[q.reward.champion];
+      ctx.drawImage(this.a.ui.img, r[0], r[1], r[2], r[3], x - 11, py + 2, 22, 22);
+    } else {
       const r = ui.part('stardust');
       blit(ctx, this.a.ui.img, r, x - Math.floor(r[2] / 2), py + 13 - Math.floor(r[3] / 2));
     }
@@ -367,6 +371,14 @@ export class ChallengesScreen extends BaseScreen {
         ui.text(ctx, 'Found: in Weaving now.', rx + 30, py + 63, { color: COLORS.good });
       } else ui.para(ctx, st === 'claimed' ? 'Taken, into Weaving.' : many ? 'Their main stats are drawn when you claim them.' : 'Its main stat is drawn when you claim it.', rx + 30, py + 42, 152, { color: COLORS.faint });
       if (p) ui.para(ctx, `${p.pieces} ${p.name} spools in a matrix weave ${patternBonusText(p)}.`, rx, py + 82, 180, { color: COLORS.faint });
+    } else if (rw.kind === 'champion') {
+      const c = champion(rw.champion);
+      const r = this.a.ui.json.portraits[rw.champion];
+      ctx.drawImage(this.a.ui.img, r[0], r[1], r[2], r[3], rx, py + 27, 28, 28);
+      ui.text(ctx, c.name, rx + 36, py + 30, { color: COLORS.goldHi, variant: 'bold' });
+      ui.text(ctx, `${RARITIES[c.rarity].name} ${c.role}`, rx + 36, py + 43, { color: COLORS.dim });
+      const already = found?.kind === 'champion' && found.already;
+      ui.para(ctx, already ? 'Already with you.' : st === 'claimed' ? 'Joined your champions.' : 'Joins your champions when you claim this. No summon brings him.', rx, py + 62, 180, { color: found || st === 'claimed' ? COLORS.good : COLORS.faint });
     } else {
       ui.blit(ctx, 'bigstardust', rx, py + 27);
       ui.text(ctx, `${rw.amount} ${SUMMONING.fragment}`, rx + 30, py + 30, { color: STARDUST_TINT });
@@ -402,7 +414,8 @@ export class ChallengesScreen extends BaseScreen {
     const replay = q.goal.kind === 'tutorial' && st !== 'open' ? { label: 'REPLAY TUTORIAL', click: tutorial } : undefined;
     const star = q.reward.kind === 'fragments' && st === 'claimed' && summonsReady(this.archivist) > 0 ? { label: 'TO THE WISHING STAR', click: () => r.summon() } : undefined;
     if (st === 'ready') return { label: 'CLAIM', icon: 'mi_play', click: () => this.claim(q), second: replay };
-    if (st === 'claimed') return { label: 'CLAIMED', second: replay ?? star };
+    const hero = q.reward.kind === 'champion' && st === 'claimed' ? q.reward.champion : undefined;
+    if (st === 'claimed') return { label: 'CLAIMED', second: replay ?? star ?? (hero ? { label: 'SEE CHAMPION', click: () => r.champion(hero) } : undefined) };
     if (st === 'locked') return { label: 'LOCKED' };
     if (q.goal.kind === 'tutorial') return { label: 'START TUTORIAL', icon: 'mi_play', click: tutorial };
     if (q.goal.kind === 'stage') return { label: 'TO THE CAMPAIGN', icon: 'mi_campaign', click: () => r.campaign() };

@@ -103,6 +103,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Toadcap, the Bristleback and the Hive Tender, my proposals on his "go", filling the Court of Root's Commons; at most two skills each, on his word | 50-52 |
 | 2026-11-01 | The Journey's fourth quest: Beat Campaign 1-10, two spools | 53 |
 | 2026-11-01 | Zone 6, the Golden Expanse: battle background, the world map extended east with a tunnel between areas 5 and 6, ten placeholder stages | 5.9 |
+| 2026-11-01 | The Journey's fifth quest: Beat Campaign 5-10, the Paladin its reward; no longer summoned | 34, 36, 54 |
 
 ---
 
@@ -1170,11 +1171,8 @@ open questions.
   stars; twice as likely for each part of a wish a champion matches; never
   twice, a rarity whose champions are all owned giving its share to the
   others; section 36)*
-- The quest line whose reward is the Paladin: Jakub, 2026-10-24, "this will
-  be reward for quest line later, i will specify later the whole quest
-  concept" *(since 2026-10-25 he is summoned like every champion but the
-  Rime Scholar, "this is only exception": the only Heroic, so the 5%;
-  section 36)*
+- The quest line whose reward is the Paladin: *answered 2026-11-01, the
+  Journey's Beat Campaign 5-10, section 54*
 - The Daily and Persistent challenges: "for now in daily and persistent tabs
   those ar ejust placeholders" (2026-10-24) *(the tabs show empty rows and
   "not designed yet", section 35)*
@@ -3835,3 +3833,19 @@ extend journey for new quest. to beat campaign 1-10. reward can be 2 spools.
 Built as Beat Campaign 1-10, after Beat Campaign 1-3: clear stage 1-10, claim two spools at once.
 Stand-ins until he sets them: which two, two Silver Vigor, whose main stats are drawn on claiming
 (Vigor is a Fracture Reach pattern, and two pieces weave its bonus), and the quest's text.
+
+## 54. The Paladin comes from the Journey (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+add new journey quest to beat campaign 5-10. reward is Paladin hero acquired. it will get unclocked once reward collected.
+```
+
+Built as the Journey's fifth quest, Beat Campaign 5-10, after Beat Campaign 1-10. Clearing the stage
+makes it ready; claiming it recruits the Paladin. This answers section 34's quest line.
+
+**Readings.** "Unlocked once reward collected": he joins on the claim, not on the clear, and this is
+now his only way in, so he left the summon pool (section 36 had put him there), and the other
+Heroics share the 5%. A save that already has him keeps him; its claim says "Already with you" and
+gives nothing else. The quest's text and the wording in its panel are mine.
