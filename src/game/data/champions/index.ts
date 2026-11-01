@@ -45,6 +45,7 @@ import { lastRiter } from './last_riter';
 import { lineholder } from './lineholder';
 import { necromancer } from './necromancer';
 import { overlordOfentol } from './overlord_ofentol';
+import { verdantLuminary } from './verdant_luminary';
 import { paladin } from './paladin';
 import { quartermaster } from './quartermaster';
 import { redCloak } from './red_cloak';
@@ -61,7 +62,7 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman, overlordOfentol,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman, overlordOfentol, verdantLuminary,
 ];
 
 /**
@@ -82,4 +83,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { crossbowman, overlordOfentol, toadcap, bristleback, hiveTender, archer, ashWidow, gravedigger, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, harvestSpecialist, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, sentry, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };
+export { crossbowman, overlordOfentol, verdantLuminary, toadcap, bristleback, hiveTender, archer, ashWidow, gravedigger, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, harvestSpecialist, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, sentry, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };

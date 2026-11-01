@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest';
 import { decide } from '../src/game/battle/ai';
 import { Battle, combatants, landShare } from '../src/game/battle/battle';
 import { flatten, simulate } from '../src/game/battle/sim';
-import { ALL_CHAMPIONS, overlordOfentol } from '../src/game/data/champions';
+import { ALL_CHAMPIONS, overlordOfentol, verdantLuminary } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
+import { balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -928,6 +928,62 @@ describe('statuses', () => {
     expect(tick.map((e) => e.kind === 'damage' && e.dot)).toEqual(['poison']);
     b.endTurn(a);
     expect(b.has(a, 'poison')).toBe(false);
+  });
+
+  it('answers a critical hit on any ally, itself included, on the attacker, with its chance, and nothing else', () => {
+    // a critical hit on an ally, a plain hit, an ally's blow felled by it: the attacker takes ATK Down each time it is critical
+    const crit = fixture('crit_striker', { stats: { crit: 1 } });
+    const plain = fixture('plain_striker', { stats: { crit: 0 } });
+    const b = new Battle(combatants([reproacher(1), striker]), combatants([crit]), { seed: 3 });
+    const a = b.get('e0');
+    const r = b.useSkill(a, crit.skills[0], 'p1');
+    expect(r.events.filter((e) => e.kind === 'passive').map((e) => e.kind === 'passive' && [e.effect, e.target, e.source])).toEqual([['reproach', 'e0', 'p0']]);
+    expect(b.has(a, 'atk_down')).toBe(true);
+    const own = new Battle(combatants([reproacher(1)]), combatants([crit]), { seed: 3 });
+    own.useSkill(own.get('e0'), crit.skills[0], 'p0');
+    expect(own.has(own.get('e0'), 'atk_down')).toBe(true);
+    const calm = new Battle(combatants([reproacher(1), striker]), combatants([plain]), { seed: 3 });
+    expect(calm.useSkill(calm.get('e0'), plain.skills[0], 'p1').events.some((e) => e.kind === 'passive')).toBe(false);
+    // an ally the blow fells is still answered; a holder it fells answers nothing
+    const fell = new Battle(combatants([reproacher(1), striker]), combatants([crit]), { seed: 3 });
+    fell.get('p1').hp = 1;
+    fell.useSkill(fell.get('e0'), crit.skills[0], 'p1');
+    expect(fell.get('p1').alive).toBe(false);
+    expect(fell.has(fell.get('e0'), 'atk_down')).toBe(true);
+    const down = new Battle(combatants([reproacher(1), striker]), combatants([crit]), { seed: 3 });
+    down.get('p0').hp = 1;
+    down.useSkill(down.get('e0'), crit.skills[0], 'p0');
+    expect(down.has(down.get('e0'), 'atk_down')).toBe(false);
+    // the chance
+    let answered = 0;
+    for (let seed = 1; seed <= 200; seed++) {
+      const c = new Battle(combatants([reproacher(0.7), striker]), combatants([crit]), { seed });
+      if (c.useSkill(c.get('e0'), crit.skills[0], 'p1').events.some((e) => e.kind === 'passive')) answered++;
+    }
+    expect(answered).toBeGreaterThan(120);
+    expect(answered).toBeLessThan(165);
+  });
+
+  it("gives the Verdant Luminary a fifth of what her A1 deals, and rolls her A2's Heal Block on each enemy alone while Regen reaches every ally", () => {
+    const b = new Battle(combatants([verdantLuminary, striker]), combatants([guard, guard, guard]), { seed: 5 });
+    const me = b.get('p0');
+    me.hp = 100;
+    const r = b.useSkill(me, verdantLuminary.skills[0], 'e0');
+    const dealt = r.events.find((e) => e.kind === 'damage');
+    const healed = r.events.find((e) => e.kind === 'heal' && e.target === 'p0');
+    expect(dealt?.kind === 'damage' && healed?.kind === 'heal' && healed.amount).toBe(dealt?.kind === 'damage' && Math.round(dealt.amount * 0.2));
+    let blocked = 0, mixed = 0;
+    for (let seed = 1; seed <= 200; seed++) {
+      const c = new Battle(combatants([verdantLuminary, striker]), combatants([guard, guard, guard]), { seed });
+      c.useSkill(c.get('p0'), skill(verdantLuminary, 'crowns_mandate'));
+      const on = ['e0', 'e1', 'e2'].filter((id) => c.has(c.get(id), 'heal_block')).length;
+      blocked += on;
+      if (on > 0 && on < 3) mixed++;
+      expect(c.has(c.get('p0'), 'regen') && c.has(c.get('p1'), 'regen')).toBe(true);
+    }
+    expect(blocked / 600).toBeGreaterThan(0.6);
+    expect(blocked / 600).toBeLessThan(0.8);
+    expect(mixed).toBeGreaterThan(50);
   });
 
   it('strikes a second time only on its chance, and a hit that does not come leaves the skill one hit short', () => {

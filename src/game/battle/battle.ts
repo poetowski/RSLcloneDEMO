@@ -453,6 +453,7 @@ export class Battle {
     this.ward(actor, damaged, last, events);
     this.defy(actor, critOn, last, events);
     this.retaliate(actor, damaged, last, events);
+    this.reproach(actor, critOn, last, events);
 
     const result: SkillResult = { actor: actor.uid, skill, target: primary?.uid, targets: targets.map((t) => t.uid), events, counter: asCounter, counters: [], landed: landing.length };
 
@@ -693,6 +694,26 @@ export class Battle {
       if (p.chance !== undefined && !this.rng.chance(p.chance)) continue;
       events.push({ kind: 'passive', target: actor.uid, name: p.name, hit, effect: 'retaliate', source: d.uid });
       for (const st of p.statuses ?? []) this.tryApply(d, actor, st.status, st.turns, undefined, p.value, hit, events);
+    }
+  }
+
+  /**
+   * Reproach (passive): a critical hit of an enemy skill on an ally of the holder, the
+   * holder included, even one that fells it, may be answered on the attacker after the
+   * skill's last hit, once for each ally so struck, with the passive's chance (the
+   * Verdant Luminary's Formal Protest: ATK Down for 1 turn, 70% of the time). A holder
+   * who fell to it answers nothing. The debuff meets the attacker's RES like any other.
+   */
+  private reproach(actor: Unit, critOn: Set<Unit>, hit: number, events: BattleEvent[]) {
+    for (const d of critOn) {
+      if (d.team === actor.team) continue;
+      for (const h of this.allies(d)) {
+        const p = h.champion.passive;
+        if (p?.kind !== 'reproach' || !actor.alive) continue;
+        if (p.chance !== undefined && !this.rng.chance(p.chance)) continue;
+        events.push({ kind: 'passive', target: actor.uid, name: p.name, hit, effect: 'reproach', source: h.uid });
+        for (const st of p.statuses ?? []) this.tryApply(h, actor, st.status, st.turns, undefined, p.value, hit, events);
+      }
     }
   }
 

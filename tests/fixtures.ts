@@ -171,6 +171,8 @@ export const bannerman = (chance: number) =>
 export const hide = fixture('hide', { stats: { hp: 1500 }, passive: { id: 'hide', name: 'Hide', desc: '', kind: 'ward', self: true, value: 0.1, statuses: [{ status: 'shield', turns: 1 }] } });
 
 /** Retaliate: an enemy skill that damaged it gets Poison for 1 turn on its attacker after the hit, with `chance`. */
+export const reproacher = (chance: number) =>
+  fixture(`reproacher_${chance}`, { passive: { id: 'reproach', name: 'Reproach', desc: '', kind: 'reproach', value: 0, chance, statuses: [{ status: 'atk_down', turns: 1 }] } });
 export const stinger = (chance: number) =>
   fixture(`stinger_${chance}`, { passive: { id: 'sting', name: 'Sting', desc: '', kind: 'retaliate', value: 0, chance, statuses: [{ status: 'poison', turns: 1 }] } });
 

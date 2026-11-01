@@ -112,6 +112,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 8-10, three spools | 57 |
 | 2026-11-01 | The Crossbowman, an Elite Damage of the Azure Crown, Tide | 58 |
 | 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
+| 2026-11-01 | The Verdant Luminary, an Elite Support of the Azure Crown, Bloom | 60 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
@@ -4086,3 +4087,41 @@ may carry `struckMeter`.
 Stand-ins: the names Hammer and Scythe, I Am Ofentol! and Overlord's Round, the lore's wording, A1's 0.7 a
 hit, the stats, and his look past the brief (bald, ginger beard, red nose, a shirt too short for his belly,
 the Crown's blue belt), the golden ale bubbles of his cheer.
+
+## 60. The Verdant Luminary (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+generate new champion.
+azure crown
+support
+rarity elite
+afinity bloom
+name Verdant Luminary
+design - a forest nymph female with shortbow attached on hear back. and holds another bow, this is big bow. she is in service of azure crown because she is born in kingdom and raised by govermental money to represent them toward green races.
+kit - A1 - hit single target and heal herself for 20% of damage output.
+A2 - hit every enemy and has 70% individually on each target to put stop healing debuff for 2 turns. also put regen buff on every ally including herself for 2 turns. CD 4 turns.
+A3 passive - when ally including this champion is critically hit, has 70% chance to put ATTACK DOWN on attacker for 1 turn.
+```
+
+And while she was being drawn: "redraw hed back bow for a sword and bag instead". So a sheathed sword and a
+bag on her back, no shortbow. And after that: "make nympha's blue insignia and colors more significant on her". So
+the Crown's blue is what shows first: bodice, tabard and shoulder caps, with the gold crown on the chest and the
+tabard.
+
+HP 1240, ATK 92, DEF 62, SPD 104, CRIT 5%, score 404, the low end of the Elite budget, with A1 0.95 and A2
+0.5: with ATK 96, SPD 106, A1 1.0 and A2 0.6 she measured an impact of 64% (target 40-60); she stands at 59%.
+
+**Readings.** "Stop healing": the game's Heal Block. Its 70% and the passive's 70% are the chance before the
+target's RES, like every debuff. "Is critically hit": once for each ally so struck by a skill, after its last
+hit, however many of its hits were critical; an ally the blow fells still counts, and a Luminary it fells does
+not answer. A 1-turn ATK Down placed on the attacker's own turn lasts through its next turn.
+
+**New in the engine.** The passive kind `reproach`; `lifestealMote` names what a lifesteal drifts back as (hers
+is sap, not the purple soul wisps).
+
+Stand-ins: the names Envoy's Arrow, Crown's Mandate and Formal Protest, the lore's wording, the multipliers, the
+stats, and her look past the brief: skin pale as birch, long copper hair, pointed ears, bare feet, a skirt of
+leaves, the cut of the blue and where the crowns sit, a gold circlet, the great bow's living wood, leaves and gold
+caps, the bag's blue flap, the leaves that fall on allies and the gold seal on the attacker.

@@ -107,9 +107,9 @@ export function auditChampion(c: ChampionDef): string[] {
   if (p?.kind === 'purge' && (p.statuses?.length || p.value)) out.push(`${p.id}: a purge passive only lifts debuffs`);
   if (p?.kind === 'immune' && (!p.immuneTo || STATUSES[p.immuneTo].buff)) out.push(`${p.id}: an immune passive names a debuff`);
   if (p?.kind === 'brace' && (!p.statuses?.length || p.statuses.some((st) => !STATUSES[st.status].buff))) out.push(`${p.id}: a brace passive gives its holder buffs`);
-  if ((p?.kind === 'tend' || p?.kind === 'ward' || p?.kind === 'retaliate' || p?.kind === 'remedy') && !p.statuses?.length) out.push(`${p.id}: a ${p.kind} passive needs statuses`);
+  if ((p?.kind === 'tend' || p?.kind === 'ward' || p?.kind === 'retaliate' || p?.kind === 'remedy' || p?.kind === 'reproach') && !p.statuses?.length) out.push(`${p.id}: a ${p.kind} passive needs statuses`);
   if (p?.chance !== undefined && !(p.chance > 0 && p.chance <= 1)) out.push(`${p.id}: a chance of ${p.chance}`);
-  if (p?.kind === 'retaliate' && p.statuses?.some((st) => STATUSES[st.status].buff)) out.push(`${p.id}: a retaliation places debuffs`);
+  if ((p?.kind === 'retaliate' || p?.kind === 'reproach') && p.statuses?.some((st) => STATUSES[st.status].buff)) out.push(`${p.id}: a ${p.kind} passive places debuffs`);
   if (p?.kind === 'remedy' && p.statuses?.some((st) => !STATUSES[st.status].buff)) out.push(`${p.id}: a remedy gives buffs`);
   if (p?.self && p.kind !== 'ward') out.push(`${p.id}: only a ward guards its holder alone`);
   // a defy answers a critical hit on its holder with something for the holder: buffs, a heal or both

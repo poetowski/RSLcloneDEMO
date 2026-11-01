@@ -197,7 +197,80 @@ function boltShape(b: Bitmap, x0: number, x1: number, cy: number, heavy: boolean
   for (const w of [-1, 1]) for (let k = 0; k < 3; k++) b.set(x0 + k, cy + w, MAT.green.ramp[4 - k]);
 }
 
+/** A leaf the size of three pixels or five, a light midrib; `a` turns it (screen space). */
+function leafAt(b: Bitmap, x: number, y: number, a: number, big: boolean, ramp: RGBA[], fade = 1) {
+  const cx = Math.round(Math.cos(a)), cy = Math.round(Math.sin(a));
+  for (let n = big ? -2 : -1; n <= (big ? 2 : 1); n++) {
+    const px = x + cx * n, py = y + cy * n;
+    if (!dith(px, py, fade)) continue;
+    b.set(px, py, ramp[n === 0 ? 5 : n > 0 ? 4 : 3]);
+    if (big && Math.abs(n) < 2 && dith(px + 1, py + 1, fade)) b.set(px - cy, py + cx, ramp[3]);
+  }
+}
+
+/** The Verdant Luminary's leaves: the green of her dress and hair, a young leaf's light on them. */
+const LEAF: RGBA[] = MAT.green.ramp;
+const LEAF_GOLD: RGBA[] = MAT.gold.ramp;
+
 export const AZURE_CROWN_FX: Record<string, FxDef> = {
+  /** The Verdant Luminary's long arrow in flight (drawn pointing right; the battle turns it along its path): a pale shaft, a gold head, two green leaves for fletching. */
+  luminary_arrow: {
+    w: 32, h: 9, n: 1, ms: 100, ax: 0.82, ay: 0.5, loop: true,
+    draw: (b) => {
+      for (let x = 4; x < 27; x++) b.set(x, 4, MAT.wood.ramp[x % 5 === 0 ? 4 : 5]);
+      for (const [x, y, k] of [[27, 3, 4], [27, 4, 5], [27, 5, 3], [28, 3, 4], [28, 4, 5], [28, 5, 3], [29, 4, 5], [30, 4, 4]] as const) b.set(x, y, LEAF_GOLD[k]);
+      for (const [x, y, k] of [[1, 2, 3], [2, 2, 4], [3, 2, 5], [4, 3, 4], [2, 3, 3], [3, 3, 4], [1, 6, 2], [2, 6, 3], [3, 6, 4], [4, 5, 3], [2, 5, 2], [3, 5, 3]] as const) b.set(x, y, LEAF[k]);
+    },
+  },
+  /** Envoy's Arrow lands: a short bright flash where the head bites, splinters and a few torn leaves thrown off. */
+  luminary_strike: {
+    w: 44, h: 44, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const cx = 22, cy = 22;
+      if (i < 3) burst(b, cx, cy, 7, 1, [7, 11, 7][i], 1.1, DU, 0.3);
+      if (i >= 1) sparks(b, cx, cy, 6, 14, (i - 1) / 4, DU, 613, 8);
+      if (i >= 1) {
+        const k = (i - 1) / 4, r = rng(617);
+        for (let n = 0; n < 5; n++) {
+          const a = r() * Math.PI * 2, d = 5 + r() * 12;
+          leafAt(b, Math.round(cx + Math.cos(a) * d * (0.4 + k)), Math.round(cy + Math.sin(a) * d * (0.4 + k) + k * k * 8), a + i, n % 2 === 0, LEAF, 1 - k * 0.7);
+        }
+      }
+    },
+  },
+  /** Crown's Mandate reaches an ally: young leaves come down round it, turning as they fall, a little green light rising through them. Anchored at the feet. */
+  luminary_leaves: {
+    w: 56, h: 84, n: 12, ms: 70, ax: 0.5, ay: 1, pad: [2, 4, 2, 4],
+    draw: (b, t, i) => {
+      const r = rng(631);
+      for (let n = 0; n < 9; n++) {
+        const x0 = 8 + r() * 40, start = r() * 0.4, ph = r() * 6.28;
+        const k = (t - start) / 0.6;
+        if (k < 0 || k > 1) continue;
+        const y = Math.round(10 + k * 66), x = Math.round(x0 + Math.sin(k * 5 + ph) * 4);
+        leafAt(b, x, y, ph + k * 5, n % 3 !== 0, LEAF, k < 0.7 ? 1 : (1 - k) / 0.3);
+      }
+      motes(b, 28, 74, 30, 52, 7, t, MAT.glowGreen.ramp, 637);
+    },
+  },
+  /** Formal Protest reaches the attacker: the Crown's seal comes down on it in gold, with a ring pressed out, and fades. */
+  luminary_seal: {
+    w: 48, h: 48, n: 9, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 24, cy = 24;
+      const fade = i < 5 ? 1 : 1 - (i - 4) / 5;
+      const dy = i === 0 ? -6 : i === 1 ? -2 : 0;
+      const rows = ['#..#..#', '#..#..#', '#.###.#', '#######', '#######', '.......', '#######'];
+      rows.forEach((row, y) => {
+        for (let x = 0; x < row.length; x++) {
+          if (row[x] !== '#') continue;
+          const px = cx - 3 + x, py = cy - 3 + y + dy;
+          if (dith(px, py, fade)) b.set(px, py, LEAF_GOLD[y < 2 ? 5 : y === 6 ? 3 : 4]);
+        }
+      });
+      if (i >= 1) ring(b, cx, cy, 8 + i * 1.8, 8 + i * 1.8, Math.max(0.7, 1.8 - i * 0.2), LEAF_GOLD, Math.max(0.25, 1 - i * 0.12));
+    },
+  },
   /** Line Cut: one straight cut from high behind to low in front, a white line shedding chips of light. */
   sword_cut: {
     w: 72, h: 72, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],

@@ -111,6 +111,8 @@ export interface SkillDef {
   stripBuffs?: boolean;
   /** heals the actor by this fraction of damage dealt */
   lifesteal?: number;
+  /** presentation: what the lifesteal drifts back as, and its trail (soul wisps when absent); the Verdant Luminary's is sap */
+  lifestealMote?: { fx: string; trail: string[] };
   /** turn meter change for targets (negative = reduce), on the last hit */
   tmTargets?: number;
   /** turn meter change for the actor's allies (not the actor), on the last hit */
@@ -186,15 +188,19 @@ export interface PassiveDef {
    * keen:      when an ally of the champion falls, every ally still standing (the champion
    *            included) heals by `value` x the champion's max HP and takes `statuses` (the
    *            Ash Widow's Keening: 12% and ATK Up for 2 turns, 2026-11-01)
+   * reproach:  when an enemy skill lands a critical hit on an ally (the champion included),
+   *            even one that fells it, `chance` to place `statuses` on the attacker after the
+   *            skill's last hit, once for each ally so struck (the Verdant Luminary's Formal
+   *            Protest: 70%, ATK Down for 1 turn, 2026-11-01)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune' | 'keen';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune' | 'keen' | 'reproach';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
   /** rebuke, tend and ward: the champion's own turns the passive rests after it acts (a ward is ready from the start) */
   cooldown?: number;
   /** stat and fallen: the stat it raises */
   stat?: StatId;
-  /** ward, retaliate and remedy: the chance of each answer, 0..1 */
+  /** ward, retaliate, remedy and reproach: the chance of each answer, 0..1 */
   chance?: number;
   /** immune: the debuff that never lands */
   immuneTo?: StatusId;
