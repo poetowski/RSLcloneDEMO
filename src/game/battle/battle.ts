@@ -706,10 +706,23 @@ export class Battle {
     }
   }
 
+  /** Keen (passive): an ally of the holder fell: everyone still standing on its side heals and takes the statuses (the Ash Widow's Keening). */
+  private keen(h: Unit, p: PassiveDef, hit: number, events: BattleEvent[]) {
+    this.allies(h).forEach((a, i) => {
+      events.push({ kind: 'passive', target: a.uid, name: p.name, hit, effect: 'keen', source: h.uid, ...(i ? { quiet: true } : {}) });
+      this.heal(a, Math.round(h.maxHp * p.value), hit, events);
+      for (const st of p.statuses ?? []) {
+        this.addStatus(a, st.status, st.turns, 0, h.uid);
+        events.push({ kind: 'status', target: a.uid, status: st.status, turns: st.turns, hit });
+      }
+    });
+  }
+
   /** Fallen (passive): the fall of an ally raises its holder's stat (`fallenBonus`); shown while the bonus still grows. */
   private mourn(t: Unit, hit: number, events: BattleEvent[]) {
     for (const h of this.allies(t)) {
       const p = h.champion.passive;
+      if (p?.kind === 'keen' && h.alive) this.keen(h, p, hit, events);
       if (p?.kind !== 'fallen') continue;
       const fallen = this.units.filter((x) => x.team === h.team && x !== h && !x.alive).length;
       const cap = p.max ?? Infinity;

@@ -413,6 +413,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C29 | A skill with `ignoreDef` deals its hits as if the target's Defense, after DEF Up and DEF Down, were `1 - ignoreDef` of it; nothing else about the hit changes | `battle.test.ts` (ignores a share of the target's Defense) |
 | INV-C30 | A ward with a `cooldown` is ready from the start of the battle; after it answers it rests for `cooldown` of its holder's own turns, and while it rests no blow wakes it | `battle.test.ts` (rests a ward with a cooldown) |
 | INV-C31 | An enemy only (`ENEMIES`) is never in the roster (`CHAMPIONS`), the summon pool or a stage's `recruit`, and fights in at least one stage | `content.test.ts` (keeps the enemies only out of the roster) |
+| INV-C32 | A `keen` passive answers each ally's fall while its holder stands, reaching every ally still standing, the holder included | `battle.test.ts` (keens) |
 
 ### 6.2 Catalog
 

@@ -496,4 +496,60 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
       if (i >= 2 && i < 8) motes(b, cx, gy - 10, 20, 50, 8, (t * 1.4) % 1, R, 823);
     },
   },
+  /** Spade Cut: a dull chop, the rust at its edge, clods of grave dirt thrown off and falling. Matter. */
+  spade_cut: {
+    w: 56, h: 56, n: 6, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      if (i < 3) cut(b, cx + 10, cy - 18, cx - 10, cy + 16, 5, 3.2 - i * 0.8, [RUST[1], RUST[3], DU[3], DU[4], W], 1 - i * 0.2);
+      if (i >= 1) sparks(b, cx, cy + 2, 12, 20, (i - 1) / 5, ramps.sand, 911, 14);
+    },
+  },
+  /** Shallow Grave: the spade comes down: a heavy dull streak, a ring pressed into the ground, a spray of dirt thrown high and falling. Matter. */
+  shallow_grave: {
+    w: 76, h: 72, n: 8, ms: 60, ax: 0.5, ay: 0.72, pad: [2, 2, 10, 2],
+    draw: (b, t, i) => {
+      const cx = 38, cy = 52;
+      if (i < 2) cut(b, cx + 2, cy - 34, cx - 2, cy + 2, 2, 2 - i * 0.6, [DU[0], DU[1], DU[2], DU[3]], 0.7);
+      if (i >= 1 && i < 5) burst(b, cx, cy, 9, 2, [12, 18, 14, 9][i - 1], 1.6, ramps.sand, 0.3);
+      if (i >= 1) {
+        const r = 6 + (i - 1) * 4;
+        ring(b, cx, cy + 2, r, r * 0.34, Math.max(0.6, 1.6 - (i - 1) * 0.2), DU, Math.max(0.3, 1.1 - (i - 1) * 0.14));
+        sparks(b, cx, cy - 2, 20, 32, (i - 1) / 7, ramps.sand, 919, 26);
+      }
+    },
+  },
+  /** Ash Flick: a small puff of ash bursting on the enemy and drifting off. Matter. */
+  ash_flick: {
+    w: 48, h: 48, n: 7, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 24, cy = 24;
+      if (i < 3) burst(b, cx, cy, 7, 1, [6, 11, 8][i], 1.1, DU, 0.5);
+      sparks(b, cx, cy, 14, 18, t, DU, 929, 6);
+      motes(b, cx, cy - 2, 20, 18, 8, t, DU, 937);
+    },
+  },
+  /** Sift the Ash: ash sifting down over the ally from above its head, pale and calm, and settling in a ring at its feet. Matter. */
+  sift_ash: {
+    w: 60, h: 84, n: 10, ms: 70, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 30, gy = 78;
+      for (let k = 0; k < 26; k++) {
+        const x = Math.round(cx + Math.sin(k * 12.9) * (6 + (k % 5) * 3.4));
+        const y = Math.round(((k * 19) % 60) + t * 42);
+        if (y > gy || !dith(x, y, 1 - t * 0.5)) continue;
+        b.set(x, y, SOUL[1 + (k % 4)]);
+      }
+      const rr = 6 + t * 16;
+      if (i >= 3) ring(b, cx, gy, rr, rr * 0.3, 1, SOUL, 1 - t * 0.6);
+    },
+  },
+  /** Keening: her keen, rings of grey going out from her head, ash shaken loose. Matter. */
+  keening: {
+    w: 72, h: 72, n: 10, ms: 70, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      soundRings(b, 36, 36, i, 10, 3, 4, 6, SOUL);
+      motes(b, 36, 36, 26, 20, 8, t, DU, 941);
+    },
+  },
 };

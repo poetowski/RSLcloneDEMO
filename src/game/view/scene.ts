@@ -826,7 +826,7 @@ export class BattleScene {
         break;
       case 'passive': {
         const src = e.source ? this.views.get(e.source) : undefined;
-        if (e.effect === 'tend' || e.effect === 'ward' || e.effect === 'retaliate' || e.effect === 'remedy' || e.effect === 'defy' || e.effect === 'purge' || e.effect === 'brace') {
+        if (e.effect === 'tend' || e.effect === 'ward' || e.effect === 'retaliate' || e.effect === 'remedy' || e.effect === 'defy' || e.effect === 'purge' || e.effect === 'brace' || e.effect === 'keen') {
           // a passive acting in the flow of the fight acts often: no banner, its name over its holder, then its
           // effects as its data names them, on the holder (the Jungle Herder's bell) and on whom it reaches
           // (the ally it shields or soothes, the enemy it answers)

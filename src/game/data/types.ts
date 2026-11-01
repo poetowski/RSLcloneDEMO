@@ -179,8 +179,11 @@ export interface PassiveDef {
    *            `statuses` (the Forest Gargoyle's Heartwood: DEF Up for 1 turn, 2026-10-31)
    * immune:    the debuff `immuneTo` never lands on the champion (Dead Knight Amstron's
    *            Unbreached Plate: DEF Down, 2026-10-31)
+   * keen:      when an ally of the champion falls, every ally still standing (the champion
+   *            included) heals by `value` x the champion's max HP and takes `statuses` (the
+   *            Ash Widow's Keening: 12% and ATK Up for 2 turns, 2026-11-01)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune' | 'keen';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
   /** rebuke, tend and ward: the champion's own turns the passive rests after it acts (a ward is ready from the start) */

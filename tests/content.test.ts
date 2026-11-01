@@ -88,6 +88,13 @@ describe('champions', () => {
     }
   });
 
+  it('has six Commons in the Azure Crown and the Dominion and the Reign\'s two new ones, two of a class', () => {
+    const of = (f: string, r: string) => CHAMPIONS.filter((c) => c.rarity === 'common' && c.faction === f && c.role === r).length;
+    for (const f of ['azure_crown', 'sanguine_dominion', 'ashveil_reign']) for (const r of ['Damage', 'Tank', 'Support']) expect(of(f, r), `${f} ${r}`).toBe(2);
+    expect(champion('gravedigger').skills[1]?.execute).toEqual({ below: 0.4, mult: 1.5 });
+    expect(champion('ash_widow').passive?.kind).toBe('keen');
+  });
+
   it('has the Junior Ward as a normal hero and the Sentry in the Ashveil Reign, on his word', () => {
     expect(CHAMPIONS.map((c) => c.id)).toContain('junior_ward');
     expect(ENEMIES).toEqual([]);
@@ -889,7 +896,7 @@ describe('summoning', () => {
     const chance = wishChance(pool, wish);
     expect(chance).toBeGreaterThan(wishChance(pool, wish, false));
     expect(chance).toBeLessThan(1);
-    expect(plain.get('wild_speaker')).toBeCloseTo(0.7 / 19, 9);
+    expect(plain.get('wild_speaker')).toBeCloseTo(0.7 / 21, 9);
     expect(wishChance(pool, {})).toBe(0);
   });
 

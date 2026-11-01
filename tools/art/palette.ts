@@ -124,6 +124,11 @@ export const MAT = {
   /** the rot that oozes out of him: a bilious green */
   bile: m('bile', 'matte', ['#1a2408', '#344a10', '#567818', '#80a828', '#aed048', '#d8f080']),
   /** the Skeleton's fancy strip at the neck: a plum silk, old but still rich */
+  // the Ash Widow's mourning gown and her clay urn, both greyed with ash
+  ashPlum: m('ashPlum', 'cloth', ['#120b12', '#241722', '#382636', '#4e3749', '#684b5e', '#846475']),
+  ashClay: m('ashClay', 'matte', ['#1e1612', '#3a2c24', '#5a4638', '#7a6250', '#9a826c', '#b8a28a']),
+  // the Gravedigger's sackcloth, dirty with the ground
+  graveSack: m('graveSack', 'cloth', ['#17130e', '#2c2519', '#443a28', '#5e5238', '#786a4c', '#938562']),
   plum: m('plum', 'cloth', ['#16080f', '#311226', '#53203f', '#7a2e5a', '#a34479', '#c86a9a']),
 
   // --- woods of the living ---------------------------------------------------

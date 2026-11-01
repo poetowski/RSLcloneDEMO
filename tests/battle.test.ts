@@ -1073,6 +1073,23 @@ describe('full auto battles', () => {
     expect(winners.size).toBe(2);
   });
 
+  it('keens: an ally falling heals everyone left standing by a share of the holder\'s max HP and gives them its statuses', () => {
+    const widow = ALL_CHAMPIONS.find((c) => c.id === 'ash_widow')!;
+    const digger = ALL_CHAMPIONS.find((c) => c.id === 'gravedigger')!;
+    const b = new Battle(combatants([widow, digger, digger]), combatants([digger]), { seed: 1 });
+    const [w, frail, other] = b.units.filter((u) => u.team === 'player');
+    const foe = b.units.find((u) => u.team === 'enemy')!;
+    frail.hp = 1;
+    other.hp = 100;
+    w.hp = 100;
+    const r = b.useSkill(foe, digger.skills[0], frail.uid);
+    expect(frail.alive).toBe(false);
+    expect(r.events.filter((e) => e.kind === 'passive' && e.effect === 'keen').map((e) => e.target)).toEqual([w.uid, other.uid]);
+    expect(other.hp).toBe(100 + Math.round(w.maxHp * 0.12));
+    expect(w.hp).toBe(100 + Math.round(w.maxHp * 0.12));
+    expect(other.statuses.some((s) => s.id === 'atk_up')).toBe(true);
+  });
+
   it('runs every champion of the roster through battles without errors', () => {
     const all = ALL_CHAMPIONS;
     const at = (i: number) => all[i % all.length];

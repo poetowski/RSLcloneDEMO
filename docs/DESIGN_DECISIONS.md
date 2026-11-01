@@ -99,6 +99,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Sentry, a Common Tank of the Sanguine Dominion; the lighter stats and the A2's Regen on someone else on his word, the rest of the worksheet's recommended options | 46 |
 | 2026-11-01 | The Sentry approved as built: his art, the names Checkpoint Cut and Watch Rotation, the lore line | 46 |
 | 2026-11-01 | The Junior Ward a normal hero, no longer enemy only; the Sentry a skeleton under his armour, moved to the Ashveil Reign; the target of six Commons per faction, two per class | 47 |
+| 2026-11-01 | The Gravedigger and the Ash Widow, my proposals on his word, filling the Ashveil Reign's Commons; a new passive kind, `keen` | 48, 49 |
 
 ---
 
@@ -3673,9 +3674,50 @@ armour holds him together.
 | Azure Crown | Skirmisher, Strongman | Lineholder, Town Guard | Quartermaster, Last Riter |
 | Sanguine Dominion | Enforcer, Archer | Bloodhound, Junior Ward | Dominion Medic, Harvest Specialist |
 | Court of Root | Follower, *open* | Walking Bush, *open* | Wild Speaker, *open* |
-| Ashveil Reign | Skeleton, *open* | Rot Hulk, Sentry | Bellringer, *open* |
+| Ashveil Reign | Skeleton, Gravedigger (48) | Rot Hulk, Sentry | Bellringer, Ash Widow (49) |
 
 Stand-ins until Jakub sets them: the Sentry's new lore line ("A sentry of the Ashveil
 Reign, bones in the armour he died in, who still walks its borders by night, and has
 never let anyone cross without asking twice."), every detail of the skeleton above, and
 2-6's power, raised from 0.81 to 0.86 because the larger summon pool made it too easy.
+
+## 48. The Gravedigger (received 2026-11-01)
+
+Jakub, for this and section 49, verbatim:
+
+```
+we need to cover ashveil reign damage common second hero and ashveil reign support common second hero. be very creative and propose both and design and deliver. stay consistent, but be creative.
+```
+
+So both are my proposals, built on that word. **All of both is a stand-in until he sets it:**
+names, kits, Bloom (which evens the Reign's Commons at two each of Ember, Tide and Bloom),
+numbers, lore lines and art.
+
+A Common Damage of the Ashveil Reign: a hunched dried corpse, not bare bones, so he does not
+read as a third skeleton. Shrunken grey skin, one sunken socket with the Reign's pale light, a
+stitched mouth; a wide-brimmed dark hat with the white bone on it, a dirty sackcloth smock, a
+leather apron, a small lantern at his hip, bare shins, wrapped feet; a long T-handled spade
+with a rusty blade that he leans on at rest.
+
+- **Spade Cut** (A1): one enemy, 1.0, a 25% chance of Slow for 1 turn.
+- **Shallow Grave** (A2, CD 4): one enemy, 1.2, and half as much again below 40% HP (the
+  engine's `execute`, which no champion had used).
+- Stats HP 1000, ATK 110, DEF 56, SPD 104, CRIT 2.5%, score 383. Summoned.
+
+## 49. The Ash Widow (received 2026-11-01)
+
+A Common Support of the Ashveil Reign: a dead woman in mourning. A greyed plum gown, its hem
+grey with ash, a charcoal sash; a black veil over her whole head and down her back, a skull's
+shadow showing through it; a tall comb of bone standing up behind the veil; a clay urn with an
+iron lid and the white bone, ash falling from a crack in its base.
+
+- **Ash Flick** (A1): one enemy from where she stands, 0.9, a 30% chance of Heal Block for 1 turn.
+- **Sift the Ash** (A2, CD 4): every ally loses one debuff and heals by 10% of her max HP. No
+  attack. The AI keeps it until an ally is hurt.
+- **Keening** (passive, new kind `keen`): when an ally falls, every ally still standing, she
+  included, heals by 12% of her max HP and gains ATK Up for 2 turns. No cooldown; a revived
+  ally who falls again sets it off again; a Heal Block stops only that ally's heal.
+- Stats HP 1240, ATK 82, DEF 62, SPD 106, CRIT 2.5%, score 388. Summoned.
+
+With both in the summon pool, Zone 2's powers rose as stand-ins: 2-1 1.26 -> 1.32, 2-2 0.74 ->
+0.80, 2-3 0.98 -> 1.04, 2-6 0.86 -> 0.91, 2-10 0.71 -> 0.80.
