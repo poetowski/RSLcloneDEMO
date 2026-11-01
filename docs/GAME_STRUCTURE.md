@@ -58,6 +58,7 @@ The roster today:
 | Wild Speaker (`wild_speaker`) | Common | Ember | Support | Court of Root | summoned |
 | Jungle Herder (`jungle_herder`) | Elite | Bloom (a stand-in) | Tank | Court of Root | summoned |
 | Associate (`associate`) | Elite | Ember (a stand-in) | Support | Azure Crown | summoned |
+| Crossbowman (`crossbowman`) | Elite | Tide | Damage | Azure Crown | summoned |
 | Emissary Handlings (`emissary_handlings`) | Elite | Tide (a stand-in) | Tank | Azure Crown | summoned |
 | Black Rhino (`black_rhino`) | Elite | Bloom (a stand-in) | Tank | Sanguine Dominion | summoned |
 | Red Cloak (`red_cloak`) | Elite | Bloom (a stand-in) | Damage | Sanguine Dominion | summoned |

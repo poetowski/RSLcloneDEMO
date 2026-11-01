@@ -110,6 +110,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-01 | Zone 8, the Crystal Graveyard: battle background, the world map extended east, ten placeholder stages | 5.11 |
 | 2026-11-01 | The Journey gains Beat Campaign 8-10, three spools | 57 |
+| 2026-11-01 | The Crossbowman, an Elite Damage of the Azure Crown, Tide | 58 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
@@ -4017,3 +4018,33 @@ after this is done, create new quest beating campaign 8-10. reward is 3 spools.
 ```
 
 The Journey's seventh quest, after Beat Campaign 5-10. Which three spools is a stand-in: Gilded Apex.
+
+## 58. The Crossbowman (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+i want new champion.
+name = Crossbowman
+rarity ELITE
+affinity tide
+azure crown
+damage role
+design = this guy wears city medieval dress in green and yellow and blue colors, wear fancy hat with feather and has big mustache. has crossbow.
+kit: A1 - attacks 1 target. make this good multiplier.
+A2 - attacks 1 target, debuff target with DEFENSE DOWN for 2 turns. CD 3.
+A3 passive - plus 20% critical damage always.
+```
+
+Built as given. Numbers: A1 1.25, "a good multiplier" read as the top of the norm for a single-target
+A1; A2 1.4, its DEF Down guaranteed; the passive a stat passive (+20% C.DMG, in battle only, outside
+the stat budget). HP 1010, ATK 124, DEF 58, SPD 102, CRIT 10%, score 424 of the Elite 425. He is
+summoned, like the other Elites.
+
+**The look.** A guild master on parade: a green doublet striped with yellow and skirted to the
+thigh, yellow sleeves puffed and slashed with green, blue forearms and hose, yellow boot cuffs; a
+broad blue hat with a yellow band, one long yellow feather tipped with green, a handlebar mustache; a
+small gold crown on his chest for the Azure Crown; the crossbow in both hands.
+
+Stand-ins: the names Guild Shot, Armour Breaker and Master's Eye, the lore, A2's multiplier, the
+stats, how the colours are shared out, A2 taken from one knee, the bolts and their effects.

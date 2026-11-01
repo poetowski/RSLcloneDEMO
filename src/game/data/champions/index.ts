@@ -9,7 +9,8 @@
 // Ears of the Court of Root, Emissary Handlings and the Associate of the Azure
 // Crown, and Red Cloak and the Black Rhino of the Sanguine Dominion; and the
 // Skeleton, the Rot Hulk and the Bellringer, Commons of the Ashveil Reign, and
-// the Necromancer, the Automated Soul and Irving Wellbington, its Elites; and
+// the Necromancer, the Automated Soul and Irving Wellbington, its Elites; the
+// Crossbowman, an Elite of the Azure Crown; and
 // the Paladin, the Azure Crown's Heroic and the roster's first, Chief
 // Engineer CJ, the Sanguine Dominion's, the Forest Gargoyle, the Court of
 // Root's, and Dead Knight Amstron, the Ashveil Reign's; everything else waits for his design.
@@ -23,6 +24,7 @@ import { blackRhino } from './black_rhino';
 import { bloodhound } from './bloodhound';
 import { captainGareth } from './captain_gareth';
 import { chiefEngineerCj } from './chief_engineer_cj';
+import { crossbowman } from './crossbowman';
 import { deadKnightAmstron } from './dead_knight_amstron';
 import { dominionMedic } from './dominion_medic';
 import { emissaryHandlings } from './emissary_handlings';
@@ -58,7 +60,7 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman,
 ];
 
 /**
@@ -79,4 +81,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { toadcap, bristleback, hiveTender, archer, ashWidow, gravedigger, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, harvestSpecialist, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, sentry, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };
+export { crossbowman, toadcap, bristleback, hiveTender, archer, ashWidow, gravedigger, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, harvestSpecialist, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, sentry, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };

@@ -24,6 +24,7 @@
 // the double cross on it, before each ally; in Trial by Fire the levelled
 // blade roars up along its length, and the sweep passes through each enemy as
 // a flat arc of flame, flames bursting up where it went.
+import { MAT } from '../palette.ts';
 import { disc, dith, ellipseRing, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, hash2, RGBA, rng } from '../raster.ts';
 import { burst, cut, flame, FxDef, motes, ramps, ring, sparks, W } from './kit.ts';
@@ -181,6 +182,19 @@ function puff(b: Bitmap, x: number, y: number, rad: number, alpha: number) {
       b.set(xx, yy, rampDither(SM, Math.max(0, Math.min(4, lit)), xx, yy));
     }
   }
+}
+
+/** A crossbow bolt pointing right: a short shaft, an iron head, green flights at its tail. */
+function boltShape(b: Bitmap, x0: number, x1: number, cy: number, heavy: boolean) {
+  for (let x = x0; x < x1 - 2; x++) {
+    b.set(x, cy, MAT.wood.ramp[4]);
+    if (heavy) b.set(x, cy + 1, MAT.wood.ramp[2]);
+  }
+  for (let k = 0; k < (heavy ? 5 : 3); k++) {
+    const r = heavy ? 2 - Math.floor((k * 2) / 5) : k < 2 ? 1 : 0;
+    for (let w = -r; w <= r; w++) b.set(x1 - 3 + k - (heavy ? 1 : 0), cy + w, MAT.iron.ramp[w < 0 ? 4 : 3]);
+  }
+  for (const w of [-1, 1]) for (let k = 0; k < 3; k++) b.set(x0 + k, cy + w, MAT.green.ramp[4 - k]);
 }
 
 export const AZURE_CROWN_FX: Record<string, FxDef> = {
@@ -630,6 +644,38 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
         puff(b, x, y, 3.5 + tt * 4, (1 - tt * 0.8) * (tt < 0.1 ? tt / 0.1 : 1));
       }
       if (t > 0.2) sparks(b, 40, 22, 8, 22, (t - 0.2) / 0.8, GO, 523, 18);
+    },
+  },
+  /** The Crossbowman's bolt in flight: short, thick, green at the fletching. */
+  crossbow_bolt: {
+    w: 20, h: 5, n: 1, ms: 100, ax: 0.8, ay: 0.5, loop: true,
+    draw: (b) => boltShape(b, 1, 18, 2, false),
+  },
+  /** Armour Breaker's bolt: heavier, an iron head as wide as a thumb. */
+  heavy_bolt: {
+    w: 26, h: 9, n: 1, ms: 100, ax: 0.8, ay: 0.5, loop: true,
+    draw: (b) => boltShape(b, 1, 24, 4, true),
+  },
+  /** Guild Shot: the bolt thuds in, a short white flash, chips flung out behind. */
+  bolt_strike: {
+    w: 60, h: 46, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 6, 6],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 23;
+      if (i < 3) cut(b, cx - 12 + i * 3, cy, cx + 10 + i * 3, cy, 0, [2.2, 2.6, 1.4][i], ramps.steel, [1.2, 1, 0.6][i], 1);
+      if (i >= 1 && i < 4) burst(b, cx, cy, 7, [2, 3, 2][i - 1], [9, 13, 9][i - 1], [2, 2.2, 1.4][i - 1], ramps.steel, 0.3);
+      if (i >= 1) sparks(b, cx + 3, cy, 7, 20, (i - 1) / 5, ramps.steel, 811, 10);
+    },
+  },
+  /** Armour Breaker: the bolt punches through, a crack of white light across the armour, plates of it flung out and falling. */
+  armour_breach: {
+    w: 76, h: 60, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 6, 6, 6],
+    draw: (b, t, i) => {
+      const cx = 36, cy = 28;
+      if (i < 4) cut(b, cx - 18 + i * 3, cy, cx + 16 + i * 5, cy, 0, [3, 3.6, 2.6, 1.4][i], ramps.steel, [1.4, 1.3, 1, 0.6][i], 1);
+      if (i >= 1 && i < 5) burst(b, cx, cy, 9, [3, 4, 4, 3][i - 1], [12, 18, 15, 10][i - 1], [2.6, 3, 2.2, 1.4][i - 1], ramps.steel, 0.2);
+      // the crack
+      if (i >= 1 && i < 6) for (const [dx, dy] of [[-7, -11], [8, -9], [-9, 8], [10, 10]]) cut(b, cx, cy, cx + dx * (1 + i * 0.1), cy + dy * (1 + i * 0.1), 0, 1, ramps.steel, 0.7, 1);
+      if (i >= 1) sparks(b, cx + 4, cy, 12, 30, (i - 1) / 7, ramps.steel, 821, 22);
     },
   },
 };
