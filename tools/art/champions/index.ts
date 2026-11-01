@@ -39,7 +39,7 @@ import { skirmisher } from './skirmisher.ts';
 import { crossbowman } from './crossbowman.ts';
 import { overlordOfentol } from './overlord_ofentol.ts';
 import { verdantLuminary } from './verdant_luminary.ts';
-import { tombstonesLegs } from './tombstones_legs.ts';
+import { coffinsLegs } from './coffins_legs.ts';
 import { wraith } from './wraith.ts';
 import { boneAugur } from './bone_augur.ts';
 import { strongman } from './strongman.ts';
@@ -48,7 +48,7 @@ import { walkingBush } from './walking_bush.ts';
 import { wildSpeaker } from './wild_speaker.ts';
 
 export const CHAMPION_ART: Record<string, ChampionArt> = {
-  tombstones_legs: tombstonesLegs, wraith, bone_augur: boneAugur, crossbowman, overlord_ofentol: overlordOfentol, verdant_luminary: verdantLuminary, captain_gareth: captainGareth, rime_scholar: rimeScholar, follower, skirmisher, strongman, town_guard: townGuard, last_riter: lastRiter, archer, harvest_specialist: harvestSpecialist, sentry, junior_ward: juniorWard, gravedigger, ash_widow: ashWidow, toadcap, bristleback, hive_tender: hiveTender, dominion_medic: dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
+  coffins_legs: coffinsLegs, wraith, bone_augur: boneAugur, crossbowman, overlord_ofentol: overlordOfentol, verdant_luminary: verdantLuminary, captain_gareth: captainGareth, rime_scholar: rimeScholar, follower, skirmisher, strongman, town_guard: townGuard, last_riter: lastRiter, archer, harvest_specialist: harvestSpecialist, sentry, junior_ward: juniorWard, gravedigger, ash_widow: ashWidow, toadcap, bristleback, hive_tender: hiveTender, dominion_medic: dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
   walking_bush: walkingBush, wild_speaker: wildSpeaker, jungle_herder: jungleHerder, associate, emissary_handlings: emissaryHandlings, black_rhino: blackRhino, red_cloak: redCloak, grove_keeper: groveKeeper, big_ears: bigEars, skeleton, rot_hulk: rotHulk, bellringer, necromancer, automated_soul: automatedSoul, irving_wellbington: irvingWellbington, paladin, chief_engineer_cj: chiefEngineerCj, forest_gargoyle: forestGargoyle, dead_knight_amstron: deadKnightAmstron,
 };
 

@@ -1,15 +1,15 @@
 import { ChampionDef } from '../types';
 
-// Tombstone's Legs (docs/DESIGN_DECISIONS.md section 61, Jakub's request of
+// Coffin's Legs (docs/DESIGN_DECISIONS.md section 61, Jakub's request of
 // 2026-11-01 for the Ashveil Reign's remaining Elites, "be creative but
 // consistent", he names them himself one by one): my proposal, built on that
 // word. A dead giant of a mourner who carries a coffin before him as a shield
 // and a ram. The roster's first Undying: the engine's passive no champion had
 // used. His name is Jakub's (2026-11-01). Stand-ins until Jakub sets them: the kit, Ember,
 // the numbers, the lore line, the art). He is summoned, like the other Elites.
-export const tombstonesLegs: ChampionDef = {
-  id: 'tombstones_legs',
-  name: "Tombstone's Legs",
+export const coffinsLegs: ChampionDef = {
+  id: 'coffins_legs',
+  name: "Coffin's Legs",
   role: 'Tank',
   rarity: 'elite',
   affinity: 'ember',

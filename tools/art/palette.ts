@@ -130,7 +130,7 @@ export const MAT = {
   // the Gravedigger's sackcloth, dirty with the ground
   graveSack: m('graveSack', 'cloth', ['#17130e', '#2c2519', '#443a28', '#5e5238', '#786a4c', '#938562']),
   plum: m('plum', 'cloth', ['#16080f', '#311226', '#53203f', '#7a2e5a', '#a34479', '#c86a9a']),
-  /** Tombstone's Legs' coffin: old dark wood gone almost black, a reddish brown where the light catches the grain */
+  /** Coffin's Legs' coffin: old dark wood gone almost black, a reddish brown where the light catches the grain */
   coffin: m('coffin', 'matte', ['#0c0808', '#1a1312', '#2a201d', '#3e302a', '#57443a', '#76604f']),
   /** the Wraith's shroud: a grave-cloth gone the grey-green of old smoke, paler at its frayed edges */
   shroud: m('shroud', 'cloth', ['#0c0f10', '#1a2021', '#2c3433', '#434d49', '#626d65', '#8a9586']),

@@ -1,4 +1,4 @@
-// Tombstone's Legs (docs/DESIGN_DECISIONS.md section 61, 2026-11-01, my proposal on
+// Coffin's Legs (docs/DESIGN_DECISIONS.md section 61, 2026-11-01, my proposal on
 // Jakub's word): an Elite Tank of the Ashveil Reign, a dead giant of a mourner
 // who carries a coffin before him as a shield and a ram. Broad and heavy, a
 // black cowl over a bald grey head; his jaw bound shut with a strip of linen tied
@@ -276,8 +276,8 @@ const VICTORY = pose({ y: 0, torso: 92, head: 98, legN: { ik: v(-10, 3) }, legF:
 const mid = (a: Pose, b: Pose, t: number) => lerpPose(a, b, t, D);
 
 const char: CharDef = {
-  id: 'tombstones_legs',
-  name: "Tombstone's Legs",
+  id: 'coffins_legs',
+  name: "Coffin's Legs",
   dims: D,
   build,
   anims: {
@@ -367,7 +367,7 @@ function iconCoffin(d: Draw, o: V, ang: number, z: number, k = 1) {
   d.capsule({ mat: BN, z: z + 0.3, group: 'icbone' }, g(7, -5), g(7, 5), 1.2, 1.2);
 }
 
-export const tombstonesLegs: ChampionArt = {
+export const coffinsLegs: ChampionArt = {
   char,
   iconBg: CT,
   icons: {

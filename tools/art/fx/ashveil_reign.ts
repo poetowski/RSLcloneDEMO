@@ -561,7 +561,7 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
     },
   },
 
-  // --- Tombstone's Legs (section 61) -----------------------------------------
+  // --- Coffin's Legs (section 61) -----------------------------------------
   /** Lid Crush lands: the coffin's flat face meets the enemy in a broad dull flash, dust pressed out in a ring, splinters of old wood thrown off. Matter. */
   lid_crush: {
     w: 64, h: 64, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 10, 2],

@@ -113,7 +113,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Crossbowman, an Elite Damage of the Azure Crown, Tide | 58 |
 | 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
 | 2026-11-01 | The Verdant Luminary, an Elite Support of the Azure Crown, Bloom | 60 |
-| 2026-11-01 | Tombstone's Legs (first built as the Pallbearer), the Wraith and the Bone Augur, my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Tombstone's Legs the first | 61-63 |
+| 2026-11-01 | Coffin's Legs (first built as the Pallbearer, then Tombstone's Legs), the Wraith and the Bone Augur, my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Coffin's Legs the first | 61-63 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
@@ -331,7 +331,7 @@ its second, the Rot Hulk, a Common Tank (section 29), its third, the
 Bellringer, a Common Support (section 30), its fourth, the Necromancer, a
 Support and its first Elite (section 31), its fifth, the Automated Soul, an
 Elite of the Damage role (section 32), and its sixth, Irving Wellbington, an
-Elite Tank (section 33). Its other three Elites, Tombstone's Legs (Tank), the
+Elite Tank (section 33). Its other three Elites, Coffin's Legs (Tank), the
 Wraith (Damage) and the Bone Augur (Support), are my proposals on his word of
 2026-11-01 (sections 61-63).
 
@@ -4129,7 +4129,7 @@ stats, and her look past the brief: skin pale as birch, long copper hair, pointe
 leaves, the cut of the blue and where the crowns sit, a gold circlet, the great bow's living wood, leaves and gold
 caps, the bag's blue flap, the leaves that fall on allies and the gold seal on the attacker.
 
-## 61. Tombstone's Legs (received 2026-11-01)
+## 61. Coffin's Legs (received 2026-11-01)
 
 Jakub, for this and sections 62-63, verbatim:
 
@@ -4139,7 +4139,7 @@ I want to create 3 remaining 3 elites in ashveil reign. Be creative but consiste
 
 The Ashveil Reign had one Elite of each role (the Necromancer, the Automated Soul, Irving Wellbington)
 where the Azure Crown has two, so these are its second Elite Tank, Damage and Support. **All of the
-three is a stand-in until he sets it:** the names above all, which he gives one by one (Tombstone's Legs the first, below), and the kits,
+three is a stand-in until he sets it:** the names above all, which he gives one by one (Coffin's Legs the first, below), and the kits,
 affinities, numbers, lore lines and art. Their affinities even the Reign's Elites at two each of
 Ember, Bloom and Tide. The engine's Undying, Dispel and the turn meter given to every other ally had
 no champion using them; each of the three takes one.
@@ -4150,7 +4150,14 @@ Built first as the Pallbearer, a stand-in; then, mid-build, Jakub named him, ver
 Rename pallbearer to Tombstone's Legs
 ```
 
-So his name is Jakub's; the id is `tombstones_legs`.
+and then:
+
+```
+My base rename it to Coffin's Legs. Hopefully it is coffin
+```
+
+It is a coffin: six-sided, iron straps, the white bone across the lid. So his name is Jakub's,
+Coffin's Legs; the id is `coffins_legs`.
 
 An Elite Tank of the Reign, Ember: a dead giant of a mourner who carries a coffin before him as a
 shield and a ram. A black cowl over a bald grey head, his jaw bound shut with a strip of linen tied
