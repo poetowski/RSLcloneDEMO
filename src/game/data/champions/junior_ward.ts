@@ -1,10 +1,10 @@
 import { ChampionDef } from '../types';
 
 // The Junior Ward (Jakub's brief, docs/DESIGN_DECISIONS.md section 44,
-// 2026-10-31, the worksheet's recommended options): an enemy of the Sanguine
+// 2026-10-31, the worksheet's recommended options): a champion of the Sanguine
 // Dominion, Common, Tank, Bloom (abstract: it sets nothing in his look); a
-// tall young man with a long spear, a black tunic, bare arms. Enemy only: he
-// is never summoned and is not in the collection (ENEMIES in index.ts). An A1
+// tall young man with a long spear, a black tunic, bare arms. Enemy only at
+// first; a normal hero, summoned, on Jakub's word (section 47, 2026-11-01). An A1
 // on one enemy, and a passive: when an enemy skill damages him, a 25% chance
 // of DEF Up on himself for 2 turns, then a rest of 1 of his turns, ready from
 // the start. Jakub approved the names, the lore line and the art as shown

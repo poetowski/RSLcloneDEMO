@@ -53,14 +53,15 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist, sentry,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry,
 ];
 
 /**
  * Enemies only: they fight on the enemy side of campaign stages and are never
- * summoned, collected or put in a team (Jakub's Junior Ward, 2026-10-31).
+ * summoned, collected or put in a team. None today: the Junior Ward, the first,
+ * joined the roster on Jakub's word (2026-11-01).
  */
-export const ENEMIES: ChampionDef[] = [juniorWard];
+export const ENEMIES: ChampionDef[] = [];
 
 /** Every champion the game knows: the roster and the enemies only (norms, art, assets, demos). */
 export const ALL_CHAMPIONS: ChampionDef[] = [...CHAMPIONS, ...ENEMIES];

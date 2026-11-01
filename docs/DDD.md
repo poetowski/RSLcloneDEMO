@@ -76,7 +76,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Term | Meaning | In code |
 | --- | --- | --- |
 | Champion | the definition of a hero, enemy or boss: identity, stats, kit, lore | `ChampionDef` |
-| Enemy only | a champion that fights only on the enemy side of stages, never summoned, collected or put in a team (the Junior Ward) | `ENEMIES`, `ALL_CHAMPIONS` |
+| Enemy only | a champion that fights only on the enemy side of stages, never summoned, collected or put in a team (none today) | `ENEMIES`, `ALL_CHAMPIONS` |
 | Kit | a champion's one to three skills and its passive | `ChampionDef.skills`, `.passive` |
 | Rarity | Common, Elite, Heroic, Mythic; sets the stat budget and the card frame (what it gates in play is not decided) | `Rarity`, `RARITIES`, `RARITY_BUDGET` |
 | Affinity | Ember, Bloom, Tide, a cycle: Ember beats Bloom, Bloom beats Tide, Tide beats Ember (no Void) | `Affinity`, `AFFINITIES`, `affinityEdge` |

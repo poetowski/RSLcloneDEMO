@@ -98,6 +98,7 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Archer, the Junior Ward and the Harvest Specialist approved as built: their art, names and lore lines, and the Harvest Specialist's Tide | 43-45 |
 | 2026-11-01 | The Sentry, a Common Tank of the Sanguine Dominion; the lighter stats and the A2's Regen on someone else on his word, the rest of the worksheet's recommended options | 46 |
 | 2026-11-01 | The Sentry approved as built: his art, the names Checkpoint Cut and Watch Rotation, the lore line | 46 |
+| 2026-11-01 | The Junior Ward a normal hero, no longer enemy only; the Sentry a skeleton under his armour, moved to the Ashveil Reign; the target of six Commons per faction, two per class | 47 |
 
 ---
 
@@ -3640,3 +3641,41 @@ budget: HP 1260, ATK 82, DEF 66, SPD 100, CRIT 2.5%, score 391), the lore line (
 of the Sanguine Dominion who walks its borders by night, and has never let anyone cross
 without asking twice.") and every detail of his art and effects above. He is summoned
 (section 36), an eighteenth Common in that pool; every stage stayed in its band.
+
+## 47. The Junior Ward and the Sentry change places (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+junior ward should be normal hero, not just enemy, and then we have sentry, which can be remodeled as skeleton under that armor and move it to ashveil reign. so we are approaching 6 characters in common rarity per each faction, two instances per each class, tank support and damage
+```
+
+and, mid-build:
+
+```
+make sure when you move that hero to ashveil reign, to change lore etc of him
+```
+
+**The Junior Ward** is summoned and collected like any Common. He still fights in 2-1 and
+2-4. `ENEMIES` stays in the code, empty.
+
+**The Sentry** is of the Ashveil Reign; kit, names and stats are unchanged. Under the same
+gambeson, pauldrons, bracers, cloak, boots and cap he is now bones: a skull with a pale
+light in its socket, bare forearms and shins, ribs through a tear in the chest. The
+hexagon is gone; the Reign's white bone is on his cap. Watch Rotation's effect moved to
+the Reign's effects, its look unchanged. His death stays a fall, not a heap, because the
+armour holds him together.
+
+**The target:** six Commons per faction, two of each class.
+
+| Faction | Damage | Tank | Support |
+| --- | --- | --- | --- |
+| Azure Crown | Skirmisher, Strongman | Lineholder, Town Guard | Quartermaster, Last Riter |
+| Sanguine Dominion | Enforcer, Archer | Bloodhound, Junior Ward | Dominion Medic, Harvest Specialist |
+| Court of Root | Follower, *open* | Walking Bush, *open* | Wild Speaker, *open* |
+| Ashveil Reign | Skeleton, *open* | Rot Hulk, Sentry | Bellringer, *open* |
+
+Stand-ins until Jakub sets them: the Sentry's new lore line ("A sentry of the Ashveil
+Reign, bones in the armour he died in, who still walks its borders by night, and has
+never let anyone cross without asking twice."), every detail of the skeleton above, and
+2-6's power, raised from 0.81 to 0.86 because the larger summon pool made it too easy.

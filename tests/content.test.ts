@@ -88,6 +88,12 @@ describe('champions', () => {
     }
   });
 
+  it('has the Junior Ward as a normal hero and the Sentry in the Ashveil Reign, on his word', () => {
+    expect(CHAMPIONS.map((c) => c.id)).toContain('junior_ward');
+    expect(ENEMIES).toEqual([]);
+    expect(champion('sentry').faction).toBe('ashveil_reign');
+  });
+
   it('keeps the enemies only out of the roster and the summons, and puts each in a stage', () => {
     const pool = summonPool(newArchivist()).map((c) => c.id);
     const fought = new Set(allStages().flatMap((s) => s.enemies.map((e) => e.champion)));
@@ -883,7 +889,7 @@ describe('summoning', () => {
     const chance = wishChance(pool, wish);
     expect(chance).toBeGreaterThan(wishChance(pool, wish, false));
     expect(chance).toBeLessThan(1);
-    expect(plain.get('wild_speaker')).toBeCloseTo(0.7 / 18, 9);
+    expect(plain.get('wild_speaker')).toBeCloseTo(0.7 / 19, 9);
     expect(wishChance(pool, {})).toBe(0);
   });
 

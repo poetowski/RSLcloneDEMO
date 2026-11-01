@@ -1,20 +1,21 @@
 // The Sentry (Jakub's brief, docs/DESIGN_DECISIONS.md section 46,
-// 2026-11-01): a Common Tank of the Sanguine Dominion, a soldier who patrols
-// the border, lightly armoured, with a long sword and dark-brown shoulders.
-// On the Town Guard's rig: a dark-red padded gambeson to mid-thigh with a
-// small red hexagon on the chest (the Dominion's mark), dark-brown leather
-// pauldrons and bracers, charcoal trousers and travel boots, a short
-// dark-grey cloak, an open-faced iron cap, a stubbled face; a long sword with
-// a long grip, held in both hands, point down at rest. Checkpoint Cut: a
+// 2026-11-01, and section 47): a Common Tank of the Ashveil Reign, a soldier
+// who still patrols the border, a skeleton under his light armour, with a long
+// sword and dark-brown shoulders. On the Town Guard's rig: a dark-red padded
+// gambeson to mid-thigh, torn open over the ribs, the Reign's white bone on
+// his cap, dark-brown leather pauldrons and
+// bracers on bare forearm bones, charcoal breeches, bare shins into travel
+// boots, a short dark-grey cloak, a skull under an open-faced iron cap; a long
+// sword with a long grip, held in both hands, point down at rest. Checkpoint Cut: a
 // two-handed diagonal cut with a plain white streak; Watch Rotation: the
 // sword planted, rose light rising round him. His affinity (Tide) sets
 // nothing here (Jakub, 2026-10-11).
+import { BN, skullFrame, vertebrae } from '../bones.ts';
 import { BuildInfo, ChampionArt, CharDef, cycle, keys, tween } from '../char.ts';
 import { compose, glyph } from '../icons.ts';
 import { ACCENT, FXR, MAT } from '../palette.ts';
 import { arm, cape, leg, smear, sword, torsoPts } from '../parts.ts';
-import { at, Dims, Draw, ease, ik2, lerpPose, lerpV, pose, Pose, Skel, tweak, V, v } from '../rig.ts';
-import { face } from './common.ts';
+import { at, D2R, Dims, Draw, ease, ik2, lerpPose, lerpV, pose, Pose, Skel, tweak, V, v } from '../rig.ts';
 
 const D: Dims = {
   hipH: 33,
@@ -33,7 +34,7 @@ const D: Dims = {
   hipF: 2.2,
 };
 
-const SK = MAT.skinTan, GB = MAT.maroon, BR = MAT.darkleather, CH = MAT.charcoal, CL = MAT.blackCloth, IR = MAT.iron, ST = MAT.steel, RD = MAT.red, HR = MAT.hairBrown;
+const GB = MAT.maroon, BR = MAT.darkleather, CH = MAT.charcoal, CL = MAT.blackCloth, IR = MAT.iron, ST = MAT.steel;
 const E = ACCENT;
 
 /** The streak of a cut: plain white with the light of the steel. */
@@ -80,13 +81,13 @@ function build(d: Draw, s: Skel, info: BuildInfo) {
 // ---------------------------------------------------------------------------
 
 const legCfg = (z: number, shade: number) => ({
-  thigh: CH, shin: CH, foot: BR, rThigh: [4.2, 3.4] as [number, number], rShin: [3.1, 2.6] as [number, number], z, shade, footStyle: 'boot' as const,
-  boot: { mat: BR, from: 0.45, r: [3.3, 3.0] as [number, number], cuff: BR },
+  thigh: CH, shin: BN, foot: BR, rThigh: [3.8, 2.8] as [number, number], rShin: [1.2, 1.0] as [number, number], z, shade, footStyle: 'boot' as const,
+  boot: { mat: BR, from: 0.66, r: [3.3, 3.0] as [number, number], cuff: BR },
 });
 
-// the gambeson's padded sleeves, dark-red to the wrist
+// the gambeson's padded sleeves end at the elbow; below them, bone
 const armCfg = (z: number, shade: number) => ({
-  upper: GB, fore: GB, hand: SK, rUp: [3.2, 2.8] as [number, number], rLo: [2.7, 2.3] as [number, number], rHand: 2.1, z, shade,
+  upper: GB, fore: BN, hand: BN, rUp: [3.2, 2.8] as [number, number], rLo: [1.1, 0.9] as [number, number], rHand: 1.7, z, shade,
 });
 
 /** Where the far arm reaches: its hand on the long grip, `TWO` from the near hand toward the pommel. */
@@ -96,18 +97,18 @@ function farArm(s: Skel, ang: number): { e: V; h: V; lo: number } {
   return { e: r.mid, h: r.end, lo: r.a2 };
 }
 
-/** The far arm drawn from its solved joints: the padded sleeve, the bracer, the hand. */
+/** The far arm drawn from its solved joints: the padded sleeve, the forearm's bone, the bracer, the hand. */
 function farArmDraw(d: Draw, sh: V, el: V, ha: V, z: number, shade: number) {
   d.capsule({ mat: GB, z, group: 'armF', shade }, sh, el, 3.2, 2.8);
-  d.capsule({ mat: GB, z: z + 0.1, group: 'armF', shade }, el, ha, 2.7, 2.3);
+  d.capsule({ mat: BN, z: z + 0.1, group: 'armF', shade }, el, ha, 1.1, 0.9);
   bracer(d, el, ha, z + 0.2, shade, 'F');
-  d.circle({ mat: SK, z: z + 0.3, group: 'armF', shade }, ha, 2.1);
+  d.circle({ mat: BN, z: z + 0.3, group: 'armF', shade }, ha, 1.7);
 }
 
 /** A dark-brown leather bracer on the forearm. */
 function bracer(d: Draw, el: V, ha: V, z: number, shade: number, side: string) {
   const a = (Math.atan2(ha.y - el.y, ha.x - el.x) * 180) / Math.PI;
-  d.capsule({ mat: BR, z, group: 'bracer' + side, shade }, at(el, a, 3.8), at(ha, a, -2.0), 2.8, 2.6);
+  d.capsule({ mat: BR, z, group: 'bracer' + side, shade }, at(el, a, 6.4), at(ha, a, -1.4), 2.6, 2.4);
 }
 
 /** A dark-brown leather pauldron over the shoulder, two lames. */
@@ -120,7 +121,7 @@ function pauldron(d: Draw, s: Skel, side: 'N' | 'F', z: number, shade: number) {
   d.capsule({ mat: BR, z: z + 0.1, group: 'pauldron' + side, shade: shade - 1, line: 'soft' }, at(lame, up + 90, 4.0), at(lame, up - 90, 4.0), 1.0, 1.0);
 }
 
-/** The gambeson: dark-red, padded in rows, a skirt to mid-thigh, a small red hexagon on the chest, a dark-brown belt. */
+/** The gambeson: dark-red, padded in rows, a skirt to mid-thigh, torn over the ribs, a dark-brown belt. */
 function gambeson(d: Draw, s: Skel, z: number) {
   const body = torsoPts(s, [
     [0, 6.4, 6.6],
@@ -140,34 +141,51 @@ function gambeson(d: Draw, s: Skel, z: number) {
   // the belt
   d.poly({ mat: BR, z: z + 1, group: 'belt' }, [s.T(3.4, -6.8), s.T(3.6, 7.6), s.T(1.2, 7.4), s.T(1.0, -6.6)], { kind: 'cyl', a: s.T(1.0, 0), b: s.T(3.6, 0), r: 7.4 });
   d.poly({ mat: IR, z: z + 1.1, group: 'buckle' }, [s.T(3.8, 4.8), s.T(3.8, 7.6), s.T(0.8, 7.6), s.T(0.8, 4.8)], { kind: 'bevel', w: 1 });
-  hexBadge(d, s.T(14.4, 3.2), z + 1.2);
+  ribsThrough(d, s, z + 1.1);
 }
 
-/** A small red hexagon (the Sanguine Dominion's mark) with a dark rim, pixel by pixel so it stays crisp. */
-function hexBadge(d: Draw, center: V, z: number) {
+/** A tear in the padding across his chest: the dark of the empty chest, and his ribs across it. */
+function ribsThrough(d: Draw, s: Skel, z: number) {
+  d.poly({ mat: CL, z, group: 'tear', line: 'soft', shade: -2 }, [s.T(18.4, -1.0), s.T(18.6, 5.6), s.T(15.4, 7.2), s.T(11.6, 6.6), s.T(10.6, 2.0), s.T(13.6, -1.8)], { kind: 'flat', n: [0, 0, 1] });
+  for (const [u, a, b] of [[17.2, 0.2, 5.4], [15.0, -0.6, 6.4], [12.8, 0.2, 5.8]] as const) {
+    d.capsule({ mat: BN, z: z + 0.1, group: 'rib' + u, line: 'none', outline: false }, s.T(u + 0.5, a), s.T(u - 0.3, b), 0.7, 0.6);
+  }
+}
+
+/** The Reign's mark: one white horizontal bone on the cap, pixel by pixel so it stays crisp. */
+function boneBadge(d: Draw, center: V, z: number) {
   const c = v(Math.floor(center.x) + 0.5, Math.floor(center.y) + 0.5);
-  const R = RD.ramp;
-  const px: { p: V; c: (typeof R)[number] }[] = [];
-  for (const [x, y] of [[-1, 2], [0, 2], [1, 2], [-2, 1], [2, 1], [-2, 0], [2, 0], [-2, -1], [2, -1], [-1, -2], [0, -2], [1, -2]]) px.push({ p: v(c.x + x, c.y + y), c: R[1] });
-  for (const [x, y] of [[-1, 1], [0, 1], [1, 1], [-1, 0], [0, 0], [1, 0], [-1, -1], [0, -1], [1, -1]]) px.push({ p: v(c.x + x, c.y + y), c: y > 0 || x < 0 ? R[4] : R[3] });
-  d.pixels({ mat: RD, z, group: 'badge', line: 'none', outline: false }, px);
+  const px: { p: V; c: (typeof E.white) }[] = [];
+    for (let x = -2; x <= 2; x++) px.push({ p: v(c.x + x, c.y), c: E.white });
+  for (const x of [-3, 3]) for (const y of [-1, 1]) px.push({ p: v(c.x + x, c.y + y), c: E.white });
+  d.pixels({ mat: CH, z, group: 'badge', line: 'none', outline: false }, px);
 }
 
-/** A stubbled face under an open-faced iron cap, a riveted brim, the hair at the nape. */
+/** A bare skull under the open-faced iron cap, a pale light in its socket, the jaw hanging open when he strains; the riveted brim. */
 function head(d: Draw, s: Skel, P: Record<string, number>) {
   const H = s.H;
-  d.capsule({ mat: SK, z: 37.5, group: 'neck' }, s.neck, H(0, -4), 2.9, 2.7);
-  face(d, s, { skin: SK, z: 38, brow: HR.ramp[1], browStyle: P.grit ? 'angry' : 'flat', mouth: P.grit ? 'shout' : 'line', lip: SK.ramp[1], rx: 6.0, ry: 6.6 });
-  // stubble along the jaw
-  d.pixels({ mat: SK, z: 38.4, group: 'stubble', line: 'none', outline: false }, [
-    { p: H(4.6, -4.6), c: SK.ramp[2] }, { p: H(3.0, -5.6), c: SK.ramp[2] }, { p: H(1.4, -5.8), c: SK.ramp[2] }, { p: H(-0.2, -5.2), c: SK.ramp[2] },
-  ]);
-  // hair at the nape under the cap
-  d.poly({ mat: HR, z: 38.6, group: 'nape', shade: -1 }, [H(-6.2, 0.4), H(-5.6, -3.0), H(-3.6, -2.8), H(-3.6, 0.4)], { kind: 'flat', n: [0, 0, 1] });
+  const F = skullFrame({ head: s.head, headDir: s.pose.head });
+  const ha = s.pose.head - 90;
+  vertebrae(d, s.neck, H(0, -4), 37.5, 3);
+  // the jaw, turning on its hinge under the ear
+  const jaw = P.grit ? 18 : 4;
+  const hx = -0.3, hy = -1.4;
+  const cj = Math.cos(-jaw * D2R), sj = Math.sin(-jaw * D2R);
+  const J = (x: number, y: number) => F(hx + (x - hx) * cj - (y - hy) * sj, hy + (x - hx) * sj + (y - hy) * cj);
+  d.poly({ mat: BN, z: 37.9, group: 'jaw' }, [J(-1.4, -0.6), J(-0.9, -2.8), J(1.2, -4.5), J(4.4, -4.6), J(5.5, -3.9), J(5.4, -3.1), J(2.0, -3.1), J(0.4, -2.2)], { kind: 'dome', c: J(2.2, -3.0), r: 4.4, bevel: 0.6 });
+  // the skull: the vault, the face, the sockets, the nose's hollow, the upper teeth
+  d.ellipse({ mat: BN, z: 38, group: 'skull' }, F(-0.8, 1.3), 5.5, 5.7, ha);
+  d.poly({ mat: BN, z: 38.05, group: 'skull' }, [F(-0.4, 3.2), F(3.6, 3.1), F(5.5, 1.6), F(6.0, -0.6), F(5.7, -2.2), F(4.6, -2.9), F(1.8, -2.9), F(-0.9, -1.6)], { kind: 'dome', c: F(1.4, 0.4), r: 6.6, bevel: 0.8 });
+  d.ellipse({ mat: BN, z: 38.15, group: 'socket', flat: 0, line: 'none' }, F(2.6, 0.7), 1.85, 2.0, ha);
+  d.ellipse({ mat: BN, z: 38.15, group: 'socketF', flat: 0, line: 'none' }, F(5.2, 0.6), 0.65, 1.5, ha);
+  d.pixels({ mat: BN, z: 38.2, group: 'socket' }, [{ p: F(3.0, 0.6), c: E.ashEye }, { p: F(2.9, -0.4), c: E.ashEyeDim }]);
+  d.pixels({ mat: BN, z: 38.2, group: 'skull' }, [{ p: F(5.0, -1.2), c: BN.ramp[0] }, { p: F(5.4, -1.2), c: BN.ramp[0] }, { p: F(5.1, -1.8), c: BN.ramp[1] }]);
+  d.pixels({ mat: BN, z: 38.2, group: 'skull' }, [1.9, 2.9, 3.9, 4.9].flatMap((x, i) => [{ p: F(x, -2.8), c: BN.ramp[i % 2 ? 4 : 5] }, { p: F(x + 0.5, -2.8), c: BN.ramp[1] }]));
   // the iron cap: a rounded skull, a brim all round, a rivet or two
-  d.poly({ mat: IR, z: 39, group: 'cap', line: 'soft' }, [H(6.4, 3.0), H(5.4, 6.6), H(2.4, 9.0), H(-1.6, 9.4), H(-5.4, 8.0), H(-7.6, 4.6), H(-7.8, 1.6), H(-2.0, 2.8), H(2.4, 3.2)], { kind: 'dome', c: H(-0.8, 4.6), r: 8.6, bevel: 1.3 });
-  d.ribbon({ mat: IR, z: 39.1, group: 'brim', shade: -1 }, [H(8.0, 2.8), H(3.0, 2.6), H(-2.4, 2.0), H(-7.0, 1.0), H(-8.6, 0.4)], [1.0, 1.1, 1.1, 1.0, 0.9]);
-  d.pixels({ mat: IR, z: 39.2, group: 'cap' }, [{ p: H(-1.6, 9.0), c: IR.ramp[5] }, { p: H(2.6, 3.4), c: IR.ramp[4] }, { p: H(-3.6, 2.8), c: IR.ramp[4] }]);
+  d.poly({ mat: IR, z: 39, group: 'cap', line: 'soft' }, [H(6.4, 5.0), H(5.4, 8.6), H(2.4, 11.0), H(-1.6, 11.4), H(-5.4, 10.0), H(-7.6, 6.6), H(-7.8, 3.6), H(-2.0, 4.8), H(2.4, 5.2)], { kind: 'dome', c: H(-0.8, 6.6), r: 8.6, bevel: 1.3 });
+  d.ribbon({ mat: IR, z: 39.1, group: 'brim', shade: -1 }, [H(8.0, 4.8), H(3.0, 4.6), H(-2.4, 4.0), H(-7.0, 3.0), H(-8.6, 2.4)], [1.0, 1.1, 1.1, 1.0, 0.9]);
+  d.pixels({ mat: IR, z: 39.2, group: 'cap' }, [{ p: H(-3.6, 4.8), c: IR.ramp[4] }]);
+  boneBadge(d, H(1.2, 7.8), 39.3);
 }
 
 /** The long sword: a straight blade to a point, a cross guard, a long leather grip for two hands, a round pommel. */
