@@ -215,7 +215,7 @@ export class CampaignScreen extends BaseScreen {
       blit(ctx, this.a.ui.img, g, x - Math.floor(g[2] / 2), y - Math.floor(g[3] / 2));
     }
     blit(ctx, this.a.ui.img, r, x - Math.floor(r[2] / 2), y - Math.floor(r[3] / 2) - lift);
-    if (open) ui.text(ctx, loc.chapter, x, y - 9 - lift, { color: kind === 'camp_cleared' ? '#2a1404' : '#fff0b0', variant: 'display', align: 'center', outline: kind === 'camp_cleared' ? '#ffe070' : COLORS.ink });
+    if (open) this.numeral(ctx, loc.chapter, x, y - 9 - lift, kind === 'camp_cleared' ? '#2a1404' : '#fff0b0', kind === 'camp_cleared' ? '#ffe070' : COLORS.ink);
     this.banner(ctx, loc, x, y + 19);
     const status = this.statusOf(loc);
     const [won, all] = this.starsOf(loc);
@@ -232,6 +232,33 @@ export class CampaignScreen extends BaseScreen {
       click: () => this.openList(loc),
       tip: () => ({ title: `${loc.chapter}. ${loc.name}`, sub: status, body: loc.patterns ? `${loc.blurb} Its stages find ${loc.patterns.map(patternName).join(' and ')} spools.` : loc.blurb, color: COLORS.goldHi }),
     });
+  }
+
+  /**
+   * An area's numeral on its medallion, in the display face. VII is as wide as a
+   * medallion holds, so a longer numeral closes up its letters to that width, the same
+   * letters at the same size with their serifs joined; their outlines go down first,
+   * so no letter's outline cuts into the one beside it.
+   */
+  private numeral(ctx: CanvasRenderingContext2D, s: string, cx: number, y: number, color: string, outline: string) {
+    const ui = this.ui;
+    const st = { color, variant: 'display' as const };
+    const fit = ui.measure('VII', 'display');
+    const over = ui.measure(s, 'display') - fit;
+    if (over <= 0) {
+      ui.text(ctx, s, cx, y, { ...st, align: 'center', outline });
+      return;
+    }
+    const letters = [...s];
+    const closer = over / (letters.length - 1);
+    let at = Math.round(cx - fit / 2);
+    const xs = letters.map((ch) => {
+      const x = at;
+      at += ui.measure(ch, 'display') + 2 - closer;
+      return Math.round(x);
+    });
+    letters.forEach((ch, i) => ui.text(ctx, ch, xs[i], y, { ...st, outline }));
+    letters.forEach((ch, i) => ui.text(ctx, ch, xs[i], y, { ...st, outline: undefined }));
   }
 
   /** An area's name on a banner centered at (cx, y); dimmed and locked until the area opens. */
