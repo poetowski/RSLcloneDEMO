@@ -101,6 +101,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Junior Ward a normal hero, no longer enemy only; the Sentry a skeleton under his armour, moved to the Ashveil Reign; the target of six Commons per faction, two per class | 47 |
 | 2026-11-01 | The Gravedigger and the Ash Widow, my proposals on his word, filling the Ashveil Reign's Commons; a new passive kind, `keen` | 48, 49 |
 | 2026-11-01 | The Toadcap, the Bristleback and the Hive Tender, my proposals on his "go", filling the Court of Root's Commons; at most two skills each, on his word | 50-52 |
+| 2026-11-01 | The Journey's fourth quest: Beat Campaign 1-10, two spools | 53 |
 
 ---
 
@@ -3772,3 +3773,15 @@ straw hive hanging from it, bees circling it. No insignia.
 - Stats HP 1220, ATK 84, DEF 62, SPD 106, CRIT 2.5%, score 389. Summoned.
 
 With all three in the summon pool 2-5's power rose as a stand-in, 0.86 -> 0.89.
+
+## 53. The Journey's fourth quest (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+extend journey for new quest. to beat campaign 1-10. reward can be 2 spools.
+```
+
+Built as Beat Campaign 1-10, after Beat Campaign 1-3: clear stage 1-10, claim two spools at once.
+Stand-ins until he sets them: which two, two Silver Vigor, whose main stats are drawn on claiming
+(Vigor is a Fracture Reach pattern, and two pieces weave its bonus), and the quest's text.

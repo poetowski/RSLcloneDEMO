@@ -291,7 +291,10 @@ export class ChallengesScreen extends BaseScreen {
     const py = KNOT_Y - 52 + bob;
     ui.panel(ctx, 'well', x - 13, py, 26, 26);
     ctx.globalAlpha = st === 'claimed' ? 0.45 : st === 'locked' ? 0.6 : 1;
-    if (q.reward.kind === 'spool') ui.blit(ctx, `spool_${q.reward.pattern}_${q.reward.grade}`, x - 9, py + 4);
+    if (q.reward.kind === 'spool') {
+      ui.blit(ctx, `spool_${q.reward.pattern}_${q.reward.grade}`, x - 9, py + 4);
+      if ((q.reward.count ?? 1) > 1) ui.text(ctx, `x${q.reward.count}`, x + 2, py + 17, { color: COLORS.text });
+    }
     else {
       const r = ui.part('stardust');
       blit(ctx, this.a.ui.img, r, x - Math.floor(r[2] / 2), py + 13 - Math.floor(r[3] / 2));
@@ -350,12 +353,19 @@ export class ChallengesScreen extends BaseScreen {
     if (rw.kind === 'spool') {
       const p = pattern(rw.pattern);
       ui.blit(ctx, `bigspool_${rw.pattern}_${rw.grade}`, rx, py + 27);
-      ui.text(ctx, `${GRADES[rw.grade]} ${patternName(rw.pattern)} spool`, rx + 30, py + 30, { color: PATTERN_TINT[rw.pattern] });
+      const many = (rw.count ?? 1) > 1;
+      ui.text(ctx, `${many ? `${rw.count} ` : ''}${GRADES[rw.grade]} ${patternName(rw.pattern)} ${many ? 'spools' : 'spool'}`, rx + 30, py + 30, { color: PATTERN_TINT[rw.pattern] });
       if (found?.kind === 'spool') {
         ui.blit(ctx, spoolIcon(found.spool), rx + 30, py + 42);
         ui.text(ctx, statText(found.spool.main.stat, found.spool.main.value), rx + 51, py + 47, { color: COLORS.text });
+        // a second spool beside the first
+        const second = found.more?.[0];
+        if (second) {
+          ui.blit(ctx, spoolIcon(second), rx + 104, py + 42);
+          ui.text(ctx, statText(second.main.stat, second.main.value), rx + 125, py + 47, { color: COLORS.text });
+        }
         ui.text(ctx, 'Found: in Weaving now.', rx + 30, py + 63, { color: COLORS.good });
-      } else ui.para(ctx, st === 'claimed' ? 'Taken, into Weaving.' : 'Its main stat is drawn when you claim it.', rx + 30, py + 42, 152, { color: COLORS.faint });
+      } else ui.para(ctx, st === 'claimed' ? 'Taken, into Weaving.' : many ? 'Their main stats are drawn when you claim them.' : 'Its main stat is drawn when you claim it.', rx + 30, py + 42, 152, { color: COLORS.faint });
       if (p) ui.para(ctx, `${p.pieces} ${p.name} spools in a matrix weave ${patternBonusText(p)}.`, rx, py + 82, 180, { color: COLORS.faint });
     } else {
       ui.blit(ctx, 'bigstardust', rx, py + 27);

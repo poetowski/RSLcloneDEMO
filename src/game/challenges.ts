@@ -39,8 +39,8 @@ export function currentQuest(a: MasterArchivist): QuestDef | undefined {
   return JOURNEY.find((q) => !a.claimed.includes(q.id));
 }
 
-/** What a claim gave: the spool it found, or the Stardust. */
-export type QuestFind = { kind: 'spool'; spool: ThreadSpool } | { kind: 'fragments'; amount: number };
+/** What a claim gave: the spools it found (`spool`, and `more` when it gives several), or the Stardust. */
+export type QuestFind = { kind: 'spool'; spool: ThreadSpool; more?: ThreadSpool[] } | { kind: 'fragments'; amount: number };
 
 /** Claims a ready quest: a spool goes into storage with the NEW badge, Stardust to the Wishing Star, and the next quest opens. Null when it is not ready. */
 export function claimQuest(a: MasterArchivist, id: string, rng: () => number = Math.random): QuestFind | null {
@@ -48,9 +48,11 @@ export function claimQuest(a: MasterArchivist, id: string, rng: () => number = M
   if (!q || questState(a, q) !== 'ready') return null;
   let find: QuestFind;
   if (q.reward.kind === 'spool') {
-    const spool = rollSpool(q.reward.pattern, q.reward.grade, rollMainStat(rng), rng);
-    a.reliquary.addSpool(spool, true);
-    find = { kind: 'spool', spool };
+    const reward = q.reward;
+    const spools = Array.from({ length: reward.count ?? 1 }, () => rollSpool(reward.pattern, reward.grade, rollMainStat(rng), rng));
+    for (const s of spools) a.reliquary.addSpool(s, true);
+    const [spool, ...more] = spools;
+    find = more.length ? { kind: 'spool', spool, more } : { kind: 'spool', spool };
   } else {
     a.fragments += q.reward.amount;
     find = { kind: 'fragments', amount: q.reward.amount };

@@ -698,7 +698,7 @@ describe('challenges and the tutorial', () => {
     expect(JOURNEY[0].title).toBe('Finish Tutorial');
     // Jakub, 2026-10-25: "new journey quest: beat campaign 1-3. reward can be 100 summoning fragments", then
     // "swap quests: weave a spool make sooner and after that make beat campaign 1-3 ... swap also rewards"
-    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3']);
+    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3', 'Beat Campaign 1-10']);
     expect([JOURNEY[1].goal, JOURNEY[1].reward]).toEqual([{ kind: 'weave' }, { kind: 'fragments', amount: 100 }]);
     expect([JOURNEY[2].goal, JOURNEY[2].reward.kind]).toEqual([{ kind: 'stage', stage: '1-3' }, 'spool']);
   });
@@ -734,6 +734,18 @@ describe('challenges and the tutorial', () => {
     expect(claimQuest(p, third.id)?.kind).toBe('spool');
     expect(p.claimed).toEqual(JOURNEY.slice(0, 3).map((q) => q.id));
     expect(readyCount(p)).toBe(0);
+    // Beat Campaign 1-10 waits for its stage, then gives its two spools, both in storage and new
+    const fourth = JOURNEY[3];
+    expect(questState(p, fourth)).toBe('open');
+    for (const s of allStages().slice(0, 9)) recordClear(p, s.id, 2);
+    expect(questState(p, fourth)).toBe('open');
+    recordClear(p, '1-10', 2);
+    expect(questState(p, fourth)).toBe('ready');
+    const had = p.reliquary.spools().length;
+    const won = claimQuest(p, fourth.id);
+    expect(won?.kind === 'spool' && won.more?.length).toBe(1);
+    expect(p.reliquary.spools()).toHaveLength(had + 2);
+    expect(currentQuest(p)).toBeUndefined();
   });
 
   it('keeps the tutorial and the claims through a save; an older save reads them as never done, and claims stay in order', () => {

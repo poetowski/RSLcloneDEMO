@@ -432,6 +432,7 @@ The Challenges are quests to accomplish, in three tabs (Jakub, 2026-10-24, [DESI
 | Finish Tutorial (his) | the tutorial finished: its first victory | a Silver Vigor spool |
 | Weave a Spool (stand-in for his placeholder; second on his word, 2026-10-25) | any spool woven into any champion's Weaver Matrix | 100 Stardust (his): the third champion's summon |
 | Beat Campaign 1-3 (his, 2026-10-25; third on his word) | stage 1-3 cleared | a Gilded Sunder spool |
+| Beat Campaign 1-10 (his, 2026-11-01) | stage 1-10 cleared | two spools (his); Silver Vigor, a set's two pieces, stands in |
 
 A reward spool has its quest's pattern and grade; its main stat is drawn by slot and its strands rolled as a found spool's are (section 14), and it comes into storage as a new find. Stardust goes to the Wishing Star (section 16). The spool rewards are stand-ins.
 
