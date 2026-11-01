@@ -497,18 +497,22 @@ describe('design decisions', () => {
     expect(LOCATIONS[0].stages).toHaveLength(10);
   });
 
-  it('names the areas as Jakub did, the Snowy Mesa the easternmost with ten placeholder stages after 4-10', () => {
+  it('names the areas as Jakub did, the Golden Expanse the easternmost with ten placeholder stages after 5-10', () => {
     expect(LOCATIONS.map((l) => [l.chapter, l.name, l.zone])).toEqual([
       ['I', 'Fracture Reach', 'zone1'],
       ['II', 'Verdant Grove', 'zone2'],
       ['III', 'Moonlit Basin', 'zone3'],
       ['IV', 'Earth Scars', 'zone4'],
       ['V', 'Snowy Mesa', 'zone5'],
+      ['VI', 'Golden Expanse', 'zone6'],
     ]);
     const scars = LOCATIONS[3];
     expect([scars.requires, scars.stages.map((s) => s.id)]).toEqual(['3-10', ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6', '4-7', '4-8', '4-9', '4-10']]);
     const mesa = LOCATIONS[4];
     expect([mesa.requires, mesa.stages.map((s) => s.id)]).toEqual(['4-10', ['5-1', '5-2', '5-3', '5-4', '5-5', '5-6', '5-7', '5-8', '5-9', '5-10']]);
+    const expanse = LOCATIONS[5];
+    expect([expanse.requires, expanse.stages.map((s) => s.id)]).toEqual(['5-10', ['6-1', '6-2', '6-3', '6-4', '6-5', '6-6', '6-7', '6-8', '6-9', '6-10']]);
+    expect(expanse.stages.filter((s) => s.recruit)).toEqual([]);
     // none of its stages brings a champion: since summoning (2026-10-25) the Paladin is summoned like the rest
     expect(mesa.stages.filter((s) => s.recruit)).toEqual([]);
   });

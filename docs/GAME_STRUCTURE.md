@@ -103,6 +103,7 @@ Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8):
 | III. Moonlit Basin (after 2-10) | `zone3` | 3-1 to 3-10, placeholders so the area can be played (2026-10-17); 3-10 is the boss |
 | IV. Earth Scars (after 3-10) | `zone4` | 4-1 to 4-10, placeholders Jakub asked for (2026-10-18); 4-10 is the boss |
 | V. Snowy Mesa (after 4-10) | `zone5` | 5-1 to 5-10, placeholders Jakub asked for (2026-10-19); 5-10 is the boss |
+| VI. Golden Expanse (after 5-10) | `zone6` | 6-1 to 6-10, placeholders Jakub asked for (2026-11-01); 6-10 is the boss |
 
 Every victory finds Stardust for the Wishing Star as well as spools ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14, 16). Until 2026-10-25 the stages of Zones 1 to 5 brought the champions one by one (1-4 to 1-10, 2-1 to 2-9, 3-1 to 3-3, 4-1 to 4-3, 5-10); now they are summoned.
 

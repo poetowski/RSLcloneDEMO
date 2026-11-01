@@ -102,6 +102,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Gravedigger and the Ash Widow, my proposals on his word, filling the Ashveil Reign's Commons; a new passive kind, `keen` | 48, 49 |
 | 2026-11-01 | The Toadcap, the Bristleback and the Hive Tender, my proposals on his "go", filling the Court of Root's Commons; at most two skills each, on his word | 50-52 |
 | 2026-11-01 | The Journey's fourth quest: Beat Campaign 1-10, two spools | 53 |
+| 2026-11-01 | Zone 6, the Golden Expanse: battle background, the world map extended east with a tunnel between areas 5 and 6, ten placeholder stages | 5.9 |
 
 ---
 
@@ -1033,6 +1034,55 @@ line Jakub made him the reward of, until 2026-10-25, when champions came to be
 summoned (section 36). Stages, enemies and story wait for him.
 
 ---
+
+### 5.9 Zone 6 — the Golden Expanse (2026-11-01)
+
+Jakub, verbatim:
+
+```
+now i want to generate sixth area. you need to expand world map to the east.
+sixth zone is called Golden Expanse.
+The central desert consists of enormous golden dunes.
+- Dunes can reach heights of 50–100 metres.
+- Wind constantly reshapes the landscape. be creative
+- Some dunes contain buried ruins, skeletons and forgotten structures.
+- Occasionally, strange lights move beneath the surface.
+extend world map, generate also new battle background, create 10 placeholder stages.
+when you will expand world map, you can dig a tunnel between area 5 and area 6 on world map.
+```
+
+**The battle background (`tools/art/zones/zone6.ts`).** Late afternoon, the sun low in the upper
+left. Ranges of dunes behind each other, each a long back rising from the left with a knife edge of
+crest winding down it, lit and ribbed on the sun's side, deep amber on the lee. A huge dune on the
+right; a tiny wall and arch on its flank give its scale. Between the dunes the top of a sunken
+stepped temple. Half buried on the arena's far edge a colonnade and the ribs of something enormous.
+In the arena's sand a buried warrior with his sword, a helmet, bones, a fallen column drum.
+
+**"Wind constantly reshapes the landscape, be creative"**, read as things that move, all slow, the
+calm-motion rule: sand streams off the crests; runnels slide down the huge dune's lee; low snakes of
+sand run over the arena; a dust devil wanders across the far flanks; the wind's gusts cross the
+arena (ambient `sand`); and **the drifts round the colonnade and the ribs rise and fall over about
+half a minute, burying and uncovering them.**
+
+**"Occasionally, strange lights move beneath the surface"**: a pale turquoise glow, a colour nothing
+else here has, travels through the grains on the huge dune and under the arena, for about five
+seconds in every fifteen or so, each on its own rhythm.
+
+**The map.** 2240 wide, its overview four times smaller (560 x 90). The storm now ends at a ridge
+of bare rock with snow on its crests and sand on its eastern foot. **The tunnel:** the road crosses
+from the last mesa on a rope bridge to a stone mouth in the ridge's west face and comes out of a
+second on the east; an atlas's dotted line and three smoking air shafts mark its course. Beyond lie
+the dunes, a trail half lost under drifts, a buried temple above the node, huge ribs and a skull, a
+colonnade, a tilted obelisk, a dome, dust devils, patches of pale light under the sand. Pixels west
+of about x 1900 are kept, but for the storm's back edge.
+
+**Stages 6-1 to 6-10** after 5-10, placeholders: their texts walk his description, enemies are
+copies of the roster, 6-10 a boss Dead Knight Amstron, no champion joins there.
+
+Stand-ins until he sets them: everything his description did not name, including the time of day,
+the temple, colonnade, ribs, warrior and vultures, the lights' colour and rhythm, the ridge and the
+tunnel's look, the stages' enemies, powers and texts, the spools (Focus and Ward) and the Stardust
+(45 a victory).
 
 ## 6. Cross-cutting
 

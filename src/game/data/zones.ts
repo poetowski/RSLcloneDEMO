@@ -89,6 +89,20 @@ export const ZONES: ZoneDef[] = [
     // a first take: now and then lightning glows inside the storm, white and lilac, rarely
     flash: { at: [566, 40], every: [14000, 30000], ms: 1200, colors: ['#dfe2ff', '#cbbcff', '#eceaff'] },
   },
+  {
+    // Zone 6, named and described by Jakub (2026-11-01): the Golden Expanse, enormous golden dunes, wind constantly
+    // reshaping the land, buried ruins, skeletons and forgotten structures, strange lights moving beneath the surface
+    id: 'zone6',
+    name: 'Golden Expanse',
+    ambient: 'sand',
+    // the low sun on the sand
+    glow: [255, 214, 140],
+    shadow: { dx: 5, stretch: 1.25 },
+    tint: { color: '#ffc27a', alpha: 0.05, op: 'soft-light' },
+    // a first take: vultures wheeling over the ribs
+    birds: 3,
+    birdsAt: [[130, 70]],
+  },
 ];
 
 const byId = new Map(ZONES.map((z) => [z.id, z]));

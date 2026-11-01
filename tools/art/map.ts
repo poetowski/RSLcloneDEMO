@@ -1,7 +1,7 @@
 // The campaign world map: the broken realm seen from above at a slant, in
 // autumn, lit from the top-left like everything else. The world (WORLD_MAP)
 // is one screen tall and wider than the screen; it scrolls sideways under the
-// campaign screen, and the overview is the same world at half the size.
+// campaign screen, and the overview is the same world made small enough to fit it.
 //
 // After Jakub's briefs (2026-10-10, redrawn 2026-10-11): the land fills every
 // pixel, with no edge to the north or south. In the west the rift: a tear
@@ -22,7 +22,10 @@
 // at the brink of a great gulf and the Snowy Mesa (Zone 5) begins: a sea of
 // cloud in the light before sunset, snow-capped tabletop mountains rising out
 // of it, joined by cables hung with candles; a castle breathing purple dust,
-// the arbiter on his mesa, the storm coming on from the east.
+// the arbiter on his mesa, the storm coming on from the east. Beyond it
+// (2026-11-01) a ridge stops the storm; the road goes under it through a tunnel,
+// and the Golden Expanse (Zone 6) begins: enormous golden dunes combed by the wind,
+// half-buried ruins and skeletons, strange lights under the sand.
 //
 // Everything is drawn in world pixels, and every random choice is a hash of
 // its position, so the map grows east area by area: widen WORLD_MAP by the new
@@ -225,11 +228,13 @@ const NODES = LOCATIONS.map((l): P => [l.map.x, l.map.y]);
 
 /** The road: the old road ends at the far lip, takes up again on this side, and runs through every node to the east edge (through the hills' pass). */
 const ROAD_FAR = curve([[-10, 318], [40, 322], [96, 334], [150, 332], [186, 324]]);
-const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [W + 12, 184]]);
+const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [W + 12, 200]]);
 /** the road's bridges of rope over the gulf: from the brink to the arbiter's mesa, and on east toward the storm */
 const MESA_BRIDGES: [P, P, number][] = [
   [[1626, 188], [1714, 197], 5],
   [[1834, 192], [1890, 186], 4],
+  // on to the tunnel's west mouth, clear of the storm
+  [[1921, 185], [1943, 183], 2],
 ];
 
 /** The river, from the north edge to the south edge between the two areas. */
@@ -488,6 +493,8 @@ function farGround(x: number, y: number, light: number): RGBA {
 }
 
 function groundAt(x: number, y: number): RGBA {
+  // the ridge and the Golden Expanse beyond it
+  if (x >= 1900 && x >= ridgeW(y)) return expanseGround(x, y);
   // beyond the brink: the gulf and the mesas of the Snowy Mesa
   if (x >= 1596 && x > brinkX(y)) return mesaGround(x, y);
   const g = dayGround(x, y);
@@ -1206,6 +1213,12 @@ function road(b: Bitmap, pts: P[]) {
         if (d > 2.4) continue;
         const X = Math.round(x + dx), Y = Math.round(y + dy);
         if (!inBounds(X, Y) || sdAt(X, Y) < 0 || inRiver(X, Y) > 0) continue;
+        if (X >= 1900 && X >= ridgeW(Y)) {
+          // under the ridge the tunnel carries it; over the sand a trail, drifted over in places
+          if (X < ridgeE(Y) || vnoise(X, Y, 26, 1501) > 0.74) continue;
+          if (d <= 1.7) b.set(X, Y, rampDither(DUST, 4.2 + (hash2(X, Y, 1502) - 0.5) * 1.2 + (d > 0.9 ? 0.8 : -0.4), X, Y));
+          continue;
+        }
         if (X >= 1596 && X > brinkX(Y)) {
           // over the gulf the bridges carry it; on a mesa's top a path trodden in the snow
           if (mesaKind[idx(X, Y)] !== 1) continue;
@@ -2039,7 +2052,10 @@ function precomputeMesas() {
 }
 
 /** How far the storm has come over the land at x,y: 0 none, 1 under its dark; heaviest toward the north-east corner. */
-const stormMapK = (x: number, y: number) => smooth(1846, 1898, x + y * 0.14 - 20 + (vnoise(x, y, 24, 1330) - 0.5) * 30 + (vnoise(x, y, 8, 1331) - 0.5) * 8);
+const stormMapK = (x: number, y: number) =>
+  smooth(1846, 1898, x + y * 0.14 - 20 + (vnoise(x, y, 24, 1330) - 0.5) * 30 + (vnoise(x, y, 8, 1331) - 0.5) * 8) *
+  // the ridge stops it: its back edge frays out before the tunnel's mouth
+  (1 - smooth(1908, 1926, x + (vnoise(x, y, 18, 1332) - 0.5) * 8));
 
 /**
  * The gulf: the sea of cloud in billows lit gold and rose on their western
@@ -2594,6 +2610,7 @@ function renderWorld(): Bitmap {
   zeppelinMap(b, ZEPPELIN[0], ZEPPELIN[1]);
   // the Snowy Mesa's waterfalls, plume, cables and bridges, and the storm over it all
   mesaOverlays(b);
+  expanseOverlays(b);
   compass(b, W - 40, H - 44);
   frame(b);
   return b;
@@ -2614,6 +2631,237 @@ function hexagon(s: Bitmap, x: number, y: number) {
   for (const [dx, dy] of [[1, 0], [0, 1], [2, 1], [0, 2], [2, 2], [1, 3]]) s.set(x + dx, y + dy, BLOOD[2]);
   s.set(x + 1, y + 1, BLOOD[0]);
   s.set(x + 1, y + 2, BLOOD[0]);
+}
+
+// ---------------------------------------------------------------------------
+// The ridge, the tunnel and the Golden Expanse (Zone 6, named and described by
+// Jakub, 2026-11-01: "you can dig a tunnel between area 5 and area 6"). A ridge of
+// bare rock rises out of the cloud east of the last mesa, snow on its west side,
+// sand on its east. The road crosses to a stone mouth in its west face and comes
+// out of another on its east; a dotted line and three air shafts mark its course.
+// East of it the desert: enormous dunes whose crests wander north and south, the
+// sun's side lit and ribbed, the lee in shade; streamers of sand blown off the
+// crests; a trail half lost under the drifts; a buried temple above the node, the
+// ribs of something huge, a colonnade, a tilted obelisk, a dome; dust devils; pale
+// lights under the sand.
+// ---------------------------------------------------------------------------
+
+const DUST = ramp(['#2c1408', '#40200c', '#582e10', '#723e14', '#8e5018', '#aa661e', '#c47e26', '#d89630', '#e6aa40', '#f0bc56', '#f8d076', '#fde6a2']);
+const RIDGE = ramp(['#16141c', '#24202a', '#352f38', '#494048', '#5e5358', '#74686a', '#8c7f7c', '#a59890']);
+const RUIN = ramp(['#3c2a1c', '#583e28', '#745436', '#906c46', '#ac8658', '#c6a06c', '#dcb984', '#ecd2a2']);
+const BONES = ramp(['#4a3e30', '#6c5e4a', '#8e8068', '#b0a286', '#cec2a4', '#e6dcc0', '#f6f0dc']);
+const UNDERLIGHT = ramp(['#7ad8c8', '#a4eadc', '#d0f6ec', '#f4fffa']);
+const PORTAL_W: P = [1946, 183], PORTAL_E: P = [2030, 197];
+
+/** Where the ridge begins and ends at y. */
+function ridgeW(y: number): number {
+  return 1936 + 12 * vnoise(0, y, 34, 1510) + 3 * vnoise(0, y, 9, 1511);
+}
+function ridgeE(y: number): number {
+  return 2016 + 18 * vnoise(0, y, 40, 1512) + 4 * vnoise(0, y, 11, 1513);
+}
+/** The ridge's height: a spine running north and south, crags on it. */
+function ridgeH(x: number, y: number): number {
+  const t = clamp((x - ridgeW(y)) / (ridgeE(y) - ridgeW(y)));
+  // broad crags, smooth noise so the rock takes the light in faces and not in lines
+  return Math.pow(Math.sin(t * Math.PI), 0.8) * (0.42 + vnoise(x, y, 26, 1514) * 0.5 + vnoise(x, y, 9, 1515) * 0.14);
+}
+
+/** The field of dunes: 0 at a lee's foot, rising along the sun's side to the crest; `t` over 0.8 is the lee. */
+function dunePhase(x: number, y: number, big: number, off: number): number {
+  const warp = (vnoise(x, y, 70, 1520 + off) - 0.5) * 92 + (vnoise(x, y, 22, 1521 + off) - 0.5) * 16;
+  const p = (x + warp + y * 0.22) / big + off * 0.37;
+  return p - Math.floor(p);
+}
+const DUNE_BIG = 58;
+function expanseGround(x: number, y: number): RGBA {
+  if (x < ridgeE(y)) {
+    const a = ridgeH(x - 1, y - 1), c = ridgeH(x + 1, y + 1);
+    const light = (a - c) * 58;
+    const h = ridgeH(x, y);
+    const t = (x - ridgeW(y)) / (ridgeE(y) - ridgeW(y));
+    // snow on its stormward side, sand blown up its eastern foot
+    if (t < 0.6 && h > 0.68 + (vnoise(x, y, 5, 1516) - 0.5) * 0.14) return rampDither(MSNOW, clamp(5.4 + light * 1.5, 0, MSNOW.length - 1), x, y);
+    if (t > 0.72 + (vnoise(x, y, 9, 1517) - 0.5) * 0.3) return rampDither(DUST, clamp(5.2 + light * 1.4 - (1 - t) * 3, 0, DUST.length - 1), x, y);
+    return rampDither(RIDGE, clamp(3 + light + h * 2.2 + (hash2(x, y, 1518) - 0.5) * 0.6, 0, RIDGE.length - 1), x, y);
+  }
+  const t = dunePhase(x, y, DUNE_BIG, 0);
+  const ft = dunePhase(x, y, 15, 1);
+  const broad = vnoise(x, y, 110, 1522);
+  let v: number;
+  if (t < 0.8) {
+    // the sun's side, brightening up to the crest, ribbed across the wind
+    const rib = Math.sin(x * 0.7 + y * 1.5 + vnoise(x, y, 11, 1523) * 6);
+    v = 5.4 + (t / 0.8) * 4.2 + (rib > 0.55 ? 0.6 : rib < -0.6 ? -0.5 : 0) + (ft > 0.82 ? -0.6 : 0);
+    if (t > 0.78) v = 11;
+  } else {
+    // the lee, in shade under the crest and paling toward its foot
+    v = 1.8 + ((t - 0.8) / 0.2) * 2.6;
+    if (t < 0.81) v = 1;
+  }
+  v += (broad - 0.5) * 1.8;
+  // the sand laps up against the ridge's foot in its shadow
+  v -= 2.2 * Math.max(0, 1 - (x - ridgeE(y)) / 12);
+  return rampDither(DUST, clamp(v + (hash2(x, y, 1524) - 0.5) * 0.4, 0, DUST.length - 1), x, y);
+}
+
+/** A stone mouth in the rock: a dark arch with its voussoirs, a keystone, a lantern each side, the road running into it. */
+function tunnelMouth(b: Bitmap, [cx, cy]: P) {
+  ellipseFill(b, cx, cy - 1, 12, 11, (x, y, d) => (y > cy + 3 ? b.get(x, y) : rampDither(RUIN, 4.2 - (x - cx) * 0.18 - d * 1.4, x, y)));
+  for (let x = cx - 12; x <= cx + 12; x++) b.set(x, cy + 3, RUIN[1]);
+  ellipseFill(b, cx, cy, 7, 8, (x, y, d) => (y > cy + 3 ? b.get(x, y) : d > 0.82 ? RUIN[1] : INK));
+  for (let k = -1; k <= 1; k++) b.set(cx + k, cy - 10, RUIN[7]);
+  b.set(cx, cy - 9, RUIN[6]);
+  for (const s of [-10, 10]) {
+    b.set(cx + s, cy - 2, EMBER[4]);
+    b.set(cx + s, cy - 3, EMBER[3]);
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -2], [0, 1]]) b.set(cx + s + dx, cy - 2 + dy, mix(b.get(cx + s + dx, cy - 2 + dy), EMBER[3], 0.5));
+  }
+}
+
+/** A half-buried thing's foot: sand heaped against it, lit on the sun's side, a shadow to the east. */
+function drift(b: Bitmap, cx: number, cy: number, rx: number, ry: number) {
+  ellipseFill(b, cx + 3, cy + 1, rx + 3, ry, (x, y, d) => (dith(x, y, (1 - d) * 1.2) ? DUST[2] : b.get(x, y)));
+  ellipseFill(b, cx, cy, rx, ry, (x, y, d) => rampDither(DUST, 8.8 - ((x - cx) / rx) * 2.4 - d * 0.8, x, y));
+}
+
+/** The temple above the node: three stepped terraces, half sunk, a doorway, sand over its east end. */
+function mapTemple(b: Bitmap, cx: number, by: number) {
+  const steps: [number, number, number][] = [[30, 7, 0], [22, 7, 7], [14, 7, 14], [8, 8, 21]];
+  for (const [half, h, up] of steps) {
+    for (let y = by - up - h; y < by - up; y++) {
+      for (let x = cx - half; x <= cx + half; x++) {
+        const u = (x - cx + half) / (half * 2);
+        const top = y === by - up - h;
+        b.set(x, y, rampDither(RUIN, clamp(6.4 - u * 4.8 + (top ? 1 : 0) - (y % 3 === 0 ? 0.5 : 0), 0, RUIN.length - 1), x, y));
+      }
+    }
+  }
+  for (let y = by - 28; y < by - 21; y++) for (let x = cx - 2; x <= cx + 2; x++) b.set(x, y, INK);
+  drift(b, cx + 22, by - 1, 22, 7);
+  drift(b, cx - 12, by + 2, 26, 5);
+}
+
+/** The ribs of something huge, curving out of a dune, its long skull at the end. */
+function mapRibs(b: Bitmap, cx: number, by: number) {
+  const curve3 = (x0: number, y0: number, xm: number, ym: number, x1: number, y1: number, r: number) => {
+    for (let i = 0; i <= 28; i++) {
+      const t = i / 28, m = 1 - t;
+      const x = m * m * x0 + 2 * m * t * xm + t * t * x1, y = m * m * y0 + 2 * m * t * ym + t * t * y1;
+      ellipseFill(b, x, y, r, r, (px, py) => rampDither(BONES, clamp(4.4 - (px - x) * 0.7 - (py - y) * 0.7, 0, BONES.length - 1), px, py));
+    }
+  };
+  for (let k = 0; k < 7; k++) {
+    const x = cx - 30 + k * 10, h = 20 - Math.abs(k - 3) * 2;
+    curve3(x, by - h, x + 9, by - h + 4, x + 5, by + 2, 0.8);
+    curve3(x, by - h, x - 7, by - h + 6, x - 3, by + 3, 1.05);
+  }
+  for (let k = 0; k <= 13; k++) {
+    const x = cx - 34 + k * 5.4;
+    ellipseFill(b, x, by - 20 + Math.abs(k - 6.5) * 0.9, 1.9, 1.7, (px, py) => BONES[py < by - 20 + Math.abs(k - 6.5) * 0.9 ? 5 : 3]);
+  }
+  ellipseFill(b, cx + 44, by - 8, 9, 5.4, (px, py, d) => rampDither(BONES, 5 - d * 2 - (px - cx - 44) * 0.14, px, py));
+  ellipseFill(b, cx + 43, by - 9, 1.8, 1.6, () => BONES[0]);
+  for (const x of [48, 50, 52]) b.set(cx + x, by - 4, BONES[5]);
+  drift(b, cx, by + 4, 42, 6);
+  drift(b, cx + 44, by - 1, 12, 3.6);
+}
+
+/** Columns of a buried colonnade, a lintel left on two of them. */
+function mapColonnade(b: Bitmap, cx: number, by: number) {
+  const hs = [15, 16, 9, 14, 7, 12];
+  hs.forEach((h, k) => {
+    const x = cx - 24 + k * 10;
+    for (let y = by - h; y <= by; y++) {
+      b.set(x - 1, y, RUIN[6]);
+      b.set(x, y, RUIN[4]);
+      b.set(x + 1, y, RUIN[2]);
+    }
+  });
+  for (let x = cx - 26; x <= cx - 12; x++) {
+    b.set(x, by - 17, RUIN[7]);
+    b.set(x, by - 16, RUIN[4]);
+  }
+  drift(b, cx, by + 1, 34, 4);
+}
+
+function mapObelisk(b: Bitmap, cx: number, by: number) {
+  polyFill(b, [[cx - 3, by], [cx + 3, by], [cx + 11, by - 26], [cx + 8, by - 30], [cx + 6, by - 27]], (x) => (x < cx + 4 ? RUIN[6] : RUIN[2]));
+  for (let k = 0; k < 4; k++) b.set(cx + 2 + k * 2, by - 5 - k * 6, UNDERLIGHT[0]);
+  drift(b, cx, by + 1, 12, 3.4);
+}
+
+function mapDome(b: Bitmap, cx: number, by: number) {
+  ellipseFill(b, cx, by - 4, 17, 13, (x, y, d) => (y > by ? b.get(x, y) : rampDither(RUIN, 5.6 - (x - cx) * 0.2 - (y - by + 4) * 0.2 - d * 1.2, x, y)));
+  for (const k of [-10, -3, 4, 11]) for (let y = by - 11; y < by; y++) if (hash2(k, y, 1531) > 0.3) b.set(cx + k, y, RUIN[2]);
+  drift(b, cx + 4, by + 2, 24, 5);
+}
+
+/** A pale light under the sand: a soft patch breaking through the grains. */
+function mapLight(b: Bitmap, cx: number, cy: number, rx: number, ry: number) {
+  ellipseFill(b, cx, cy, rx, ry, (x, y, d) => {
+    const a = (1 - d) * (0.4 + vnoise(x, y, 3, 1541) * 0.8);
+    return dith(x, y, a) ? UNDERLIGHT[a > 0.7 ? 3 : a > 0.48 ? 2 : a > 0.28 ? 1 : 0] : b.get(x, y);
+  });
+}
+
+/** A dust devil from above at a slant: a thin leaning column of grains, its shadow on the sand. */
+function mapDevil(b: Bitmap, x: number, y: number, h: number) {
+  ellipseFill(b, x + 4, y + 2, 7, 2, (px, py) => mix(b.get(px, py), SHADOW, 0.3));
+  // a funnel: rings of grains, narrow at the foot, wide at the top, the near side lit
+  const n = h * 14;
+  for (let i = 0; i < n; i++) {
+    const u = i / n, a = i * 2.399;
+    const r = 0.5 + u * u * 6;
+    const px = Math.round(x + u * 3 + Math.cos(a) * r), py = Math.round(y - u * h + Math.sin(a) * r * 0.32);
+    if (inBounds(px, py)) b.set(px, py, DUST[Math.sin(a) > 0 ? 11 : 7]);
+  }
+}
+
+/** Everything over the desert and the ridge: the tunnel, the blown sand, what the sand has not quite buried. */
+function expanseOverlays(b: Bitmap) {
+  // streamers of sand blown off the crests, along the wind: thin lines leaving the crest
+  for (let y = 4; y < H - 4; y += 2) {
+    for (let x = 2040; x < W - 4; x++) {
+      const t = dunePhase(x, y, DUNE_BIG, 0);
+      if (t < 0.78 || t > 0.8 || hash2(x, y, 1562) > 0.34) continue;
+      const len = 5 + Math.floor(hash2(x, y, 1563) * 13);
+      for (let k = 1; k < len && x + k < W - 4; k++) b.set(x + k, y + (k >> 3), mix(b.get(x + k, y + (k >> 3)), DUST[11], 0.55 * (1 - k / len)));
+    }
+  }
+  // the tunnel's course under the ridge: an atlas's dotted line, three air shafts
+  const [wx, wy] = PORTAL_W, [ex, ey] = PORTAL_E;
+  const at = (k: number): P => [wx + (ex - wx) * k, wy + (ey - wy) * k + Math.sin(k * Math.PI) * -4];
+  for (let k = 0.14; k < 0.9; k += 0.052) {
+    const [x, y] = at(k);
+    b.set(Math.round(x), Math.round(y), GOLD[3]);
+    b.set(Math.round(x) + 1, Math.round(y), GOLD[2]);
+  }
+  for (const k of [0.3, 0.5, 0.7]) {
+    const [x0, y0] = at(k);
+    const x = Math.round(x0), y = Math.round(y0) - 2;
+    for (let dy = -4; dy <= 0; dy++) {
+      b.set(x - 1, y + dy, RUIN[5]);
+      b.set(x, y + dy, RUIN[3]);
+      b.set(x + 1, y + dy, RUIN[1]);
+    }
+    b.set(x, y - 4, EMBER[4]);
+    for (let s = 1; s < 8; s++) if (dith(x + (s >> 1), y - 4 - s, 0.7 - s * 0.08)) b.set(x + (s >> 1), y - 4 - s, SMOKE[5]);
+  }
+  tunnelMouth(b, PORTAL_W);
+  tunnelMouth(b, PORTAL_E);
+  // the buried things, far first
+  const node = NODES[5];
+  mapDome(b, 2082, 58);
+  mapRibs(b, 2176, 106);
+  mapTemple(b, node[0] + 4, node[1] - 14);
+  mapObelisk(b, 2196, 262);
+  mapColonnade(b, 2072, 300);
+  // the lights, and what the wind is doing
+  for (const [x, y, rx, ry] of [[2060, 124, 16, 6], [2150, 62, 12, 4], [2214, 150, 12, 5], [2148, 258, 18, 6], [2062, 336, 12, 4], [2212, 322, 10, 4]] as const) mapLight(b, x, y, rx, ry);
+  mapDevil(b, 2132, 138, 24);
+  mapDevil(b, 2202, 214, 20);
+  mapDevil(b, 2046, 244, 16);
 }
 
 /** Shrinks a bitmap k times (k may be fractional) by averaging the source pixels under each overview pixel, weighted by how much of each it covers. */

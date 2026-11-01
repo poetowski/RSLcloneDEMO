@@ -44,14 +44,14 @@
 import { LocationDef, StageDef } from './types';
 
 /**
- * The campaign world map in pixels: one screen tall and three screens wide,
+ * The campaign world map in pixels: one screen tall and three and a half screens wide,
  * scrolled sideways. Location `map` positions (the campaign nodes) are in this
  * space; `overview` is how many times smaller the whole-world overview is
- * drawn (three times smaller it fills the screen's width, so a wider map needs a
+ * drawn (four times smaller it fits the screen's width, so a wider map may need a
  * smaller one). The map grows east area by area: a new area widens it by its stretch,
  * and everything west of the stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 1920, h: 360, overview: 3 };
+export const WORLD_MAP = { w: 2240, h: 360, overview: 4 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];
@@ -77,6 +77,11 @@ const YURTS = 'Yurts stand on the steppe, small colourful flags running like a c
 const YAKS = 'A few wild yaks roam nearby.';
 const PEAKS = 'Far off, a little to the left, a very big mountain with a snowy peak; on its right a twin, a little lower.';
 const ZEPPELIN = 'Far off in the sky, a zeppelin flies.';
+// Zone 6: Jakub's description of the Golden Expanse (2026-11-01), from the dunes to the lights under them
+const DUNES = 'The central desert: enormous golden dunes, fifty to a hundred metres high.';
+const WIND = 'The wind reshapes the land without rest; nothing here keeps its shape.';
+const RUINS = 'Some dunes hold buried ruins, skeletons and forgotten structures.';
+const LIGHTS = 'Now and then strange lights move beneath the surface.';
 // Zone 5: Jakub's description of the Snowy Mesa (2026-10-19), from the mesa's top to the arbiter on it
 const MESA_TOP = 'The top of a snow-capped tabletop mountain.';
 const MESAS = 'Many more tabletop mountains all round, all connected with many candles.';
@@ -452,6 +457,30 @@ export const LOCATIONS: LocationDef[] = [
         enemies: [{ champion: 'irving_wellbington', boss: true }, { champion: 'necromancer' }, { champion: 'automated_soul' }],
         power: 0.67,
       },
+    ],
+  },
+  {
+    // Zone 6, named and described by Jakub (2026-11-01, DESIGN_DECISIONS.md 5.9); he asked for ten placeholder
+    // stages, whose enemies, powers and texts are stand-ins; no champion joins there
+    id: 'zone6',
+    chapter: 'VI',
+    name: 'Golden Expanse',
+    zone: 'zone6',
+    blurb: 'East of the Snowy Mesa, through the tunnel under the ridge: a central desert of enormous golden dunes the wind never leaves alone.',
+    requires: '5-10',
+    map: { x: 2112, y: 196 },
+    patterns: ['pattern_focus', 'pattern_ward'],
+    stages: [
+      { id: '6-1', blurb: DUNES, enemies: [{ champion: 'toadcap' }, { champion: 'bristleback' }, { champion: 'hive_tender' }], power: 0.88 },
+      { id: '6-2', blurb: DUNES, enemies: [{ champion: 'gravedigger' }, { champion: 'sentry' }, { champion: 'ash_widow' }], power: 0.94 },
+      { id: '6-3', blurb: WIND, enemies: [{ champion: 'archer' }, { champion: 'junior_ward' }, { champion: 'harvest_specialist' }], power: 0.94 },
+      { id: '6-4', blurb: WIND, enemies: [{ champion: 'strongman' }, { champion: 'town_guard' }, { champion: 'last_riter' }], power: 1.1 },
+      { id: '6-5', blurb: RUINS, enemies: [{ champion: 'skeleton' }, { champion: 'necromancer' }, { champion: 'rot_hulk' }], power: 0.88 },
+      { id: '6-6', blurb: RUINS, enemies: [{ champion: 'gravedigger' }, { champion: 'automated_soul' }, { champion: 'ash_widow' }], power: 0.8 },
+      { id: '6-7', blurb: RUINS, enemies: [{ champion: 'irving_wellbington' }, { champion: 'gravedigger' }, { champion: 'necromancer' }], power: 0.79 },
+      { id: '6-8', blurb: LIGHTS, enemies: [{ champion: 'red_cloak' }, { champion: 'big_ears' }, { champion: 'grove_keeper' }], power: 0.79 },
+      { id: '6-9', blurb: LIGHTS, enemies: [{ champion: 'black_rhino' }, { champion: 'captain_gareth' }, { champion: 'associate' }], power: 0.71 },
+      { id: '6-10', blurb: `${LIGHTS} The last stage of the area.`, enemies: [{ champion: 'dead_knight_amstron', boss: true }, { champion: 'gravedigger' }, { champion: 'necromancer' }], power: 0.64 },
     ],
   },
 ];
