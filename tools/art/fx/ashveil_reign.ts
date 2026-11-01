@@ -56,7 +56,7 @@ const TALON: RGBA[] = [MAT.shroud.ramp[0], MAT.shroud.ramp[2], MAT.shroud.ramp[4
 const SHREDS: RGBA[] = MAT.shroud.ramp.slice(1, 6);
 /** its wail: the shroud's grey-green, pale at the front of the sound */
 const WAIL: RGBA[] = [MAT.shroud.ramp[2], MAT.shroud.ramp[3], MAT.shroud.ramp[4], MAT.shroud.ramp[5], ACCENT.ashEye];
-/** the Bone Augur's ill omen: the dark */
+/** the Haruspex's ill omen: the dark */
 const OMEN: RGBA[] = [MAT.blackCloth.ramp[0], MAT.blackCloth.ramp[2], MAT.blackCloth.ramp[4]];
 const SOUL: RGBA[] = [MAT.ashBone.ramp[1], MAT.ashBone.ramp[2], MAT.ashBone.ramp[3], MAT.ashBone.ramp[4], ACCENT.ashEye];
 
@@ -673,7 +673,7 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
     },
   },
 
-  // --- the Bone Augur (section 63) -------------------------------------------
+  // --- the Haruspex (section 63) -------------------------------------------
   /** Her cast: a handful of knucklebones tumbling through the air, flying right. */
   knucklebones: {
     w: 22, h: 14, n: 3, ms: 60, ax: 0.8, ay: 0.5, loop: true,

@@ -14,7 +14,7 @@
 // the Paladin, the Azure Crown's Heroic and the roster's first, Chief
 // Engineer CJ, the Sanguine Dominion's, the Forest Gargoyle, the Court of
 // Root's, and Dead Knight Amstron, the Ashveil Reign's; Coffin's Legs, the
-// Wraith and the Bone Augur, the Ashveil Reign's other Elites, my proposals on
+// Wraith and the Haruspex, the Ashveil Reign's other Elites, my proposals on
 // his word (sections 61-63); everything else waits for his design.
 import { ChampionDef } from '../types';
 import { archer } from './archer';
@@ -50,7 +50,7 @@ import { overlordOfentol } from './overlord_ofentol';
 import { verdantLuminary } from './verdant_luminary';
 import { coffinsLegs } from './coffins_legs';
 import { wraith } from './wraith';
-import { boneAugur } from './bone_augur';
+import { haruspex } from './haruspex';
 import { paladin } from './paladin';
 import { quartermaster } from './quartermaster';
 import { redCloak } from './red_cloak';
@@ -67,7 +67,7 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman, overlordOfentol, verdantLuminary, coffinsLegs, wraith, boneAugur,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman, overlordOfentol, verdantLuminary, coffinsLegs, wraith, haruspex,
 ];
 
 /**

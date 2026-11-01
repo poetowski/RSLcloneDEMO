@@ -1,4 +1,4 @@
-// The Bone Augur (docs/DESIGN_DECISIONS.md section 63, 2026-11-01, my proposal on
+// The Haruspex (docs/DESIGN_DECISIONS.md section 63, 2026-11-01, my proposal on
 // Jakub's word): an Elite Support of the Ashveil Reign, a dead seer who reads
 // the fight in knucklebones. An old woman, gaunt and a little bent, her eyes
 // bound with a strip of linen whose ends hang behind her head; long white hair
@@ -257,8 +257,8 @@ const VICTORY = tweak(IDLE, { y: 1, torso: 90, head: 100, armF: { up: 54, lo: 86
 const mid = (a: Pose, b: Pose, t: number) => lerpPose(a, b, t, D);
 
 const char: CharDef = {
-  id: 'bone_augur',
-  name: 'Bone Augur',
+  id: 'haruspex',
+  name: 'Haruspex',
   dims: D,
   build,
   anims: {
@@ -348,7 +348,7 @@ function iconSkull(d: Draw, c: V, z: number) {
   d.ribbon({ mat: HN, z: z + 0.2, group: 'ihorn', tex: (h) => (Math.sin(h.u * 18) > 0.4 ? -1 : 0) }, [v(c.x + 3, c.y + 5), v(c.x + 9, c.y + 9), v(c.x + 13, c.y + 4), v(c.x + 11, c.y - 2), v(c.x + 7, c.y - 1)], [2.6, 2.4, 2, 1.6, 1.1]);
 }
 
-export const boneAugur: ChampionArt = {
+export const haruspex: ChampionArt = {
   char,
   iconBg: RB,
   icons: {

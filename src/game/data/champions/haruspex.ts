@@ -1,16 +1,16 @@
 import { ChampionDef } from '../types';
 
-// The Bone Augur (docs/DESIGN_DECISIONS.md section 63, Jakub's request of
+// The Haruspex (docs/DESIGN_DECISIONS.md section 63, named by Jakub; his request of
 // 2026-11-01 for the Ashveil Reign's remaining Elites, "be creative but
 // consistent", he names them himself one by one): my proposal, built on that
 // word. A dead seer, her eyes bound, who reads the fight in knucklebones and a
 // ram's skull on her staff. The roster's first skill that fills every other
 // ally's turn meter (the engine's `tmAllies`). Stand-ins until Jakub sets them:
-// all of it (the name, the kit, Tide, the numbers, the lore line, the art). She
+// the kit, Tide, the numbers, the lore line, the art). She
 // is summoned, like the other Elites.
-export const boneAugur: ChampionDef = {
-  id: 'bone_augur',
-  name: 'Bone Augur',
+export const haruspex: ChampionDef = {
+  id: 'haruspex',
+  name: 'Haruspex',
   role: 'Support',
   rarity: 'elite',
   affinity: 'tide',

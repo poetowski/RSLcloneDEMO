@@ -113,7 +113,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Crossbowman, an Elite Damage of the Azure Crown, Tide | 58 |
 | 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
 | 2026-11-01 | The Verdant Luminary, an Elite Support of the Azure Crown, Bloom | 60 |
-| 2026-11-01 | Coffin's Legs (first built as the Pallbearer, then Tombstone's Legs), the Wraith and the Bone Augur, my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Coffin's Legs the first | 61-63 |
+| 2026-11-01 | Coffin's Legs (first built as the Pallbearer, then Tombstone's Legs), the Wraith and the Haruspex (first built as the Bone Augur), my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Coffin's Legs and the Haruspex his | 61-63 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
@@ -332,7 +332,7 @@ Bellringer, a Common Support (section 30), its fourth, the Necromancer, a
 Support and its first Elite (section 31), its fifth, the Automated Soul, an
 Elite of the Damage role (section 32), and its sixth, Irving Wellbington, an
 Elite Tank (section 33). Its other three Elites, Coffin's Legs (Tank), the
-Wraith (Damage) and the Bone Augur (Support), are my proposals on his word of
+Wraith (Damage) and the Haruspex (Support), are my proposals on his word of
 2026-11-01 (sections 61-63).
 
 **Name rationale.** "Reign" puts the faction on the same footing as Crown and
@@ -4195,7 +4195,15 @@ its fingers. It glides instead of walking; its death is the shroud falling empty
   multipliers of 0.55 + 0.55, 1.5, 0.9 with a 20% drain it measured 76%; it stands at 61%, a point
   over. Summoned.
 
-## 63. The Bone Augur (received 2026-11-01)
+## 63. The Haruspex (received 2026-11-01)
+
+Built first as the Bone Augur, a stand-in; then Jakub named her, verbatim:
+
+```
+Rename to Haruspex
+```
+
+So her name is Jakub's (a haruspex reads omens in remains, as she reads the bones); the id is `haruspex`.
 
 An Elite Support of the Reign, Tide: a dead seer who reads the fight in knucklebones. An old
 woman, gaunt and a little bent, her eyes bound with a strip of linen knotted behind her head, its

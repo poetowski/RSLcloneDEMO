@@ -134,7 +134,7 @@ export const MAT = {
   coffin: m('coffin', 'matte', ['#0c0808', '#1a1312', '#2a201d', '#3e302a', '#57443a', '#76604f']),
   /** the Wraith's shroud: a grave-cloth gone the grey-green of old smoke, paler at its frayed edges */
   shroud: m('shroud', 'cloth', ['#0c0f10', '#1a2021', '#2c3433', '#434d49', '#626d65', '#8a9586']),
-  /** the Bone Augur's robe: a dust-brown wool, the colour of a tomb's floor */
+  /** the Haruspex's robe: a dust-brown wool, the colour of a tomb's floor */
   tombDust: m('tombDust', 'cloth', ['#140f0c', '#2a2119', '#433528', '#5e4c39', '#7c674e', '#9d8768']),
 
   // --- woods of the living ---------------------------------------------------
