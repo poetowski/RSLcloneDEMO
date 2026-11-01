@@ -4171,8 +4171,10 @@ falls flat beside him; when Not Yet Buried holds him he gets up again and takes 
 - **Bear the Dead** (A2, CD 4): Taunt on himself for 2 turns and a Shield of 10% of his max HP on
   every ally for 2 turns. No attack. The coffin planted before him knocks (`pall_knock`), and the
   shape of a coffin's lid rises in pale light before each ally (`pall_ward`).
-- **Not Yet Buried** (passive, `undying`): the first blow that would fell him leaves him at 20% of
-  his max HP, every debuff lifted. The roster's first Undying.
+- **Not Yet Buried** (passive, `undying`): the first blow that would fell him leaves him at 30% of
+  his max HP, every debuff lifted. The roster's first Undying. Built at 20%; raised to 30% on
+  Jakub's word, verbatim: "Raise passive hp after kill of coffins legs to 30% from 20." His impact
+  rose from 61% to 64%.
 - Stats HP 1440, ATK 78, DEF 74, SPD 90, CRIT 2.5%, score 407, the low end of the Elite budget: at
   HP 1500, ATK 80, a 30% Undying and a 12% Shield he measured an impact of 67%; he stands at 61%, a
   point over the band, as Overlord Ofentol. Summoned.

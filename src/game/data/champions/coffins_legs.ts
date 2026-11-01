@@ -44,8 +44,8 @@ export const coffinsLegs: ChampionDef = {
   passive: {
     id: 'not_yet_buried',
     name: 'Not Yet Buried',
-    desc: 'The first blow that would fell him leaves him at 20% of his max HP instead, with every debuff lifted. Once a battle.',
+    desc: 'The first blow that would fell him leaves him at 30% of his max HP instead, with every debuff lifted. Once a battle.',
     kind: 'undying',
-    value: 0.2,
+    value: 0.3,
   },
 };
