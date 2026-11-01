@@ -559,4 +559,67 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
       motes(b, 52, 46, 30, -22, 6, t, ramps.green, 747);
     },
   },
+  /** Spore Slap: a soft dull thump, a puff of pale spores. Matter. */
+  spore_slap: {
+    w: 52, h: 52, n: 7, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 26, cy = 26;
+      if (i < 3) burst(b, cx, cy, 8, 2, [8, 13, 9][i], 1.3, DU, 0.4);
+      sparks(b, cx, cy, 14, 20, t, ramps.sand, 951, 4);
+      motes(b, cx, cy - 2, 22, 20, 10, t, DU, 953);
+    },
+  },
+  /** Tusk Gore: a short hooked tear upward, chips thrown off. Matter. */
+  tusk_gore: {
+    w: 56, h: 56, n: 6, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      if (i < 3) cut(b, cx - 12, cy + 14, cx + 10, cy - 16, -8, 3 - i * 0.7, DULL, 1 - i * 0.25);
+      if (i >= 1) sparks(b, cx, cy, 10, 18, (i - 1) / 5, DU, 959, 8);
+    },
+  },
+  /** Dig In: dust stamped up round his feet in a low ring. Matter. */
+  dig_in: {
+    w: 84, h: 44, n: 8, ms: 70, ax: 0.5, ay: 0.9, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      void i;
+      const cx = 42, gy = 38;
+      const r = 8 + t * 26;
+      ring(b, cx, gy, r, r * 0.26, 1.4, DU, 1 - t * 0.7);
+      sparks(b, cx, gy - 2, 16, 22, t, ramps.sand, 967, 12);
+      motes(b, cx, gy - 2, 44, 18, 10, t, DU, 971);
+    },
+  },
+  /** Sting Swarm: bees converging on the enemy in a tightening knot, then scattering. Matter. */
+  bee_swarm: {
+    w: 60, h: 60, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      void i;
+      const cx = 30, cy = 30;
+      const r = t < 0.6 ? 26 - t * 34 : 6 + (t - 0.6) * 50;
+      for (let k = 0; k < 18; k++) {
+        const a = k * 2.399 + t * 7;
+        const q = r * (0.5 + ((k * 7) % 5) * 0.12);
+        const x = Math.round(cx + Math.cos(a) * q), y = Math.round(cy + Math.sin(a) * q * 0.85);
+        b.set(x, y, AM[4]);
+        b.set(x + 1, y, AM[1]);
+      }
+    },
+  },
+  /** Comb Honey: gold drops falling slowly over the ally and pooling at its feet. Matter. */
+  honey_drip: {
+    w: 60, h: 84, n: 10, ms: 70, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 30, gy = 78;
+      for (let k = 0; k < 14; k++) {
+        const x = Math.round(cx + Math.sin(k * 7.1) * (5 + (k % 4) * 4));
+        const y = Math.round(((k * 23) % 50) + t * 34);
+        if (y > gy) continue;
+        b.set(x, y, AM[4]);
+        b.set(x, y + 1, AM[3]);
+        b.set(x, y - 1, AM[2]);
+      }
+      if (i >= 3) ring(b, cx, gy, 6 + t * 14, 2 + t * 4, 1, AM, 1 - t * 0.5);
+    },
+  },
 };

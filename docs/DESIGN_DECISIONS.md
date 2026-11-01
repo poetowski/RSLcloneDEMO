@@ -100,6 +100,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Sentry approved as built: his art, the names Checkpoint Cut and Watch Rotation, the lore line | 46 |
 | 2026-11-01 | The Junior Ward a normal hero, no longer enemy only; the Sentry a skeleton under his armour, moved to the Ashveil Reign; the target of six Commons per faction, two per class | 47 |
 | 2026-11-01 | The Gravedigger and the Ash Widow, my proposals on his word, filling the Ashveil Reign's Commons; a new passive kind, `keen` | 48, 49 |
+| 2026-11-01 | The Toadcap, the Bristleback and the Hive Tender, my proposals on his "go", filling the Court of Root's Commons; at most two skills each, on his word | 50-52 |
 
 ---
 
@@ -3673,7 +3674,7 @@ armour holds him together.
 | --- | --- | --- | --- |
 | Azure Crown | Skirmisher, Strongman | Lineholder, Town Guard | Quartermaster, Last Riter |
 | Sanguine Dominion | Enforcer, Archer | Bloodhound, Junior Ward | Dominion Medic, Harvest Specialist |
-| Court of Root | Follower, *open* | Walking Bush, *open* | Wild Speaker, *open* |
+| Court of Root | Follower, Toadcap (50) | Walking Bush, Bristleback (51) | Wild Speaker, Hive Tender (52) |
 | Ashveil Reign | Skeleton, Gravedigger (48) | Rot Hulk, Sentry | Bellringer, Ash Widow (49) |
 
 Stand-ins until Jakub sets them: the Sentry's new lore line ("A sentry of the Ashveil
@@ -3721,3 +3722,53 @@ iron lid and the white bone, ash falling from a crack in its base.
 
 With both in the summon pool, Zone 2's powers rose as stand-ins: 2-1 1.26 -> 1.32, 2-2 0.74 ->
 0.80, 2-3 0.98 -> 1.04, 2-6 0.86 -> 0.91, 2-10 0.71 -> 0.80.
+
+## 50. The Toadcap (received 2026-11-01)
+
+Told that only the Court of Root's second Damage, Tank and Support were left, Jakub said:
+
+```
+go
+```
+
+read as: fill them the same way, my proposals. And mid-build, for this and sections 51-52:
+
+```
+these three new heroes should have max 2 skills, some even just a1
+```
+
+read with a passive counting as a skill, as in his earlier briefs ("A2 passive"). **All of the
+three is a stand-in until he sets it:** names, kits, affinities (one each, which evens the Court's
+Commons at two each of Ember, Bloom and Tide), numbers, lore lines and art.
+
+A Common Damage of the Court of Root, Ember: a walking mushroom, a pale fat stalk on root feet
+under a huge russet cap with pale warts and gills, two small dark eyes, spores drifting off it.
+When it dies the cap topples off.
+
+- **Spore Slap** (A1, its only skill): one enemy, 1.0, a butt of the cap, a 35% chance of Poison
+  for 1 turn.
+- Stats HP 1000, ATK 106, DEF 58, SPD 104, CRIT 2.5%, score 383. Summoned.
+
+## 51. The Bristleback (received 2026-11-01)
+
+A Common Tank of the Court of Root, Tide: a heavy old boar on four legs (the Follower's rig), dark
+hide, a black crest, curved bone tusks, moss on his rump and a sapling growing from his shoulders.
+No collar.
+
+- **Tusk Gore** (A1): one enemy, 1.0.
+- **Dig In** (A2, CD 4): Taunt for 1 turn and DEF Up for 2 turns on himself. No attack. A Tank
+  without a Taunt draws no fire (MDA T20), so this stayed and a passive went.
+- Stats HP 1400, ATK 78, DEF 70, SPD 92, CRIT 2.5%, score 397. Summoned.
+
+## 52. The Hive Tender (received 2026-11-01)
+
+A Common Support of the Court of Root, Bloom: a woman of the semi-wild tribes in a round woven hat
+with a wide brim, a green shawl, a dark leather tunic, a skirt of grass strands; a long pole with a
+straw hive hanging from it, bees circling it. No insignia.
+
+- **Sting Swarm** (A1): one enemy from where she stands, 0.9, a 30% chance of ATK Down for 1 turn.
+- **Comb Honey** (A2, CD 4): Regen for 2 turns on every ally, and 15% Turn Meter to the ally lowest
+  on HP (never herself). No attack. The AI keeps it until an ally is hurt.
+- Stats HP 1220, ATK 84, DEF 62, SPD 106, CRIT 2.5%, score 389. Summoned.
+
+With all three in the summon pool 2-5's power rose as a stand-in, 0.86 -> 0.89.
