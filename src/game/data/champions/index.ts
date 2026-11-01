@@ -48,6 +48,7 @@ import { lineholder } from './lineholder';
 import { necromancer } from './necromancer';
 import { overlordOfentol } from './overlord_ofentol';
 import { verdantLuminary } from './verdant_luminary';
+import { sirSiroslav } from './sir_siroslav';
 import { coffinsLegs } from './coffins_legs';
 import { wraith } from './wraith';
 import { haruspex } from './haruspex';
@@ -67,7 +68,7 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman, overlordOfentol, verdantLuminary, coffinsLegs, wraith, haruspex,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, forestGargoyle, deadKnightAmstron, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman, overlordOfentol, verdantLuminary, coffinsLegs, wraith, haruspex, sirSiroslav,
 ];
 
 /**

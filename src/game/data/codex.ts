@@ -124,7 +124,7 @@ export const CHAPTERS: Chapter[] = [
     icon: 'status_counter',
     blocks: [
       { kind: 'h', text: 'Counterattack' },
-      { kind: 'p', text: 'A champion with Counterattack strikes back with its A1 at whoever hit it with a skill, once per enemy action. Counters ignore Taunt and cannot themselves be countered.' },
+      { kind: 'p', text: 'A champion with Counterattack strikes back with its A1 at whoever hit it with a skill, once per enemy action. Counters ignore Taunt and cannot themselves be countered. Sir Siroslav\'s Hold the Line gives Counterattack to his whole side for a turn.' },
       { kind: 'h', text: 'Dispel and Cleanse' },
       { kind: 'p', text: "Dispel strips every buff from an enemy: the Wraith's Strip the Living tears them all off before its talons land. A cleanse lifts debuffs from allies: the Grove Keeper's Cleansing Rite takes every debuff off the one ally he chooses, Stun and Freeze too." },
       { kind: 'h', text: 'Lifesteal, Execute, Turn Meter' },

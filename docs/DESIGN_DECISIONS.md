@@ -114,6 +114,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
 | 2026-11-01 | The Verdant Luminary, an Elite Support of the Azure Crown, Bloom | 60 |
 | 2026-11-01 | Coffin's Legs (first built as the Pallbearer, then Tombstone's Legs), the Wraith and the Haruspex (first built as the Bone Augur), my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Coffin's Legs and the Haruspex his | 61-63 |
+| 2026-11-01 | Sir Siroslav, a Heroic Support of the Sanguine Dominion, the roster's first Heroic Support; Ember, my choice on his word | 64 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
@@ -4228,4 +4229,55 @@ feature); with her near hand she casts the bones.
 **Readings.** "Remaining 3 elites": one of each role, as the Crown's two of each. "Show summary":
 the summary is given in the session, not in the game. The ATK Down and the DEF Down meet RES like
 every debuff; the drains are certain.
+
+## 64. Sir Siroslav (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+Now I want to create another champion.
+Name: Sir Siroslav
+Faction sanguine dominion
+Role support
+Affinity balance yourself per faction role
+Rarity elite be very creative and consistent
+```
+
+and, mid-build:
+
+```
+His rarity must be heroic. Change if needed and redesign
+```
+
+So a Heroic Support of the Sanguine Dominion, the roster's first Heroic Support. His name, faction,
+role and rarity are Jakub's.
+
+**Affinity.** Ember, on his word to balance it per faction and role: the Dominion's Supports (the
+Rime Scholar, the Dominion Medic, the Harvest Specialist) were all Tide.
+
+**The look.** A winged knight-commander. Sanguine is life (3.2), so nothing grim: a crimson coat to
+the calf with a gold braid, a black breastplate edged in gold with the Dominion's red hexagon, black
+pauldrons rimmed in gold, a black sash, brown riding boots; a tall cap of black fur with a crimson
+crown, a gold brooch with a red stone and a white heron's plume; a long grey moustache. Rising from
+his back, a wooden frame hung with crimson and black feathers, standing up behind his head and
+curling forward at the top (the silhouette feature); a commander's mace in his near hand, a round
+ribbed head of gold on a gilded haft. As an Elite he was bareheaded, a shaved crown and one forelock;
+the cap and the gold came with Heroic.
+
+- **Mace of Command** (A1): one enemy, 1.0, and 15% turn meter to the ally lowest on HP.
+- **Hold the Line** (A2, CD 4): DEF Up for 2 turns and Counterattack for 1 on every ally. No attack.
+  The first skill to give Counterattack to a whole side.
+- **Winged Charge** (A3, CD 5): heals every ally by 15% of its max HP, SPD Up for 2 turns, and 15%
+  turn meter to every ally but him. No attack. The AI keeps it until an ally is hurt.
+- **Never Retreat** (passive, `overdrive`): the first time he drops below 50% HP, DEF Up and
+  Counterattack on himself for 2 turns.
+- Stats HP 1360, ATK 92, DEF 68, SPD 110, CRIT 2.5%, score 428 of the Heroic 440. Impact 72%,
+  within the Heroics' range (63-80%). Summoned, like the other Heroics but the Paladin.
+
+As an Elite (A1, A2, A3 without a passive, 10% turn meter, a 12% heal, score 412) he measured 60%.
+
+Stand-ins until Jakub sets them: the kit, its names and numbers, the stats, the lore line and every
+detail of the art and effects (the gold flash and ring of `bulawa_strike`, the shout of
+`command_call`, the crimson hexagon of `line_held`, the feathers of `wing_rush` and
+`charge_feathers`).
 

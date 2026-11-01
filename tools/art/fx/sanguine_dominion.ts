@@ -29,6 +29,14 @@ const DU = ramps.dust;
 /** A dull flash: grey to white, no hue of its own. */
 const DULL: RGBA[] = [DU[0], DU[2], DU[3], DU[4], W];
 
+/** One of Sir Siroslav's feathers, 4 px long, crimson or black by `k`, turning as it flies. */
+function featherBit(b: Bitmap, x: number, y: number, k: number, i: number, fade: number) {
+  const R = k % 2 ? MAT.red.ramp : MAT.blackCloth.ramp;
+  const dirs = [[1, 0], [1, 1], [0, 1], [-1, 1]];
+  const [dx, dy] = dirs[(k + i) % 4];
+  for (let s2 = 0; s2 < 4; s2++) if (dith(x + dx * s2, y + dy * s2, fade)) b.set(x + dx * s2, y + dy * s2, R[s2 === 0 ? 5 : s2 < 3 ? 4 : 3]);
+}
+
 /** A jagged arc of the hammer's charge from (x0, y0) to (x1, y1): a white core and a blue edge; `seed` keeps its shape, `k` thins it away. */
 function bolt(b: Bitmap, x0: number, y0: number, x1: number, y1: number, jag: number, seed: number, k = 1) {
   const r = rng(seed);
@@ -649,6 +657,81 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
         b.set(x, y, ramps.gold[tt < 0.5 ? 4 : 3]);
         if (k % 2) b.set(x + 1, y, ramps.sand[3]);
       }
+    },
+  },
+
+  // --- Sir Siroslav (section 64) -----------------------------------------------
+  /** Mace of Command lands: a round flash where the gold head bites, the ring of its flanges pressed out, sparks of gold. */
+  bulawa_strike: {
+    w: 56, h: 56, n: 7, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      if (i < 3) burst(b, cx, cy, 8, 1.5, [9, 13, 10][i], 1.4, DULL, 0.25);
+      if (i >= 1) ring(b, cx, cy, 5 + (i - 1) * 3.4, (5 + (i - 1) * 3.4) * 0.8, Math.max(0.6, 1.8 - (i - 1) * 0.25), ramps.gold, Math.max(0.3, 1.2 - (i - 1) * 0.18));
+      if (i >= 1) sparks(b, cx, cy, 10, 20, (i - 1) / 5, ramps.gold, 1201, 8);
+    },
+  },
+  /** Hold the Line's call at his raised mace: a gold burst, rings of his shout going out in crimson and gold. Played at his head on the `cast` event (additive). */
+  command_call: {
+    w: 84, h: 72, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      if (i < 4) burst(b, 42, 36, 10, 2, [8, 14, 11, 7][i], 1.4, ramps.gold, 0.2);
+      for (let k = 0; k < 3; k++) {
+        const age = i - k * 2;
+        if (age < 0 || age > 6) continue;
+        ring(b, 42, 36, 6 + age * 5, 5 + age * 4, Math.max(0.6, 1.6 - age * 0.2), k % 2 ? ramps.blood : ramps.gold, 1.1 - age * 0.15);
+      }
+    },
+  },
+  /** Hold the Line reaches an ally: the Dominion's hexagon in crimson light rises before it and holds, gold motes at its rim; it fades. Anchored at the feet (additive). */
+  line_held: {
+    w: 60, h: 84, n: 12, ms: 60, ax: 0.5, ay: 1, pad: [2, 4, 3, 4],
+    draw: (b, t, i) => {
+      const cx = 30, gy = 82;
+      const up = [0.3, 0.65, 0.95, 1, 1, 1, 1, 1, 1, 1, 1, 1][i];
+      const fade = i < 7 ? 1 : [0.8, 0.6, 0.42, 0.26, 0.12][i - 7];
+      const R = ramps.blood;
+      ellipseRing(b, cx, gy - 3, 20, 5, 1.2, (x, y, a) => (dith(x, y, fade * (Math.sin(a) > -0.1 ? 1 : 0.45)) ? rampDither(ramps.gold, 3 + Math.sin(a) * 0.6, x, y) : 0));
+      const cy = gy - 10 - 26 * up, r = 18 * Math.min(1, up + 0.2);
+      for (let k = 0; k < 6; k++) {
+        const a0 = (k / 6) * Math.PI * 2 + Math.PI / 6, a1 = ((k + 1) / 6) * Math.PI * 2 + Math.PI / 6;
+        for (let s2 = 0; s2 <= 12; s2++) {
+          const tt = s2 / 12;
+          const x = Math.round(cx + (Math.cos(a0) * (1 - tt) + Math.cos(a1) * tt) * r), y = Math.round(cy + (Math.sin(a0) * (1 - tt) + Math.sin(a1) * tt) * r);
+          if (dith(x, y, fade)) { b.set(x, y, R[4]); b.set(x, y + 1, R[2]); }
+        }
+      }
+      ellipseFill(b, cx, cy, r * 0.8, r * 0.8, (x, y, d) => (dith(x, y, fade * 0.16 * (1 - d)) ? R[2] : 0));
+      motes(b, cx, cy, 30, 30, 6, t, ramps.gold, 1211);
+    },
+  },
+  /** Winged Charge at his head: a rush of crimson and black feathers flung out and drifting down, a gold flash at its heart. On the `cast` event. Matter. */
+  wing_rush: {
+    w: 96, h: 80, n: 12, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const cx = 48, cy = 40;
+      if (i < 3) burst(b, cx, cy, 10, 2, [8, 13, 9][i], 1.3, ramps.gold, 0.3);
+      for (let k = 0; k < 16; k++) {
+        const a = k * 0.39 + 0.2;
+        const d = 6 + t * 34 * (0.6 + (k % 3) * 0.2);
+        const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d * 0.7 + t * t * 18;
+        featherBit(b, Math.round(x), Math.round(y), k, i, 1 - t * 0.6);
+      }
+    },
+  },
+  /** Winged Charge reaches an ally: feathers spiralling up round it with a warm crimson light of life rising. Anchored at the feet (additive). */
+  charge_feathers: {
+    w: 60, h: 84, n: 12, ms: 60, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 30, gy = 78;
+      for (let k = 0; k < 6; k++) {
+        const a = t * Math.PI * 4 + (k / 6) * Math.PI * 2;
+        const x = Math.round(cx + Math.cos(a) * 15), y = Math.round(gy - 4 - t * 56 + Math.sin(a) * 4 - k * 2);
+        if (Math.sin(a) < -0.3) continue;
+        featherBit(b, x, y, k, i, 1 - t * 0.5);
+      }
+      ellipseRing(b, cx, gy, 15 + t * 5, 4 + t, 1, (x, y) => (dith(x, y, 1 - t) ? ramps.rose[3] : 0));
+      motes(b, cx, gy - 6, 26, 62, 10, t, ramps.rose, 1223);
     },
   },
 };
