@@ -96,6 +96,8 @@ Section 7 lists what is not decided.
 | 2026-10-31 | The Junior Ward, a Common Tank of the Sanguine Dominion and the game's first enemy only, fought in 2-1 and 2-4; the worksheet's recommended options approved | 3-5, 44 |
 | 2026-10-31 | The Harvest Specialist, a Common Support of the Sanguine Dominion; Tide, my choice on his word; the golden wheat and the sturdy stats on his word, the rest of the worksheet's recommended options | 45 |
 | 2026-10-31 | The Archer, the Junior Ward and the Harvest Specialist approved as built: their art, names and lore lines, and the Harvest Specialist's Tide | 43-45 |
+| 2026-11-01 | The Sentry, a Common Tank of the Sanguine Dominion; the lighter stats and the A2's Regen on someone else on his word, the rest of the worksheet's recommended options | 46 |
+| 2026-11-01 | The Sentry approved as built: his art, the names Checkpoint Cut and Watch Rotation, the lore line | 46 |
 
 ---
 
@@ -3580,3 +3582,61 @@ armies, and knows that a field cut at the right hour holds an enemy back better 
 wall.") and every detail of his art and effects above (`straw`, a new material, for the
 hat and the wheat). He is summoned (section 36), a seventeenth Common in that pool;
 with him in it 2-3 rose to the top of its band (92%), so it runs at 0.98 (was 0.94).
+
+## 46. The Sentry (received 2026-11-01)
+
+Jakub's brief, verbatim:
+
+```
+I want new champion.
+Sanguine dominion.
+Common tide tank.
+Name "Sentry"
+Design border patroling light armoured soldier with long sword.
+Dark brown shoulders.
+Kit A1 damage single target and remove 7% if target turn meter.
+A2 add Regen to this champion and ally with lowest max HP for 2 turns. cD 4 turns. Also boost this champion turn meter by 30%.
+```
+
+and, to the worksheet that followed (sturdy stats or lighter ones, names, who the A2's
+ally is, how the 30% reads, the look, the lore line):
+
+```
+Lighter patrol. A2 buff also someone else. Go
+```
+
+read as the lighter stats, the A2's Regen on someone other than him, and a yes to every
+other recommended option.
+
+**Readings.** "Remove 7% if target turn meter" is 7% of the target's turn meter, certain,
+after the hit, as every drain is. "Ally with lowest max HP" is the living ally with the
+lowest max HP other than him while anyone else stands (the Last Riter's rule); alone, he
+gets one Regen. Regen is the game's status; placed by him, it covers his next two turns.
+"Boost this champion turn meter by 30%" is the Paladin's Beacon: he ends this turn with
+30% of his meter instead of none. A2 strikes no one. No passive, no Taunt.
+
+**As built:** a border soldier, lightly armoured: a dark-red padded gambeson to mid-thigh
+with a small red hexagon on the chest, a dark-brown belt with an iron buckle, dark-brown
+leather pauldrons of two lames and bracers (his "dark brown shoulders"), charcoal
+trousers and travel boots, a short dark cloak, an open-faced iron cap with a riveted
+brim, a stubbled face; a long sword with a long grip, held in both hands, point down at
+rest. Checkpoint Cut: raised over his shoulder and cut down on the diagonal, a plain
+white streak, landing as Gareth's cut. Watch Rotation: the sword planted point-down, he
+stands tall, a ring of rose light at his feet and motes of it rising. Victory: the
+sword raised in both hands. Death: he kneels and falls, the sword beside him.
+
+Shown the previews with the names Checkpoint Cut and Watch Rotation and the lore line,
+Jakub answered:
+
+```
+All approved go then merge to main
+```
+
+so the art, the names and the lore line are his.
+
+What the game filled in before that (listed in CLAUDE.md): the names Checkpoint Cut and
+Watch Rotation and their texts, A1's 1.0, his stats (the lighter option, on the Common
+budget: HP 1260, ATK 82, DEF 66, SPD 100, CRIT 2.5%, score 391), the lore line ("A sentry
+of the Sanguine Dominion who walks its borders by night, and has never let anyone cross
+without asking twice.") and every detail of his art and effects above. He is summoned
+(section 36), an eighteenth Common in that pool; every stage stayed in its band.
