@@ -77,6 +77,14 @@ export const JOURNEY: readonly QuestDef[] = [
     goal: { kind: 'stage', stage: '1-10' },
     reward: { kind: 'spool', pattern: 'pattern_vigor', grade: 1, count: 2 },
   },
+  // his (2026-11-01): "beat 3-10 campaign. reward for this is 250 spawning fragments"
+  {
+    id: 'beat_3_10',
+    title: 'Beat Campaign 3-10',
+    text: 'Clear stage 3-10 of the campaign, the last of the Moonlit Basin.',
+    goal: { kind: 'stage', stage: '3-10' },
+    reward: { kind: 'fragments', amount: 250 },
+  },
   // his (2026-11-01): "beat campaign 5-10. reward is Paladin hero acquired. it will get unclocked once reward collected"
   {
     id: 'beat_5_10',

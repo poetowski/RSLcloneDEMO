@@ -1,7 +1,7 @@
 // The campaign world map: the broken realm seen from above at a slant, in
 // autumn, lit from the top-left like everything else. The world (WORLD_MAP)
 // is one screen tall and wider than the screen; it scrolls sideways under the
-// campaign screen, and the overview is the same world made small enough to fit it.
+// campaign screen.
 //
 // After Jakub's briefs (2026-10-10, redrawn 2026-10-11): the land fills every
 // pixel, with no edge to the north or south. In the west the rift: a tear
@@ -3154,37 +3154,10 @@ function deadOverlays(b: Bitmap) {
   mapStag(b, 2464, 227, false);
 }
 
-/** Shrinks a bitmap k times (k may be fractional) by averaging the source pixels under each overview pixel, weighted by how much of each it covers. */
-function shrink(src: Bitmap, k: number): Bitmap {
-  const out = new Bitmap(Math.round(src.w / k), Math.round(src.h / k));
-  for (let y = 0; y < out.h; y++) {
-    const y0 = y * k, y1 = y0 + k;
-    for (let x = 0; x < out.w; x++) {
-      const x0 = x * k, x1 = x0 + k;
-      let r = 0, g = 0, bl = 0, wsum = 0;
-      for (let sy = Math.floor(y0); sy < Math.ceil(y1); sy++) {
-        const wy = Math.min(y1, sy + 1) - Math.max(y0, sy);
-        for (let sx = Math.floor(x0); sx < Math.ceil(x1); sx++) {
-          const wx = Math.min(x1, sx + 1) - Math.max(x0, sx);
-          const c = src.get(sx, sy), w = wx * wy;
-          r += R(c) * w;
-          g += G(c) * w;
-          bl += B(c) * w;
-          wsum += w;
-        }
-      }
-      out.set(x, y, rgba(Math.round(r / wsum), Math.round(g / wsum), Math.round(bl / wsum)));
-    }
-  }
-  return out;
-}
-
-/** The scrolling world, and the overview: the same world made small enough to fit one screen. */
+/** The scrolling world. */
 export function buildMap(out: string) {
   const world = renderWorld();
   world.save(path.join(out, 'map', 'world.png'));
   world.save(path.join('docs', 'images', 'world_map.png'));
-  const overview = shrink(world, WORLD_MAP.overview);
-  overview.save(path.join(out, 'map', 'overview.png'));
-  console.log(`  map: world ${world.w}x${world.h}, overview ${overview.w}x${overview.h}, ${LOCATIONS.length} campaign nodes`);
+  console.log(`  map: world ${world.w}x${world.h}, ${LOCATIONS.length} campaign nodes`);
 }

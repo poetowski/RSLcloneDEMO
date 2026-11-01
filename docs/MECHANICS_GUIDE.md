@@ -329,7 +329,7 @@ This split keeps the rules testable without a browser (`npm test`) and lets the 
 | `A` or AUTO | auto battle (saved as the default) |
 | `S` or the speed button | x1 / x2 / x3 (saved as the default) |
 | `Esc` / `P` or MENU | pause menu: resume, auto, speed, retreat |
-| Campaign map | drag to move; arrows jump between areas; `W` `A` `S` `D` or `Shift` + arrows slide; `M` whole map; `Enter` opens a stage, then PREPARE |
+| Campaign map | drag to move; arrows jump between areas; `W` `A` `S` `D` or `Shift` + arrows slide; `Enter` opens a stage, then PREPARE |
 | MATRIX tab (champion page) | click a slot, then a lit spool in the stock to weave it; TAKE OUT returns the slot's spool to the stock |
 
 URL parameters: `?screen=menu|campaign|team|battle|collection|champion|academy|options|recruit`, `&stage=1-5`, `&team=captain_gareth,rime_scholar`, `&champion=rime_scholar`, `&chapter=buffs`, `?demo=<skill_id>` (loops one skill), `?unlockall=1`, `?reset=1`, `?spools=1` (adds 24 sample spools to the stock), and for screenshots `&hp=0.1` (scales enemy HP).
@@ -433,6 +433,7 @@ The Challenges are quests to accomplish, in three tabs (Jakub, 2026-10-24, [DESI
 | Weave a Spool (stand-in for his placeholder; second on his word, 2026-10-25) | any spool woven into any champion's Weaver Matrix | 100 Stardust (his): the third champion's summon |
 | Beat Campaign 1-3 (his, 2026-10-25; third on his word) | stage 1-3 cleared | a Gilded Sunder spool |
 | Beat Campaign 1-10 (his, 2026-11-01) | stage 1-10 cleared | two spools (his); Silver Vigor, a set's two pieces, stands in |
+| Beat Campaign 3-10 (his, 2026-11-01) | stage 3-10 cleared | 250 Stardust (his) |
 | Beat Campaign 5-10 (his, 2026-11-01) | stage 5-10 cleared | the Paladin joins (his); no summon brings him |
 
 A reward spool has its quest's pattern and grade; its main stat is drawn by slot and its strands rolled as a found spool's are (section 14), and it comes into storage as a new find. Stardust goes to the Wishing Star (section 16). The spool rewards are stand-ins.

@@ -130,7 +130,6 @@ export interface Assets {
   /** the campaign world, larger than the screen */
   map: HTMLImageElement;
   /** the same world drawn small enough to fit one screen */
-  overview: HTMLImageElement;
   font: BitmapFont;
 }
 
@@ -159,7 +158,7 @@ export async function loadAssets(championIds: string[], zoneIds: string[], progr
     ]);
     zones[id] = { json, tiles, backdrop, props };
   });
-  const [fxJson, fxImg, uiJson, uiImg, fontJson, fontImg, map, overview, menuJson, menuSky, menuScene] = await Promise.all([
+  const [fxJson, fxImg, uiJson, uiImg, fontJson, fontImg, map, menuJson, menuSky, menuScene] = await Promise.all([
     track(loadJson<FxJson>('assets/fx/fx.json')),
     track(loadImage('assets/fx/fx.png')),
     track(loadJson<UiJson>('assets/ui/ui.json')),
@@ -167,7 +166,6 @@ export async function loadAssets(championIds: string[], zoneIds: string[], progr
     track(loadJson<FontJson>('assets/ui/font.json')),
     track(loadImage('assets/ui/font.png')),
     track(loadImage('assets/map/world.png')),
-    track(loadImage('assets/map/overview.png')),
     track(loadJson<MenuJson>('assets/menu/menu.json')),
     track(loadImage('assets/menu/sky.png')),
     track(loadImage('assets/menu/scene.png')),
@@ -180,7 +178,6 @@ export async function loadAssets(championIds: string[], zoneIds: string[], progr
     ui: { json: uiJson, img: uiImg },
     menu: { json: menuJson, sky: menuSky, scene: menuScene },
     map,
-    overview,
     font: new BitmapFont(fontImg, fontJson),
   };
 }

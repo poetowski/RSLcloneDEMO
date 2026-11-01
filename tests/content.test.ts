@@ -156,15 +156,12 @@ describe('campaign', () => {
     for (const k of ['camp_open', 'camp_cleared', 'camp_locked', 'camp_glow_0', 'node_open', 'node_cleared', 'node_locked', 'node_boss', 'node_glow_0']) expect(ui.parts[k], k).toBeTruthy();
   });
 
-  it('has a world map and an overview of the size the campaign data assumes', () => {
+  it('has a world map of the size the campaign data assumes', () => {
     const size = (f: string) => {
       const b = fs.readFileSync(f);
       return [b.readUInt32BE(16), b.readUInt32BE(20)];
     };
     expect(size('public/assets/map/world.png')).toEqual([WORLD_MAP.w, WORLD_MAP.h]);
-    expect(size('public/assets/map/overview.png')).toEqual([WORLD_MAP.w / WORLD_MAP.overview, WORLD_MAP.h / WORLD_MAP.overview]);
-    // the overview shows the whole world on one screen: a map that grows past twice the screen needs a smaller overview
-    expect(WORLD_MAP.w / WORLD_MAP.overview, 'overview width').toBeLessThanOrEqual(640);
   });
 
   it('runs its areas west to east, each node east of the one before', () => {
@@ -707,7 +704,7 @@ describe('challenges and the tutorial', () => {
     expect(JOURNEY[0].title).toBe('Finish Tutorial');
     // Jakub, 2026-10-25: "new journey quest: beat campaign 1-3. reward can be 100 summoning fragments", then
     // "swap quests: weave a spool make sooner and after that make beat campaign 1-3 ... swap also rewards"
-    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3', 'Beat Campaign 1-10', 'Beat Campaign 5-10']);
+    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3', 'Beat Campaign 1-10', 'Beat Campaign 3-10', 'Beat Campaign 5-10']);
     expect([JOURNEY[1].goal, JOURNEY[1].reward]).toEqual([{ kind: 'weave' }, { kind: 'fragments', amount: 100 }]);
     expect([JOURNEY[2].goal, JOURNEY[2].reward.kind]).toEqual([{ kind: 'stage', stage: '1-3' }, 'spool']);
   });
@@ -754,8 +751,17 @@ describe('challenges and the tutorial', () => {
     const won = claimQuest(p, fourth.id);
     expect(won?.kind === 'spool' && won.more?.length).toBe(1);
     expect(p.reliquary.spools()).toHaveLength(had + 2);
+    // Beat Campaign 3-10 waits for its stage, then gives its 250 Stardust
+    const between = JOURNEY[4];
+    expect(between.id).toBe('beat_3_10');
+    expect(questState(p, between)).toBe('open');
+    for (const s of allStages().slice(0, 30)) recordClear(p, s.id, 2);
+    expect(questState(p, between)).toBe('ready');
+    const dustBefore = p.fragments;
+    expect(claimQuest(p, between.id)).toEqual({ kind: 'fragments', amount: 250 });
+    expect(p.fragments).toBe(dustBefore + 250);
     // Beat Campaign 5-10 waits for its stage, then the Paladin joins, new, and only then
-    const fifth = JOURNEY[4];
+    const fifth = JOURNEY[5];
     expect(p.reliquary.has('paladin')).toBe(false);
     expect(questState(p, fifth)).toBe('open');
     for (const s of allStages().slice(0, 50)) recordClear(p, s.id, 2);

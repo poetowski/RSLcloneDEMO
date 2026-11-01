@@ -53,7 +53,7 @@ Open http://localhost:5173. The sprite gallery (every animation, effect and icon
 | mouse | everything: click skills, targets and buttons; hover anything for a tooltip |
 | `1` `2` `3`, arrows, `Enter` | pick a skill, cycle targets, confirm |
 | `A`, `S`, `Esc` | auto battle, speed x1/x2/x3, pause menu (and back in menus) |
-| campaign map | drag to move; arrows jump between areas; `W` `A` `S` `D` or `Shift` + arrows slide the map; `M` shows the whole world |
+| campaign map | drag to move; arrows jump between areas; `W` `A` `S` `D` or `Shift` + arrows slide the map |
 | arrows + `Enter` in menus | move between buttons, activate |
 
 Deep links: `?screen=campaign|team|battle|collection|champion|weaving|academy|challenges|options|recruit|summon`, `&tab=daily`, `?tutorial=1` (start the tutorial; `0` keeps it and its lessons away from a fresh game, `summon` starts the lesson on the first summon), `?stardust=250`, `?soulstars=2` (set what the save holds), `&stage=1-5`, `&team=captain_gareth,rime_scholar`, `&champion=rime_scholar`, `&chapter=buffs`; `?demo=<skill_id>` loops one skill; `&zone=zone5` (a battle or team select on another area's background), `&hp=0.1` (scales the enemies' max HP); `?unlockall=1`, `?progress=1-4` (clear up to a stage), `?reset=1`, `?spools=1` (a sample stock of Thread Spools, added once), `?skyflash=1` (a zone's rare flash in its sky every few seconds).

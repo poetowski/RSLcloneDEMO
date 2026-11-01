@@ -44,14 +44,12 @@
 import { LocationDef, StageDef } from './types';
 
 /**
- * The campaign world map in pixels: one screen tall and three and a half screens wide,
- * scrolled sideways. Location `map` positions (the campaign nodes) are in this
- * space; `overview` is how many times smaller the whole-world overview is
- * drawn (four times smaller it fits the screen's width, so a wider map may need a
- * smaller one). The map grows east area by area: a new area widens it by its stretch,
- * and everything west of the stretch keeps its pixels (tools/art/map.ts).
+ * The campaign world map in pixels: one screen tall and many wide, scrolled sideways.
+ * Location `map` positions (the campaign nodes) are in this space. The map grows east
+ * area by area: a new area widens it by its stretch, and everything west of the
+ * stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 2520, h: 360, overview: 4 };
+export const WORLD_MAP = { w: 2520, h: 360 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];

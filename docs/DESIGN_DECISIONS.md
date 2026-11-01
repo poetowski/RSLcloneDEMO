@@ -106,6 +106,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey's fifth quest: Beat Campaign 5-10, the Paladin its reward; no longer summoned | 34, 36, 54 |
 | 2026-11-01 | Whole map shows only Roman numerals (names on the campaign map) | - |
 | 2026-11-01 | Zone 7, the Dead Forest: battle background, the world map extended east, ten placeholder stages | 5.10 |
+| 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
@@ -1136,8 +1137,7 @@ little way, eats for a long time, looks up, walks back. Pale moths wander about 
 butterflies' code). The dead grass hardly stirs. A thread of ash runs off the lip of the great hole.
 
 **The map.** 2520 wide, its overview still four times smaller (630 x 90), which leaves room for
-only 40 more pixels: **the next area needs a smaller overview** (a test holds it
-to one screen). The dunes' sand greys out and frays into the ash along a wandering burn line. Beyond
+only 40 more pixels *(moot: the overview was removed the same day, section 55)*. The dunes' sand greys out and frays into the ash along a wandering burn line. Beyond
 it the same forest from above: pale ash and cracked soil, small hands each with its shadow, thicker
 toward the north and south, fallen trunks, seven piles of timber, stones, charcoal, patches of dead
 grass, nine great holes, mist in the hollows, and above the node the greatest hand with its long
@@ -3917,3 +3917,17 @@ makes it ready; claiming it recruits the Paladin. This answers section 34's ques
 now his only way in, so he left the summon pool (section 36 had put him there), and the other
 Heroics share the 5%. A save that already has him keeps him; its claim says "Already with you" and
 gives nothing else. The quest's text and the wording in its panel are mine.
+
+## 55. Beat Campaign 3-10, and no more whole map (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+add new quest in journey between winning 1-10 and 5-10 campaign nodes. create new quest in between: beat 3-10 campaign. reward for this is 250 spawning fragments.
+regarding the whole map popup, i realized its size is getting smaller and smaller in vertical dimension. i want actually the whole map to be removed at all. we do not need it anymore.
+```
+
+The Journey's new quest gives 250 Stardust ("spawning fragments" read as Stardust, the game's
+summoning fragments). The popup, its button, the M key and `overview.png` are gone; the map is
+moved by dragging, W A S D, Shift + arrows, and the arrows jump between areas as before. A save
+that already claimed a later quest finds this one ready.

@@ -5,7 +5,8 @@
 // team select. Stages have no place
 // on the map of their own. The world is wider than the screen and scrolls sideways:
 // a camera follows the keyboard focus from node to node, the map can be dragged
-// or slid with W A S D (or Shift + arrows), and M shows the whole world at once.
+// or slid with W A S D (or Shift + arrows). The whole-map popup is gone (Jakub,
+// 2026-11-01: "i want actually the whole map to be removed at all").
 import { H, W } from '../../engine/screen';
 import { App, KeyMods } from '../app';
 import { cleared, frontier, isUnlocked, locationOpen, stageOpen } from '../archivist';
@@ -42,7 +43,6 @@ export class CampaignScreen extends BaseScreen {
   private selected: StageDef | null = null;
   private camX = new Scroller();
   private camY = new Scroller();
-  private overview = false;
   private followed: string | null = null;
 
   /** With a stage (back from a battle or team select), its area's list opens on it. */
@@ -73,14 +73,12 @@ export class CampaignScreen extends BaseScreen {
   showArea(id: string) {
     const loc = LOCATIONS.find((l) => l.id === id);
     if (!loc || this.open) return;
-    this.overview = false;
     this.centerOn(loc);
     this.ui.focusId = this.followed = 'loc_' + loc.id;
   }
 
   protected back() {
-    if (this.overview) this.overview = false;
-    else if (this.open) this.closeList();
+    if (this.open) this.closeList();
     else this.app.router.menu();
   }
 
@@ -130,7 +128,7 @@ export class CampaignScreen extends BaseScreen {
   }
 
   drag(dx: number, dy: number) {
-    if (this.overview || this.open) return;
+    if (this.open) return;
     this.camX.shift(-dx);
     this.camY.shift(-dy);
   }
@@ -146,21 +144,13 @@ export class CampaignScreen extends BaseScreen {
       super.key(k);
       return;
     }
-    if (k === 'm') {
-      this.overview = !this.overview;
-      return;
-    }
     const slide: Record<string, [number, number]> = { w: [0, -1], a: [-1, 0], s: [0, 1], d: [1, 0] };
     const arrows: Record<string, [number, number]> = { ArrowUp: [0, -1], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowRight: [1, 0] };
-    // in the overview the arrows move the view frame; on the map they jump between areas unless Shift is held
-    const step = slide[k] ?? (this.overview || mods?.shift ? arrows[k] : undefined);
+    // the arrows jump between areas unless Shift is held
+    const step = slide[k] ?? (mods?.shift ? arrows[k] : undefined);
     if (step) {
       this.camX.by(step[0] * STEP.x);
       this.camY.by(step[1] * STEP.y);
-      return;
-    }
-    if (this.overview) {
-      if (k === 'Enter' || k === ' ' || k === 'Escape' || k === 'Backspace') this.overview = false;
       return;
     }
     // left and right walk the line of areas in campaign order, wherever the map has been slid
@@ -178,10 +168,6 @@ export class CampaignScreen extends BaseScreen {
     const ui = this.ui;
     const ox = -this.camX.offset, oy = -this.camY.offset;
     ctx.drawImage(this.a.map, ox, oy);
-    if (this.overview) {
-      this.drawOverview(ctx);
-      return;
-    }
     const current = locationOf(frontier(this.archivist));
     for (const loc of LOCATIONS) this.node(ctx, loc, loc.map.x + ox, loc.map.y + oy, loc === current, !this.open);
     this.header(ctx, 'CAMPAIGN', this.open ? `${this.open.chapter}. ${this.open.name}` : 'Choose an area');
@@ -189,8 +175,7 @@ export class CampaignScreen extends BaseScreen {
       this.drawList(ctx, this.open);
       return;
     }
-    this.overviewButton(ctx);
-    ui.text(ctx, 'Drag or W A S D: move the map    Arrows: areas    M: whole map', W / 2, H - 12, { color: COLORS.dim, align: 'center' });
+    ui.text(ctx, 'Drag or W A S D: move the map    Arrows: areas', W / 2, H - 12, { color: COLORS.dim, align: 'center' });
   }
 
   /** Stars won and stars there are in an area. */
@@ -255,10 +240,6 @@ export class CampaignScreen extends BaseScreen {
     ctx.globalAlpha = 1;
     ui.text(ctx, label, cx, y + 5, { color: open ? '#ffe9a0' : '#b0a0a0', variant: 'bold', align: 'center' });
     if (!open) ui.blit(ctx, 'lock', x - 6, y + 2);
-  }
-
-  private overviewButton(ctx: CanvasRenderingContext2D) {
-    this.ui.button(ctx, 'overview', 430, 5, 108, 20, this.overview ? 'BACK TO MAP' : 'WHOLE MAP (M)', { click: () => (this.overview = !this.overview), kind: 'small' });
   }
 
   /** The stage list of an area, over the dimmed map. */
@@ -420,63 +401,5 @@ export class CampaignScreen extends BaseScreen {
       ui.text(ctx, c.name, x + w, cy, { color: RARITIES[c.rarity].color, align: 'right' });
     }
     if (!stageOpen(p, s.id)) ui.text(ctx, 'Clear the previous stage first.', x, PY + PH - 50, { color: COLORS.bad });
-  }
-
-  /** The whole world on one screen: every area, the part the camera shows, click to go there. */
-  private drawOverview(ctx: CanvasRenderingContext2D) {
-    const ui = this.ui;
-    const o = this.a.overview;
-    const k = o.width / this.a.map.width;
-    const x0 = Math.round((W - o.width) / 2), y0 = Math.round(TOP + (H - TOP - o.height) / 2) - 4;
-    ui.dim(ctx, 0.85);
-    ctx.drawImage(o, x0, y0);
-    // the jump: anywhere on the world centers the map there
-    ui.regions.push({
-      x: x0, y: y0, w: o.width, h: o.height,
-      click: () => {
-        const m = ui.mouse;
-        this.camX.to((m.x - x0) / k - W / 2);
-        this.camY.to((m.y - y0) / k - (TOP + H) / 2);
-        this.overview = false;
-      },
-    });
-    // the part of the world the map shows now
-    const fx = Math.round(x0 + this.camX.offset * k), fy = Math.round(y0 + this.camY.offset * k);
-    const fw = Math.round(W * k), fh = Math.round(H * k);
-    ctx.fillStyle = COLORS.ink;
-    ctx.fillRect(fx - 1, fy - 1, fw + 2, 3);
-    ctx.fillRect(fx - 1, fy + fh - 2, fw + 2, 3);
-    ctx.fillRect(fx - 1, fy - 1, 3, fh + 2);
-    ctx.fillRect(fx + fw - 2, fy - 1, 3, fh + 2);
-    ctx.fillStyle = COLORS.goldHi;
-    ctx.fillRect(fx, fy, fw, 1);
-    ctx.fillRect(fx, fy + fh - 1, fw, 1);
-    ctx.fillRect(fx, fy, 1, fh);
-    ctx.fillRect(fx + fw - 1, fy, 1, fh);
-    // the areas: only their Roman numerals, too many names to read at this size (Jakub, 2026-11-01); a name shows on hover
-    const p = this.archivist;
-    for (const loc of LOCATIONS) {
-      const open = locationOpen(p, loc);
-      const done = loc.stages.length > 0 && loc.stages.every((s) => cleared(p, s.id));
-      const r = ui.part(!open ? 'node_locked' : done ? 'node_cleared' : 'node_open');
-      const nx = Math.round(x0 + loc.map.x * k), ny = Math.round(y0 + loc.map.y * k);
-      const x = nx - Math.floor(r[2] / 2), y = ny - Math.floor(r[3] / 2);
-      const id = 'ov_' + loc.id;
-      const hot = ui.hot(id, x - 2, y - 2, r[2] + 4, r[3] + 4);
-      blit(ctx, this.a.ui.img, r, x, y - (hot ? 1 : 0));
-      if (open) ui.text(ctx, loc.chapter, nx, y + 6 - (hot ? 1 : 0), { color: done ? '#2a1404' : COLORS.text, align: 'center', outline: done ? '#ffe070' : COLORS.ink });
-      ui.regions.push({
-        id, x: x - 2, y: y - 2, w: r[2] + 4, h: r[3] + 4,
-        click: () => {
-          this.overview = false;
-          this.ui.focusId = this.followed = 'loc_' + loc.id;
-          this.centerOn(loc);
-        },
-        tip: () => ({ title: `${loc.chapter}. ${loc.name}`, sub: this.statusOf(loc), body: '', color: COLORS.goldHi }),
-      });
-    }
-    this.header(ctx, 'CAMPAIGN', 'The whole world');
-    this.overviewButton(ctx);
-    ui.text(ctx, 'Click a place to go there    Arrows: move the frame    M or Esc: back to the map', W / 2, H - 12, { color: COLORS.dim, align: 'center' });
   }
 }
