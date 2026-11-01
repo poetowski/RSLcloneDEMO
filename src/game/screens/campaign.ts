@@ -215,7 +215,7 @@ export class CampaignScreen extends BaseScreen {
       blit(ctx, this.a.ui.img, g, x - Math.floor(g[2] / 2), y - Math.floor(g[3] / 2));
     }
     blit(ctx, this.a.ui.img, r, x - Math.floor(r[2] / 2), y - Math.floor(r[3] / 2) - lift);
-    if (open) ui.text(ctx, loc.chapter, x, y - 9 - lift, { color: kind === 'camp_cleared' ? '#2a1404' : '#fff0b0', variant: loc.chapter.length > 3 ? 'bold' : 'display', align: 'center', outline: kind === 'camp_cleared' ? '#ffe070' : COLORS.ink });
+    if (open) ui.text(ctx, loc.chapter, x, y - 9 - lift, { color: kind === 'camp_cleared' ? '#2a1404' : '#fff0b0', variant: 'display', align: 'center', outline: kind === 'camp_cleared' ? '#ffe070' : COLORS.ink });
     this.banner(ctx, loc, x, y + 19);
     const status = this.statusOf(loc);
     const [won, all] = this.starsOf(loc);
