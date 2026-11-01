@@ -1,619 +1,673 @@
 {
  "icons": {
-  "guild_shot": [
+  "lid_crush": [
    0,
+   0,
+   40,
+   40
+  ],
+  "bear_the_dead": [
+   41,
+   0,
+   40,
+   40
+  ],
+  "not_yet_buried": [
+   82,
+   0,
+   40,
+   40
+  ],
+  "grave_talons": [
+   123,
+   0,
+   40,
+   40
+  ],
+  "strip_the_living": [
+   164,
+   0,
+   40,
+   40
+  ],
+  "hollow_wail": [
+   205,
+   0,
+   40,
+   40
+  ],
+  "cast_the_bones": [
+   246,
+   0,
+   40,
+   40
+  ],
+  "read_the_omens": [
+   287,
+   0,
+   40,
+   40
+  ],
+  "ill_omen": [
+   328,
+   0,
+   40,
+   40
+  ],
+  "guild_shot": [
+   369,
    0,
    40,
    40
   ],
   "armour_breaker": [
-   41,
+   410,
    0,
    40,
    40
   ],
   "masters_eye": [
-   820,
-   123,
+   164,
+   164,
    40,
    40
   ],
   "hammer_and_scythe": [
-   123,
+   492,
    0,
    40,
    40
   ],
   "i_am_ofentol": [
-   164,
+   533,
    0,
    40,
    40
   ],
   "overlords_round": [
-   205,
+   574,
    0,
    40,
    40
   ],
   "envoys_arrow": [
-   246,
+   615,
    0,
    40,
    40
   ],
   "crowns_mandate": [
-   287,
+   656,
    0,
    40,
    40
   ],
   "formal_protest": [
-   328,
+   697,
    0,
    40,
    40
   ],
   "line_cut": [
-   369,
+   738,
    0,
    40,
    40
   ],
   "iron_blow": [
-   410,
+   779,
    0,
    40,
    40
   ],
   "wide_sweep": [
-   451,
+   820,
    0,
    40,
    40
   ],
   "pale_strike": [
-   492,
+   861,
    0,
    40,
    40
   ],
   "rimebind": [
-   533,
+   902,
    0,
    40,
    40
   ],
   "cold_rebuke": [
-   574,
+   943,
    0,
    40,
    40
   ],
   "snap": [
-   615,
+   984,
    0,
    40,
    40
   ],
   "rend": [
-   656,
    0,
+   41,
    40,
    40
   ],
   "twin_cut": [
-   697,
-   0,
+   41,
+   41,
    40,
    40
   ],
   "stone_slam": [
-   738,
-   0,
+   82,
+   41,
    40,
    40
   ],
   "gather_strength": [
-   779,
-   0,
+   123,
+   41,
    40,
    40
   ],
   "watch_cut": [
-   820,
-   0,
+   164,
+   41,
    40,
    40
   ],
   "shield_check": [
-   861,
-   0,
+   205,
+   41,
    40,
    40
   ],
   "incense_veil": [
-   902,
-   0,
+   246,
+   41,
    40,
    40
   ],
   "last_unction": [
-   943,
-   0,
+   287,
+   41,
    40,
    40
   ],
   "piercing_shot": [
-   984,
-   0,
+   328,
+   41,
    40,
    40
   ],
   "threshing_blow": [
-   0,
+   369,
    41,
    40,
    40
   ],
   "checkpoint_cut": [
-   41,
+   410,
    41,
    40,
    40
   ],
   "watch_rotation": [
-   82,
+   451,
    41,
    40,
    40
   ],
   "long_thrust": [
-   123,
+   492,
    41,
    40,
    40
   ],
   "hold_fast": [
-   164,
+   533,
    41,
    40,
    40
   ],
   "spade_cut": [
-   205,
+   574,
    41,
    40,
    40
   ],
   "shallow_grave": [
-   246,
+   615,
    41,
    40,
    40
   ],
   "ash_flick": [
-   287,
+   656,
    41,
    40,
    40
   ],
   "sift_ash": [
-   328,
+   697,
    41,
    40,
    40
   ],
   "keening": [
-   369,
+   738,
    41,
    40,
    40
   ],
   "spore_slap": [
-   410,
+   779,
    41,
    40,
    40
   ],
   "tusk_gore": [
-   451,
+   820,
    41,
    40,
    40
   ],
   "dig_in": [
-   492,
+   861,
    41,
    40,
    40
   ],
   "sting_swarm": [
-   533,
+   902,
    41,
    40,
    40
   ],
   "comb_honey": [
-   574,
+   943,
    41,
    40,
    40
   ],
   "tonic": [
-   615,
+   984,
    41,
    40,
    40
   ],
   "guard_cut": [
-   656,
-   41,
+   0,
+   82,
    40,
    40
   ],
   "brace": [
-   697,
    41,
+   82,
    40,
    40
   ],
   "bite": [
-   738,
-   41,
+   82,
+   82,
    40,
    40
   ],
   "bay": [
-   779,
-   41,
+   123,
+   82,
    40,
    40
   ],
   "stick_rap": [
-   820,
-   41,
+   164,
+   82,
    40,
    40
   ],
   "field_rations": [
-   861,
-   41,
+   205,
+   82,
    40,
    40
   ],
   "heavy_cut": [
-   902,
-   41,
+   246,
+   82,
    40,
    40
   ],
   "keen_edge": [
-   943,
-   41,
+   287,
+   82,
    40,
    40
   ],
   "root_lash": [
-   984,
-   41,
+   328,
+   82,
    40,
    40
   ],
   "thicket": [
-   0,
+   369,
    82,
    40,
    40
   ],
   "staff_blow": [
-   41,
+   410,
    82,
    40,
    40
   ],
   "quell": [
-   82,
+   451,
    82,
    40,
    40
   ],
   "crook_strike": [
-   123,
+   492,
    82,
    40,
    40
   ],
   "bellwether": [
-   164,
+   533,
    82,
    40,
    40
   ],
   "herders_ward": [
-   205,
+   574,
    82,
    40,
    40
   ],
   "mote_bolt": [
-   246,
+   615,
    82,
    40,
    40
   ],
   "quickening": [
-   287,
+   656,
    82,
    40,
    40
   ],
   "bitter_motes": [
-   328,
+   697,
    82,
    40,
    40
   ],
   "banner_strike": [
-   369,
+   738,
    82,
    40,
    40
   ],
   "rallying_standard": [
-   410,
+   779,
    82,
    40,
    40
   ],
   "unbroken_flag": [
-   451,
-   82,
-   40,
-   40
-  ],
-  "gore": [
-   492,
-   82,
-   40,
-   40
-  ],
-  "war_bellow": [
-   533,
-   82,
-   40,
-   40
-  ],
-  "thick_hide": [
-   574,
-   82,
-   40,
-   40
-  ],
-  "cleave": [
-   615,
-   82,
-   40,
-   40
-  ],
-  "crimson_blade": [
-   656,
-   82,
-   40,
-   40
-  ],
-  "onrush": [
-   697,
-   82,
-   40,
-   40
-  ],
-  "thornburst": [
-   738,
-   82,
-   40,
-   40
-  ],
-  "cleansing_rite": [
-   779,
-   82,
-   40,
-   40
-  ],
-  "keepers_balm": [
    820,
    82,
    40,
    40
   ],
-  "poison_dart": [
+  "gore": [
    861,
    82,
    40,
    40
   ],
-  "dart_volley": [
+  "war_bellow": [
    902,
    82,
    40,
    40
   ],
-  "hidden_in_the_undergrowth": [
+  "thick_hide": [
    943,
    82,
    40,
    40
   ],
-  "rusty_hack": [
+  "cleave": [
    984,
    82,
    40,
    40
   ],
-  "bare_bones": [
+  "crimson_blade": [
    0,
    123,
    40,
    40
   ],
-  "putrid_slam": [
+  "onrush": [
    41,
    123,
    40,
    40
   ],
-  "warning_toll": [
+  "thornburst": [
    82,
    123,
    40,
    40
   ],
-  "last_peal": [
+  "cleansing_rite": [
    123,
    123,
    40,
    40
   ],
-  "grave_chill": [
+  "keepers_balm": [
    164,
    123,
    40,
    40
   ],
-  "plague_verse": [
+  "poison_dart": [
    205,
    123,
    40,
    40
   ],
-  "raise_dead": [
+  "dart_volley": [
    246,
    123,
    40,
    40
   ],
-  "unerring_shot": [
+  "hidden_in_the_undergrowth": [
    287,
    123,
    40,
    40
   ],
-  "sundering_volley": [
+  "rusty_hack": [
    328,
    123,
    40,
    40
   ],
-  "pinning_shot": [
+  "bare_bones": [
    369,
    123,
    40,
    40
   ],
-  "shield_bash": [
+  "putrid_slam": [
    410,
    123,
    40,
    40
   ],
-  "bulwark_slam": [
+  "warning_toll": [
    451,
    123,
    40,
    40
   ],
-  "old_grudge": [
+  "last_peal": [
    492,
    123,
    40,
    40
   ],
-  "searing_cut": [
+  "grave_chill": [
    533,
    123,
    40,
    40
   ],
-  "beacon": [
+  "plague_verse": [
    574,
    123,
    40,
    40
   ],
-  "trial_by_fire": [
+  "raise_dead": [
    615,
    123,
    40,
    40
   ],
-  "unbowed": [
+  "unerring_shot": [
    656,
    123,
    40,
    40
   ],
-  "mending_blows": [
+  "sundering_volley": [
    697,
    123,
    40,
    40
   ],
-  "masters_decree": [
+  "pinning_shot": [
    738,
    123,
    40,
    40
   ],
-  "earthen_surge": [
+  "shield_bash": [
    779,
    123,
    40,
    40
   ],
-  "splinter_talon": [
+  "bulwark_slam": [
+   820,
+   123,
+   40,
+   40
+  ],
+  "old_grudge": [
    861,
    123,
    40,
    40
   ],
-  "razor_gale": [
+  "searing_cut": [
    902,
    123,
    40,
    40
   ],
-  "graven_dread": [
+  "beacon": [
    943,
    123,
    40,
    40
   ],
-  "heartwood": [
+  "trial_by_fire": [
    984,
    123,
    40,
    40
   ],
-  "hobbling_thrust": [
+  "unbowed": [
    0,
    164,
    40,
    40
   ],
-  "grave_pierce": [
+  "mending_blows": [
    41,
    164,
    40,
    40
   ],
-  "last_bastion": [
+  "masters_decree": [
    82,
    164,
    40,
    40
   ],
-  "unbreached_plate": [
+  "earthen_surge": [
    123,
+   164,
+   40,
+   40
+  ],
+  "splinter_talon": [
+   205,
+   164,
+   40,
+   40
+  ],
+  "razor_gale": [
+   246,
+   164,
+   40,
+   40
+  ],
+  "graven_dread": [
+   287,
+   164,
+   40,
+   40
+  ],
+  "heartwood": [
+   328,
+   164,
+   40,
+   40
+  ],
+  "hobbling_thrust": [
+   369,
+   164,
+   40,
+   40
+  ],
+  "grave_pierce": [
+   410,
+   164,
+   40,
+   40
+  ],
+  "last_bastion": [
+   451,
+   164,
+   40,
+   40
+  ],
+  "unbreached_plate": [
+   492,
    164,
    40,
    40
@@ -1713,260 +1767,278 @@
   ]
  },
  "portraits": {
-  "crossbowman": [
+  "tombstones_legs": [
    0,
+   456,
+   28,
+   28
+  ],
+  "wraith": [
+   29,
+   456,
+   28,
+   28
+  ],
+  "bone_augur": [
+   58,
+   456,
+   28,
+   28
+  ],
+  "crossbowman": [
+   87,
    456,
    28,
    28
   ],
   "overlord_ofentol": [
-   29,
+   116,
    456,
    28,
    28
   ],
   "verdant_luminary": [
-   58,
+   145,
    456,
    28,
    28
   ],
   "captain_gareth": [
-   87,
+   174,
    456,
    28,
    28
   ],
   "rime_scholar": [
-   116,
+   203,
    456,
    28,
    28
   ],
   "follower": [
-   145,
-   456,
-   28,
-   28
-  ],
-  "skirmisher": [
-   174,
-   456,
-   28,
-   28
-  ],
-  "strongman": [
-   203,
-   456,
-   28,
-   28
-  ],
-  "town_guard": [
    232,
    456,
    28,
    28
   ],
-  "last_riter": [
+  "skirmisher": [
    261,
    456,
    28,
    28
   ],
-  "archer": [
+  "strongman": [
    290,
    456,
    28,
    28
   ],
-  "harvest_specialist": [
+  "town_guard": [
    319,
    456,
    28,
    28
   ],
-  "sentry": [
+  "last_riter": [
    348,
    456,
    28,
    28
   ],
-  "junior_ward": [
+  "archer": [
    377,
    456,
    28,
    28
   ],
-  "gravedigger": [
+  "harvest_specialist": [
    406,
    456,
    28,
    28
   ],
-  "ash_widow": [
+  "sentry": [
    435,
    456,
    28,
    28
   ],
-  "toadcap": [
+  "junior_ward": [
    464,
    456,
    28,
    28
   ],
-  "bristleback": [
+  "gravedigger": [
    493,
    456,
    28,
    28
   ],
-  "hive_tender": [
+  "ash_widow": [
    522,
    456,
    28,
    28
   ],
-  "dominion_medic": [
+  "toadcap": [
    551,
    456,
    28,
    28
   ],
-  "lineholder": [
+  "bristleback": [
    580,
    456,
    28,
    28
   ],
-  "bloodhound": [
+  "hive_tender": [
    609,
    456,
    28,
    28
   ],
-  "quartermaster": [
+  "dominion_medic": [
    638,
    456,
    28,
    28
   ],
-  "enforcer": [
+  "lineholder": [
    667,
    456,
    28,
    28
   ],
-  "walking_bush": [
+  "bloodhound": [
    696,
    456,
    28,
    28
   ],
-  "wild_speaker": [
+  "quartermaster": [
    725,
    456,
    28,
    28
   ],
-  "jungle_herder": [
+  "enforcer": [
    754,
    456,
    28,
    28
   ],
-  "associate": [
+  "walking_bush": [
    783,
    456,
    28,
    28
   ],
-  "emissary_handlings": [
+  "wild_speaker": [
    812,
    456,
    28,
    28
   ],
-  "black_rhino": [
+  "jungle_herder": [
    841,
    456,
    28,
    28
   ],
-  "red_cloak": [
+  "associate": [
    870,
    456,
    28,
    28
   ],
-  "grove_keeper": [
+  "emissary_handlings": [
    899,
    456,
    28,
    28
   ],
-  "big_ears": [
+  "black_rhino": [
    928,
    456,
    28,
    28
   ],
-  "skeleton": [
+  "red_cloak": [
    957,
    456,
    28,
    28
   ],
-  "rot_hulk": [
+  "grove_keeper": [
    986,
    456,
    28,
    28
   ],
-  "bellringer": [
+  "big_ears": [
    0,
    485,
    28,
    28
   ],
-  "necromancer": [
+  "skeleton": [
    29,
    485,
    28,
    28
   ],
-  "automated_soul": [
+  "rot_hulk": [
    58,
    485,
    28,
    28
   ],
-  "irving_wellbington": [
+  "bellringer": [
    87,
    485,
    28,
    28
   ],
-  "paladin": [
+  "necromancer": [
    116,
    485,
    28,
    28
   ],
-  "chief_engineer_cj": [
+  "automated_soul": [
    145,
    485,
    28,
    28
   ],
-  "forest_gargoyle": [
+  "irving_wellbington": [
    174,
    485,
    28,
    28
   ],
-  "dead_knight_amstron": [
+  "paladin": [
    203,
+   485,
+   28,
+   28
+  ],
+  "chief_engineer_cj": [
+   232,
+   485,
+   28,
+   28
+  ],
+  "forest_gargoyle": [
+   261,
+   485,
+   28,
+   28
+  ],
+  "dead_knight_amstron": [
+   290,
    485,
    28,
    28

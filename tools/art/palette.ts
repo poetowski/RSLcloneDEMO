@@ -130,6 +130,12 @@ export const MAT = {
   // the Gravedigger's sackcloth, dirty with the ground
   graveSack: m('graveSack', 'cloth', ['#17130e', '#2c2519', '#443a28', '#5e5238', '#786a4c', '#938562']),
   plum: m('plum', 'cloth', ['#16080f', '#311226', '#53203f', '#7a2e5a', '#a34479', '#c86a9a']),
+  /** Tombstone's Legs' coffin: old dark wood gone almost black, a reddish brown where the light catches the grain */
+  coffin: m('coffin', 'matte', ['#0c0808', '#1a1312', '#2a201d', '#3e302a', '#57443a', '#76604f']),
+  /** the Wraith's shroud: a grave-cloth gone the grey-green of old smoke, paler at its frayed edges */
+  shroud: m('shroud', 'cloth', ['#0c0f10', '#1a2021', '#2c3433', '#434d49', '#626d65', '#8a9586']),
+  /** the Bone Augur's robe: a dust-brown wool, the colour of a tomb's floor */
+  tombDust: m('tombDust', 'cloth', ['#140f0c', '#2a2119', '#433528', '#5e4c39', '#7c674e', '#9d8768']),
 
   // --- woods of the living ---------------------------------------------------
   /** the Walking Bush's bark: the grey-brown of a bush's woody stems (his few leaves are `moss`) */
