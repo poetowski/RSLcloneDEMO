@@ -580,10 +580,10 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
   },
   /** Dig In: dust stamped up round his feet in a low ring. Matter. */
   dig_in: {
-    w: 84, h: 44, n: 8, ms: 70, ax: 0.5, ay: 0.9, pad: [2, 2, 14, 2],
+    w: 84, h: 58, n: 8, ms: 70, ax: 0.5, ay: 0.862, pad: [2, 2, 4, 2],
     draw: (b, t, i) => {
       void i;
-      const cx = 42, gy = 38;
+      const cx = 42, gy = 50;
       const r = 8 + t * 26;
       ring(b, cx, gy, r, r * 0.26, 1.4, DU, 1 - t * 0.7);
       sparks(b, cx, gy - 2, 16, 22, t, ramps.sand, 967, 12);
