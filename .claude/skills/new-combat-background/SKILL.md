@@ -43,8 +43,8 @@ Add a `ZoneDef` with the same id to `src/game/data/zones.ts`:
 
 | Field | Meaning |
 | --- | --- |
-| `ambient` | `snow`, `sand`, `motes` (star-dust and shooting stars), `leaves` (autumn leaves tumbling in the wind), `pollen` (pollen drifting in the sunlight), `spores` (glowing dust-motes drifting in soft pearl halos, far ones behind the champions, near ones in front: Zone 3) `seeds` (feather-grass seeds sailing across on the wind from the left, a few close to the camera: Zone 4) or `flurries` (snowflakes blown in from the right ahead of a storm, melting away as they cross: Zone 5); a new kind needs code in `src/game/view/zone.ts` (`spawnAmbient` and the ambient's count in `update`, or a system of its own like the spores) |
-| `butterflies` | optional: the spots butterflies flutter about, one butterfly each (Zone 2) |
+| `ambient` | `snow`, `sand`, `motes` (star-dust and shooting stars), `leaves` (autumn leaves tumbling in the wind), `pollen` (pollen drifting in the sunlight), `spores` (glowing dust-motes drifting in soft pearl halos, far ones behind the champions, near ones in front: Zone 3) `seeds` (feather-grass seeds sailing across on the wind from the left, a few close to the camera: Zone 4) `flurries` (snowflakes blown in from the right ahead of a storm, melting away as they cross: Zone 5) or `ash` (ash coming down through still air, slower than snow, each flake turning over: Zone 7); a new kind needs code in `src/game/view/zone.ts` (`spawnAmbient` and the ambient's count in `update`, or a system of its own like the spores) |
+| `butterflies` | optional: the spots butterflies flutter about, one butterfly each (Zone 2); with `moths: true` they are pale moths with a slower beat (Zone 7) |
 | `embers` | optional colors of the embers rising from fire props (first color, then the fade), e.g. teal for plasma braziers |
 | `glow` | RGB of the light pools around fire props |
 | `shadow` | `{ dx, stretch }` of unit shadows: high light `1 / 1`, low sun `6 / 1.35` |

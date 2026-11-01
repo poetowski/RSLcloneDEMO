@@ -49,6 +49,16 @@ const BUTTERFLY_TONES: [string, string][] = [
   ['#f6f2e6', '#7c786c'],
 ];
 
+/** The Dead Forest's moths: pale wings, their tips a little darker. */
+const MOTH_TONES: [string, string][] = [
+  ['#ece8dc', '#8a867c'],
+  ['#d8d4c8', '#7a766c'],
+  ['#f4f0e6', '#96928a'],
+];
+
+/** How many flakes of ash hang in the air at once (ambient 'ash'). */
+const ASH = 44;
+
 /** Wings open, half raised, closed: W wing, E its dark tips, B the body. */
 const BUTTERFLY_FRAMES = [
   ['EWW.WWE', 'WWWBWWW', '.WWBWW.', '..W.W..'],
@@ -125,7 +135,7 @@ export class ZoneView {
     this.tilesLayer = this.bakeTiles();
     this.light = makeGlow(64, 40, def.glow);
     this.vignette = makeVignette();
-    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'seeds' ? SEEDS : def.ambient === 'flurries' ? FLURRIES : def.ambient === 'spores' ? 0 : 70;
+    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'seeds' ? SEEDS : def.ambient === 'flurries' ? FLURRIES : def.ambient === 'ash' ? ASH : def.ambient === 'spores' ? 0 : 70;
     for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
     if (def.ambient === 'spores') {
       this.sporeHalos = SPORE_HALO.map((c) => [makeHalo(6, c), makeHalo(9, c)]);
@@ -143,13 +153,14 @@ export class ZoneView {
       );
     }
     (def.butterflies ?? []).forEach(([hx, hy], i) => {
-      const [wing, edge] = BUTTERFLY_TONES[i % BUTTERFLY_TONES.length];
+      const tones = def.moths ? MOTH_TONES : BUTTERFLY_TONES;
+      const [wing, edge] = tones[i % tones.length];
       const rnd = () => Math.random();
       this.butterflies.push({
         hx, hy, ax: 30 + rnd() * 18, ay: 9 + rnd() * 8,
         f: [0.3 + rnd() * 0.25, 0.4 + rnd() * 0.3, 0.9 + rnd() * 0.5],
         p: [rnd() * 6.3, rnd() * 6.3, rnd() * 6.3],
-        rate: 3 + rnd() * 1.4, wing, edge, x: hx, y: hy, frame: 0,
+        rate: def.moths ? 1.4 + rnd() * 0.8 : 3 + rnd() * 1.4, wing, edge, x: hx, y: hy, frame: 0,
       });
     });
     if (def.flash) {
@@ -202,6 +213,26 @@ export class ZoneView {
   }
 
   private spawnAmbient(x = -4, y = -4) {
+    if (this.def.ambient === 'ash') {
+      // ash coming down through still air, slower than snow, each flake turning over as it falls: pale side, dark side; a few close to the camera
+      const near = Math.random() < 0.2;
+      const pale = Math.random() < 0.7;
+      this.ambient.add({
+        x: x < 0 ? Math.random() * (W + 20) - 10 : x,
+        y,
+        vx: (Math.random() - 0.5) * 2.4,
+        vy: near ? 8 + Math.random() * 5 : 3.5 + Math.random() * 4,
+        life: Infinity,
+        size: near ? 2 : 1,
+        w: near ? 2 : 1,
+        h: near ? 2 : 1,
+        color: pale ? (near ? '#e4e0d6' : '#c8c5bb') : '#6c6a66',
+        alt: pale ? '#8e8c86' : '#3d3b3a',
+        spin: 0.4 + Math.random() * 0.8,
+        sway: near ? 9 : 5,
+      });
+      return;
+    }
     if (this.def.ambient === 'flurries') {
       // flurries blown in from the right ahead of the storm: flakes driven left and down, melting away as they go
       // (so they thin out toward the left), a few close to the camera
@@ -413,7 +444,7 @@ export class ZoneView {
     amb.update(dt * speedUp);
     for (const p of amb.list) if (p.y > H + 4 || p.y < -6 || p.x > W + 8 || p.x < -60) p.life = 0;
     // the spores are their own system (spawnSpore), not particles
-    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'seeds' ? SEEDS : this.def.ambient === 'flurries' ? FLURRIES : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
+    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'seeds' ? SEEDS : this.def.ambient === 'flurries' ? FLURRIES : this.def.ambient === 'ash' ? ASH : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
     while (amb.list.length < target) this.spawnAmbient();
     if (this.def.ambient === 'sand') {
       // every few seconds a gust sweeps a veil of sand across the arena

@@ -104,6 +104,8 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey's fourth quest: Beat Campaign 1-10, two spools | 53 |
 | 2026-11-01 | Zone 6, the Golden Expanse: battle background, the world map extended east with a tunnel between areas 5 and 6, ten placeholder stages | 5.9 |
 | 2026-11-01 | The Journey's fifth quest: Beat Campaign 5-10, the Paladin its reward; no longer summoned | 34, 36, 54 |
+| 2026-11-01 | Whole map shows only Roman numerals (names on the campaign map) | - |
+| 2026-11-01 | Zone 7, the Dead Forest: battle background, the world map extended east, ten placeholder stages | 5.10 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
@@ -1085,6 +1087,71 @@ Stand-ins until he sets them: everything his description did not name, including
 the temple, colonnade, ribs, warrior and vultures, the lights' colour and rhythm, the ridge and the
 tunnel's look, the stages' enemies, powers and texts, the spools (Focus and Ward) and the Stardust
 (45 a victory).
+
+### 5.10 Zone 7 — the Dead Forest (2026-11-01)
+
+Jakub, verbatim:
+
+```
+i want you to generate new world area. extend world map to the east for area 7.
+name of area is Dead Forest.
+design:
+
+The forest stretches across an uneven landscape of blackened earth, grey ash and charred tree trunks. Almost every tree has lost its leaves, branches and bark. What remains are dark, twisted silhouettes reaching towards the sky like enormous skeletal hands.
+
+Some trees remain standing, burned from their roots to their highest branches. Others have collapsed, lying across the ground in tangled piles of black timber.
+
+The ground is covered in:
+- Thick layers of grey and black ash.
+- Burnt roots protruding from cracked soil.
+- Fallen branches reduced to charcoal.
+- Scattered stones darkened by intense heat.
+- Occasional patches of pale, dead grass.
+- Deep holes where enormous trees once stood.
+
+- atmosphere is weirdly peaceful.
+
+generate are background, create 10 placeholder stages, extend world map. be creative and very detailed
+```
+
+**The battle background (`tools/art/zones/zone7.ts`).** A still, pale morning long after the fire,
+like an ink painting: a white sun behind a high veil, ridge behind ridge of burnt forest fading into
+mist. Every tree is grown as a hand: a trunk for a wrist, a thumb low on one side, fingers fanning
+from a palm and curling in by the knuckle, stubs where the branches burnt off, charcoal fissures up
+the wood, pale ash settled on whatever faces up. An enormous one on the right reaches nearly to the
+top of the sky; a snapped one stands on the left, one has fallen against its neighbour on the slope
+behind. A tangled pile of black timber lies on the arena's far edge, a burnt trunk in the near left
+corner. The arena is ash in soft mounds, scoured in patches down to cracked black soil, with the
+long soft shadows of the trees across it, knotted burnt roots, charcoal branches, broken stones,
+tufts of pale dead grass. In its middle is the great hole where the biggest tree of all once stood,
+its far wall in strata, torn roots running out from it and hanging into it, a smaller hole on the
+right and a far one on the slope.
+
+**"Weirdly peaceful"**, read as stillness: nothing burns any more, no ember, no smoke, no wind, no
+birds. Ash comes down through still air, slower than snow, each flake turning over as it falls (a
+new ambient, `ash`). Mist creeps along the valleys and over the arena's far edge, slower than
+anything else in the game, and breathes in the holes. Pale light breathes between the trunks. A stag
+the colour of ash, his antlers the same hands as the trees, grazes on the slope, unafraid; he walks a
+little way, eats for a long time, looks up, walks back. Pale moths wander about (`moths`, the
+butterflies' code). The dead grass hardly stirs. A thread of ash runs off the lip of the great hole.
+
+**The map.** 2520 wide, its overview still four times smaller (630 x 90), which leaves room for
+only 40 more pixels: **the next area needs a smaller overview** (a test holds it
+to one screen). The dunes' sand greys out and frays into the ash along a wandering burn line. Beyond
+it the same forest from above: pale ash and cracked soil, small hands each with its shadow, thicker
+toward the north and south, fallen trunks, seven piles of timber, stones, charcoal, patches of dead
+grass, nine great holes, mist in the hollows, and above the node the greatest hand with its long
+shadow. Two stags graze south-east of the node. The old road runs through it as fresh ash between
+two dark ruts. Pixels west of about x 2170 are kept.
+
+**Stages 7-1 to 7-10** after 6-10, placeholders: their texts walk his description, enemies are copies
+of the roster, 7-10 a boss Forest Gargoyle (the wooden Heroic in the burnt forest, my choice), no
+champion joins there.
+
+Stand-ins until he sets them: everything his description did not name, including the time of day and
+the sky, the giant and every other tree's place, the great hole's place in the arena, the stag, the
+moths, the mist, the light, the falling ash, the stages' enemies, powers and texts, the spools
+(Tranquility and Needle) and the Stardust (50 a victory).
 
 ## 6. Cross-cutting
 

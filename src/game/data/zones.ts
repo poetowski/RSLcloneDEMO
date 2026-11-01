@@ -103,6 +103,21 @@ export const ZONES: ZoneDef[] = [
     birds: 3,
     birdsAt: [[130, 70]],
   },
+  {
+    // Zone 7, named and described by Jakub (2026-11-01): the Dead Forest, blackened earth, grey ash and charred trunks
+    // like enormous skeletal hands, "atmosphere is weirdly peaceful"; no fire, no smoke, no wind and no birds here
+    id: 'zone7',
+    name: 'Dead Forest',
+    ambient: 'ash',
+    // nothing burns here; the colour a light pool would take
+    glow: [240, 232, 214],
+    // the sun is veiled: long, soft shadows
+    shadow: { dx: 4, stretch: 1.25 },
+    tint: { color: '#e8e4d8', alpha: 0.05, op: 'soft-light' },
+    // a first take: pale moths wandering about in the stillness
+    butterflies: [[258, 164], [398, 142], [322, 214]],
+    moths: true,
+  },
 ];
 
 const byId = new Map(ZONES.map((z) => [z.id, z]));

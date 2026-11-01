@@ -288,9 +288,10 @@ export interface ZoneDef {
    * bioluminescent flora drifting in soft, pearlescent halos (the Moonlit Basin),
    * seeds: feather-grass seeds sailing on the steppe wind (Earth Scars), or
    * flurries: snow blown in from the right ahead of a storm, thinning out as it
-   * goes (the Snowy Mesa)
+   * goes (the Snowy Mesa); ash: ash coming down through still air, slower than
+   * snow, each flake turning over as it falls (the Dead Forest)
    */
-  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen' | 'spores' | 'seeds' | 'flurries';
+  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen' | 'spores' | 'seeds' | 'flurries' | 'ash';
   /** color of brazier light pools */
   glow: [number, number, number];
   /** unit shadows: offset away from the key light and horizontal stretch */
@@ -305,6 +306,8 @@ export interface ZoneDef {
   haze?: boolean;
   /** butterflies fluttering about these spots, in screen pixels, one butterfly each */
   butterflies?: [number, number][];
+  /** those butterflies are pale moths, their wings beating slower (the Dead Forest) */
+  moths?: boolean;
   /** brazier embers: first color, then the colors they fade through (default: firelight) */
   embers?: string[];
   /**

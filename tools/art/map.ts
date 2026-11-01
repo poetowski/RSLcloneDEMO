@@ -25,7 +25,10 @@
 // the arbiter on his mesa, the storm coming on from the east. Beyond it
 // (2026-11-01) a ridge stops the storm; the road goes under it through a tunnel,
 // and the Golden Expanse (Zone 6) begins: enormous golden dunes combed by the wind,
-// half-buried ruins and skeletons, strange lights under the sand.
+// half-buried ruins and skeletons, strange lights under the sand. Beyond it
+// (2026-11-01) the sand gives out over blackened earth and the Dead Forest (Zone 7)
+// begins: grey ash, cracked soil, a forest burned to its bones, every tree a hand
+// reaching up, the great holes where the biggest once stood, mist lying still.
 //
 // Everything is drawn in world pixels, and every random choice is a hash of
 // its position, so the map grows east area by area: widen WORLD_MAP by the new
@@ -228,7 +231,7 @@ const NODES = LOCATIONS.map((l): P => [l.map.x, l.map.y]);
 
 /** The road: the old road ends at the far lip, takes up again on this side, and runs through every node to the east edge (through the hills' pass). */
 const ROAD_FAR = curve([[-10, 318], [40, 322], [96, 334], [150, 332], [186, 324]]);
-const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [W + 12, 200]]);
+const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [2252, 200], [2306, 190], [2352, 198], NODES[6], [2442, 186], [W + 12, 194]]);
 /** the road's bridges of rope over the gulf: from the brink to the arbiter's mesa, and on east toward the storm */
 const MESA_BRIDGES: [P, P, number][] = [
   [[1626, 188], [1714, 197], 5],
@@ -493,6 +496,12 @@ function farGround(x: number, y: number, light: number): RGBA {
 }
 
 function groundAt(x: number, y: number): RGBA {
+  // the Dead Forest, the sand thinning out over its black earth
+  if (x >= DEAD_W) {
+    const k = deadK(x, y);
+    if (k > 0.14 + vnoise(x, y, 7, 1601) * 0.72) return deadGround(x, y);
+    if (k > 0) return mix(expanseGround(x, y), ASHM[9], Math.min(0.72, k * 1.3));
+  }
   // the ridge and the Golden Expanse beyond it
   if (x >= 1900 && x >= ridgeW(y)) return expanseGround(x, y);
   // beyond the brink: the gulf and the mesas of the Snowy Mesa
@@ -1213,6 +1222,12 @@ function road(b: Bitmap, pts: P[]) {
         if (d > 2.4) continue;
         const X = Math.round(x + dx), Y = Math.round(y + dy);
         if (!inBounds(X, Y) || sdAt(X, Y) < 0 || inRiver(X, Y) > 0) continue;
+        if (X >= DEAD_W && deadK(X, Y) > 0.5) {
+          // through the Dead Forest an old road: pale fresh ash between two dark ruts, drifted over in places
+          if (vnoise(X, Y, 19, 1603) > 0.84) continue;
+          if (d <= 1.9) b.set(X, Y, rampDither(ASHM, d > 1.1 ? 2.6 : 11.2 + (hash2(X, Y, 1604) - 0.5) * 1.2, X, Y));
+          continue;
+        }
         if (X >= 1900 && X >= ridgeW(Y)) {
           // under the ridge the tunnel carries it; over the sand a trail, drifted over in places
           if (X < ridgeE(Y) || vnoise(X, Y, 26, 1501) > 0.74) continue;
@@ -2611,6 +2626,7 @@ function renderWorld(): Bitmap {
   // the Snowy Mesa's waterfalls, plume, cables and bridges, and the storm over it all
   mesaOverlays(b);
   expanseOverlays(b);
+  deadOverlays(b);
   compass(b, W - 40, H - 44);
   frame(b);
   return b;
@@ -2822,11 +2838,11 @@ function mapDevil(b: Bitmap, x: number, y: number, h: number) {
 function expanseOverlays(b: Bitmap) {
   // streamers of sand blown off the crests, along the wind: thin lines leaving the crest
   for (let y = 4; y < H - 4; y += 2) {
-    for (let x = 2040; x < W - 4; x++) {
+    for (let x = 2040; x < DEAD_W + 8; x++) {
       const t = dunePhase(x, y, DUNE_BIG, 0);
       if (t < 0.78 || t > 0.8 || hash2(x, y, 1562) > 0.34) continue;
       const len = 5 + Math.floor(hash2(x, y, 1563) * 13);
-      for (let k = 1; k < len && x + k < W - 4; k++) b.set(x + k, y + (k >> 3), mix(b.get(x + k, y + (k >> 3)), DUST[11], 0.55 * (1 - k / len)));
+      for (let k = 1; k < len && x + k < DEAD_W + 16; k++) b.set(x + k, y + (k >> 3), mix(b.get(x + k, y + (k >> 3)), DUST[11], 0.55 * (1 - k / len)));
     }
   }
   // the tunnel's course under the ridge: an atlas's dotted line, three air shafts
@@ -2864,6 +2880,280 @@ function expanseOverlays(b: Bitmap) {
   mapDevil(b, 2046, 244, 16);
 }
 
+// ---------------------------------------------------------------------------
+// The Dead Forest (Zone 7, named and described by Jakub, 2026-11-01: "atmosphere
+// is weirdly peaceful"). East of the dunes the sand thins out over blackened earth.
+// Grey and black ash in soft mounds, scoured down in patches to cracked soil; a
+// forest burned to its bones, every tree a small hand reaching up, each with its
+// long soft shadow; fallen trunks and tangled piles of black timber; stones, charcoal,
+// clumps of pale dead grass; the deep holes where enormous trees once stood. Above the
+// node the greatest of the hands. Nothing burns any more: no fire, no smoke. Mist lies
+// in the hollows and two stags the colour of ash graze near the road.
+// ---------------------------------------------------------------------------
+
+const DEAD_W = 2226;
+const ASHM = ramp(['#131213', '#1c1a1b', '#262424', '#312f2f', '#3d3b3a', '#4a4846', '#575553', '#65635f', '#73716c', '#817f79', '#8f8d86', '#9d9b94', '#aba9a1']);
+const CHARW = ramp(['#08080a', '#111114', '#1a1a1d', '#252527', '#323233', '#424242', '#555452', '#8a8680']);
+const DEADGRASS = ramp(['#6e6a52', '#8e8868', '#aca684', '#c8c2a0', '#ded8ba']);
+const MISTM = ramp(['#a8a8a6', '#bcbcb8', '#d0cfca', '#e2e0d9']);
+/** the great holes: x, y, half width, half height */
+const MAP_HOLES: [number, number, number, number][] = [[2338, 118, 15, 5.5], [2432, 92, 19, 7], [2470, 256, 23, 8], [2352, 284, 13, 4.6], [2374, 36, 11, 3.8], [2494, 142, 11, 4], [2334, 232, 10, 3.4], [2414, 326, 17, 5.6], [2456, 170, 20, 7]];
+const inHole = (x: number, y: number, m: number) => MAP_HOLES.some(([hx, hy, rx, ry]) => ((x - hx) / (rx + m)) ** 2 + ((y - hy) / (ry + m * 0.5)) ** 2 < 1);
+const deadClear = (x: number, y: number) => clearing(x, y, NODES[6], 66, 34);
+
+/** Where the sand gives out at y, and how far into the ash a point is. */
+const burnW = (y: number) => 2252 + 44 * vnoise(0, y, 58, 1602) + 12 * vnoise(0, y, 17, 1605);
+const deadK = (x: number, y: number) => smooth(burnW(y) - 24, burnW(y) + 26, x + (vnoise(x, y, 23, 1606) - 0.5) * 20);
+
+const deadHeight = (x: number, y: number) => vnoise(x, y, 58, 1611) * 0.6 + vnoise(x, y, 21, 1612) * 0.3 + vnoise(x, y, 8, 1613) * 0.1;
+/** How near a point is to the edge of a plate of cracked soil. */
+function deadPlate(x: number, y: number): number {
+  const p = x / 8, q = (y * 1.7) / 8;
+  const px = Math.floor(p), py = Math.floor(q);
+  let f1 = 9, f2 = 9;
+  for (let j = -1; j <= 1; j++) {
+    for (let i = -1; i <= 1; i++) {
+      const d = Math.hypot(p - (px + i + hash2(px + i, py + j, 1614)), q - (py + j + hash2(px + i, py + j, 1615)));
+      if (d < f1) {
+        f2 = f1;
+        f1 = d;
+      } else if (d < f2) f2 = d;
+    }
+  }
+  return f2 - f1;
+}
+
+/** Pale ash in soft mounds lit from the upper left, grey and black mottled in it, scoured down in patches to cracked black soil. */
+function deadGround(x: number, y: number): RGBA {
+  let v = 9.1 + (deadHeight(x - 1, y - 1) - deadHeight(x + 1, y + 1)) * 30 + (vnoise(x, y, 120, 1616) - 0.5) * 1.8;
+  const soot = smooth(0.58, 0.72, vnoise(x, y, 44, 1617) + (vnoise(x, y, 13, 1618) - 0.5) * 0.2);
+  v -= soot * 4.2;
+  if (soot > 0.4) {
+    const e = deadPlate(x, y);
+    if (e < 0.08) v -= 2.6 * soot;
+    else if (e < 0.17) v += 0.7 * soot;
+  }
+  v += (vnoise(x, y, 4, 1619) - 0.5) * 0.9 + (hash2(x, y, 1620) - 0.5) * 0.35;
+  if (hash2(x, y, 1621) > 0.988) v -= 2.4;
+  return rampDither(ASHM, clamp(v, 0, ASHM.length - 1), x, y);
+}
+
+/** A soft shadow thrown down and to the right from a foot, thinning out. */
+function deadShadow(b: Bitmap, x: number, y: number, len: number, wide: number) {
+  for (let k = 1; k < len; k++) {
+    const a = 0.8 * (1 - k / len);
+    for (let w = 0; w < wide; w++) {
+      const X = Math.round(x + k), Y = Math.round(y + k * 0.42) + w;
+      if (inBounds(X, Y) && dith(X, Y, a)) b.set(X, Y, mix(b.get(X, Y), SHADOW, 0.26));
+    }
+  }
+}
+
+/** A burnt tree from afar: a trunk for a wrist, its fingers fanning up and curling in; or a snag, snapped off with one stub. */
+function deadHand(b: Bitmap, x: number, y: number, h: number, seed: number) {
+  deadShadow(b, x, y, h * 0.8, 1);
+  const lean = (hash2(seed, 1, 1630) - 0.5) * h * 0.2;
+  const snag = hash2(seed, 2, 1630) < 0.2;
+  const trunkH = h * (snag ? 0.72 + hash2(seed, 3, 1630) * 0.2 : 0.46 + hash2(seed, 3, 1630) * 0.14);
+  const thick = h > 15;
+  for (let k = 0; k <= trunkH; k++) {
+    const t = k / trunkH, X = Math.round(x + lean * t * 0.6), Y = Math.round(y - k);
+    b.set(X, Y, CHARW[thick ? 3 : 1]);
+    if (thick && t < 0.8) b.set(X + 1, Y, CHARW[0]);
+  }
+  if (thick) {
+    b.set(x - 1, y, CHARW[2]);
+    b.set(x + 2, y, CHARW[1]);
+  }
+  const tx = x + lean * 0.6, ty = y - trunkH;
+  const n = snag ? 1 : h > 13 ? 4 + Math.floor(hash2(seed, 4, 1630) * 2) : 3;
+  for (let i = 0; i < n; i++) {
+    const k = n > 1 ? i / (n - 1) - 0.5 : hash2(seed, 5, 1630) - 0.5;
+    let a = -Math.PI / 2 + k * 2.1 + (hash2(seed, 6 + i, 1630) - 0.5) * 0.3;
+    let px = tx + k * 1.4, py = ty;
+    const len = (snag ? h * 0.22 : (h - trunkH) * (1.05 - Math.abs(k) * 0.5)) * (0.8 + hash2(seed, 12 + i, 1630) * 0.4);
+    for (let j = 0; j < len; j++) {
+      px += Math.cos(a);
+      py += Math.sin(a);
+      a -= (k * 1.6) / len;
+      b.set(Math.round(px), Math.round(py), CHARW[j < len * 0.4 ? 1 : 2]);
+    }
+  }
+}
+
+/** A thick charred stroke, lit from the upper left, with a line of pale ash along its top. */
+function charStroke(b: Bitmap, x0: number, y0: number, xm: number, ym: number, x1: number, y1: number, r0: number, r1: number, ash = true) {
+  const n = Math.ceil((Math.hypot(xm - x0, ym - y0) + Math.hypot(x1 - xm, y1 - ym)) * 1.3);
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, m = 1 - t;
+    const x = m * m * x0 + 2 * m * t * xm + t * t * x1, y = m * m * y0 + 2 * m * t * ym + t * t * y1;
+    const r = r0 + (r1 - r0) * t;
+    ellipseFill(b, x, y, Math.max(0.7, r), Math.max(0.7, r), (px, py) => rampDither(CHARW, clamp(2.2 - ((px - x) + (py - y)) * (1.6 / Math.max(1, r)), 0, CHARW.length - 2), px, py));
+    if (ash && r > 1.1 && hash2(i, 0, 1631) > 0.5) b.set(Math.round(x), Math.round(y - r), ASHM[11]);
+  }
+}
+
+/** A trunk lying where it fell, its shadow under it, burnt-off limbs along it. */
+function deadLog(b: Bitmap, x0: number, y0: number, x1: number, y1: number, r: number, seed: number) {
+  const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0));
+  for (let k = 0; k <= n; k++) {
+    const X = Math.round(x0 + ((x1 - x0) * k) / n + 1), Y = Math.round(y0 + ((y1 - y0) * k) / n + r + 1);
+    if (inBounds(X, Y)) b.set(X, Y, mix(b.get(X, Y), SHADOW, 0.5));
+  }
+  charStroke(b, x0, y0, (x0 + x1) / 2 + (hash2(seed, 0, 1632) - 0.5) * 6, (y0 + y1) / 2 + 1, x1, y1, r, r * 0.66);
+  for (let i = 0; i < n / 9; i++) {
+    const t = 0.15 + hash2(seed, i + 1, 1633) * 0.7;
+    const X = x0 + (x1 - x0) * t, Y = y0 + (y1 - y0) * t;
+    const l = 2 + hash2(seed, i + 1, 1634) * 4, a = -Math.PI / 2 + (hash2(seed, i + 1, 1635) - 0.5) * 1.8;
+    for (let k = 0; k < l; k++) b.set(Math.round(X + Math.cos(a) * k), Math.round(Y - r + Math.sin(a) * k), CHARW[2]);
+  }
+}
+
+/** A tangled pile of black timber: trunks thrown across each other anyhow. */
+function deadPile(b: Bitmap, cx: number, cy: number, w: number, seed: number) {
+  ellipseFill(b, cx + 2, cy + 3, w * 0.62, w * 0.2, (x, y, d) => (dith(x, y, (1 - d) * 1.6) ? mix(b.get(x, y), SHADOW, 0.5) : b.get(x, y)));
+  const n = 6 + Math.floor(w / 5);
+  for (let i = 0; i < n; i++) {
+    const a = (hash2(seed, i, 1636) - 0.5) * 2 + (i % 2 ? 0 : Math.PI);
+    const l = w * (0.36 + hash2(seed, i, 1637) * 0.4);
+    const ox = (hash2(seed, i, 1638) - 0.5) * w * 0.7, oy = (i / n - 0.8) * w * 0.34;
+    deadLog(b, cx + ox - Math.cos(a) * l * 0.5, cy + oy - Math.sin(a) * l * 0.3, cx + ox + Math.cos(a) * l * 0.5, cy + oy + Math.sin(a) * l * 0.3, 1.1 + hash2(seed, i, 1639) * 1, seed + i);
+  }
+}
+
+/** A deep hole where an enormous tree once stood: a lip of ash, torn roots running out from it, its far wall in strata sinking into nothing, roots hanging in. */
+function deadHole(b: Bitmap, cx: number, cy: number, rx: number, ry: number) {
+  const n = Math.round(rx * 0.7);
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2 + hash2(cx, i, 1641);
+    const l = 5 + hash2(cx, i, 1642) * rx * 0.8;
+    charStroke(b, cx + Math.cos(a) * rx, cy + Math.sin(a) * ry, cx + Math.cos(a + 0.3) * (rx + l * 0.6), cy + Math.sin(a + 0.3) * (ry + l * 0.3), cx + Math.cos(a) * (rx + l), cy + Math.sin(a) * (ry + l * 0.46), Math.max(0.8, rx * 0.06), 0.6, false);
+  }
+  ellipseFill(b, cx, cy, rx + 2, ry + 1.2, (x, y) => rampDither(ASHM, clamp(10.4 - ((x - cx) / rx) * 1.4 - ((y - cy) / ry) * 1.2, 0, ASHM.length - 1), x, y));
+  ellipseFill(b, cx, cy, rx, ry, (x, y) => {
+    const xx = (x - cx) / rx, yy = (y - cy) / ry;
+    const wall = (yy + Math.sqrt(Math.max(0, 1 - xx * xx))) * (ry / 7);
+    const v = wall < 0.1 ? 7 - xx : wall < 0.18 ? 3 : wall < 0.36 ? 2.4 + Math.max(0, xx) : wall < 0.56 ? 1 : 0;
+    return rampDither(ASHM, v, x, y);
+  });
+  for (let i = 0; i < Math.max(1, Math.round(rx / 7)); i++) {
+    const xx = hash2(cx, i, 1643) * 1.4 - 0.7;
+    const x = cx + xx * rx, y0 = cy - Math.sqrt(1 - xx * xx) * ry + 1;
+    for (let k = 0; k < ry * 0.8; k++) b.set(Math.round(x + (hash2(cx, i, 1644) - 0.5) * k), Math.round(y0 + k), CHARW[k < ry * 0.5 ? 3 : 1]);
+  }
+}
+
+/** The greatest of the hands, above the node: burned from root to fingertip, its thumb out to the left, ash heaped at its foot. */
+function mapGiantHand(b: Bitmap, cx: number, by: number, h: number) {
+  // its shadow lies long across the ash
+  for (let k = 2; k < h * 1.2; k++) {
+    const hw = 2.6 - (k / (h * 1.2)) * 1.8;
+    const X = cx + k, Yc = by + k * 0.36;
+    for (let w = -hw; w <= hw; w++) if (inBounds(X, Math.round(Yc + w)) && dith(X, Math.round(Yc + w), 0.8 - (k / (h * 1.2)) * 0.5)) b.set(X, Math.round(Yc + w), mix(b.get(X, Math.round(Yc + w)), SHADOW, 0.5));
+  }
+  const [wx, wy]: P = [cx - 1, by - h * 0.46];
+  for (const [dx, dy] of [[-8, 2], [-4, 3], [5, 3], [9, 1]]) charStroke(b, cx, by - 2, cx + dx * 0.5, by, cx + dx, by + dy, 2.2, 0.8, false);
+  charStroke(b, cx, by, cx - 2, by - h * 0.24, wx, wy, 3.8, 2.4);
+  // the thumb, then the fingers
+  charStroke(b, cx - 1, by - h * 0.32, cx - 10, by - h * 0.38, cx - 11, by - h * 0.54, 1.5, 0.7);
+  const fingers: [number, number, number, number][] = [[-16, -14, -12, -29], [-7, -22, -6, -34], [1, -23, 3, -37], [9, -20, 10, -33], [17, -11, 15, -24]];
+  for (const [mx, my, ex, ey] of fingers) charStroke(b, wx, wy, wx + mx, wy + my, wx + ex, wy + ey, 1.9, 0.7);
+  ellipseFill(b, cx - 1, by + 2, 11, 3, (x, y, d) => (dith(x, y, (1 - d) * 2.6) ? rampDither(ASHM, 8.4 - ((x - cx) / 11) * 1.4, x, y) : b.get(x, y)));
+  // a burnt hollow in its wrist
+  for (let k = 0; k < 6; k++) b.set(cx - 1, by - 9 - k, CHARW[0]);
+}
+
+/** Mist lying still in a hollow: a soft pale veil over whatever is there, thickest in its middle. */
+function deadMist(b: Bitmap, cx: number, cy: number, rx: number, ry: number) {
+  ellipseFill(b, cx, cy, rx, ry, (x, y, d) => {
+    const a = (1 - d * d) * (0.35 + vnoise(x, y * 2.4, 17, 1651) * 0.8) * 0.62;
+    const lvl = Math.floor(a * 6) / 6 + (dith(x, y, a * 6 - Math.floor(a * 6)) ? 1 / 6 : 0);
+    return mix(b.get(x, y), MISTM[3], clamp(lvl, 0, 0.72));
+  });
+}
+
+/** A stag the colour of ash, a few pixels long, his antlers two forks. */
+function mapStag(b: Bitmap, x: number, y: number, down: boolean) {
+  deadShadow(b, x + 3, y + 1, 5, 1);
+  for (const dx of [0, 1, 4, 5]) b.set(x + dx, y, MISTM[0]);
+  for (const dy of [-1, -2]) for (let dx = 0; dx <= 5; dx++) b.set(x + dx, y + dy, MISTM[dy === -2 ? 3 : 1]);
+  if (down) {
+    b.set(x + 6, y - 1, MISTM[1]);
+    b.set(x + 7, y, MISTM[2]);
+    b.set(x + 8, y - 1, CHARW[3]);
+    b.set(x + 8, y - 2, CHARW[3]);
+  } else {
+    b.set(x + 6, y - 3, MISTM[2]);
+    b.set(x + 7, y - 4, MISTM[3]);
+    b.set(x + 8, y - 4, MISTM[1]);
+    for (const [dx, dy] of [[6, -5], [6, -6], [5, -7], [7, -7], [8, -5], [8, -6], [9, -7]]) b.set(x + dx, y + dy, CHARW[3]);
+  }
+}
+
+/** Everything standing in the Dead Forest. */
+function deadOverlays(b: Bitmap) {
+  const node = NODES[6];
+  // on the ground first: charcoal, stones, dead grass, the holes
+  for (let gy = 2; gy < H; gy += 4) {
+    for (let gx = DEAD_W; gx < W; gx += 4) {
+      const x = gx + Math.floor(hash2(gx, gy, 1661) * 4), y = gy + Math.floor(hash2(gx, gy, 1662) * 4);
+      if (!inBounds(x, y) || deadK(x, y) < 0.8 || roadDist[idx(x, y)] < 3 || inHole(x, y, 3)) continue;
+      const roll = hash2(gx, gy, 1663);
+      if (roll < 0.035) {
+        // a stone, darkened by the heat
+        const r = 1 + hash2(gx, gy, 1664) * 1.4;
+        ellipseFill(b, x + 1, y + 1, r + 0.6, r * 0.6, (px, py) => mix(b.get(px, py), SHADOW, 0.4));
+        ellipseFill(b, x, y, r, r * 0.74, (px, py) => CHARW[px <= x && py <= y ? 5 : 3]);
+      } else if (roll < 0.09) {
+        // a fallen branch reduced to charcoal
+        const a = hash2(gx, gy, 1665) * Math.PI, l = 2 + hash2(gx, gy, 1666) * 4;
+        for (let k = 0; k < l; k++) b.set(Math.round(x + Math.cos(a) * k), Math.round(y + Math.sin(a) * k * 0.5), CHARW[2]);
+      } else if (roll < 0.135 && vnoise(x, y, 40, 1667) > 0.52) {
+        // pale dead grass, in patches
+        for (let k = 0; k < 3; k++) {
+          const dx = Math.round((hash2(gx + k, gy, 1668) - 0.5) * 5);
+          const l = 1 + Math.round(hash2(gx + k, gy, 1669) * 2);
+          for (let j = 0; j <= l; j++) b.set(x + dx, y - j, DEADGRASS[Math.min(4, 1 + j + (k & 1))]);
+        }
+      }
+    }
+  }
+  for (const [x, y, rx, ry] of MAP_HOLES) deadHole(b, x, y, rx, ry);
+
+  // the trees and the timber, back to front
+  const things: { y: number; draw: () => void }[] = [];
+  for (let gy = -2; gy < H + 8; gy += 7) {
+    for (let gx = DEAD_W - 8; gx < W + 4; gx += 9) {
+      const x = Math.round(gx + (hash2(gx, gy, 1671) - 0.5) * 8), y = Math.round(gy + (hash2(gx, gy, 1672) - 0.5) * 6);
+      if (!inBounds(x, y)) continue;
+      const k = deadK(x, y);
+      const off = Math.abs(y - 192) / 150;
+      const p = (0.22 + smooth(0.2, 1, off) * 0.4 + (vnoise(x, y, 54, 1673) - 0.5) * 0.7) * smooth(0.25, 0.9, k);
+      if (hash2(gx, gy, 1674) > p || roadDist[idx(x, y)] < 6 || deadClear(x, y) || inHole(x, y, 6)) continue;
+      const h = 12 + hash2(gx, gy, 1675) * 9 + (hash2(gx, gy, 1676) > 0.9 ? 9 : 0);
+      things.push({ y, draw: () => deadHand(b, x, y, h, gx * 7919 + gy) });
+    }
+  }
+  // timber lying where it fell: single trunks across the ash, and piles
+  for (let gy = 8; gy < H; gy += 26) {
+    for (let gx = DEAD_W + 30; gx < W - 10; gx += 30) {
+      if (hash2(gx, gy, 1677) > 0.46) continue;
+      const x = gx + (hash2(gx, gy, 1678) - 0.5) * 22, y = gy + (hash2(gx, gy, 1679) - 0.5) * 18;
+      if (!inBounds(Math.round(x), Math.round(y)) || deadK(x, y) < 0.8 || deadClear(x, y) || roadDist[idx(Math.round(x), Math.round(y))] < 7 || inHole(x, y, 8)) continue;
+      const a = (hash2(gx, gy, 1680) - 0.5) * 1.4 + (hash2(gx, gy, 1681) < 0.5 ? 0 : Math.PI), l = 10 + hash2(gx, gy, 1682) * 18;
+      things.push({ y, draw: () => deadLog(b, x, y, x + Math.cos(a) * l, y + Math.sin(a) * l * 0.5, 1 + hash2(gx, gy, 1683), gx + gy) });
+    }
+  }
+  for (const [x, y, w] of [[2326, 164, 22], [2352, 72, 28], [2474, 108, 24], [2316, 262, 28], [2452, 306, 26], [2492, 214, 20], [2396, 252, 18]] as const) things.push({ y, draw: () => deadPile(b, x, y, w, x + y) });
+  things.push({ y: node[1] - 16, draw: () => mapGiantHand(b, node[0] + 2, node[1] - 16, 62) });
+  things.sort((p, q) => p.y - q.y).forEach((t) => t.draw());
+
+  // the stillness: mist lying in the hollows, stags grazing near the road
+  for (const [x, y, rx, ry] of [[2330, 150, 34, 9], [2400, 58, 40, 10], [2478, 200, 30, 8], [2366, 308, 40, 10], [2322, 90, 22, 7], [2496, 74, 20, 6], [2308, 334, 22, 6]] as const) deadMist(b, x, y, rx, ry);
+  mapStag(b, 2452, 222, true);
+  mapStag(b, 2464, 227, false);
+}
+
 /** Shrinks a bitmap k times (k may be fractional) by averaging the source pixels under each overview pixel, weighted by how much of each it covers. */
 function shrink(src: Bitmap, k: number): Bitmap {
   const out = new Bitmap(Math.round(src.w / k), Math.round(src.h / k));
@@ -2889,7 +3179,7 @@ function shrink(src: Bitmap, k: number): Bitmap {
   return out;
 }
 
-/** The scrolling world, and the overview: the same world at half the size, so it fits one screen. */
+/** The scrolling world, and the overview: the same world made small enough to fit one screen. */
 export function buildMap(out: string) {
   const world = renderWorld();
   world.save(path.join(out, 'map', 'world.png'));

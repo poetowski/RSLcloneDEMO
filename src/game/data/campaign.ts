@@ -51,7 +51,7 @@ import { LocationDef, StageDef } from './types';
  * smaller one). The map grows east area by area: a new area widens it by its stretch,
  * and everything west of the stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 2240, h: 360, overview: 4 };
+export const WORLD_MAP = { w: 2520, h: 360, overview: 4 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];
@@ -82,6 +82,14 @@ const DUNES = 'The central desert: enormous golden dunes, fifty to a hundred met
 const WIND = 'The wind reshapes the land without rest; nothing here keeps its shape.';
 const RUINS = 'Some dunes hold buried ruins, skeletons and forgotten structures.';
 const LIGHTS = 'Now and then strange lights move beneath the surface.';
+// Zone 7: Jakub's description of the Dead Forest (2026-11-01), from the charred land to its strange peace
+const CHARRED = 'An uneven landscape of blackened earth, grey ash and charred tree trunks.';
+const HANDS = 'Dark, twisted silhouettes reach towards the sky like enormous skeletal hands.';
+const COLLAPSED = 'Some trees stand burned from root to crown; others lie in tangled piles of black timber.';
+const ASHFALL = 'Thick layers of grey and black ash, fallen branches reduced to charcoal, stones darkened by the heat.';
+const ROOTS = 'Burnt roots protrude from cracked soil, among occasional patches of pale, dead grass.';
+const HOLES = 'Deep holes where enormous trees once stood.';
+const PEACE = 'It is weirdly peaceful here.';
 // Zone 5: Jakub's description of the Snowy Mesa (2026-10-19), from the mesa's top to the arbiter on it
 const MESA_TOP = 'The top of a snow-capped tabletop mountain.';
 const MESAS = 'Many more tabletop mountains all round, all connected with many candles.';
@@ -481,6 +489,30 @@ export const LOCATIONS: LocationDef[] = [
       { id: '6-8', blurb: LIGHTS, enemies: [{ champion: 'red_cloak' }, { champion: 'big_ears' }, { champion: 'grove_keeper' }], power: 0.79 },
       { id: '6-9', blurb: LIGHTS, enemies: [{ champion: 'black_rhino' }, { champion: 'captain_gareth' }, { champion: 'associate' }], power: 0.71 },
       { id: '6-10', blurb: `${LIGHTS} The last stage of the area.`, enemies: [{ champion: 'dead_knight_amstron', boss: true }, { champion: 'gravedigger' }, { champion: 'necromancer' }], power: 0.64 },
+    ],
+  },
+  {
+    // Zone 7, named and described by Jakub (2026-11-01, DESIGN_DECISIONS.md 5.10); he asked for ten placeholder
+    // stages, whose enemies, powers and texts are stand-ins; no champion joins there
+    id: 'zone7',
+    chapter: 'VII',
+    name: 'Dead Forest',
+    zone: 'zone7',
+    blurb: 'East of the Golden Expanse the sand gives out over blackened earth: a whole forest burned to its bones, and in it a strange peace.',
+    requires: '6-10',
+    map: { x: 2392, y: 192 },
+    patterns: ['pattern_tranquility', 'pattern_needle'],
+    stages: [
+      { id: '7-1', blurb: CHARRED, enemies: [{ champion: 'gravedigger' }, { champion: 'skeleton' }, { champion: 'ash_widow' }], power: 0.92 },
+      { id: '7-2', blurb: CHARRED, enemies: [{ champion: 'follower' }, { champion: 'walking_bush' }, { champion: 'wild_speaker' }], power: 0.96 },
+      { id: '7-3', blurb: HANDS, enemies: [{ champion: 'rot_hulk' }, { champion: 'bellringer' }, { champion: 'sentry' }], power: 1.04 },
+      { id: '7-4', blurb: HANDS, enemies: [{ champion: 'jungle_herder' }, { champion: 'grove_keeper' }, { champion: 'big_ears' }], power: 0.74 },
+      { id: '7-5', blurb: COLLAPSED, enemies: [{ champion: 'necromancer' }, { champion: 'irving_wellbington' }, { champion: 'automated_soul' }], power: 0.7 },
+      { id: '7-6', blurb: ASHFALL, enemies: [{ champion: 'black_rhino' }, { champion: 'red_cloak' }, { champion: 'emissary_handlings' }], power: 0.72 },
+      { id: '7-7', blurb: ROOTS, enemies: [{ champion: 'grove_keeper' }, { champion: 'bristleback' }, { champion: 'associate' }], power: 0.94 },
+      { id: '7-8', blurb: HOLES, enemies: [{ champion: 'dead_knight_amstron' }, { champion: 'skeleton' }, { champion: 'gravedigger' }], power: 0.76 },
+      { id: '7-9', blurb: PEACE, enemies: [{ champion: 'chief_engineer_cj' }, { champion: 'necromancer' }, { champion: 'automated_soul' }], power: 0.58 },
+      { id: '7-10', blurb: `${PEACE} The last stage of the area.`, enemies: [{ champion: 'forest_gargoyle', boss: true }, { champion: 'grove_keeper' }, { champion: 'red_cloak' }], power: 0.68 },
     ],
   },
 ];
