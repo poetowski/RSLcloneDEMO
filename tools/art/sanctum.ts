@@ -2024,6 +2024,12 @@ export function buildSanctum(out: string) {
       { x: 340, y: 284, facing: 'L' },
       { x: 180, y: 278, facing: 'R' },
       { x: 394, y: 277, facing: 'L' },
+      // Jakub, 2026-11-01: "lets try 4 on left and 5 on right"; filled in this order, so a small roster still stands on both sides
+      { x: 206, y: 264, facing: 'R' },
+      { x: 368, y: 264, facing: 'L' },
+      { x: 130, y: 270, facing: 'R' },
+      { x: 466, y: 274, facing: 'L' },
+      { x: 424, y: 260, facing: 'L' },
     ],
     twinkles: TWINKLES,
     rings: [RIM],
