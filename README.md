@@ -6,8 +6,8 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 
 ![Battle](docs/images/battle.gif)
 
-- **55 champions** in four factions, each with idle, run, every skill, hurt, death and a victory pose, rendered for both facings:
-  - *Azure Crown*: Captain Gareth, the Skirmisher, the Lineholder, the Quartermaster, Emissary Handlings, a proud standard-bearer, the Associate, a mage with a staff of white motes, the Paladin, the first Heroic, a young knight in silver plate with a double-cross shield and a burning sword, the Strongman, the Town Guard, the Last Riter, the Crossbowman, a guild master with a feathered hat and a great mustache, Overlord Ofentol, a fat smith with a hammer and a scythe, and the Verdant Luminary, a forest nymph in the Crown's blue with a great bow.
+- **56 champions** in four factions, each with idle, run, every skill, hurt, death and a victory pose, rendered for both facings:
+  - *Azure Crown*: Captain Gareth, the Skirmisher, the Lineholder, the Quartermaster, Emissary Handlings, a proud standard-bearer, the Associate, a mage with a staff of white motes, the Paladin, the first Heroic, a young knight in silver plate with a double-cross shield and a burning sword, the Strongman, the Town Guard, the Last Riter, the Crossbowman, a guild master with a feathered hat and a great mustache, Overlord Ofentol, a fat smith with a hammer and a scythe, and the Verdant Luminary, a forest nymph in the Crown's blue with a great bow, and the Astronomer Royal, levitating under a crown and a halo of gold with planets orbiting her.
   - *Sanguine Dominion*: the Rime Scholar, the Dominion Medic, the Bloodhound (the first on four legs), the Enforcer, Red Cloak, a bald knight in plate with a silver zweihander, the Black Rhino, a great black bull with prosthetic tusks, Chief Engineer CJ, a Heroic, a fat forge-master in an orange helm with a sparking two-handed hammer, the Archer, the Junior Ward, the Harvest Specialist, Sir Siroslav, a Heroic, a winged knight-commander, the War Tigress, a heavy tigress in a war-blanket, the Hex Warden, who carries the standard as a shield, and the Transfusionist, a field doctor with a great flask of blood on her back.
   - *Court of Root*: the Follower, a grey wolf, the Walking Bush, a small ent of a bush, the Wild Speaker, a tattooed man with a long stick, the Jungle Herder, a hunchbacked herder with a crook and a bell, the Grove Keeper, an old druid with antlers, Big Ears, a small big-eared creature with a blowpipe, the Forest Gargoyle, a Heroic, a winged gargoyle carved from wood, its features sharp leaves, the Toadcap, the Bristleback, the Hive Tender, Silkfang, a great old spider with moss on her back, the Bog Troll, a hunched swamp creature with a log, the Moth Seer, a masked figure with great pale wings and a lantern of fireflies, and Rootfather, an ancient wanderer with bark for skin and an emerald seed in his staff.
   - *Ashveil Reign*: the Skeleton, a short skeleton with a rusty sword, the Rot Hulk, a big, fat abomination of patched flesh, the Bellringer, a very tall skeleton with a golden bell, the Necromancer, a hooded man in black with a book of the dead, the Automated Soul, a headless archer skeleton in azure and gold plate, and Irving Wellbington, a dwarf skeleton with a horned helmet behind a big round shield, Dead Knight Amstron, a Heroic, a skull over full plate of red and crimson, with a spear and a tower shield, the Sentry, the Gravedigger, the Ash Widow, Coffin's Legs, a broad dead giant, the Wraith, a hooded shade, and the Haruspex, a gaunt old seer, and the Cinder Sylph, a gaunt demon on burned wings who raises every fallen ally.
@@ -69,7 +69,7 @@ Deep links: `?screen=campaign|team|battle|collection|champion|weaving|academy|ch
 |---|---|---:|---:|---:|---:|
 | **Azure Crown** | Common | 2 | 2 | 2 | 6 |
 | | Elite | 2 | 2 | 2 | 6 |
-| | Heroic | 0 | 1 | 0 | 1 |
+| | Heroic | 0 | 1 | 1 | 2 |
 | **Sanguine Dominion** | Common | 2 | 2 | 2 | 6 |
 | | Elite | 2 | 2 | 2 | 6 |
 | | Heroic | 0 | 1 | 1 | 2 |
@@ -79,7 +79,7 @@ Deep links: `?screen=campaign|team|battle|collection|champion|weaving|academy|ch
 | **Ashveil Reign** | Common | 2 | 2 | 2 | 6 |
 | | Elite | 2 | 2 | 2 | 6 |
 | | Heroic | 0 | 1 | 1 | 2 |
-| **All factions** | | **16** | **20** | **19** | **55** |
+| **All factions** | | **16** | **20** | **20** | **56** |
 
 There are no Mythics yet.
 
@@ -139,6 +139,7 @@ All fifty-three come from Jakub's design record ([docs/DESIGN_DECISIONS.md](docs
 | ![](docs/images/reel_war_tigress.gif) | **War Tigress**. Elite Ember Damage, Sanguine Dominion. A heavy, low tigress, russet with black stripes, a black war-blanket edged in red with the Dominion's hexagon. | **Claw Rake** (A1): rakes one enemy with both forepaws. **Blood Pounce** (A2): leaps on one enemy, half as hard again below 40% HP, and heals her for 30% of the damage. **Scent of Blood** (passive): +10% C.RATE. |
 | ![](docs/images/reel_hex_warden.gif) | **Hex Warden**. Elite Ember Tank, Sanguine Dominion. A big man in black plate under a tall red crest, behind a shield that is the Dominion's standard itself. | **Standard Ram** (A1): the shield into one enemy, 30% chance of Slow. **Blood Oath** (A2): Taunt on himself and a Shield on the frailest other ally. **Second Pulse** (passive): DEF Up and Regen the first time below 40% HP. |
 | ![](docs/images/reel_transfusionist.gif) | **Transfusionist**. Elite Tide Support, Sanguine Dominion. An upright field doctor in a black coat and red apron, a great glass flask of blood on her back, a tube to a long brass needle. | **Draw Blood** (A1): pricks one enemy and heals the frailest other ally. **Open the Flask** (A2): heals every ally 15%. **Bedside Rounds** (passive): Regen on the frailest other ally, every other turn. |
+| ![](docs/images/reel_astronomer_royal.gif) | **Astronomer Royal**. Heroic Ember Support, Azure Crown. She levitates in a train of star-mapped midnight velvet under a towering crown, a gold armillary halo behind her head and planets orbiting her, a long brass telescope for a staff. Her Hour of Destiny lines up the planets and gives one ally a turn at once. |
 | ![](docs/images/reel_cinder_sylph.gif) | **Cinder Sylph**. Heroic Tide Support, Ashveil Reign. A gaunt hovering demon on great burned bat wings, a skull's grin under ringed horns, fire between her ribs, a heavy iron scepter burning at its head. Her Rise From Ash brings every fallen ally back at once. |
 | ![](docs/images/reel_rootfather.gif) | **Rootfather**. Heroic Ember Support, Court of Root. An ancient wanderer with skin of bark and green light in his veins, flowers in his beard, a crown of branches and antlers, a cloak of leaves, roots growing from his boots into the ground, and an emerald seed floating in the crown of his staff. |
 | ![](docs/images/reel_silkfang.gif) | **Silkfang**. Elite Tide Damage, Court of Root. A great old jungle spider on tall arched legs, moss and fern growing on her back, eight amber eyes. | **Fang Bite** (A1): one enemy, 35% chance of Poison. **Web Shot** (A2): all enemies, 60% on each of Slow for 2 turns. **Tripline** (passive): when hit, 35% chance of Slow on the attacker. |

@@ -148,6 +148,8 @@ export const MAT = {
   skinDeep: m('skinDeep', 'skin', ['#1a0c08', '#2e1810', '#4a2a1c', '#6a3e28', '#8a5638', '#ac7450']),
   // the Verdant Luminary: a forest nymph, pale as birch with a little green in it
   skinNymph: m('skinNymph', 'skin', ['#2c2a18', '#5e6638', '#98a860', '#d0da9a', '#eef2c0', '#fdfee6']),
+  // the Astronomer Royal: the Crown's blue gone to a midnight velvet, a sheen where the light lies
+  nightVelvet: m('nightVelvet', 'cloth', ['#04061c', '#0a1040', '#121c62', '#1e3090', '#3452c0', '#7090ee']),
   // the Cinder Sylph: the grey of a burned log, and what is left of her wings, dark red up to a live edge
   skinCinder: m('skinCinder', 'skin', ['#120d10', '#2e2426', '#514343', '#796763', '#a58f86', '#d0bcae']),
   emberMembrane: m('emberMembrane', 'matte', ['#1a0808', '#3e100c', '#6e1c10', '#a02e18', '#d2541e', '#f4963c']),

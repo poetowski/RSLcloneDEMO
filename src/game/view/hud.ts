@@ -17,7 +17,7 @@ export interface SkillSlot {
   skill: SkillDef;
   cooldown: number;
   selected: boolean;
-  /** off cooldown but with nothing to do (a skill that raises the fallen while nobody has fallen) */
+  /** off cooldown but with nothing to do (a skill that raises the fallen while nobody has fallen, or gives a turn with nobody to take it) */
   blocked?: boolean;
 }
 
@@ -220,7 +220,7 @@ export class Hud extends Ui {
         click: () => !off && onPick(sl.skill),
         tip: () => ({
           title: sl.skill.name,
-          sub: `${sl.skill.tag}${sl.skill.cooldown ? `  -  Cooldown ${sl.skill.cooldown}` : ''}${sl.cooldown > 0 ? `  (ready in ${sl.cooldown})` : sl.blocked ? '  (no ally has fallen)' : ''}`,
+          sub: `${sl.skill.tag}${sl.skill.cooldown ? `  -  Cooldown ${sl.skill.cooldown}` : ''}${sl.cooldown > 0 ? `  (ready in ${sl.cooldown})` : sl.blocked ? (sl.skill.grantTurn ? '  (no other ally can act)' : '  (no ally has fallen)') : ''}`,
           body: sl.skill.desc,
           color: COLORS.goldHi,
         }),

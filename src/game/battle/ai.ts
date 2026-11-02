@@ -34,6 +34,8 @@ function pickTarget(b: Battle, actor: Unit, s: SkillDef): string | undefined {
   if (s.target !== 'enemy' && s.target !== 'ally') return undefined;
   const valid = b.validTargets(actor, s);
   if (!valid.length) return undefined;
+  // a turn goes to the hardest hitter
+  if (s.grantTurn) return [...valid].sort((x, y) => b.attack(y) - b.attack(x))[0].uid;
   const controls = (s.statuses ?? []).some((x) => x.status === 'stun' || x.status === 'freeze');
   if (controls) {
     // never stun someone already disabled; prefer the hardest hitter

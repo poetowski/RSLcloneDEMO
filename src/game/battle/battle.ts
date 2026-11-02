@@ -48,6 +48,8 @@ export interface Unit {
   overdriven: boolean;
   /** turn meter granted for the end of this turn (selfTm skills) */
   pendingTm: number;
+  /** on a turn given by an ally (`grantTurn`): the meter it goes back to when the turn ends */
+  keptTm?: number;
 }
 
 export type BattleEvent =
@@ -63,6 +65,8 @@ export type BattleEvent =
   | { kind: 'dispel'; target: string; status: StatusId; hit: number }
   | { kind: 'tm'; target: string; delta: number; hit: number }
   | { kind: 'revive'; target: string; hp: number; hit: number }
+  /** an ally's skill gave it a turn, to be taken as soon as this one ends (the Astronomer Royal's Hour of Destiny) */
+  | { kind: 'extraTurn'; target: string; hit: number }
   /** a fallen champion raised by an ally's skill (the Necromancer's Raise Dead) */
   | { kind: 'raise'; target: string; hp: number; hit: number }
   /** `quiet`: the same waking of the passive reaching one more ally: its effect there, no name over its holder again */
@@ -131,6 +135,8 @@ export class Battle {
   turn = 0;
   /** the champion whose turn it is, from startTurn to endTurn */
   acting: Unit | null = null;
+  /** who takes the next turn, ahead of the meters (`grantTurn`) */
+  private granted: Unit | null = null;
 
   constructor(player: Combatant[], enemy: Combatant[], opts: BattleOptions = {}) {
     this.rng = new Rng(opts.seed ?? 1);
@@ -230,6 +236,15 @@ export class Battle {
 
   /** Fills every turn meter until someone reaches 100. Returns the actor. */
   advance(): Unit {
+    // a turn given by an ally comes first: nobody's meter moves, and its own goes back afterwards
+    const given = this.granted;
+    this.granted = null;
+    if (given?.alive) {
+      given.keptTm = given.tm;
+      given.tm = TURN_FULL;
+      this.turn++;
+      return given;
+    }
     const live = this.alive();
     let best: Unit | null = null, bestT = Infinity;
     for (const u of live) {
@@ -253,6 +268,7 @@ export class Battle {
     this.purge(u, events);
     this.brace(u, events);
     this.renewal(u, events);
+    this.alignment(u, events);
     if (this.has(u, 'poison')) this.applyDamage(u, Math.round(u.maxHp * POISON_PCT), false, 0, 0, events, 'poison');
     if (u.alive && this.has(u, 'burn')) this.applyDamage(u, Math.round(u.maxHp * BURN_PCT), false, 0, 0, events, 'burn');
     if (u.alive && this.has(u, 'regen')) this.heal(u, Math.round(u.maxHp * REGEN_PCT), 0, events);
@@ -266,8 +282,9 @@ export class Battle {
     // still the holder's turn: a Shield it gives itself now covers its next turn, like any status placed on its own turn
     this.tend(u, events);
     if (this.acting === u) this.acting = null;
-    u.tm = u.alive ? Math.min(TURN_FULL - 1, u.pendingTm) : 0;
+    u.tm = u.alive ? Math.min(TURN_FULL - 1, Math.max(u.pendingTm, u.keptTm ?? 0)) : 0;
     u.pendingTm = 0;
+    u.keptTm = undefined;
     for (const s of [...u.statuses]) {
       if (s.fresh) {
         s.fresh = false;
@@ -283,9 +300,9 @@ export class Battle {
     return events;
   }
 
-  /** Off cooldown, and a skill that raises the fallen has someone to raise. */
+  /** Off cooldown, a skill that raises the fallen has someone to raise, and one that gives a turn has someone to give it to. */
   ready(u: Unit, s: SkillDef): boolean {
-    return (u.cooldowns[s.id] ?? 0) <= 0 && (s.target !== 'fallen' || this.fallen(u).length > 0);
+    return (u.cooldowns[s.id] ?? 0) <= 0 && (s.target !== 'fallen' || this.fallen(u).length > 0) && (!s.grantTurn || this.validTargets(u, s).length > 0);
   }
 
   /** Units the actor may click for this skill (taunt is enforced here). */
@@ -299,6 +316,8 @@ export class Battle {
       case 'enemies':
         return this.foes(u);
       case 'ally': {
+        // a turn is given to someone else, who can take it (the Astronomer Royal's Hour of Destiny)
+        if (s.grantTurn) return this.allies(u).filter((a) => a !== u && !this.has(a, 'stun') && !this.has(a, 'freeze'));
         // a skill that also helps its user is aimed at someone else while anyone else stands (the
         // Walking Bush's Thicket: himself and one chosen ally; the Bellringer's Warning Toll: a Shield
         // on one ally and a heal for himself)
@@ -424,6 +443,15 @@ export class Battle {
       }
     }
     place(false, last);
+    if (skill.grantTurn && primary?.alive && primary !== actor && !asCounter) {
+      this.granted = primary;
+      // what the skill gave it counts from after the turn it gave it
+      for (const st of skill.statuses ?? []) {
+        const s = primary.statuses.find((x) => x.id === st.status);
+        if (s) s.fresh = true;
+      }
+      events.push({ kind: 'extraTurn', target: primary.uid, hit: last });
+    }
     if (skill.tmTargets) {
       for (const t of targets) {
         if (!t.alive) continue;
@@ -640,6 +668,22 @@ export class Battle {
       this.heal(a, Math.round(u.maxHp * p.value), 0, events);
       named = true;
     }
+  }
+
+  /**
+   * Alignment (passive): at the start of its holder's turn, before anything ticks and
+   * on a turn it will skip too, the other living ally lowest on turn meter gains
+   * `value` (the Astronomer Royal's Fixed Stars: 10). Alone, it does nothing.
+   */
+  private alignment(u: Unit, events: BattleEvent[]) {
+    const p = u.champion.passive;
+    if (p?.kind !== 'alignment') return;
+    const low = this.allies(u).filter((a) => a !== u).sort((x, y) => x.tm - y.tm)[0];
+    if (!low) return;
+    const before = low.tm;
+    low.tm = Math.min(TURN_FULL, low.tm + p.value);
+    events.push({ kind: 'passive', target: low.uid, name: p.name, hit: 0, effect: 'alignment', source: u.uid });
+    events.push({ kind: 'tm', target: low.uid, delta: low.tm - before, hit: 0 });
   }
 
   /**

@@ -78,6 +78,7 @@ export function auditChampion(c: ChampionDef): string[] {
     const n = SKILL_NORMS[s.slot];
     if (s.cooldown < n.cooldown[0] || s.cooldown > n.cooldown[1]) out.push(`${s.id}: cooldown ${s.cooldown} outside ${n.cooldown.join('-')}`);
     if (s.reviveAll && (s.target !== 'fallen' || !s.revive)) out.push(`${s.id}: reviveAll needs a revive on the fallen`);
+    if (s.grantTurn && s.target !== 'ally') out.push(`${s.id}: a turn is given to one chosen ally`);
     const m = totalMult(s);
     if (m > 0) {
       const [lo, hi] = isAoe(s) ? n.aoe : n.single;
@@ -106,6 +107,7 @@ export function auditChampion(c: ChampionDef): string[] {
   if (p?.kind === 'fallen' && (!p.stat || !p.max)) out.push(`${p.id}: a fallen passive needs a stat and a cap`);
   if (p?.kind === 'keen' && ((!p.statuses?.length && !p.value) || p.statuses?.some((st) => !STATUSES[st.status].buff))) out.push(`${p.id}: a keen passive gives a heal or buffs`);
   if (p?.kind === 'purge' && (p.statuses?.length || p.value)) out.push(`${p.id}: a purge passive only lifts debuffs`);
+  if (p?.kind === 'alignment' && !p.value) out.push(`${p.id}: an alignment passive needs turn meter to give`);
   if (p?.kind === 'renewal' && !p.value) out.push(`${p.id}: a renewal passive needs a heal`);
   if (p?.kind === 'immune' && (!p.immuneTo || STATUSES[p.immuneTo].buff)) out.push(`${p.id}: an immune passive names a debuff`);
   if (p?.kind === 'brace' && (!p.statuses?.length || p.statuses.some((st) => !STATUSES[st.status].buff))) out.push(`${p.id}: a brace passive gives its holder buffs`);

@@ -104,6 +104,14 @@ export const raiser = fixture('raiser', {
   skills: [undefined, undefined, skill('raise', 3, { target: 'fallen', approach: 'none', cooldown: 6, hits: [{ mult: 0 }], revive: 0.3, ai: { priority: 3 } })],
 });
 
+/** A3 gives one other ally a turn at once, with SPD Up for 2 turns, cooldown 6. */
+export const herald2 = fixture('herald2', {
+  skills: [undefined, undefined, skill('hour', 3, { target: 'ally', approach: 'none', cooldown: 6, hits: [{ mult: 0 }], statuses: [{ status: 'spd_up', turns: 2, to: 'targets' }], grantTurn: true, ai: { priority: 3 } })],
+});
+
+/** Alignment: at the start of its turn the other ally lowest on turn meter gains 10. */
+export const aligner = fixture('aligner', { passive: { id: 'alignment', name: 'Alignment', desc: '', kind: 'alignment', value: 10 } });
+
 /** A3 raises every fallen ally with 25% of its max HP, cooldown 6. */
 export const massRaiser = fixture('massRaiser', {
   skills: [undefined, undefined, skill('raiseAll', 3, { target: 'fallen', approach: 'none', cooldown: 6, hits: [{ mult: 0 }], revive: 0.25, reviveAll: true, ai: { priority: 3 } })],

@@ -61,6 +61,8 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Kept meter | the actor ends its turn with this meter instead of 0 (the Paladin's Beacon: 35%, shown over him as `+35% TURN` as his turn ends) | `selfTm`, `Unit.pendingTm` |
 | Purge | a passive that, at the start of its holder's turn, lifts one random debuff from every ally (Chief Engineer CJ's Master's Eye) | `PassiveDef.kind: 'purge'`, `Battle.purge` |
 | Brace | a passive that gives its holder statuses at the start of its turn (the Forest Gargoyle's Heartwood) | `PassiveDef.kind: 'brace'`, `Battle.brace` |
+| Given turn | a turn an ally's skill gives, taken next, ahead of the meters (the Astronomer Royal's Hour of Destiny) | `SkillDef.grantTurn`, `Battle.advance`, `Unit.keptTm` |
+| Alignment | a passive giving the other ally lowest on turn meter a share at the start of its holder's turn (Fixed Stars) | `PassiveDef.kind: 'alignment'`, `Battle.alignment` |
 | Renewal | a passive that heals every ally by a share of its holder's max HP at the start of its turn (Rootfather's Sap Rises) | `PassiveDef.kind: 'renewal'`, `Battle.renewal` |
 | Immune | a passive naming one debuff that never lands on its holder (Dead Knight Amstron's Unbreached Plate) | `PassiveDef.kind: 'immune'`, `immuneTo` |
 | Counterattack | the `counter` status, and the A1 it answers with | `counter`, `SkillResult.counter` |
@@ -415,6 +417,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C30 | A ward with a `cooldown` is ready from the start of the battle; after it answers it rests for `cooldown` of its holder's own turns, and while it rests no blow wakes it | `battle.test.ts` (rests a ward with a cooldown) |
 | INV-C31 | An enemy only (`ENEMIES`) is never in the roster (`CHAMPIONS`), the summon pool or a stage's `recruit`, and fights in at least one stage | `content.test.ts` (keeps the enemies only out of the roster) |
 | INV-C32 | A `keen` passive answers each ally's fall while its holder stands, reaching every ally still standing, the holder included | `battle.test.ts` (keens) |
+| INV-C37 | A skill with `grantTurn` gives one other living ally who can act the very next turn; no meter moves for it; when it ends the ally has the meter it had before, or more if its own skill gave more. | `Battle.advance`, `Battle.endTurn` |
 | INV-C36 | A skill with `reviveAll` raises every fallen ally of its user at once, each with its `revive` share of max HP, nothing on it and an empty turn meter; it is ready only while an ally has fallen. | `Battle.useSkill`, `Battle.ready` |
 | INV-C35 | A `renewal` passive heals every living ally by `value` x its holder's max HP at the start of the holder's turn, a skipped one too, before anything ticks; Heal Block stops it on whoever carries it. | `Battle.renewal` |
 | INV-C33 | A `reproach` passive answers a critical hit of an enemy skill on an ally of its living holder, even one that fells that ally, once per ally per skill, after the skill's last hit, with its chance, while the attacker stands; the debuff meets the attacker's RES; a holder the hit fells answers nothing | code (`Battle.reproach`); test |

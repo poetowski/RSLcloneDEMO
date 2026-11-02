@@ -212,7 +212,92 @@ function leafAt(b: Bitmap, x: number, y: number, a: number, big: boolean, ramp: 
 const LEAF: RGBA[] = MAT.green.ramp;
 const LEAF_GOLD: RGBA[] = MAT.gold.ramp;
 
+/** The Moon's face in her Eclipse: blacker than night. */
+const hexNight = MAT.nightVelvet.ramp[0];
+
 export const AZURE_CROWN_FX: Record<string, FxDef> = {
+  /** Falling Star: a star streaks down out of the sky onto the enemy and breaks on it. Light. */
+  falling_star: {
+    w: 72, h: 120, n: 10, ms: 50, ax: 0.5, ay: 0.72, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const cx = 36, cy = 86, G = ramps.gold;
+      if (i < 4) {
+        const k = (i + 1) / 4;
+        const x = Math.round(cx + 24 * (1 - k)), y = Math.round(cy - 80 * (1 - k));
+        for (let n = 0; n < 34; n++) {
+          const px = Math.round(x + (n * 24) / 80), py = y - n;
+          if (py >= 0 && dith(px, py, 1 - n / 34)) b.set(px, py, G[n < 8 ? 4 : n < 18 ? 3 : 1]);
+        }
+        burst(b, x, y, 4, 1, 5, 1, G, 0);
+      } else {
+        const k = (i - 4) / 5;
+        burst(b, cx, cy, 8, 2, 8 + k * 12, 1.2, G, k);
+        ring(b, cx, cy, 6 + k * 18, 3 + k * 8, 1.2, G, 1 - k);
+        sparks(b, cx, cy, 12, 24, k, ramps.ice, 1301, 12);
+      }
+    },
+  },
+  /** Eclipse on an enemy: a black disc slides over a small sun above it, the corona burning round it, and its shade falls. */
+  eclipse_shade: {
+    w: 64, h: 72, n: 12, ms: 65, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 32, cy = 22, G = ramps.gold;
+      const fade = i < 8 ? 1 : 1 - (i - 8) / 4;
+      const cover = Math.min(1, i / 5);
+      disc(b, cx, cy, 10, (x, y) => (dith(x, y, fade) ? G[3] : 0));
+      ring(b, cx, cy, 13 + Math.sin(t * 9), 13 + Math.sin(t * 9), 1.2, G, fade);
+      disc(b, cx + (1 - cover) * 16, cy, 10, (x, y) => (dith(x, y, fade) ? hexNight : 0));
+      if (cover >= 1) for (let k = 0; k < 16; k++) {
+        const x = Math.round(cx - 18 + ((k * 13) % 36)), y = Math.round(36 + ((k * 7) % 12) + t * 18);
+        if (dith(x, y, fade * 0.8)) b.set(x, y, ramps.dust[1]);
+      }
+    },
+  },
+  /** Her orrery flares: gold rings opening from her, the stars caught in them. Light. */
+  orrery_flare: {
+    w: 96, h: 96, n: 10, ms: 65, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const c = 48, G = ramps.gold;
+      const k = [0.3, 0.6, 1, 1, 0.9, 0.75, 0.6, 0.45, 0.3, 0.15][i];
+      burst(b, c, c, 8, 3, 5 + k * 12, 1, G, t * 0.5);
+      ring(b, c, c, 6 + t * 38, 6 + t * 38, 1.2, G, 1 - t);
+      ring(b, c, c, 4 + t * 38, 1.5 + t * 11, 1, ramps.ice, 1 - t);
+    },
+  },
+  /** Hour of Destiny on the ally: a constellation drawing itself round it, gold lines star to star, and a column of stars rising from its feet. Light. */
+  destiny_stars: {
+    w: 76, h: 100, n: 14, ms: 65, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const G = ramps.gold, I = ramps.ice;
+      const fade = i < 10 ? 1 : 1 - (i - 10) / 4;
+      const pts: [number, number][] = [[10, 84], [24, 56], [12, 30], [38, 10], [62, 32], [50, 58], [66, 84]];
+      const drawn = Math.min(pts.length - 1, t * 2.4 * (pts.length - 1));
+      for (let n = 0; n < Math.floor(drawn); n++) {
+        const [x0, y0] = pts[n], [x1, y1] = pts[n + 1];
+        const len = Math.hypot(x1 - x0, y1 - y0);
+        for (let u = 0; u <= len; u++) {
+          const x = Math.round(x0 + ((x1 - x0) * u) / len), y = Math.round(y0 + ((y1 - y0) * u) / len);
+          if (dith(x, y, fade * 0.85)) b.set(x, y, G[2]);
+        }
+      }
+      for (let n = 0; n <= Math.floor(drawn); n++) {
+        const [x, y] = pts[n];
+        if (fade > 0.2) burst(b, x, y, 4, 0, 3 + (i % 3 === n % 3 ? 2 : 0), 1, G, 0);
+      }
+      motes(b, 38, 92, 30, 84, 16, t, I, 1319);
+      motes(b, 38, 92, 22, 70, 10, t, G, 1327);
+    },
+  },
+  /** Fixed Stars on an ally: one small star comes to rest over it, and a gold ring runs round its feet. Light. */
+  fixed_star: {
+    w: 48, h: 76, n: 9, ms: 65, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const G = ramps.gold;
+      const y = Math.round(10 + Math.min(1, t * 2) * 8);
+      burst(b, 24, y, 4, 0, [3, 5, 6, 6, 5, 4, 3, 2, 2][i], 1, G, 0);
+      ring(b, 24, 68, 6 + t * 12, 2 + t * 3, 1, G, 1 - t);
+    },
+  },
   /** The Verdant Luminary's long arrow in flight (drawn pointing right; the battle turns it along its path): a pale shaft, a gold head, two green leaves for fletching. */
   luminary_arrow: {
     w: 32, h: 9, n: 1, ms: 100, ax: 0.82, ay: 0.5, loop: true,

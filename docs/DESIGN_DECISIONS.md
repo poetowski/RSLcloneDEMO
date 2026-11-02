@@ -114,6 +114,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
 | 2026-11-01 | The Verdant Luminary, an Elite Support of the Azure Crown, Bloom | 60 |
 | 2026-11-01 | Coffin's Legs (first built as the Pallbearer, then Tombstone's Legs), the Wraith and the Haruspex (first built as the Bone Augur), my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Coffin's Legs and the Haruspex his | 61-63 |
+| 2026-11-02 | The Astronomer Royal, a Heroic Support of the Azure Crown, Ember; his choice from four I proposed | 73 |
 | 2026-11-02 | The Cinder Sylph, a Heroic Support of the Ashveil Reign, Tide (my choice); her name his, from five proposed | 72 |
 | 2026-11-02 | Rootfather, a Heroic Support of the Court of Root, Ember; his brief and name | 71 |
 | 2026-11-02 | Three Elites of the Court of Root on Jakub's word: Silkfang, the Bog Troll, the Moth Seer; all mine until he sets them; the Transfusionist's healing cut | 67-70 |
@@ -4428,3 +4429,26 @@ with prongs at its head and fire burning in them in every frame.
 - Stats HP 1320, ATK 96, DEF 64, SPD 112, CRIT 2.5%, score 423. Impact 57%. Summoned.
 - Stand-ins until he sets them: Support, Tide, the skill names and texts, ATK Down as the debuff, every number, the lore
   line, and that she is summoned. A Heroic's A3 here is a whole team back on its feet: it can be used again after 6 of her turns.
+
+## 73. The Astronomer Royal (received 2026-11-02)
+
+Jakub's brief: a Heroic Support of the Azure Crown. He chose her from four I proposed: "I want Astronomer Royal. make
+sure A3 works correctly. design must be very royal, creative and supreme looking and magic".
+
+She levitates, her hem clear of the floor: the Crown's midnight velvet (`nightVelvet`, added), a train sweeping far
+behind her mapped with gold constellations and white stars; a high lace collar; a towering gold crown, jewelled, a star
+over it; silver hair and a long braid, brown skin. A gold armillary halo stands behind her head, a small sun on it, and
+two planets orbit her body, passing behind and before her; for Hour of Destiny they leave their orbit and line up above
+her. A long brass telescope is her staff, its lens alight; a star hangs over her other palm; the Crown's gold crown on her chest.
+
+- **Falling Star** (A1): one enemy, 0.9.
+- **Eclipse** (A2, CD 4): all enemies, 0.5, Slow for 2 turns, 15% of their Turn Meter taken.
+- **Hour of Destiny** (A3, CD 6, new `grantTurn`): one other ally takes a turn immediately, ahead of everyone, nobody's meter
+  moving; it is a real turn (its cooldowns and statuses tick, Poison bites), and it keeps the meter it had. SPD Up for 2
+  turns, counted after that turn. Never on herself or on an ally who is Stunned or Frozen, and not ready while there is
+  nobody to take it. The AI gives it to the hardest hitter who can act.
+- **Fixed Stars** (passive, new kind `alignment`): at the start of her turn, a skipped one too, the other ally lowest on
+  Turn Meter gains 10%. Alone, nothing.
+- Stats HP 1400, ATK 84, DEF 70, SPD 104, CRIT 2.5%, score 419. Impact 58%. Summoned.
+- Stand-ins until he sets them: the skill names and texts (those I proposed), every number, Ember, the lore line, the
+  rules read for the given turn, and that she is summoned.

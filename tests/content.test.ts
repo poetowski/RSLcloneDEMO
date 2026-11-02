@@ -76,7 +76,7 @@ describe('champions', () => {
       }
       for (const f of [c.passive?.fx, c.passive?.holderFx]) if (f) expect(fx[f], `${c.passive?.id} -> fx ${f}`).toBeTruthy();
       // a passive that acts in the flow of the fight shows on whom it reaches
-      if (c.passive && ['tend', 'ward', 'retaliate', 'remedy', 'purge', 'brace', 'renewal'].includes(c.passive.kind)) expect(c.passive.fx, `${c.passive.id} needs an fx`).toBeTruthy();
+      if (c.passive && ['tend', 'ward', 'retaliate', 'remedy', 'purge', 'brace', 'renewal', 'alignment'].includes(c.passive.kind)) expect(c.passive.fx, `${c.passive.id} needs an fx`).toBeTruthy();
     }
   });
 
@@ -347,6 +347,16 @@ describe('design decisions', () => {
     expect(a2 && [a2.slot, a2.target, a2.cooldown, totalMult(a2), a2.statuses, a2.tmTargets]).toEqual([2, 'enemies', 4, 0, [{ status: 'def_up', turns: 2, to: 'allies' }, { status: 'regen', turns: 1, to: 'allies' }], -7]);
     expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.statuses, totalMult(a3) > 0]).toEqual([3, 'enemies', 4, [{ status: 'stun', turns: 1, chance: 0.35, to: 'targets' }, { status: 'shield', turns: 2, value: 0.15, to: 'lowestMaxHp' }], true]);
     expect(c?.passive?.kind).toBe('purge');
+  });
+
+  it('has the Astronomer Royal he chose: a Heroic Support of the Azure Crown; an A1 on one enemy; an A2 on all enemies with Slow and 15% of their meter; an A3 giving one ally a turn with SPD Up; a passive feeding the ally lowest on meter', () => {
+    const c = CHAMPIONS.find((x) => x.id === 'astronomer_royal');
+    expect(c && [c.name, c.rarity, c.role, c.faction]).toEqual(['Astronomer Royal', 'heroic', 'Support', 'azure_crown']);
+    const [a1, a2, a3] = c?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, totalMult(a1) > 0]).toEqual([1, 'enemy', true]);
+    expect(a2 && [a2.slot, a2.target, a2.statuses, a2.tmTargets]).toEqual([2, 'enemies', [{ status: 'spd_down', turns: 2, to: 'targets' }], -15]);
+    expect(a3 && [a3.slot, a3.target, a3.grantTurn, a3.statuses]).toEqual([3, 'ally', true, [{ status: 'spd_up', turns: 2, to: 'targets' }]]);
+    expect(c?.passive && [c.passive.kind, c.passive.value]).toEqual(['alignment', 10]);
   });
 
   it('has the Cinder Sylph of his brief: a Heroic of the Ashveil Reign; an A1 on one enemy; an A2 debuff on all enemies; an A3 that raises all fallen allies; a passive that burns enemies', () => {
@@ -932,6 +942,7 @@ describe('summoning', () => {
     q.reliquary.recruit('sir_siroslav');
     q.reliquary.recruit('rootfather');
     q.reliquary.recruit('cinder_sylph');
+    q.reliquary.recruit('astronomer_royal');
     const odds = rarityOdds(summonPool(q));
     expect(odds.heroic).toBe(0);
     expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);

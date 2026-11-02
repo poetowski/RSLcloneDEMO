@@ -107,6 +107,8 @@ export interface SkillDef {
    * Necromancer's Raise Dead)
    */
   revive?: number;
+  /** with `target: 'ally'`: that ally takes a turn immediately, ahead of everyone, nobody's meter moving, and keeps the meter it had (the Astronomer Royal's Hour of Destiny); never the actor, nor an ally who cannot act */
+  grantTurn?: boolean;
   /** with `target: 'fallen'`: raises every fallen ally, not one at random (the Cinder Sylph's Rise From Ash) */
   reviveAll?: boolean;
   /** removes every buff from the targets before the first hit */
@@ -197,8 +199,11 @@ export interface PassiveDef {
    * renewal:   at the start of each of the champion's turns, a skipped one too, every ally (the
    *            champion included) heals by `value` x the champion's max HP (Rootfather's Sap
    *            Rises: 10%, 2026-11-02)
+   * alignment: at the start of each of the champion's turns, a skipped one too, the other ally
+   *            lowest on turn meter gains `value` turn meter (the Astronomer Royal's Fixed Stars:
+   *            10, 2026-11-02)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune' | 'keen' | 'reproach' | 'renewal';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune' | 'keen' | 'reproach' | 'renewal' | 'alignment';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
   /** rebuke, tend and ward: the champion's own turns the passive rests after it acts (a ward is ready from the start) */

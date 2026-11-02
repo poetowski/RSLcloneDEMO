@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest';
 import { decide } from '../src/game/battle/ai';
 import { Battle, combatants, landShare } from '../src/game/battle/battle';
 import { flatten, simulate } from '../src/game/battle/sim';
-import { ALL_CHAMPIONS, cinderSylph, necromancer, rootfather, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
+import { ALL_CHAMPIONS, astronomerRoyal, paladin, cinderSylph, necromancer, rootfather, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
+import { aligner, herald2, balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -1040,6 +1040,130 @@ describe('statuses', () => {
     expect(alone.has(her, 'regen')).toBe(false);
   });
 
+  describe('grantTurn', () => {
+    const hour = skill(herald2, 'hour');
+    const setup = () => {
+      const b = new Battle(combatants([herald2, guard, twin]), combatants([striker, cleaver]), { seed: 3 });
+      const me = b.get('p0'), ally = b.get('p1'), other = b.get('p2'), foe = b.get('e0');
+      me.tm = 100;
+      ally.tm = 40;
+      other.tm = 90;
+      foe.tm = 99;
+      b.get('e1').tm = 70;
+      return { b, me, ally, other, foe };
+    };
+
+    it('gives the chosen ally the very next turn, ahead of everyone, with no meter moving', () => {
+      const { b, me, ally, other, foe } = setup();
+      b.startTurn(me);
+      const r = b.useSkill(me, hour, ally.uid);
+      expect(r.events.some((e) => e.kind === 'extraTurn' && e.target === ally.uid)).toBe(true);
+      b.endTurn(me);
+      const turnBefore = b.turn;
+      expect(b.advance()).toBe(ally);
+      expect(b.turn).toBe(turnBefore + 1);
+      expect(other.tm).toBe(90);
+      expect(foe.tm).toBe(99);
+    });
+
+    it('leaves the ally the meter it had when the given turn ends, and the queue goes on as before', () => {
+      const { b, me, ally, foe } = setup();
+      b.startTurn(me);
+      b.useSkill(me, hour, ally.uid);
+      b.endTurn(me);
+      expect(b.advance()).toBe(ally);
+      b.startTurn(ally);
+      b.endTurn(ally);
+      expect(ally.tm).toBe(40);
+      expect(ally.keptTm).toBeUndefined();
+      // once only: the next turn is the meters' again
+      expect(b.advance()).toBe(foe);
+    });
+
+    it('takes the ally a real turn: its skills are usable, its cooldowns and statuses tick', () => {
+      const { b, me, ally } = setup();
+      ally.cooldowns.x = 2;
+      b.addStatus(ally, 'poison', 2, 0, 'e0');
+      b.startTurn(me);
+      b.useSkill(me, hour, ally.uid);
+      b.endTurn(me);
+      b.advance();
+      const hp = ally.hp;
+      const st = b.startTurn(ally);
+      expect(st.skip).toBe(false);
+      expect(ally.hp).toBeLessThan(hp);
+      b.endTurn(ally);
+      expect(ally.cooldowns.x).toBe(1);
+      expect(b.has(ally, 'poison')).toBe(true);
+    });
+
+    it('counts its SPD Up from after the given turn', () => {
+      const { b, me, ally } = setup();
+      b.startTurn(me);
+      b.useSkill(me, hour, ally.uid);
+      b.endTurn(me);
+      b.advance();
+      b.startTurn(ally);
+      b.endTurn(ally);
+      expect(ally.statuses.find((s) => s.id === 'spd_up')?.turns).toBe(2);
+      b.startTurn(ally);
+      b.endTurn(ally);
+      b.startTurn(ally);
+      b.endTurn(ally);
+      expect(b.has(ally, 'spd_up')).toBe(false);
+    });
+
+    it('is never aimed at its user or at an ally who cannot act, and waits while there is nobody to give it to', () => {
+      const { b, me, ally, other } = setup();
+      expect(b.validTargets(me, hour).map((u) => u.uid)).toEqual([ally.uid, other.uid]);
+      b.addStatus(ally, 'stun', 1, 0, 'e0');
+      expect(b.validTargets(me, hour).map((u) => u.uid)).toEqual([other.uid]);
+      b.addStatus(other, 'freeze', 1, 0, 'e0');
+      expect(b.ready(me, hour)).toBe(false);
+      const alone = new Battle(combatants([herald2]), combatants([striker]), { seed: 3 });
+      expect(alone.ready(alone.get('p0'), hour)).toBe(false);
+      // whatever is asked, the turn goes to someone who may take it
+      const fresh = setup();
+      fresh.b.useSkill(fresh.me, hour, fresh.me.uid);
+      fresh.b.endTurn(fresh.me);
+      expect(fresh.b.advance()).toBe(fresh.ally);
+    });
+
+    it('is lost if the ally has fallen before it could take the turn', () => {
+      const { b, me, ally, foe } = setup();
+      b.startTurn(me);
+      b.useSkill(me, hour, ally.uid);
+      b.endTurn(me);
+      ally.alive = false;
+      ally.hp = 0;
+      expect(b.advance()).toBe(foe);
+    });
+
+    it('goes on its cooldown, and the AI gives it to the hardest hitter who can act', () => {
+      const { b, me, ally, other } = setup();
+      const d = decide(b, me);
+      expect(d.skill.id).toBe('hour');
+      expect(d.target).toBe([ally, other].sort((x, y) => b.attack(y) - b.attack(x))[0].uid);
+      b.useSkill(me, hour, d.target);
+      expect(b.ready(me, hour)).toBe(false);
+    });
+  });
+
+  it('alignment gives the other ally lowest on turn meter its share at the start of the turn, never its holder, and alone does nothing', () => {
+    const b = new Battle(combatants([aligner, guard, twin]), combatants([striker]), { seed: 3 });
+    const me = b.get('p0'), a = b.get('p1'), c = b.get('p2');
+    me.tm = 0;
+    a.tm = 50;
+    c.tm = 20;
+    const st = b.startTurn(me);
+    expect(c.tm).toBe(30);
+    expect(a.tm).toBe(50);
+    expect(me.tm).toBe(0);
+    expect(st.events.some((e) => e.kind === 'tm' && e.target === c.uid)).toBe(true);
+    const alone = new Battle(combatants([aligner]), combatants([striker]), { seed: 3 });
+    expect(alone.startTurn(alone.get('p0')).events).toHaveLength(0);
+  });
+
   it('reviveAll raises every fallen ally at once, clean and with an empty turn meter, and is ready only while one has fallen', () => {
     const raise = skill(massRaiser, 'raiseAll');
     const b = new Battle(combatants([massRaiser, guard, twin]), ENEMY, { seed: 3 });
@@ -1063,6 +1187,20 @@ describe('statuses', () => {
 
   it('ends a battle between two teams whose healers can raise everyone', () => {
     const team = [cinderSylph, necromancer, rootfather];
+    // and two who hand each other turns still run out of them
+    for (const t of [[astronomerRoyal, paladin, rootfather], team]) {
+      const m = new Battle(combatants(t), combatants(t), { seed: 12 });
+      for (let i = 0; !m.winner() && i < 3000; i++) {
+        const a = m.advance();
+        const st = m.startTurn(a);
+        if (a.alive && !st.skip && !m.winner()) {
+          const d = decide(m, a);
+          m.useSkill(a, d.skill, d.target);
+        }
+        m.endTurn(a);
+      }
+      expect(m.winner()).toBeTruthy();
+    }
     const b = new Battle(combatants(team), combatants(team), { seed: 9 });
     for (let turns = 0; !b.winner() && turns < 3000; turns++) {
       const a = b.advance();

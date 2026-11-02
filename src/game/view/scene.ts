@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['cinder_touch', 'ash_crown', 'rise_from_ash', 'smoulder', 'seed_flare', 'seed_quicken', 'blight_seed', 'sap_rises', 'silk_bite', 'tigress_rake', 'tigress_rake_back', 'hex_ram', 'hex_pulse', 'needle_prick', 'luminary_strike', 'luminary_seal', 'ofentol_hammer', 'ofentol_scythe', 'ofentol_plate', 'bolt_strike', 'armour_breach', 'hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare', 'grudge_runes', 'searing_cut', 'beacon_flare', 'beacon_glare', 'beacon_ward', 'trial_blaze', 'trial_flames', 'jolt_blow', 'jolt_slam', 'decree_sigil', 'decree_lull', 'decree_ward', 'earth_surge', 'surge_plate', 'eye_cleared', 'talon_rend', 'leaf_gale', 'dread_howl', 'heartwood_set', 'dead_thrust', 'grave_pierce', 'bastion_call', 'bastion_ward', 'pierce_shot', 'watch_light', 'pall_ward', 'omen_skull', 'omen_favour', 'command_call', 'line_held', 'charge_feathers']);
+const ADDITIVE = new Set(['falling_star', 'orrery_flare', 'destiny_stars', 'fixed_star', 'cinder_touch', 'ash_crown', 'rise_from_ash', 'smoulder', 'seed_flare', 'seed_quicken', 'blight_seed', 'sap_rises', 'silk_bite', 'tigress_rake', 'tigress_rake_back', 'hex_ram', 'hex_pulse', 'needle_prick', 'luminary_strike', 'luminary_seal', 'ofentol_hammer', 'ofentol_scythe', 'ofentol_plate', 'bolt_strike', 'armour_breach', 'hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare', 'grudge_runes', 'searing_cut', 'beacon_flare', 'beacon_glare', 'beacon_ward', 'trial_blaze', 'trial_flames', 'jolt_blow', 'jolt_slam', 'decree_sigil', 'decree_lull', 'decree_ward', 'earth_surge', 'surge_plate', 'eye_cleared', 'talon_rend', 'leaf_gale', 'dread_howl', 'heartwood_set', 'dead_thrust', 'grave_pierce', 'bastion_call', 'bastion_ward', 'pierce_shot', 'watch_light', 'pall_ward', 'omen_skull', 'omen_favour', 'command_call', 'line_held', 'charge_feathers']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -195,11 +195,12 @@ export class BattleScene {
   }
 
   private async endTurn(actor: Unit) {
+    const kept = actor.keptTm ?? 0;
     const ev = this.battle.endTurn(actor);
     const v = this.view(actor.uid);
     v.tm = actor.tm;
     // a skill that fills its user's own turn meter (`selfTm`, the Paladin's Beacon) shows it as the turn ends
-    if (actor.alive && actor.tm > 0) this.fx.text(v.uid, v.x, v.head().y - 30 - (v.boss ? 8 : 0), `+${Math.round(actor.tm)}% TURN`, { color: '#8fd0ff' });
+    if (actor.alive && actor.tm > kept) this.fx.text(v.uid, v.x, v.head().y - 30 - (v.boss ? 8 : 0), `+${Math.round(actor.tm)}% TURN`, { color: '#8fd0ff' });
     for (const e of ev) this.applyEvent(e, null);
     this.syncStatuses(v);
     // a passive acting at the end of the turn (the Jungle Herder's ward) is given a moment to be seen
@@ -786,6 +787,9 @@ export class BattleScene {
       case 'expire':
         this.removeStatus(v, e.status);
         break;
+      case 'extraTurn':
+        this.fx.text(v.uid, v.x, top() - 6, 'EXTRA TURN!', { color: '#ffe890', variant: 'display', outline: '#1a1440' });
+        break;
       case 'tm':
         v.tm = this.battle.get(v.uid).tm;
         this.fx.text(v.uid, v.x, top(), `${e.delta > 0 ? '+' : ''}${Math.round(e.delta)}% TURN`, { color: '#8fd0ff' });
@@ -828,7 +832,7 @@ export class BattleScene {
         break;
       case 'passive': {
         const src = e.source ? this.views.get(e.source) : undefined;
-        if (e.effect === 'tend' || e.effect === 'ward' || e.effect === 'retaliate' || e.effect === 'remedy' || e.effect === 'defy' || e.effect === 'purge' || e.effect === 'brace' || e.effect === 'keen' || e.effect === 'reproach' || e.effect === 'renewal') {
+        if (e.effect === 'tend' || e.effect === 'ward' || e.effect === 'retaliate' || e.effect === 'remedy' || e.effect === 'defy' || e.effect === 'purge' || e.effect === 'brace' || e.effect === 'keen' || e.effect === 'reproach' || e.effect === 'renewal' || e.effect === 'alignment') {
           // a passive acting in the flow of the fight acts often: no banner, its name over its holder, then its
           // effects as its data names them, on the holder (the Jungle Herder's bell) and on whom it reaches
           // (the ally it shields or soothes, the enemy it answers)
