@@ -51,7 +51,7 @@ export interface BattleHooks {
 }
 
 /** Effects that glow (drawn additively). */
-const ADDITIVE = new Set(['seed_flare', 'seed_quicken', 'blight_seed', 'sap_rises', 'silk_bite', 'tigress_rake', 'tigress_rake_back', 'hex_ram', 'hex_pulse', 'needle_prick', 'luminary_strike', 'luminary_seal', 'ofentol_hammer', 'ofentol_scythe', 'ofentol_plate', 'bolt_strike', 'armour_breach', 'hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare', 'grudge_runes', 'searing_cut', 'beacon_flare', 'beacon_glare', 'beacon_ward', 'trial_blaze', 'trial_flames', 'jolt_blow', 'jolt_slam', 'decree_sigil', 'decree_lull', 'decree_ward', 'earth_surge', 'surge_plate', 'eye_cleared', 'talon_rend', 'leaf_gale', 'dread_howl', 'heartwood_set', 'dead_thrust', 'grave_pierce', 'bastion_call', 'bastion_ward', 'pierce_shot', 'watch_light', 'pall_ward', 'omen_skull', 'omen_favour', 'command_call', 'line_held', 'charge_feathers']);
+const ADDITIVE = new Set(['cinder_touch', 'ash_crown', 'rise_from_ash', 'smoulder', 'seed_flare', 'seed_quicken', 'blight_seed', 'sap_rises', 'silk_bite', 'tigress_rake', 'tigress_rake_back', 'hex_ram', 'hex_pulse', 'needle_prick', 'luminary_strike', 'luminary_seal', 'ofentol_hammer', 'ofentol_scythe', 'ofentol_plate', 'bolt_strike', 'armour_breach', 'hit', 'chi', 'holy', 'heal', 'heal_sun', 'fire_burst', 'revive', 'counter', 'dispel', 'vigil', 'shield_up', 'sun_orb', 'spear_thrust', 'spear_spiral', 'javelin_burst', 'sound_burst', 'rhythm', 'rhythm_pulse', 'crescendo', 'magnet_pulse', 'starfall', 'overdrive', 'sword_cut', 'sword_sweep', 'cold_flare', 'blade_cut', 'blade_cut_rise', 'rations', 'long_cut', 'bite', 'bay', 'tonic', 'snap', 'rend', 'root_lash', 'staff_blow', 'quell', 'crook_strike', 'bellwether', 'banner_strike', 'rally', 'cleave', 'crimson_cut', 'onrush', 'onrush_gust', 'herd_bell', 'herd_ward', 'flag_ward', 'mote_burst', 'mote_flare', 'quicken', 'bitter_motes', 'gore', 'war_bellow', 'thick_hide', 'cleansing_rite', 'keepers_balm', 'toll_rings', 'warning_toll', 'last_peal', 'tome_flare', 'grudge_runes', 'searing_cut', 'beacon_flare', 'beacon_glare', 'beacon_ward', 'trial_blaze', 'trial_flames', 'jolt_blow', 'jolt_slam', 'decree_sigil', 'decree_lull', 'decree_ward', 'earth_surge', 'surge_plate', 'eye_cleared', 'talon_rend', 'leaf_gale', 'dread_howl', 'heartwood_set', 'dead_thrust', 'grave_pierce', 'bastion_call', 'bastion_ward', 'pierce_shot', 'watch_light', 'pall_ward', 'omen_skull', 'omen_favour', 'command_call', 'line_held', 'charge_feathers']);
 
 export class BattleScene {
   readonly clock = new Clock();
@@ -285,8 +285,8 @@ export class BattleScene {
       }
       // a skill that raises the fallen needs someone fallen: the demo fells the user's first ally
       if (skill.revive) {
-        const ally = this.battle.allies(actor).find((a) => a !== actor);
-        if (ally) {
+        const others = this.battle.allies(actor).filter((a) => a !== actor);
+        for (const ally of skill.reviveAll ? others : others.slice(0, 1)) {
           ally.alive = false;
           ally.hp = 0;
           ally.tm = 0;
@@ -1013,7 +1013,7 @@ export class BattleScene {
       const slots: SkillSlot[] = c.actor.champion.skills.map((s) => ({ skill: s, cooldown: c.actor.cooldowns[s.id] ?? 0, selected: s === c.skill, blocked: !this.battle.ready(c.actor, s) }));
       hud.drawSkills(ctx, slots, (s) => this.pickSkill(s), this.t);
       const group = c.skill.target === 'enemies' || c.skill.target === 'allies';
-      hud.drawPrompt(ctx, c.skill.target === 'fallen' ? 'Click the skill again: a fallen ally rises' : group ? 'Click a target or the skill again' : c.skill.target === 'ally' ? 'Choose an ally' : 'Choose a target');
+      hud.drawPrompt(ctx, c.skill.target === 'fallen' ? (c.skill.reviveAll ? 'Click the skill again: the fallen rise' : 'Click the skill again: a fallen ally rises') : group ? 'Click a target or the skill again' : c.skill.target === 'ally' ? 'Choose an ally' : 'Choose a target');
       for (const v of this.views.values()) {
         // the fallen a skill raises are chosen at random, not clicked
         if (!valid.has(v.uid) || v.dead) continue;

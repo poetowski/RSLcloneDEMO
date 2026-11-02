@@ -104,6 +104,11 @@ export const raiser = fixture('raiser', {
   skills: [undefined, undefined, skill('raise', 3, { target: 'fallen', approach: 'none', cooldown: 6, hits: [{ mult: 0 }], revive: 0.3, ai: { priority: 3 } })],
 });
 
+/** A3 raises every fallen ally with 25% of its max HP, cooldown 6. */
+export const massRaiser = fixture('massRaiser', {
+  skills: [undefined, undefined, skill('raiseAll', 3, { target: 'fallen', approach: 'none', cooldown: 6, hits: [{ mult: 0 }], revive: 0.25, reviveAll: true, ai: { priority: 3 } })],
+});
+
 /** Two-hit A1 rolling Poison on every hit; A3 ends the turn with 25% turn meter. */
 export const stalker = fixture('stalker', {
   stats: { spd: 118 },

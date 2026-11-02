@@ -349,6 +349,16 @@ describe('design decisions', () => {
     expect(c?.passive?.kind).toBe('purge');
   });
 
+  it('has the Cinder Sylph of his brief: a Heroic of the Ashveil Reign; an A1 on one enemy; an A2 debuff on all enemies; an A3 that raises all fallen allies; a passive that burns enemies', () => {
+    const c = CHAMPIONS.find((x) => x.id === 'cinder_sylph');
+    expect(c && [c.name, c.rarity, c.faction]).toEqual(['Cinder Sylph', 'heroic', 'ashveil_reign']);
+    const [a1, a2, a3] = c?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, totalMult(a1) > 0]).toEqual([1, 'enemy', true]);
+    expect(a2 && [a2.slot, a2.target, a2.statuses]).toEqual([2, 'enemies', [{ status: 'atk_down', turns: 2, to: 'targets' }]]);
+    expect(a3 && [a3.slot, a3.target, a3.reviveAll, a3.revive! > 0]).toEqual([3, 'fallen', true, true]);
+    expect(c?.passive && [c.passive.kind, c.passive.statuses]).toEqual(['retaliate', [{ status: 'burn', turns: 2 }]]);
+  });
+
   it('has Rootfather of his brief: a Heroic Support of the Court of Root, Ember; an A1 on all enemies; an A2 of Slow for 2 turns on all enemies and 20% Turn Meter for all allies, cooldown 4; an A3 on one enemy that strips its buffs and places Poison for 2 turns; a passive healing all allies for 10% of his max HP at the start of his turn', () => {
     const c = CHAMPIONS.find((x) => x.id === 'rootfather');
     expect(c && [c.name, c.rarity, c.role, c.faction, c.affinity]).toEqual(['Rootfather', 'heroic', 'Support', 'court_of_root', 'ember']);
@@ -921,6 +931,7 @@ describe('summoning', () => {
     q.reliquary.recruit('dead_knight_amstron');
     q.reliquary.recruit('sir_siroslav');
     q.reliquary.recruit('rootfather');
+    q.reliquary.recruit('cinder_sylph');
     const odds = rarityOdds(summonPool(q));
     expect(odds.heroic).toBe(0);
     expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);

@@ -77,6 +77,7 @@ export function auditChampion(c: ChampionDef): string[] {
     if (s.slot !== i + 1) out.push(`${s.id}: slot ${s.slot} in position ${i + 1}`);
     const n = SKILL_NORMS[s.slot];
     if (s.cooldown < n.cooldown[0] || s.cooldown > n.cooldown[1]) out.push(`${s.id}: cooldown ${s.cooldown} outside ${n.cooldown.join('-')}`);
+    if (s.reviveAll && (s.target !== 'fallen' || !s.revive)) out.push(`${s.id}: reviveAll needs a revive on the fallen`);
     const m = totalMult(s);
     if (m > 0) {
       const [lo, hi] = isAoe(s) ? n.aoe : n.single;

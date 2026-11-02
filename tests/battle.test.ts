@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest';
 import { decide } from '../src/game/battle/ai';
 import { Battle, combatants, landShare } from '../src/game/battle/battle';
 import { flatten, simulate } from '../src/game/battle/sim';
-import { ALL_CHAMPIONS, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
+import { ALL_CHAMPIONS, cinderSylph, necromancer, rootfather, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
+import { balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -1038,6 +1038,42 @@ describe('statuses', () => {
     alone.startTurn(her);
     alone.endTurn(her);
     expect(alone.has(her, 'regen')).toBe(false);
+  });
+
+  it('reviveAll raises every fallen ally at once, clean and with an empty turn meter, and is ready only while one has fallen', () => {
+    const raise = skill(massRaiser, 'raiseAll');
+    const b = new Battle(combatants([massRaiser, guard, twin]), ENEMY, { seed: 3 });
+    const me = b.get('p0'), a = b.get('p1'), c = b.get('p2');
+    expect(b.ready(me, raise)).toBe(false);
+    for (const u of [a, c]) {
+      u.alive = false;
+      u.hp = 0;
+      u.tm = 50;
+    }
+    expect(b.ready(me, raise)).toBe(true);
+    const r = b.useSkill(me, raise);
+    expect(r.events.filter((e) => e.kind === 'raise')).toHaveLength(2);
+    for (const u of [a, c]) {
+      expect(u.alive).toBe(true);
+      expect(u.hp).toBe(Math.round(u.maxHp * 0.25));
+      expect(u.tm).toBe(0);
+    }
+    expect(b.ready(me, raise)).toBe(false);
+  });
+
+  it('ends a battle between two teams whose healers can raise everyone', () => {
+    const team = [cinderSylph, necromancer, rootfather];
+    const b = new Battle(combatants(team), combatants(team), { seed: 9 });
+    for (let turns = 0; !b.winner() && turns < 3000; turns++) {
+      const a = b.advance();
+      const st = b.startTurn(a);
+      if (a.alive && !st.skip && !b.winner()) {
+        const d = decide(b, a);
+        b.useSkill(a, d.skill, d.target);
+      }
+      b.endTurn(a);
+    }
+    expect(b.winner()).toBeTruthy();
   });
 
   it('renewal heals every hurt ally by a share of its holder max HP at the start of its turn, a skipped one too, unless Heal Block stops it', () => {

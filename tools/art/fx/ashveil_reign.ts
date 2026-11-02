@@ -28,7 +28,7 @@
 import { ACCENT, MAT } from '../palette.ts';
 import { dith, ellipseFill, ellipseRing, line, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, hex, RGBA, rng } from '../raster.ts';
-import { burst, cut, FxDef, motes, ramps, ring, soundRings, sparks, W } from './kit.ts';
+import { burst, cut, flame, FxDef, motes, ramps, ring, soundRings, sparks, W } from './kit.ts';
 
 const DU = ramps.dust;
 /** A dull streak: grey to a pale core, no hue of its own. */
@@ -79,7 +79,92 @@ function blackMote(b: Bitmap, x: number, y: number, big: boolean, k: number) {
   }
 }
 
+/** The Cinder Sylph's coal and embers, and her ash. */
+const FI = ramps.fire;
+const SM = ramps.smoke;
+
 export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
+  /** Cinder Touch in flight: a live cinder, a thread of sparks behind it (drawn pointing right). */
+  cinder_mote: {
+    w: 20, h: 9, n: 2, ms: 70, ax: 0.75, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      for (const [x, y] of [[2, 4], [5, 3 + i], [8, 5 - i], [10, 4]] as const) b.set(x + i, y, FI[1]);
+      for (const [x, y, k] of [[14, 3, 2], [15, 3, 3], [13, 4, 2], [14, 4, 3], [15, 4, 4], [16, 4, 3], [14, 5, 2], [15, 5, 2]] as const) b.set(x, y, FI[k]);
+    },
+  },
+  /** Cinder Touch lands: a small hot flash, sparks flung off and falling. Light. */
+  cinder_touch: {
+    w: 56, h: 56, n: 7, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const c = 28;
+      if (i < 3) burst(b, c, c, 7, 1, [7, 13, 9][i], 1, FI, 0.4);
+      sparks(b, c, c, 12, 22, t, FI, 1201, 16);
+    },
+  },
+  /** Falling Ash from her wings: a low gust of ash thrown out and thinning. */
+  ash_beat: {
+    w: 96, h: 56, n: 8, ms: 70, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t) => {
+      ring(b, 48, 28, 8 + t * 38, 3 + t * 18, 1.4, SM, 1 - t * 0.8);
+      motes(b, 48, 30, 70, -14, 14, t, DU, 1213);
+    },
+  },
+  /** Falling Ash on an enemy: grey flakes coming down over it, turning, a few still lit. */
+  falling_ash: {
+    w: 60, h: 92, n: 12, ms: 70, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const fade = i < 8 ? 1 : 1 - (i - 8) / 4;
+      for (let k = 0; k < 22; k++) {
+        const x = Math.round(30 + Math.sin(k * 3.7) * 22 + Math.sin(t * 7 + k) * 2.4);
+        const y = Math.round(((k * 19) % 34) + t * 52);
+        if (!dith(x, y, fade)) continue;
+        const hot = k % 7 === 0;
+        b.set(x, y, hot ? FI[2] : DU[3 + (k % 2)]);
+        if (k % 2) b.set(x + (i % 2 ? 1 : -1), y, hot ? FI[0] : DU[2]);
+      }
+    },
+  },
+  /** Rise From Ash, over her: a crown of embers opening round the coal. Light. */
+  ash_crown: {
+    w: 84, h: 84, n: 12, ms: 70, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const c = 42;
+      const k = [0.3, 0.6, 1, 1, 1, 0.9, 0.8, 0.7, 0.55, 0.4, 0.25, 0.1][i];
+      burst(b, c, c, 10, 4, 6 + k * 18, 1, FI, t * 0.4);
+      ring(b, c, c, 6 + t * 30, 6 + t * 30, 1.2, FI, 1 - t);
+    },
+  },
+  /** Rise From Ash, on each of the fallen: ash whirling up from the ground in a column, embers in it, a ring of fire closing at the feet. */
+  rise_from_ash: {
+    w: 80, h: 108, n: 14, ms: 70, ax: 0.5, ay: 1, pad: [2, 2, 10, 2],
+    draw: (b, t, i) => {
+      const cx = 40, gy = 106;
+      const open = Math.min(1, i / 3);
+      const fade = i < 10 ? 1 : 1 - (i - 10) / 4;
+      ellipseRing(b, cx, gy - 3, 8 + open * 20, 2.4 + open * 5.4, 1.8, (x, y, a) => (dith(x, y, fade) ? FI[Math.sin(a * 3 + t * 6) > 0 ? 3 : 1] : 0));
+      for (let k = 0; k < 34; k++) {
+        const a = (k / 34) * Math.PI * 2 * 3 + t * 8;
+        const h = (t * 1.3 + k / 34) % 1;
+        if (h > open * 1.2) continue;
+        const rr = 20 * (1 - h * 0.55);
+        const x = Math.round(cx + Math.cos(a) * rr), y = Math.round(gy - 4 - h * 90 + Math.sin(a) * 3);
+        if (!dith(x, y, fade * (1 - h * 0.5))) continue;
+        b.set(x, y, k % 3 === 0 ? FI[2 + (k % 2)] : DU[2 + (k % 3)]);
+      }
+    },
+  },
+  /** Smoulder on the attacker: small flames licking up round it and going out, sparks above. Light. */
+  smoulder: {
+    w: 56, h: 72, n: 10, ms: 65, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const gy = 66;
+      const h = [8, 16, 24, 28, 28, 24, 18, 12, 7, 3][i];
+      flame(b, 18, gy, h * 0.8, 5, i * 0.9, FI);
+      flame(b, 29, gy, h, 6, i * 0.9 + 2, FI);
+      flame(b, 39, gy, h * 0.7, 4, i * 0.9 + 4, FI);
+      motes(b, 28, gy - 18, 28, 34, 7, t, FI, 1231);
+    },
+  },
   /** Rusty Hack: a dull cut hacked down through the target, torn where the notches bite, rust flaking off and falling. */
   rusty_hack: {
     w: 80, h: 80, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 14, 6],

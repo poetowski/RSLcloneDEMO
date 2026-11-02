@@ -329,9 +329,10 @@ export class Battle {
       targets = primary ? [primary] : [];
     } else if (skill.target === 'fallen') {
       // one fallen ally, at random: nobody chooses which (the Necromancer's Raise Dead)
+      // or, with `reviveAll`, every one of them (the Cinder Sylph's Rise From Ash)
       const fallen = this.fallen(actor);
-      primary = fallen.length ? this.rng.pick(fallen) : undefined;
-      targets = primary ? [primary] : [];
+      primary = fallen.length ? (skill.reviveAll ? fallen[0] : this.rng.pick(fallen)) : undefined;
+      targets = skill.reviveAll ? fallen : primary ? [primary] : [];
     } else {
       targets = this.validTargets(actor, skill);
     }

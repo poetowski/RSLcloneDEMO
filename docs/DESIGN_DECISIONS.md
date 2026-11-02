@@ -114,6 +114,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
 | 2026-11-01 | The Verdant Luminary, an Elite Support of the Azure Crown, Bloom | 60 |
 | 2026-11-01 | Coffin's Legs (first built as the Pallbearer, then Tombstone's Legs), the Wraith and the Haruspex (first built as the Bone Augur), my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Coffin's Legs and the Haruspex his | 61-63 |
+| 2026-11-02 | The Cinder Sylph, a Heroic Support of the Ashveil Reign, Tide (my choice); her name his, from five proposed | 72 |
 | 2026-11-02 | Rootfather, a Heroic Support of the Court of Root, Ember; his brief and name | 71 |
 | 2026-11-02 | Three Elites of the Court of Root on Jakub's word: Silkfang, the Bog Troll, the Moth Seer; all mine until he sets them; the Transfusionist's healing cut | 67-70 |
 | 2026-11-02 | Three Elites of the Sanguine Dominion on Jakub's word: the War Tigress, the Hex Warden, the Transfusionist; all mine until he sets them | 65-67 |
@@ -4403,3 +4404,27 @@ round his boots and growing into the ground; a crooked wooden staff with a lumin
   of it, and even at A1 0.3 it was 60%. Summoned.
 - Stand-ins until he sets them: the skill names and texts, A3's multiplier and cooldown, the stats, the lore line, and
   that he is summoned. Read by the game: speed down is Slow; "all allies" includes him; the debuffs are certain, meeting RES.
+
+## 72. The Cinder Sylph (received 2026-11-02)
+
+Jakub's brief: a Heroic of the Ashveil Reign, "able to revive all dead allies", her signature A3; an A1 on a single
+target, an A2 global debuff, a passive burning enemies; "creative design", "it can be demonic fairy female or
+something". Affinity and names left to me: he chose this name from Vespera Ashwing, the Cinder Sylph, Morrowmoth, Lady
+Emberwane and Nyx Kindlewing. A first drawing as a small burned fairy "looks like fairy tale": on his word she is "more
+demonic and scary", with "a more robust flame scepter".
+
+Tall and gaunt, hovering with taloned feet off the floor; grey-black burned skin (`skinCinder`, added), ribs with fire
+between them; a skull of a face, hollow sockets with a burning point, a wide grin of teeth; great ringed horns, hair
+burning up off her head, bone spikes at the shoulder, long claws; two great bat wings burned to their bones, torn
+membrane (`emberMembrane`, added), their tips alight; a barbed tail with a blade of bone; a heavy iron scepter, banded,
+with prongs at its head and fire burning in them in every frame.
+
+- **Cinder Touch** (A1): one enemy, 1.0.
+- **Falling Ash** (A2, CD 4): ATK Down on all enemies for 2 turns. No attack.
+- **Rise From Ash** (A3, CD 6, new `reviveAll`): every fallen ally rises at once with 25% of its max HP, nothing on it, an
+  empty Turn Meter. Ready only while an ally has fallen.
+- **Smoulder** (passive, `retaliate`): when an enemy attack hits her and leaves her standing, a 50% chance of Burn on it
+  for 2 turns.
+- Stats HP 1320, ATK 96, DEF 64, SPD 112, CRIT 2.5%, score 423. Impact 57%. Summoned.
+- Stand-ins until he sets them: Support, Tide, the skill names and texts, ATK Down as the debuff, every number, the lore
+  line, and that she is summoned. A Heroic's A3 here is a whole team back on its feet: it can be used again after 6 of her turns.

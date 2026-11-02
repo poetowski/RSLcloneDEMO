@@ -86,6 +86,7 @@ The roster today:
 | Sir Siroslav (`sir_siroslav`) | Heroic | Ember | Support | Sanguine Dominion | summoned |
 | Rootfather (`rootfather`) | Heroic | Ember | Support | Court of Root | summoned |
 | Forest Gargoyle (`forest_gargoyle`) | Heroic | Tide | Tank | Court of Root (read from his "root") | summoned |
+| Cinder Sylph (`cinder_sylph`) | Heroic | Tide (a stand-in) | Support (a stand-in) | Ashveil Reign | summoned |
 | Dead Knight Amstron (`dead_knight_amstron`) | Heroic | Ember | Tank | Ashveil Reign | summoned |
 | Strongman (`strongman`) | Common | Tide | Damage | Azure Crown | summoned |
 | Town Guard (`town_guard`) | Common | Ember | Tank | Azure Crown | summoned |

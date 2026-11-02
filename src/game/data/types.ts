@@ -107,6 +107,8 @@ export interface SkillDef {
    * Necromancer's Raise Dead)
    */
   revive?: number;
+  /** with `target: 'fallen'`: raises every fallen ally, not one at random (the Cinder Sylph's Rise From Ash) */
+  reviveAll?: boolean;
   /** removes every buff from the targets before the first hit */
   stripBuffs?: boolean;
   /** heals the actor by this fraction of damage dealt */
