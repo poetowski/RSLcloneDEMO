@@ -258,3 +258,6 @@ export const fencer = (chance: number) =>
   fixture(`fencer_${chance}`, {
     skills: [skill('flourish', 1, { hits: [{ mult: 0.5 }, { mult: 0.5 }, { mult: 0.5 }], tmPerHit: { chance, amount: 10 } })],
   });
+
+/** A1 strikes once (1.0) and then the Poison on its target deals every tick it has left at once. */
+export const reaper = fixture('reaper', { skills: [skill('reap', 1, { detonate: true })] });

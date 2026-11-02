@@ -111,6 +111,8 @@ export interface SkillDef {
   grantTurn?: boolean;
   /** with `target: 'fallen'`: raises every fallen ally, not one at random (the Cinder Sylph's Rise From Ash) */
   reviveAll?: boolean;
+  /** after the last hit, the Poison on each target still standing deals every tick it has left at once (5% of its max HP for each remaining turn), then is gone (the Strangler's Reaping Root) */
+  detonate?: boolean;
   /** removes every buff from the targets before the first hit */
   stripBuffs?: boolean;
   /** heals the actor by this fraction of damage dealt */

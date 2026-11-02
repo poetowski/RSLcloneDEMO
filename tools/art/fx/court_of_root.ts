@@ -26,7 +26,7 @@
 // and the grove's green, never their affinities (affinities are abstract,
 // Jakub, 2026-10-11). Light effects are additive in src/game/view/scene.ts.
 import { MAT } from '../palette.ts';
-import { disc, dith, ellipseRing, rampDither } from '../paint.ts';
+import { disc, dith, ellipseRing, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng, withAlpha } from '../raster.ts';
 import { burst, crescent, cut, FxDef, motes, ramps, ring, shard, soundRings, sparks, W } from './kit.ts';
 
@@ -128,6 +128,23 @@ function rootWhip(b: Bitmap, x: number, gy: number, h: number, lean: number, gro
       b.set(qx, qy, WOOD[o < -w * 0.3 ? 4 : o > w * 0.4 ? 1 : 3]);
     }
   }
+}
+
+/** the Strangler's poison: the bile of his figs, and their plum skins */
+const VENOM = ramps.bile;
+const FIG = MAT.plum.ramp;
+/** his vine: dark green-brown, a pale thorn on it */
+const VINE: RGBA[] = [MAT.moss.ramp[0], MAT.moss.ramp[2], MAT.moss.ramp[4], MAT.moss.ramp[5], W];
+/** a crack of the thorned vine across (x0,y0)-(x1,y1), thorns and drops of poison thrown off */
+function vineCrack(b: Bitmap, i: number, x0: number, y0: number, x1: number, y1: number, bend: number, seed: number) {
+  if (i < 4) cut(b, x0, y0, x1, y1, bend, [2.2, 2.8, 2, 1.1][i], VINE, [1.2, 1.15, 0.85, 0.5][i], [0.6, 1, 1, 1][i]);
+  if (i >= 1) sparks(b, (x0 + x1) / 2, (y0 + y1) / 2, 8, 18, (i - 1) / 4, WOOD, seed, 8);
+  if (i >= 1) sparks(b, (x0 + x1) / 2, (y0 + y1) / 2, 7, 16, (i - 1) / 4, VENOM, seed + 3, 16);
+}
+/** a puff of spores: a soft dithered ball of bile green and plum, lit on its upper side */
+function sporePuff(b: Bitmap, x: number, y: number, r: number, alpha: number, seed: number) {
+  const m = rng(seed);
+  disc(b, x, y, r, (px, py, d) => (dith(px, py, alpha * (1 - d * 0.5)) ? (m() < 0.25 ? FIG[3] : rampDither(VENOM, 3 - d * 1.6 - (py > y ? 0.6 : 0), px, py)) : 0));
 }
 
 export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
@@ -869,6 +886,92 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
         b.set(x, y - 1, AM[2]);
       }
       if (i >= 3) ring(b, cx, gy, 6 + t * 14, 2 + t * 4, 1, AM, 1 - t * 0.5);
+    },
+  },
+
+  // --- the Strangler (section 76) --------------------------------------------
+  /** Thorn Lash, the first lash: the vine cracks down across the enemy, thorns and drops of poison thrown off. Matter. */
+  thorn_lash: {
+    w: 64, h: 60, n: 6, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 6, 2],
+    draw: (b, t, i) => vineCrack(b, i, 6, 12, 58, 44, -6, 1101),
+  },
+  /** Thorn Lash, the second lash: back the other way, low to high. Matter. */
+  thorn_lash_back: {
+    w: 64, h: 60, n: 6, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 6, 2],
+    draw: (b, t, i) => vineCrack(b, i, 6, 46, 58, 16, 6, 1111),
+  },
+  /** Spore Burst over him: the crushed fig bursts in a cloud of spores, bile green flecked with its plum skin, drifting out and down. Matter. Played at his head point; the fig is crushed over his head. */
+  spore_cloud: {
+    w: 96, h: 80, n: 11, ms: 60, ax: 0.5, ay: 0.7, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 48, cy = 34;
+      for (let k = 0; k < 9; k++) {
+        const a = (k / 9) * Math.PI * 2 + 0.3;
+        const d = 4 + t * 30 * (0.6 + 0.4 * ((k * 7) % 5) / 4);
+        sporePuff(b, Math.round(cx + Math.cos(a) * d), Math.round(cy + Math.sin(a) * d * 0.7 + t * t * 10), 3 + t * 4, 1 - t * 0.8, 1121 + k);
+      }
+      if (i < 3) burst(b, cx, cy, 6, 1, [6, 10, 7][i], 1.2, VENOM, 0.4);
+      sparks(b, cx, cy, 12, 34, t, FIG, 1123, 18);
+    },
+  },
+  /** Spore Burst on an enemy: spores settle over it in a slow cloud, a few clinging and sinking. Matter. */
+  spore_hit: {
+    w: 60, h: 72, n: 10, ms: 65, ax: 0.5, ay: 0.55, pad: [2, 2, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 30, cy = 36;
+      for (let k = 0; k < 6; k++) {
+        const x = cx + Math.round(Math.sin(k * 2.3) * 12), y = Math.round(cy - 20 + k * 4 + t * 14);
+        sporePuff(b, x, y, 3 + (k % 3) + t * 2, (1 - t * 0.85) * (i === 0 ? 0.5 : 1), 1131 + k);
+      }
+      motes(b, cx, cy - 18, 26, -30, 10, t, VENOM, 1137);
+    },
+  },
+  /** Reaping Root: roots burst up out of the ground under the enemy, curling round it, thorns on them; earth thrown up; then a bile-green burst as the poison comes due. Matter. Planted at the feet. */
+  reaping_root: {
+    w: 72, h: 84, n: 11, ms: 55, ax: 0.5, ay: 0.95, pad: [4, 4, 10, 4],
+    draw: (b, t, i) => {
+      const cx = 36, gy = 80;
+      const grow = [0.2, 0.5, 0.85, 1, 1, 1, 1, 0.9, 0.7, 0.45, 0.2][i];
+      for (const [x0, lean, h, w0] of [[-14, 0.5, 46, 4], [-5, -0.25, 60, 4.6], [6, 0.3, 54, 4.2], [15, -0.45, 40, 3.4]] as const) {
+        const top = h * grow;
+        if (top < 2) continue;
+        const pts: [number, number][] = [];
+        const n = 8;
+        for (let k = 0; k <= n; k++) {
+          const u = k / n, y = gy - top * u;
+          const x = cx + x0 + Math.sin(u * 3.4 + x0) * 4 * u + lean * top * u * 0.5;
+          pts.push([x - w0 * (1 - u * 0.8), y]);
+        }
+        for (let k = n; k >= 0; k--) {
+          const u = k / n, y = gy - top * u;
+          const x = cx + x0 + Math.sin(u * 3.4 + x0) * 4 * u + lean * top * u * 0.5;
+          pts.push([x + w0 * (1 - u * 0.8), y]);
+        }
+        polyFill(b, pts, (px, py) => rampDither(WOOD, 1.6 + ((px + py) % 5 === 0 ? 1.4 : 0) + (px < cx + x0 ? 0.6 : 0), px, py));
+        for (let k = 2; k < n; k += 2) {
+          const u = k / n, y = Math.round(gy - top * u), x = Math.round(cx + x0 + Math.sin(u * 3.4 + x0) * 4 * u + lean * top * u * 0.5 + w0 * (1 - u * 0.8) + 1);
+          b.set(x, y, MAT.bone.ramp[4]);
+        }
+      }
+      if (i <= 3) sparks(b, cx, gy - 2, 14, 22, i / 3, DU, 1141, 24);
+      if (i >= 4 && i <= 8) {
+        burst(b, cx, gy - 38, 10, 2, [10, 16, 18, 14, 9][i - 4], 1.4, VENOM, 0.2);
+        sparks(b, cx, gy - 38, 14, 28, (i - 4) / 6, VENOM, 1147, 14);
+      }
+    },
+  },
+  /** Bitter Sap: drops of amber sap spat at the enemy that struck him, sticking and running, a sour green at their edge. Matter. */
+  sap_sting: {
+    w: 48, h: 56, n: 8, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 24, cy = 26;
+      for (let k = 0; k < 5; k++) {
+        const x = cx + Math.round(Math.sin(k * 2.7) * 9), y = Math.round(cy - 8 + k * 3 + t * 12);
+        if (!dith(x, y, 1 - t * 0.6)) continue;
+        b.set(x, y, AM[3]); b.set(x + 1, y, AM[4]); b.set(x, y + 1, AM[2]); b.set(x - 1, y, VENOM[2]);
+        if (t > 0.3) b.set(x, y + 2, AM[1]);
+      }
+      if (i < 3) burst(b, cx, cy, 6, 1, [5, 8, 6][i], 1, AM, 0.5);
     },
   },
 };

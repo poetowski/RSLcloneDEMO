@@ -736,7 +736,7 @@ export class BattleScene {
           else if (e.edge < 0) this.fx.text(v.uid, v.x, top() - 10, 'WEAK HIT', { color: '#8fa0c0' });
         }
         if (e.amount > 0) {
-          this.fx.text(v.uid, v.x, top(), String(e.amount), e.crit ? { color: '#ffe060', gradient: '#ff8a20', variant: 'display', outline: '#2a0a04' } : { color: !skill ? (e.dot === 'burn' ? '#ffb070' : '#b6ff7a') : e.edge > 0 ? '#ffd0a0' : '#ffffff', variant: 'bold', outline: '#2a0a10' });
+          this.fx.text(v.uid, v.x, top(), String(e.amount), e.crit ? { color: '#ffe060', gradient: '#ff8a20', variant: 'display', outline: '#2a0a04' } : { color: !skill || e.dot ? (e.dot === 'burn' ? '#ffb070' : '#b6ff7a') : e.edge > 0 ? '#ffd0a0' : '#ffffff', variant: 'bold', outline: '#2a0a10' });
         }
         if (e.absorbed) this.fx.text(v.uid, v.x, top(), `ABSORB ${e.absorbed}`, { color: '#ffe48a' });
         break;

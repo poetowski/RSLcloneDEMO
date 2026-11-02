@@ -381,6 +381,16 @@ describe('design decisions', () => {
     expect(c?.passive && [c.passive.kind, c.passive.value, c.passive.statuses]).toEqual(['overdrive', 0.4, [{ status: 'spd_up', turns: 2 }]]);
   });
 
+  it('has the Strangler he chose: a Heroic Damage of the Court of Root; an A1 of two lashes, each a 40% chance of Poison; an A2 on all enemies with Poison and Heal Block, cooldown 4; an A3 on one enemy that brings its Poison due, cooldown 5; a passive poisoning attackers', () => {
+    const c = CHAMPIONS.find((x) => x.id === 'strangler');
+    expect(c && [c.rarity, c.role, c.faction]).toEqual(['heroic', 'Damage', 'court_of_root']);
+    const [a1, a2, a3] = c?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, a1.hits.length, a1.statuses]).toEqual([1, 'enemy', 2, [{ status: 'poison', turns: 2, chance: 0.4, to: 'targets', perHit: true }]]);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'enemies', 4, [{ status: 'poison', turns: 2, chance: 0.75, to: 'targets' }, { status: 'heal_block', turns: 1, to: 'targets' }]]);
+    expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.detonate, totalMult(a3) > 0]).toEqual([3, 'enemy', 5, true, true]);
+    expect(c?.passive && [c.passive.kind, c.passive.chance, c.passive.statuses]).toEqual(['retaliate', 0.35, [{ status: 'poison', turns: 2 }]]);
+  });
+
   it('has the Cinder Sylph of his brief: a Heroic of the Ashveil Reign; an A1 on one enemy; an A2 debuff on all enemies; an A3 that raises all fallen allies; a passive that burns enemies', () => {
     const c = CHAMPIONS.find((x) => x.id === 'cinder_sylph');
     expect(c && [c.name, c.rarity, c.faction]).toEqual(['Cinder Sylph', 'heroic', 'ashveil_reign']);
@@ -971,6 +981,7 @@ describe('summoning', () => {
     q.reliquary.recruit('astronomer_royal');
     q.reliquary.recruit('azul_the_blade');
     q.reliquary.recruit('lycan');
+    q.reliquary.recruit('strangler');
     const odds = rarityOdds(summonPool(q));
     expect(odds.heroic).toBe(0);
     expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);

@@ -448,6 +448,17 @@ export class Battle {
         events.push({ kind: 'raise', target: t.uid, hp: t.hp, hit: last });
       }
     }
+    // the Poison comes due: every tick it has left at once, then it is gone
+    if (skill.detonate) {
+      for (const t of targets) {
+        const po = t.alive ? t.statuses.find((x) => x.id === 'poison') : undefined;
+        if (!po) continue;
+        const left = Math.max(1, po.turns);
+        t.statuses.splice(t.statuses.indexOf(po), 1);
+        events.push({ kind: 'expire', target: t.uid, status: 'poison', hit: last });
+        this.applyDamage(t, Math.round(t.maxHp * POISON_PCT) * left, false, 0, last, events, 'poison');
+      }
+    }
     place(false, last);
     if (skill.grantTurn && primary?.alive && primary !== actor && !asCounter) {
       this.granted = primary;

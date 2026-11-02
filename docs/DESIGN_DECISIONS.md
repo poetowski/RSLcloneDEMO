@@ -4558,3 +4558,32 @@ Stand-ins until he sets them: the names Ravening Claws, Hunter's Howl, Moonlit M
 number, his stats, the lore line, that he is summoned, and every detail of his art and effects (the fur's grey and its ruff,
 the notch and the scar, the sash, the shackle and its chain, the rag at his hip, the rakes, the jaws that close in the maul,
 the howl at the moon with its pale rings, the streaks of speed through each ally, the crescent that rises when Moon-Mad wakes).
+
+## 76. The Strangler (received 2026-11-02)
+
+Jakub asked: "Propose creative damage kit for heroic court of root". I proposed three (A, the Strangler, a poisoner who
+brings the poison due; B, the Jaguar Shade, an ambush predator; C, the Mantis Duelist, a counter-attacker) and recommended
+A; he answered "Go A". The same day, on his word "Then also fix lycan animations", Lycan's arms were reworked (section 75):
+the far elbow hangs instead of jutting up, the claws are drawn back behind him and driven through at chest height, the
+howl flings the arms down and back clear of the face, and he falls on his side with his head turned up.
+
+He is a hunter grown the way a strangler fig grows: tall and lean, a body of grey-brown roots wound round and round, open
+at the breast where a heart of amber sap glows; a long head like a mask of knotted root with two amber eyes and no mouth,
+tendrils of root trailing back like hair with thorns on them; moss over a shoulder; a belt of vine with three ripe figs,
+plum-skinned and sour with poison. The near arm ends in a long thorned vine he uses as a whip; the far hand is a cluster
+of root fingers.
+
+- **Thorn Lash** (A1): one enemy, two lashes of 0.5, each a 40% chance of Poison for 2 turns.
+- **Spore Burst** (A2, CD 4): all enemies, 0.6, a 75% chance of Poison for 2 turns on each and Heal Block for 1 turn.
+- **Reaping Root** (A3, CD 5): one enemy, 1.4; then its Poison deals every tick it has left at once (5% of its max HP for
+  each remaining turn) and is gone (new `detonate`).
+- **Bitter Sap** (passive, `retaliate`): a 35% chance of Poison for 2 turns on an enemy whose attack hits him.
+- Stats HP 1150, ATK 120, DEF 58, SPD 110, CRIT 6%, score 429. Impact 61%, just over the band. Summoned.
+
+Read by the game: Poison is one status on a champion, so Reaping Root brings due the turns it has left, after the hit; like
+a tick it ignores a Shield; the debuffs meet RES like every debuff.
+
+Stand-ins until he sets them: the name, Bloom, the names Thorn Lash, Spore Burst, Reaping Root and Bitter Sap and their
+texts, every number, his stats, the lore line, that he is summoned, and every detail of his art and effects (the wound roots,
+the amber heart, the mask and its tendrils, the moss, the figs, the vine whip and its thorns, the fig crushed overhead, the
+plunge into the ground, the roots that burst up under the enemy, the spores, the drops of sap).

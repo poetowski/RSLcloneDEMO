@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { ALL_CHAMPIONS, astronomerRoyal, paladin, cinderSylph, necromancer, rootfather, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { aligner, fencer, herald2, balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
+import { aligner, fencer, reaper, herald2, balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -478,6 +478,24 @@ describe('statuses', () => {
     b.get('e0').tm = 0;
     r = b.useSkill(b.get('p0'), skill(foreman(0), 'tap'), 'e0');
     expect(r.events.some((e) => e.kind === 'tm')).toBe(false);
+  });
+
+  it("brings a target's Poison due at once: every tick it has left, then it is gone (the Strangler's Reaping Root)", () => {
+    const tough = { ...striker, stats: { ...striker.stats, hp: 1700 } };
+    let b = new Battle(combatants([reaper]), combatants([tough]), { seed: 5 });
+    const t = b.get('e0');
+    b.addStatus(t, 'poison', 3, 0, 'test');
+    let r = b.useSkill(b.get('p0'), skill(reaper, 'reap'), 'e0');
+    const dots = r.events.filter((e) => e.kind === 'damage' && e.dot === 'poison');
+    expect(dots.length).toBe(1);
+    expect(dots[0].kind === 'damage' && dots[0].amount).toBe(Math.round(1700 * 0.05) * 3);
+    // after the hit, and the Poison gone
+    expect(r.events.findIndex((e) => e.kind === 'damage' && !e.dot)).toBeLessThan(r.events.indexOf(dots[0]));
+    expect(b.has(t, 'poison')).toBe(false);
+    // no Poison, nothing more than the hit
+    b = new Battle(combatants([reaper]), combatants([tough]), { seed: 5 });
+    r = b.useSkill(b.get('p0'), skill(reaper, 'reap'), 'e0');
+    expect(r.events.some((e) => e.kind === 'damage' && e.dot)).toBe(false);
   });
 
   it("rolls a turn meter drain on each hit, a hit at a time (Azul the Blade's Threefold Flourish)", () => {

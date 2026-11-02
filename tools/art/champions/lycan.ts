@@ -79,8 +79,8 @@ function sleeve(d: Draw, s: Skel, side: 'N' | 'F', z: number, shade: number) {
 
 /** Arms that hang past the knee: thick fur to the elbow, then the forearm, a broad paw, three black claws. */
 function armOf(d: Draw, sh: V, el: V, ha: V, lo: number, z: number, shade: number, group: string) {
-  d.capsule({ mat: FR, z, group, shade }, sh, el, 4.6, 3.8);
-  d.capsule({ mat: FR, z: z + 0.1, group, shade }, el, ha, 3.8, 3.1);
+  d.capsule({ mat: FR, z, group, shade }, sh, el, 4.2, 3.4);
+  d.capsule({ mat: FR, z: z + 0.1, group, shade }, el, ha, 3.4, 2.8);
   d.ellipse({ mat: FR, z: z + 0.3, group, shade }, ha, 3.4, 2.8, lo);
   for (const k of [-1, 0, 1]) {
     const base = at(at(ha, lo, 2.6), lo + 90, k * 1.5);
@@ -212,15 +212,15 @@ function head(d: Draw, s: Skel, P: Record<string, number>, z: number) {
 // ---------------------------------------------------------------------------
 
 const ly = (hN: V, hF: V, o: Partial<Pose> & { p?: Record<string, number> }) =>
-  pose({ armN: { ik: hN, bend: 1 }, armF: { ik: hF, bend: -1 }, ...o, p: { jaw: 0, ...(o.p ?? {}) } });
+  pose({ armN: { ik: hN, bend: -1 }, armF: { ik: hF, bend: -1 }, ...o, p: { jaw: 0, ...(o.p ?? {}) } });
 
 const STAND = { torso: 60, head: 52, legN: { ik: v(-11, 3) }, legF: { ik: v(10, 3) } };
-const IDLE = ly(v(17, 22), v(25, 26), { x: -2, y: -1, ...STAND });
+const IDLE = ly(v(15, 28), v(23, 30), { x: -2, y: -1, ...STAND });
 
 function idle(t: number): Pose {
   const a = t * Math.PI * 2;
   const b = Math.round((1 - Math.cos(a)) / 2);
-  return ly(v(17, 22 - b), v(25, 26 - b), { x: -2, y: -1 - b, ...STAND, torso: 60 - b, head: 51 - b, p: { wave: a, jaw: b * 0.12, ear: b } });
+  return ly(v(15, 28 - b), v(23, 30 - b), { x: -2, y: -1 - b, ...STAND, torso: 60 - b, head: 51 - b, p: { wave: a, jaw: b * 0.12, ear: b } });
 }
 
 function run(t: number): Pose {
@@ -232,18 +232,18 @@ function run(t: number): Pose {
   };
   const n = foot(a), f = foot(a + Math.PI);
   const sw = Math.cos(a);
-  return ly(v(14 + sw * 7, 24 + bob), v(18 - sw * 7, 25 + bob), { x: 1, y: bob - 2, torso: 52, head: 48, legN: { ik: v(n.x - 1, n.y) }, legF: { ik: v(f.x + 1, f.y) }, footN: n.ang, footF: f.ang, p: { wave: a * 2, jaw: 0.2, tail: 180 } });
+  return ly(v(14 + sw * 11, 32 + bob - Math.abs(sw) * 2), v(18 - sw * 11, 33 + bob - Math.abs(sw) * 2), { x: 1, y: bob - 2, torso: 52, head: 48, legN: { ik: v(n.x - 1, n.y) }, legF: { ik: v(f.x + 1, f.y) }, footN: n.ang, footF: f.ang, p: { wave: a * 2, jaw: 0.2, tail: 180 } });
 }
 
 // Ravening Claws: the near arm hauled back, a rake down and across; then the far arm the other way.
-const RK_WIND = ly(v(-6, 64), v(18, 28), { x: -4, y: -1, torso: 78, head: 66, legN: { ik: v(-13, 3) }, legF: { ik: v(9, 3) }, p: { jaw: 0.4 } });
-const RK_ONE = ly(v(30, 20), v(14, 34), { x: 7, y: -4, torso: 50, head: 44, legN: { ik: v(-13, 3) }, legF: { ik: v(16, 3) }, p: { jaw: 0.8, wave: 1.6 } });
-const RK_WIND2 = ly(v(24, 26), v(-2, 62), { x: 3, y: -2, torso: 66, head: 56, legN: { ik: v(-12, 3) }, legF: { ik: v(13, 3) }, p: { jaw: 0.5, wave: 2 } });
-const RK_TWO = ly(v(14, 38), v(30, 22), { x: 9, y: -5, torso: 46, head: 42, legN: { ik: v(-14, 3) }, legF: { ik: v(18, 3) }, p: { jaw: 1, wave: 2.6 } });
+const RK_WIND = ly(v(-10, 46), v(20, 24), { x: -4, y: -1, torso: 72, head: 60, legN: { ik: v(-13, 3) }, legF: { ik: v(9, 3) }, p: { jaw: 0.4 } });
+const RK_ONE = ly(v(34, 36), v(16, 34), { x: 7, y: -4, torso: 52, head: 46, legN: { ik: v(-13, 3) }, legF: { ik: v(16, 3) }, p: { jaw: 0.8, wave: 1.6 } });
+const RK_WIND2 = ly(v(26, 26), v(-6, 46), { x: 3, y: -2, torso: 64, head: 56, legN: { ik: v(-12, 3) }, legF: { ik: v(13, 3) }, p: { jaw: 0.5, wave: 2 } });
+const RK_TWO = ly(v(16, 30), v(34, 38), { x: 9, y: -5, torso: 48, head: 44, legN: { ik: v(-14, 3) }, legF: { ik: v(18, 3) }, p: { jaw: 1, wave: 2.6 } });
 
 // Hunter's Howl: he rises up on his hind legs, the arms flung out, the head thrown back, the snout at the moon.
 const HW_LOW = ly(v(12, 22), v(16, 22), { x: -3, y: -4, torso: 56, head: 50, legN: { ik: v(-12, 3) }, legF: { ik: v(10, 3) }, p: { jaw: 0.1, ear: 1 } });
-const HW_UP = ly(v(28, 78), v(-14, 76), { x: -3, y: 0, torso: 96, head: 130, legN: { ik: v(-11, 3) }, legF: { ik: v(10, 3) }, p: { jaw: 1, faceUp: 160, ear: 2, tail: 214, wave: 1 } });
+const HW_UP = ly(v(16, 30), v(-10, 34), { x: -3, y: 0, torso: 96, head: 130, legN: { ik: v(-11, 3) }, legF: { ik: v(10, 3) }, p: { jaw: 1, faceUp: 160, ear: 2, tail: 214, wave: 1 } });
 const HW_HOLD = tweak(HW_UP, { y: 1, p: { jaw: 0.85, faceUp: 164, wave: 2.2 } });
 
 // Moonlit Maul: he sinks to a crouch, springs (the scene carries him along the arc), comes down on the target with the claws out and the jaws open, and tears.
@@ -251,22 +251,22 @@ const ML_CROUCH = ly(v(8, 14), v(18, 16), { x: -5, y: -9, torso: 44, head: 40, l
 const ML_LAUNCH = ly(v(-6, 40), v(-2, 34), { x: 2, y: 3, torso: 30, head: 36, legN: { ik: v(-17, 6) }, legF: { ik: v(8, 3) }, p: { jaw: 0.6, tail: 214 } });
 const ML_FLY = ly(v(36, 52), v(32, 46), { x: 4, y: 6, torso: 24, head: 38, legN: { ik: v(-14, 14) }, legF: { ik: v(6, 10) }, p: { jaw: 1, tail: 220, wave: 2 } });
 const ML_BITE = ly(v(30, 36), v(26, 30), { x: 6, y: -2, torso: 32, head: 30, legN: { ik: v(-12, 3) }, legF: { ik: v(14, 3) }, p: { jaw: 0, faceUp: 60, wave: 2.6 } });
-const ML_TEAR = ly(v(24, 24), v(20, 22), { x: 4, y: -4, torso: 38, head: 24, legN: { ik: v(-12, 3) }, legF: { ik: v(13, 3) }, p: { jaw: 0.1, faceUp: 40, wave: 3 } });
-const ML_BACK = ly(v(14, 24), v(16, 24), { x: 0, y: -2, torso: 54, head: 46, legN: { ik: v(-12, 3) }, legF: { ik: v(11, 3) }, p: { jaw: 0.5, wave: 1 } });
+const ML_TEAR = ly(v(28, 30), v(22, 28), { x: 4, y: -4, torso: 38, head: 24, legN: { ik: v(-12, 3) }, legF: { ik: v(13, 3) }, p: { jaw: 0.1, faceUp: 40, wave: 3 } });
+const ML_BACK = ly(v(16, 30), v(20, 32), { x: 0, y: -2, torso: 54, head: 46, legN: { ik: v(-12, 3) }, legF: { ik: v(11, 3) }, p: { jaw: 0.5, wave: 1 } });
 
-const HURT = ly(v(6, 28), v(14, 24), { x: -5, y: -1, torso: 76, head: 62, legN: { ik: v(-14, 3) }, legF: { ik: v(8, 4) }, footF: 10, p: { jaw: 0.7, ear: -3 } });
+const HURT = ly(v(8, 34), v(16, 32), { x: -5, y: -1, torso: 76, head: 62, legN: { ik: v(-14, 3) }, legF: { ik: v(8, 4) }, footF: 10, p: { jaw: 0.7, ear: -3 } });
 const DEATH_KNEEL = ly(v(14, 8), v(20, 8), { x: 0, y: -12, torso: 50, head: 30, legN: { ik: v(-15, 3) }, legF: { ik: v(9, 3) }, footN: -60, p: { dead: 1, jaw: 0.4, ear: -4 } });
 const DEATH_FALL = pose({
   x: 2, y: -8, torso: 26, head: 12,
   legN: { up: -150, lo: -175 }, legF: { up: -118, lo: -170 }, footN: -90, footF: -80,
   armN: { up: -40, lo: -10 }, armF: { up: -20, lo: 10 },
-  p: { dead: 1, jaw: 0.3, ear: -4, tail: 200 },
+  p: { dead: 1, jaw: 0.3, ear: -4, tail: 200, faceUp: 120 },
 });
 const DEATH_DOWN = pose({
   x: 6, y: -19, torso: 4, head: -2,
-  legN: { up: 172, lo: 176 }, legF: { up: 178, lo: 182 }, footN: -95, footF: -95,
-  armN: { up: 4, lo: 2 }, armF: { up: -8, lo: -4 },
-  p: { dead: 1, jaw: 0.2, ear: -4, tail: 196 },
+  legN: { up: 186, lo: 150 }, legF: { up: 176, lo: 140 }, footN: -60, footF: -70,
+  armN: { up: 10, lo: -20 }, armF: { up: -6, lo: 14 },
+  p: { dead: 1, jaw: 0.2, ear: -4, tail: 196, faceUp: 150 },
 });
 
 const mid = (a: Pose, b: Pose, t: number) => lerpPose(a, b, t, D);
