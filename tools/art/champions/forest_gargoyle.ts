@@ -307,7 +307,7 @@ const HURT = tweak(IDLE, { x: -2, head: 68, p: { chip: 0.5 } });
 const D_SPLIT = tweak(IDLE, { head: 66, p: { cracks: 0.6, eyes: 0, chip: 0.4 } });
 const D_TIP = tweak(IDLE, { x: 6, y: -13, torso: 40, head: 48, armN: { ik: v(28, 8), bend: -1 }, armF: { ik: v(36, 8), bend: -1 }, p: { cracks: 1, fall: 0.15, wingN: 128, wingF: 118 } });
 const D_FALL = pose({
-  x: 14, y: -7, torso: 20, head: 26,
+  x: 14, y: -1, torso: 20, head: 26,
   legN: { up: -128, lo: 200 }, legF: { up: -110, lo: 212 }, footN: 40, footF: 50,
   armN: { up: 2, lo: -6 }, armF: { up: 6, lo: -2 },
   p: { cracks: 1, fall: 0.45, wingN: 170, wingF: 160, open: 0.3, over: 1 },

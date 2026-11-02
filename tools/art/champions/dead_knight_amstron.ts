@@ -57,11 +57,11 @@ interface Parts {
   shield: V; shA: number; grip: V; spA: number;
 }
 const HEAP: Parts = {
-  pelvis: v(-8, 8), torso: 172, head: v(-46, 5.4), headDir: 150,
-  sN: v(-30, 7), eN: v(-20, 4), hN: v(-8, 3.4), sF: v(-34, 5), eF: v(-44, 3.4), hF: v(-54, 3),
-  hipN: v(-4, 5), kneeN: v(10, 5), ankN: v(24, 4), footN: 8,
-  hipF: v(-8, 4), kneeF: v(4, 3.6), ankF: v(16, 3.4), footF: -6,
-  shield: v(36, 5), shA: 2, grip: v(-14, 2.4), spA: 3,
+  pelvis: v(-8, 13), torso: 172, head: v(-46, 7), headDir: 150,
+  sN: v(-30, 13), eN: v(-20, 8), hN: v(-8, 6.4), sF: v(-34, 11), eF: v(-44, 7), hF: v(-54, 6),
+  hipN: v(-4, 8), kneeN: v(10, 8), ankN: v(24, 7), footN: 8,
+  hipF: v(-8, 7), kneeF: v(4, 6.6), ankF: v(16, 6.4), footF: -6,
+  shield: v(36, 12), shA: 2, grip: v(-14, 4), spA: 3,
 };
 
 function partsOf(s: Skel): Parts {
@@ -73,7 +73,10 @@ function partsOf(s: Skel): Parts {
     hipF: s.hipF, kneeF: s.kneeF, ankF: s.ankF, footF: s.pose.footF,
     shield: at(at(lerpV(s.eF, s.hF, 0.55), s.torso - 90, 5), s.torso, -3), shA: P.shAng ?? 90, grip: s.hN, spA: P.spAng ?? 90,
   };
-  return fallApart(alive, HEAP, P.heap ?? 0);
+  const fallen = fallApart(alive, HEAP, P.heap ?? 0);
+  // the spear's butt comes down on the floor, never through it
+  const butt = at(fallen.grip, fallen.spA, -BUTT);
+  return butt.y < 1.5 ? { ...fallen, grip: v(fallen.grip.x, fallen.grip.y + 1.5 - butt.y) } : fallen;
 }
 
 const angle = (a: V, b: V) => Math.atan2(b.y - a.y, b.x - a.x) / D2R;
@@ -249,7 +252,7 @@ function spear(d: Draw, hand: V, ang: number, z: number, tassel: number, info: B
   // the tassel, hanging from under the blade, down the screen and trailing
   const root = f(BLADE - 3, 0);
   for (const [k, off] of [[0, -2], [1, 1], [2, 4]] as const) {
-    const end = v(root.x - 1.5 - tassel * 8 + k, root.y - 7 + tassel * 2 - k * 0.6);
+    const end = v(root.x - 1.5 - tassel * 8 + k, Math.max(1.5, root.y - 7 + tassel * 2 - k * 0.6)); // it lies on the floor, never through it
     d.ribbon({ mat: RD, z: z + 0.04 + k * 0.001, group: 'tassel', line: 'soft' }, [root, lerpV(root, end, 0.6), v(end.x + off * 0.3, end.y)], [0.8, 0.75, 0.3]);
   }
 }
