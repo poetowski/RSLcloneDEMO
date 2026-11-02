@@ -63,6 +63,7 @@ export type BattleEvent =
   | { kind: 'expire'; target: string; status: StatusId; hit: number }
   | { kind: 'cleanse'; target: string; status: StatusId; hit: number }
   | { kind: 'dispel'; target: string; status: StatusId; hit: number }
+  | { kind: 'reset'; target: string; skill: string; hit: number }
   | { kind: 'tm'; target: string; delta: number; hit: number }
   | { kind: 'revive'; target: string; hp: number; hit: number }
   /** an ally's skill gave it a turn, to be taken as soon as this one ends (the Astronomer Royal's Hour of Destiny) */
@@ -460,6 +461,11 @@ export class Battle {
       }
     }
     place(false, last);
+    // a kill gives the blade back: the cooldown is gone, ready again next turn
+    if (skill.resetOnKill && !asCounter && actor.alive && targets.some((t) => t.team !== actor.team && !t.alive)) {
+      actor.cooldowns[skill.id] = 0;
+      events.push({ kind: 'reset', target: actor.uid, skill: skill.id, hit: last });
+    }
     if (skill.grantTurn && primary?.alive && primary !== actor && !asCounter) {
       this.granted = primary;
       // what the skill gave it counts from after the turn it gave it

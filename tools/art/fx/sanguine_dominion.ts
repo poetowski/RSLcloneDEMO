@@ -852,4 +852,48 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
       motes(b, cx, gy - 6, 26, 62, 10, t, ramps.rose, 1223);
     },
   },
+
+  // --- the Executioner (section 77) ------------------------------------------
+  /** Sentence: the axe comes down through the enemy, a broad white streak and a dull flash where it bites, chips flying. Matter. */
+  axe_chop: {
+    w: 68, h: 72, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
+    draw: (b, t, i) => {
+      const DULL: RGBA[] = [DU[0], DU[2], DU[3], DU[4], W];
+      if (i < 6) cut(b, 14, 8, 50, 62, -6, [3.6, 4.6, 3.8, 2.8, 1.8, 1][i], DULL, [1.4, 1.3, 1.05, 0.8, 0.6, 0.4][i], [0.55, 1, 1, 1, 1, 1][i]);
+      if (i === 1 || i === 2) burst(b, 34, 38, 8, 2, [12, 9][i - 1], 1.4, DULL, 0.4);
+      if (i >= 1) sparks(b, 34, 38, 14, 28, (i - 1) / 5, DULL, 1201, 20);
+    },
+  },
+  /** Shackle: the manacles strike and the chain wraps the enemy, iron links round it in a ring, a dull flash. Matter. */
+  shackle_bind: {
+    w: 60, h: 64, n: 9, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 4, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 30, cy = 32;
+      const IRN = MAT.iron.ramp;
+      if (i < 3) burst(b, cx, cy, 6, 1, [7, 11, 8][i], 1.2, [DU[0], DU[2], DU[3], DU[4], W], 0.5);
+      const turn = Math.min(1, (i + 1) / 4), fade = i < 6 ? 1 : [0.7, 0.45, 0.2][i - 6];
+      const n = Math.round(14 * turn);
+      for (let k = 0; k < n; k++) {
+        const a = (k / 14) * Math.PI * 2 + t;
+        const x = Math.round(cx + Math.cos(a) * 13), y = Math.round(cy + 2 + Math.sin(a) * 5 + (k % 2 ? 0 : 0.6));
+        if (!dith(x, y, fade)) continue;
+        const back = Math.sin(a) < 0;
+        b.set(x, y, IRN[back ? 2 : 4]);
+        b.set(x + 1, y, IRN[back ? 1 : 3]);
+        if (!back) b.set(x, y - 1, IRN[5]);
+      }
+    },
+  },
+  /** Final Verdict: the axe falls like a sentence: a long white streak from high above, a heavy dull flash, a ring of the blow pressed out on the ground, dust rolling. Matter. */
+  verdict_fall: {
+    w: 80, h: 96, n: 9, ms: 50, ax: 0.5, ay: 0.6, pad: [2, 6, 8, 6],
+    draw: (b, t, i) => {
+      const DULL: RGBA[] = [DU[0], DU[2], DU[3], DU[4], W];
+      const cx = 40, cy = 58;
+      if (i < 5) cut(b, 22, 2, 46, 62, -4, [4, 5, 4, 3, 1.6][i], DULL, [1.5, 1.4, 1.1, 0.8, 0.5][i], [0.5, 1, 1, 1, 1][i]);
+      if (i >= 1 && i <= 4) burst(b, cx, cy, 10, 2, [14, 18, 14, 9][i - 1], 1.6, DULL, 0.2);
+      if (i >= 2) ring(b, cx, cy + 22, 8 + (i - 2) * 5, 3 + (i - 2) * 1.6, 1.4, DU, 1.2 - (i - 2) * 0.15);
+      if (i >= 1) sparks(b, cx, cy, 18, 34, (i - 1) / 7, DULL, 1211, 24);
+    },
+  },
 };

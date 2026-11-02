@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { ALL_CHAMPIONS, astronomerRoyal, paladin, cinderSylph, necromancer, rootfather, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { aligner, fencer, reaper, herald2, balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
+import { aligner, fencer, reaper, headsman, herald2, balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -478,6 +478,27 @@ describe('statuses', () => {
     b.get('e0').tm = 0;
     r = b.useSkill(b.get('p0'), skill(foreman(0), 'tap'), 'e0');
     expect(r.events.some((e) => e.kind === 'tm')).toBe(false);
+  });
+
+  it("readies a skill again when it fells its target (the Executioner's Final Verdict)", () => {
+    // a kill: the cooldown is gone, and the skill is ready on his next turn
+    let b = new Battle(combatants([headsman]), combatants([striker]), { seed: 5 });
+    const k = b.get('p0');
+    b.get('e0').hp = 10;
+    b.startTurn(k);
+    let r = b.useSkill(k, skill(headsman, 'verdict'), 'e0');
+    expect(b.get('e0').alive).toBe(false);
+    expect(r.events.some((e) => e.kind === 'reset')).toBe(true);
+    b.endTurn(k);
+    expect(k.cooldowns.verdict ?? 0).toBe(0);
+    // no kill: the cooldown stands
+    b = new Battle(combatants([headsman]), combatants([{ ...striker, stats: { ...striker.stats, hp: 1700 } }]), { seed: 5 });
+    const k2 = b.get('p0');
+    b.startTurn(k2);
+    r = b.useSkill(k2, skill(headsman, 'verdict'), 'e0');
+    expect(r.events.some((e) => e.kind === 'reset')).toBe(false);
+    b.endTurn(k2);
+    expect(k2.cooldowns.verdict).toBe(5);
   });
 
   it("brings a target's Poison due at once: every tick it has left, then it is gone (the Orchid Huntress's Root Embrace)", () => {

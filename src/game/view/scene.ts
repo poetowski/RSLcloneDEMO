@@ -787,6 +787,9 @@ export class BattleScene {
       case 'expire':
         this.removeStatus(v, e.status);
         break;
+      case 'reset':
+        this.fx.text(v.uid, v.x, top() - 6, 'READY AGAIN', { color: '#ff9a8a', variant: 'bold', outline: '#2a0a10' });
+        break;
       case 'extraTurn':
         this.fx.text(v.uid, v.x, top() - 6, 'EXTRA TURN!', { color: '#ffe890', variant: 'display', outline: '#1a1440' });
         break;

@@ -85,6 +85,7 @@ The roster today:
 | Azul the Blade (`azul_the_blade`) | Heroic | Ember | Damage | Azure Crown | summoned |
 | Lycan (`lycan`) | Heroic | Tide | Damage | Ashveil Reign | summoned |
 | Orchid Huntress (`orchid_huntress`) | Heroic | Bloom (a stand-in) | Damage | Court of Root | summoned |
+| Executioner (`executioner`) | Heroic | Tide (a stand-in) | Damage | Sanguine Dominion | summoned |
 | Paladin (`paladin`) | Heroic | Ember | Tank | Azure Crown | summoned (the reward of a quest line Jakub designs later) |
 | Chief Engineer CJ (`chief_engineer_cj`) | Heroic | Bloom | Tank | Sanguine Dominion | summoned |
 | Sir Siroslav (`sir_siroslav`) | Heroic | Ember | Support | Sanguine Dominion | summoned |

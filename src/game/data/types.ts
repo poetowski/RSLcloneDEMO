@@ -113,6 +113,8 @@ export interface SkillDef {
   reviveAll?: boolean;
   /** after the last hit, the Poison on each target still standing deals every tick it has left at once (5% of its max HP for each remaining turn), then is gone (the Orchid Huntress's Root Embrace) */
   detonate?: boolean;
+  /** when the skill fells its target, its cooldown is gone: it is ready again on its user's next turn (the Executioner's Final Verdict) */
+  resetOnKill?: boolean;
   /** removes every buff from the targets before the first hit */
   stripBuffs?: boolean;
   /** heals the actor by this fraction of damage dealt */

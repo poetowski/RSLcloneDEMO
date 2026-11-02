@@ -4595,3 +4595,30 @@ Stand-ins until he sets them: Bloom, the names Thorn Kiss, Pollen Veil, Root Emb
 every number, her stats, the lore line, that she is summoned, and every detail of her art and effects (the crown's petals
 and colours, the pollen, the hair, the leaf band, the bodice and its orchid, the hip and back petals, the leaf-wrapped
 legs, the vine and its bud, the lashes, the crown opening, the kneel and the roots, the pollen cloud, the drops of nectar).
+
+## 77. The Executioner (received 2026-11-02)
+
+Jakub asked for the count of heroes; the one open slot in the grid was a Heroic Damage of the Sanguine Dominion. "I want
+to hear suggestions first": I proposed three (the Crimson Countess, a blood-mage who spends her own HP; the Headsman, the
+Dominion's executioner; the Red Bombardier, a siege engineer) and recommended the first. He answered: "Go with option two,
+but rename hero to "Executioner". Make his design wearing white instead of black". Shown to him as rendered previews;
+waiting for his yes.
+
+He is the Dominion's headsman, huge and broad: a white leather hood over his whole head with two eye holes, its cape over
+his shoulders; a bare, scarred torso; a long crimson tabard with the Dominion's black hexagon hanging from a white leather
+belt; white leather breeches, bracers and boots; iron manacles on a chain at his belt, which he whirls and throws in
+Shackle; a great axe on a long haft, a broad flaring blade with the hexagon stamped in it.
+
+- **Sentence** (A1): one enemy, 1.2.
+- **Shackle** (A2, CD 4): one enemy, 1.2, Slow and ATK Down for 2 turns.
+- **Final Verdict** (A3, CD 5): one enemy, 2.0, twice as hard below 30% HP; if it fells the target, its cooldown is gone
+  and it is ready again on his next turn (new `resetOnKill`, READY AGAIN over him).
+- **Grim Duty** (passive, `stat`): +15% C.DMG, in battle only.
+- Stats HP 1250, ATK 124, DEF 60, SPD 102, CRIT 8%, score 442. Impact 71%, over the band like the other Heroics (MDA T22). Summoned.
+
+Read by the game: the debuffs are certain but meet RES like every debuff; a kill is the target felled by the skill itself.
+
+Stand-ins until he sets them: Tide, the names Sentence, Shackle, Final Verdict and Grim Duty and their texts, every number,
+his stats, the lore line, that he is summoned, and every detail of his art and effects (the hood, its peak and eye holes,
+the scars, the tabard and hexagon, the white leathers, the manacles and chain, the axe's haft, grip and blade, the chop, the
+whirl and throw, the slow lift and fall of the verdict, the streaks, the iron ring of the chain, the ring of the blow).

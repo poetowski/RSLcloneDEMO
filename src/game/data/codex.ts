@@ -58,6 +58,7 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'p', text: 'Each champion has one to three skills. A1, the basic skill, is always ready. A2 and A3 are stronger but go on cooldown when used. Skills have shapes, not just sizes: one enemy, every enemy, or your own team.' },
       { kind: 'figure', id: 'skills' },
       { kind: 'p', text: 'A cooldown counts your champion\'s own turns: a skill with Cooldown 3 used now is ready again on the fourth turn after it. The number shown on a greyed-out skill is how many turns are left.' },
+      { kind: 'p', text: "Some skills give their cooldown back: when the Executioner's Final Verdict fells its target, it is ready again on his next turn." },
       { kind: 'h', text: 'Targets' },
       { kind: 'list', items: ['Single enemy: pick any enemy (Taunt can force your choice).', 'All enemies: hits every enemy, usually for less damage each.', 'All allies: buffs, heals or shields your whole team.', 'One ally: pick the ally to help. A skill that also helps its user, like the Walking Bush\'s Thicket or the Bellringer\'s Warning Toll, picks among the others.', 'A fallen ally: the Necromancer\'s Raise Dead calls one fallen ally back, chosen at random. It is ready only while an ally has fallen.'] },
       { kind: 'tip', text: 'Keys 1, 2 and 3 pick a skill. Pick a group skill twice, or press Enter, to use it.' },

@@ -261,3 +261,6 @@ export const fencer = (chance: number) =>
 
 /** A1 strikes once (1.0) and then the Poison on its target deals every tick it has left at once. */
 export const reaper = fixture('reaper', { skills: [skill('reap', 1, { detonate: true })] });
+
+/** A3 a heavy blow whose cooldown is gone when it fells its target. */
+export const headsman = fixture('headsman', { skills: [undefined, undefined, skill('verdict', 3, { cooldown: 5, hits: [{ mult: 2 }], resetOnKill: true })] });

@@ -391,6 +391,16 @@ describe('design decisions', () => {
     expect(c?.passive && [c.passive.kind, c.passive.chance, c.passive.statuses]).toEqual(['retaliate', 0.35, [{ status: 'poison', turns: 2 }]]);
   });
 
+  it('has the Executioner he chose: a Heroic Damage of the Sanguine Dominion; an A2 with Slow and ATK Down, cooldown 4; an A3 harder below 30% HP that is ready again when it kills, cooldown 5; a passive of +15% C.DMG', () => {
+    const c = CHAMPIONS.find((x) => x.id === 'executioner');
+    expect(c && [c.name, c.rarity, c.role, c.faction]).toEqual(['Executioner', 'heroic', 'Damage', 'sanguine_dominion']);
+    const [a1, a2, a3] = c?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, totalMult(a1) > 0]).toEqual([1, 'enemy', true]);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'enemy', 4, [{ status: 'spd_down', turns: 2, to: 'targets' }, { status: 'atk_down', turns: 2, to: 'targets' }]]);
+    expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.execute?.below, a3.resetOnKill]).toEqual([3, 'enemy', 5, 0.3, true]);
+    expect(c?.passive && [c.passive.kind, c.passive.stat, c.passive.value]).toEqual(['stat', 'critDmg', 0.15]);
+  });
+
   it('has the Cinder Sylph of his brief: a Heroic of the Ashveil Reign; an A1 on one enemy; an A2 debuff on all enemies; an A3 that raises all fallen allies; a passive that burns enemies', () => {
     const c = CHAMPIONS.find((x) => x.id === 'cinder_sylph');
     expect(c && [c.name, c.rarity, c.faction]).toEqual(['Cinder Sylph', 'heroic', 'ashveil_reign']);
@@ -982,6 +992,7 @@ describe('summoning', () => {
     q.reliquary.recruit('azul_the_blade');
     q.reliquary.recruit('lycan');
     q.reliquary.recruit('orchid_huntress');
+    q.reliquary.recruit('executioner');
     const odds = rarityOdds(summonPool(q));
     expect(odds.heroic).toBe(0);
     expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);
