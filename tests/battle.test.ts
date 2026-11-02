@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { decide } from '../src/game/battle/ai';
 import { Battle, combatants, landShare } from '../src/game/battle/battle';
 import { flatten, simulate } from '../src/game/battle/sim';
-import { ALL_CHAMPIONS, overlordOfentol, verdantLuminary } from '../src/game/data/champions';
+import { ALL_CHAMPIONS, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
 import { balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
@@ -984,6 +984,54 @@ describe('statuses', () => {
     expect(blocked / 600).toBeGreaterThan(0.6);
     expect(blocked / 600).toBeLessThan(0.8);
     expect(mixed).toBeGreaterThan(50);
+  });
+
+  it("gives the War Tigress 30% of her pounce back, harder on the wounded", () => {
+    const pounce = skill(warTigress, 'blood_pounce');
+    const plain = fixture('plain_foe', { stats: { crit: 0 } });
+    const b = new Battle(combatants([warTigress]), combatants([plain]), { seed: 4 });
+    const me = b.get('p0');
+    me.hp = 100;
+    const r = b.useSkill(me, pounce, 'e0');
+    const dealt = r.events.find((e) => e.kind === 'damage');
+    const healed = r.events.find((e) => e.kind === 'heal' && e.target === 'p0');
+    expect(healed?.kind === 'heal' && healed.amount).toBe(dealt?.kind === 'damage' && Math.round(dealt.amount * 0.3));
+  });
+
+  it("puts the Hex Warden's Taunt on him and his Shield on the frailest other, and wakes his Second Pulse below 40%", () => {
+    const b = new Battle(combatants([hexWarden, fixture('frail', { stats: { hp: 900 } }), striker]), combatants([striker]), { seed: 6 });
+    b.useSkill(b.get('p0'), skill(hexWarden, 'blood_oath'));
+    expect(b.has(b.get('p0'), 'taunt')).toBe(true);
+    expect(b.get('p1').statuses.find((s) => s.id === 'shield')?.value).toBe(Math.round(b.get('p0').maxHp * 0.2));
+    expect(b.has(b.get('p2'), 'shield')).toBe(false);
+    const c = new Battle(combatants([hexWarden]), combatants([striker]), { seed: 6 });
+    const w = c.get('p0');
+    w.hp = Math.round(w.maxHp * 0.41);
+    c.useSkill(c.get('e0'), striker.skills[0], 'p0');
+    expect(w.alive && c.has(w, 'def_up') && c.has(w, 'regen')).toBe(true);
+  });
+
+  it("has the Transfusionist's needle heal the frailest other, her flask heal everyone, and her rounds place Regen at her turn's end every other turn", () => {
+    const b = new Battle(combatants([transfusionist, fixture('frail', { stats: { hp: 900 } })]), combatants([striker]), { seed: 7 });
+    const me = b.get('p0'), frail = b.get('p1');
+    frail.hp = 100;
+    b.useSkill(me, transfusionist.skills[0], 'e0');
+    expect(frail.hp).toBe(100 + Math.round(me.maxHp * 0.08));
+    me.hp = 100;
+    const before = frail.hp;
+    b.useSkill(me, skill(transfusionist, 'open_the_flask'));
+    expect(me.hp).toBe(100 + Math.round(me.maxHp * 0.2));
+    expect(frail.hp).toBe(before + Math.round(frail.maxHp * 0.2));
+    b.startTurn(me);
+    b.endTurn(me);
+    expect(b.has(frail, 'regen')).toBe(true);
+    frail.statuses = [];
+    b.startTurn(me);
+    b.endTurn(me);
+    expect(b.has(frail, 'regen')).toBe(false);
+    b.startTurn(me);
+    b.endTurn(me);
+    expect(b.has(frail, 'regen')).toBe(true);
   });
 
   it('strikes a second time only on its chance, and a hit that does not come leaves the skill one hit short', () => {

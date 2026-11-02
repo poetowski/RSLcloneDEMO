@@ -114,6 +114,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
 | 2026-11-01 | The Verdant Luminary, an Elite Support of the Azure Crown, Bloom | 60 |
 | 2026-11-01 | Coffin's Legs (first built as the Pallbearer, then Tombstone's Legs), the Wraith and the Haruspex (first built as the Bone Augur), my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Coffin's Legs and the Haruspex his | 61-63 |
+| 2026-11-02 | Three Elites of the Sanguine Dominion on Jakub's word: the War Tigress, the Hex Warden, the Transfusionist; all mine until he sets them | 65-67 |
 | 2026-11-01 | Sir Siroslav, a Heroic Support of the Sanguine Dominion, the roster's first Heroic Support; Ember, my choice on his word | 64 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
@@ -4281,3 +4282,50 @@ detail of the art and effects (the gold flash and ring of `bulawa_strike`, the s
 `command_call`, the crimson hexagon of `line_held`, the feathers of `wing_rush` and
 `charge_feathers`).
 
+## 65. The War Tigress (received 2026-11-02)
+
+Jakub, for this and sections 66-67, verbatim:
+
+```
+we need 3 more sanguine dominion elites, one per each class damage tank support. be creative, i want two humans or humanoids and one animal. be consistent. each has 2-3 skills not more
+```
+
+The Dominion had one Elite of each role (Red Cloak, the Black Rhino, the Rime Scholar) where the Azure
+Crown and the Ashveil Reign have two. **All of the three is a stand-in until he sets it:** names, kits,
+affinities, numbers, lore lines and art. They hold together on the Dominion's own idea, that blood means life
+(3.2): one takes it, one guards it, one gives it. All wear its black and red, and each carries the red hexagon.
+Their affinities even the Dominion's Elites at two each of Ember, Bloom and Tide. "2-3 skills" is read as the
+A1, A2 and passive together, so each has an A1, an A2 and a passive. No new rule was needed.
+
+An Elite Damage, Ember, the animal: a heavy, low tigress, russet with black stripes, a big head carried forward; a
+black war-blanket edged in red with the hexagon, as the Dominion marks its beasts.
+
+- **Claw Rake** (A1): one enemy, two rakes of 0.55.
+- **Blood Pounce** (A2, CD 4): leaps on one enemy, 1.3, half as hard again below 40% HP, and heals her for 30% of
+  the damage dealt, shown as red motes.
+- **Scent of Blood** (passive, `stat`): +10% C.RATE.
+- Stats HP 1080, ATK 118, DEF 58, SPD 110, CRIT 5%, score 418. Impact 57%. Summoned.
+
+## 66. The Hex Warden (received 2026-11-02)
+
+An Elite Tank, Ember: a big man in black plate, a closed helm with a tall red crest, and a shield that is the
+Dominion's standard itself, black with a red hexagon inside.
+
+- **Standard Ram** (A1): the shield into one enemy, 1.0, a 30% chance of Slow for 1 turn.
+- **Blood Oath** (A2, CD 4): Taunt on himself for 2 turns and a Shield of 20% of his max HP on the ally with the
+  lowest max HP but him for 2 turns. No attack.
+- **Second Pulse** (passive, `overdrive`): the first time he drops below 40% HP, DEF Up and Regen for 2 turns.
+- Stats HP 1480, ATK 80, DEF 74, SPD 92, CRIT 2.5%, score 415. Impact 52%. Summoned.
+
+## 67. The Transfusionist (received 2026-11-02)
+
+An Elite Support, Tide: an upright older field doctor in a long black coat and a red apron with a black hexagon,
+grey hair in a bun, gold spectacles; a great glass flask of blood on her back, a red tube from it to the long
+brass needle in her hand. Its level moves as she works: it rises when she draws and falls when she gives.
+
+- **Draw Blood** (A1): one enemy, 0.9, and a heal of 8% of her max HP on the ally with the lowest max HP but her.
+- **Open the Flask** (A2, CD 4): every ally, herself included, heals 20% of their own max HP. No attack; the AI
+  keeps it for when an ally is hurt.
+- **Bedside Rounds** (passive, `tend`): at the end of her turn, Regen for 2 turns on the ally with the lowest max
+  HP, herself included; then it rests for 1 of her turns.
+- Stats HP 1300, ATK 86, DEF 66, SPD 106, CRIT 2.5%, score 407. Impact 58%. Summoned.

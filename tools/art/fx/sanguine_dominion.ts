@@ -77,7 +77,125 @@ function huntArrow(b: Bitmap, x0: number, x1: number, y: number) {
   b.set(x0 + 1, y + 1, AFLETCH[3]); b.set(x0 + 2, y + 1, AFLETCH[2]); b.set(x0 + 3, y + 1, AFLETCH[2]);
 }
 
+/** Blood, as the Dominion means it: clear and warm, not gore. */
+const BLOOD = MAT.red.ramp;
+
+/** A falling drop of blood, three pixels tall (screen space). */
+function dropAt(b: Bitmap, x: number, y: number, fade = 1) {
+  for (const [dy, k] of [[-1, 5], [0, 4], [1, 3]] as const) if (dith(x, y + dy, fade)) b.set(x, y + dy, BLOOD[k]);
+}
+
 export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
+  /** Claw Rake, first paw: three white lines drawn down and back, chips of light. */
+  tigress_rake: {
+    w: 64, h: 64, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 4, 6, 4],
+    draw: (b, t, i) => {
+      for (const k of [0, 1, 2]) if (i < 4) cut(b, 26 + k * 9, 10, 18 + k * 9, 52, 1, [2, 2.8, 2, 1][i], DULL, 1.2 - i * 0.2, [0.6, 1, 1, 1][i]);
+      if (i >= 1) sparks(b, 32, 32, 8, 22, (i - 1) / 4, DULL, 701, 12);
+    },
+  },
+  /** Claw Rake, second paw: the same, the other way across. */
+  tigress_rake_back: {
+    w: 64, h: 64, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 4, 6, 4],
+    draw: (b, t, i) => {
+      for (const k of [0, 1, 2]) if (i < 4) cut(b, 20 + k * 9, 10, 28 + k * 9, 52, -1, [2, 2.8, 2, 1][i], DULL, 1.2 - i * 0.2, [0.6, 1, 1, 1][i]);
+      if (i >= 1) sparks(b, 32, 32, 8, 22, (i - 1) / 4, DULL, 709, 12);
+    },
+  },
+  /** Blood Pounce lands: a dull flash, a ring pressed out, red drops flung up and falling. */
+  tigress_pounce: {
+    w: 76, h: 76, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
+    draw: (b, t, i) => {
+      const c = 38;
+      if (i < 4) burst(b, c, c, 9, 2, [10, 18, 22, 14][i], [2.2, 2.8, 2.2, 1.4][i], DULL, 0.2 + i * 0.1);
+      if (i >= 1) ring(b, c, c, 6 + i * 3.4, 5 + i * 2.6, Math.max(0.7, 2.2 - i * 0.26), DU, 1.2 - i * 0.12);
+      if (i >= 1) sparks(b, c, c, 12, 26, (i - 1) / 6, BLOOD, 719, 26);
+    },
+  },
+  /** What she takes, drifting home: a red mote (drawn as it flies; the battle does not turn it). */
+  blood_mote: {
+    w: 9, h: 9, n: 2, ms: 80, ax: 0.5, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      const c = 4;
+      b.set(c, c, BLOOD[5]);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(c + dx, c + dy, BLOOD[i ? 3 : 4]);
+      if (i) for (const [dx, dy] of [[1, 1], [-1, -1]]) b.set(c + dx, c + dy, BLOOD[2]);
+    },
+  },
+  /** Standard Ram lands: a broad dull flash the size of the shield's face, iron chips, its hexagonal rim pressed out in the air. */
+  hex_ram: {
+    w: 68, h: 68, n: 7, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 4, 10, 4],
+    draw: (b, t, i) => {
+      const c = 34;
+      if (i < 3) burst(b, c, c, 8, 2, [10, 16, 11][i], [2.4, 3, 2][i], DULL, 0.3);
+      if (i >= 1) {
+        const r = 8 + i * 3.2, fade = 1 - (i - 1) / 6;
+        for (let k = 0; k < 6; k++) {
+          const a0 = (k / 6) * Math.PI * 2, a1 = ((k + 1) / 6) * Math.PI * 2;
+          for (let s = 0; s <= 1; s += 0.06) {
+            const x = Math.round(c + Math.cos(a0 + 1.57) * r * (1 - s) + Math.cos(a1 + 1.57) * r * s), y = Math.round(c + Math.sin(a0 + 1.57) * r * (1 - s) + Math.sin(a1 + 1.57) * r * s);
+            if (dith(x, y, fade)) b.set(x, y, BLOOD[i < 3 ? 4 : 3]);
+          }
+        }
+      }
+      if (i >= 1) sparks(b, c, c, 10, 26, (i - 1) / 5, DU, 727, 20);
+    },
+  },
+  /** Blood Oath: the standard driven into the ground: dust rolling out from his feet, and a ring of red rising round them. Anchored at the feet. */
+  hex_plant: {
+    w: 96, h: 60, n: 9, ms: 60, ax: 0.5, ay: 0.75, pad: [2, 6, 4, 6],
+    draw: (b, t, i) => {
+      const cx = 48, gy = 45;
+      const rr = [8, 16, 24, 30, 34, 37, 38, 38, 37][i];
+      ellipseRing(b, cx, gy - 2, rr, rr * 0.24, i < 6 ? 1.6 : 1, (x, y, a) => (dith(x, y, 1 - t * 0.8) ? rampDither(DU, 3.1 - t * 1.3 + Math.sin(a) * 0.6, x, y) : 0));
+      if (i >= 1) sparks(b, cx, gy - 4, 10, 24, (i - 1) / 7, BLOOD, 733, 24);
+    },
+  },
+  /** Second Pulse: one slow beat of red going out from his chest, then a second, fainter. */
+  hex_pulse: {
+    w: 76, h: 76, n: 10, ms: 70, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const c = 38;
+      for (const [start, k] of [[0, 1], [4, 0.6]] as const) {
+        const a = i - start;
+        if (a < 0 || a > 5) continue;
+        ring(b, c, c, 6 + a * 5, 6 + a * 5, Math.max(0.7, 2.4 - a * 0.34), BLOOD, k * (1.2 - a * 0.16));
+      }
+    },
+  },
+  /** Draw Blood lands: a fine white point of light, a few red drops falling from it. */
+  needle_prick: {
+    w: 44, h: 48, n: 7, ms: 50, ax: 0.5, ay: 0.46, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const c = 22;
+      if (i < 3) burst(b, c, c, 4, 1, [5, 9, 5][i], 0.9, DULL, 0.78);
+      if (i >= 1) for (const [dx, sp] of [[-3, 1], [1, 1.5], [4, 0.8]] as const) dropAt(b, c + dx, Math.round(c + 2 + (i - 1) * 3.6 * sp), 1 - (i - 1) / 7);
+    },
+  },
+  /** Open the Flask reaches an ally: clear red motes rise round it through a warm light and sink into its chest. Anchored at the feet. */
+  transfusion: {
+    w: 58, h: 88, n: 11, ms: 65, ax: 0.5, ay: 1, pad: [2, 4, 4, 4],
+    draw: (b, t, i) => {
+      const r = rng(739);
+      for (let n = 0; n < 12; n++) {
+        const x0 = 8 + r() * 42, start = r() * 0.45, ph = r() * 6.28;
+        const k = (t - start) / 0.55;
+        if (k < 0 || k > 1) continue;
+        const x = Math.round(x0 + (29 - x0) * k * k + Math.sin(k * 6 + ph) * 2), y = Math.round(80 - k * 50);
+        dropAt(b, x, y, k < 0.75 ? 1 : (1 - k) / 0.25);
+      }
+      ring(b, 29, 44, 5 + i * 1.4, 5 + i * 1.4, 1, BLOOD, Math.max(0.15, 0.7 - Math.abs(i - 5) * 0.11));
+    },
+  },
+  /** Bedside Rounds reaches an ally: a single drop falls, and a small ring opens where it lands. */
+  bedside_drop: {
+    w: 36, h: 44, n: 8, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const c = 18;
+      if (i < 4) dropAt(b, c, 4 + i * 6);
+      else ring(b, c, 24, (i - 3) * 3, (i - 3) * 1.8, 1, BLOOD, 1.1 - (i - 4) * 0.22);
+    },
+  },
   /** Pale Strike's shard: a slim pale needle with a few motes of cold trailing it. */
   pale_shard: {
     w: 24, h: 9, n: 2, ms: 70, ax: 0.8, ay: 0.5, loop: true,

@@ -91,7 +91,7 @@
    40
   ],
   "masters_eye": [
-   328,
+   697,
    164,
    40,
    40
@@ -132,567 +132,621 @@
    40,
    40
   ],
-  "line_cut": [
+  "claw_rake": [
    902,
    0,
    40,
    40
   ],
-  "iron_blow": [
+  "blood_pounce": [
    943,
    0,
    40,
    40
   ],
-  "wide_sweep": [
+  "scent_of_blood": [
    984,
    0,
    40,
    40
   ],
-  "pale_strike": [
+  "standard_ram": [
    0,
+   41,
+   40,
+   40
+  ],
+  "blood_oath": [
+   41,
+   41,
+   40,
+   40
+  ],
+  "second_pulse": [
+   82,
+   41,
+   40,
+   40
+  ],
+  "draw_blood": [
+   123,
+   41,
+   40,
+   40
+  ],
+  "open_the_flask": [
+   164,
+   41,
+   40,
+   40
+  ],
+  "bedside_rounds": [
+   205,
+   41,
+   40,
+   40
+  ],
+  "line_cut": [
+   246,
+   41,
+   40,
+   40
+  ],
+  "iron_blow": [
+   287,
+   41,
+   40,
+   40
+  ],
+  "wide_sweep": [
+   328,
+   41,
+   40,
+   40
+  ],
+  "pale_strike": [
+   369,
    41,
    40,
    40
   ],
   "rimebind": [
-   41,
+   410,
    41,
    40,
    40
   ],
   "cold_rebuke": [
-   82,
+   451,
    41,
    40,
    40
   ],
   "snap": [
-   123,
+   492,
    41,
    40,
    40
   ],
   "rend": [
-   164,
+   533,
    41,
    40,
    40
   ],
   "twin_cut": [
-   205,
+   574,
    41,
    40,
    40
   ],
   "stone_slam": [
-   246,
+   615,
    41,
    40,
    40
   ],
   "gather_strength": [
-   287,
+   656,
    41,
    40,
    40
   ],
   "watch_cut": [
-   328,
+   697,
    41,
    40,
    40
   ],
   "shield_check": [
-   369,
+   738,
    41,
    40,
    40
   ],
   "incense_veil": [
-   410,
+   779,
    41,
    40,
    40
   ],
   "last_unction": [
-   451,
+   820,
    41,
    40,
    40
   ],
   "piercing_shot": [
-   492,
+   861,
    41,
    40,
    40
   ],
   "threshing_blow": [
-   533,
+   902,
    41,
    40,
    40
   ],
   "checkpoint_cut": [
-   574,
+   943,
    41,
    40,
    40
   ],
   "watch_rotation": [
-   615,
+   984,
    41,
    40,
    40
   ],
   "long_thrust": [
-   656,
-   41,
+   0,
+   82,
    40,
    40
   ],
   "hold_fast": [
-   697,
    41,
+   82,
    40,
    40
   ],
   "spade_cut": [
-   738,
-   41,
+   82,
+   82,
    40,
    40
   ],
   "shallow_grave": [
-   779,
-   41,
+   123,
+   82,
    40,
    40
   ],
   "ash_flick": [
-   820,
-   41,
+   164,
+   82,
    40,
    40
   ],
   "sift_ash": [
-   861,
-   41,
+   205,
+   82,
    40,
    40
   ],
   "keening": [
-   902,
-   41,
+   246,
+   82,
    40,
    40
   ],
   "spore_slap": [
-   943,
-   41,
+   287,
+   82,
    40,
    40
   ],
   "tusk_gore": [
-   984,
-   41,
+   328,
+   82,
    40,
    40
   ],
   "dig_in": [
-   0,
+   369,
    82,
    40,
    40
   ],
   "sting_swarm": [
-   41,
+   410,
    82,
    40,
    40
   ],
   "comb_honey": [
-   82,
+   451,
    82,
    40,
    40
   ],
   "tonic": [
-   123,
+   492,
    82,
    40,
    40
   ],
   "guard_cut": [
-   164,
+   533,
    82,
    40,
    40
   ],
   "brace": [
-   205,
+   574,
    82,
    40,
    40
   ],
   "bite": [
-   246,
+   615,
    82,
    40,
    40
   ],
   "bay": [
-   287,
+   656,
    82,
    40,
    40
   ],
   "stick_rap": [
-   328,
+   697,
    82,
    40,
    40
   ],
   "field_rations": [
-   369,
+   738,
    82,
    40,
    40
   ],
   "heavy_cut": [
-   410,
+   779,
    82,
    40,
    40
   ],
   "keen_edge": [
-   451,
+   820,
    82,
    40,
    40
   ],
   "root_lash": [
-   492,
+   861,
    82,
    40,
    40
   ],
   "thicket": [
-   533,
+   902,
    82,
    40,
    40
   ],
   "staff_blow": [
-   574,
+   943,
    82,
    40,
    40
   ],
   "quell": [
-   615,
+   984,
    82,
    40,
    40
   ],
   "crook_strike": [
-   656,
-   82,
-   40,
-   40
-  ],
-  "bellwether": [
-   697,
-   82,
-   40,
-   40
-  ],
-  "herders_ward": [
-   738,
-   82,
-   40,
-   40
-  ],
-  "mote_bolt": [
-   779,
-   82,
-   40,
-   40
-  ],
-  "quickening": [
-   820,
-   82,
-   40,
-   40
-  ],
-  "bitter_motes": [
-   861,
-   82,
-   40,
-   40
-  ],
-  "banner_strike": [
-   902,
-   82,
-   40,
-   40
-  ],
-  "rallying_standard": [
-   943,
-   82,
-   40,
-   40
-  ],
-  "unbroken_flag": [
-   984,
-   82,
-   40,
-   40
-  ],
-  "gore": [
    0,
    123,
    40,
    40
   ],
-  "war_bellow": [
+  "bellwether": [
    41,
    123,
    40,
    40
   ],
-  "thick_hide": [
+  "herders_ward": [
    82,
    123,
    40,
    40
   ],
-  "cleave": [
+  "mote_bolt": [
    123,
    123,
    40,
    40
   ],
-  "crimson_blade": [
+  "quickening": [
    164,
    123,
    40,
    40
   ],
-  "onrush": [
+  "bitter_motes": [
    205,
    123,
    40,
    40
   ],
-  "thornburst": [
+  "banner_strike": [
    246,
    123,
    40,
    40
   ],
-  "cleansing_rite": [
+  "rallying_standard": [
    287,
    123,
    40,
    40
   ],
-  "keepers_balm": [
+  "unbroken_flag": [
    328,
    123,
    40,
    40
   ],
-  "poison_dart": [
+  "gore": [
    369,
    123,
    40,
    40
   ],
-  "dart_volley": [
+  "war_bellow": [
    410,
    123,
    40,
    40
   ],
-  "hidden_in_the_undergrowth": [
+  "thick_hide": [
    451,
    123,
    40,
    40
   ],
-  "rusty_hack": [
+  "cleave": [
    492,
    123,
    40,
    40
   ],
-  "bare_bones": [
+  "crimson_blade": [
    533,
    123,
    40,
    40
   ],
-  "putrid_slam": [
+  "onrush": [
    574,
    123,
    40,
    40
   ],
-  "warning_toll": [
+  "thornburst": [
    615,
    123,
    40,
    40
   ],
-  "last_peal": [
+  "cleansing_rite": [
    656,
    123,
    40,
    40
   ],
-  "grave_chill": [
+  "keepers_balm": [
    697,
    123,
    40,
    40
   ],
-  "plague_verse": [
+  "poison_dart": [
    738,
    123,
    40,
    40
   ],
-  "raise_dead": [
+  "dart_volley": [
    779,
    123,
    40,
    40
   ],
-  "unerring_shot": [
+  "hidden_in_the_undergrowth": [
    820,
    123,
    40,
    40
   ],
-  "sundering_volley": [
+  "rusty_hack": [
    861,
    123,
    40,
    40
   ],
-  "pinning_shot": [
+  "bare_bones": [
    902,
    123,
    40,
    40
   ],
-  "shield_bash": [
+  "putrid_slam": [
    943,
    123,
    40,
    40
   ],
-  "bulwark_slam": [
+  "warning_toll": [
    984,
    123,
    40,
    40
   ],
-  "old_grudge": [
+  "last_peal": [
    0,
    164,
    40,
    40
   ],
-  "searing_cut": [
+  "grave_chill": [
    41,
    164,
    40,
    40
   ],
-  "beacon": [
+  "plague_verse": [
    82,
    164,
    40,
    40
   ],
-  "trial_by_fire": [
+  "raise_dead": [
    123,
    164,
    40,
    40
   ],
-  "unbowed": [
+  "unerring_shot": [
    164,
    164,
    40,
    40
   ],
-  "mending_blows": [
+  "sundering_volley": [
    205,
    164,
    40,
    40
   ],
-  "masters_decree": [
+  "pinning_shot": [
    246,
    164,
    40,
    40
   ],
-  "earthen_surge": [
+  "shield_bash": [
    287,
    164,
    40,
    40
   ],
-  "splinter_talon": [
+  "bulwark_slam": [
+   328,
+   164,
+   40,
+   40
+  ],
+  "old_grudge": [
    369,
    164,
    40,
    40
   ],
-  "razor_gale": [
+  "searing_cut": [
    410,
    164,
    40,
    40
   ],
-  "graven_dread": [
+  "beacon": [
    451,
    164,
    40,
    40
   ],
-  "heartwood": [
+  "trial_by_fire": [
    492,
    164,
    40,
    40
   ],
-  "hobbling_thrust": [
+  "unbowed": [
    533,
    164,
    40,
    40
   ],
-  "grave_pierce": [
+  "mending_blows": [
    574,
    164,
    40,
    40
   ],
-  "last_bastion": [
+  "masters_decree": [
    615,
    164,
    40,
    40
   ],
-  "unbreached_plate": [
+  "earthen_surge": [
    656,
    164,
+   40,
+   40
+  ],
+  "splinter_talon": [
+   738,
+   164,
+   40,
+   40
+  ],
+  "razor_gale": [
+   779,
+   164,
+   40,
+   40
+  ],
+  "graven_dread": [
+   820,
+   164,
+   40,
+   40
+  ],
+  "heartwood": [
+   861,
+   164,
+   40,
+   40
+  ],
+  "hobbling_thrust": [
+   902,
+   164,
+   40,
+   40
+  ],
+  "grave_pierce": [
+   943,
+   164,
+   40,
+   40
+  ],
+  "last_bastion": [
+   984,
+   164,
+   40,
+   40
+  ],
+  "unbreached_plate": [
+   0,
+   205,
    40,
    40
   ]
@@ -701,7 +755,7 @@
   "atk_up": {
    "rect": [
     0,
-    206,
+    247,
     12,
     12
    ],
@@ -710,7 +764,7 @@
   "def_up": {
    "rect": [
     13,
-    206,
+    247,
     12,
     12
    ],
@@ -719,7 +773,7 @@
   "spd_up": {
    "rect": [
     26,
-    206,
+    247,
     12,
     12
    ],
@@ -728,7 +782,7 @@
   "shield": {
    "rect": [
     39,
-    206,
+    247,
     12,
     12
    ],
@@ -737,7 +791,7 @@
   "taunt": {
    "rect": [
     52,
-    206,
+    247,
     12,
     12
    ],
@@ -746,7 +800,7 @@
   "regen": {
    "rect": [
     65,
-    206,
+    247,
     12,
     12
    ],
@@ -755,7 +809,7 @@
   "counter": {
    "rect": [
     78,
-    206,
+    247,
     12,
     12
    ],
@@ -764,7 +818,7 @@
   "stun": {
    "rect": [
     91,
-    206,
+    247,
     12,
     12
    ],
@@ -773,7 +827,7 @@
   "freeze": {
    "rect": [
     104,
-    206,
+    247,
     12,
     12
    ],
@@ -782,7 +836,7 @@
   "poison": {
    "rect": [
     117,
-    206,
+    247,
     12,
     12
    ],
@@ -791,7 +845,7 @@
   "burn": {
    "rect": [
     130,
-    206,
+    247,
     12,
     12
    ],
@@ -800,7 +854,7 @@
   "def_down": {
    "rect": [
     143,
-    206,
+    247,
     12,
     12
    ],
@@ -809,7 +863,7 @@
   "spd_down": {
    "rect": [
     156,
-    206,
+    247,
     12,
     12
    ],
@@ -818,7 +872,7 @@
   "atk_down": {
    "rect": [
     169,
-    206,
+    247,
     12,
     12
    ],
@@ -827,7 +881,7 @@
   "heal_block": {
    "rect": [
     182,
-    206,
+    247,
     12,
     12
    ],
@@ -837,955 +891,955 @@
  "parts": {
   "matrix_rose": [
    0,
-   220,
+   261,
    144,
    144
   ],
   "logo": [
    145,
-   220,
+   261,
    271,
    58
   ],
   "frame_idle": [
    417,
-   220,
+   261,
    48,
    48
   ],
   "frame_sel": [
    466,
-   220,
+   261,
    48,
    48
   ],
   "frame_off": [
    515,
-   220,
+   261,
    48,
    48
   ],
   "camp_glow_0": [
    564,
-   220,
+   261,
    47,
    47
   ],
   "camp_glow_1": [
    612,
-   220,
+   261,
    47,
    47
   ],
   "camp_glow_2": [
    660,
-   220,
+   261,
    47,
    47
   ],
   "lobe_sel": [
    708,
-   220,
+   261,
    47,
    47
   ],
   "lobe_attune": [
    756,
-   220,
+   261,
    46,
    46
   ],
   "bigspool_pattern_pulse_0": [
    803,
-   220,
+   261,
    22,
    35
   ],
   "bigspool_pattern_pulse_1": [
    826,
-   220,
+   261,
    22,
    35
   ],
   "bigspool_pattern_pulse_2": [
    849,
-   220,
+   261,
    22,
    35
   ],
   "bigspool_pattern_sunder_0": [
    872,
-   220,
+   261,
    22,
    35
   ],
   "bigspool_pattern_sunder_1": [
    895,
-   220,
+   261,
    22,
    35
   ],
   "bigspool_pattern_sunder_2": [
    918,
-   220,
+   261,
    22,
    35
   ],
   "bigspool_pattern_ward_0": [
    941,
-   220,
+   261,
    22,
    35
   ],
   "bigspool_pattern_ward_1": [
    964,
-   220,
+   261,
    22,
    35
   ],
   "bigspool_pattern_ward_2": [
    987,
-   220,
+   261,
    22,
    35
   ],
   "bigspool_pattern_vigor_0": [
    0,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_vigor_1": [
    23,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_vigor_2": [
    46,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_needle_0": [
    69,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_needle_1": [
    92,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_needle_2": [
    115,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_apex_0": [
    138,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_apex_1": [
    161,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_apex_2": [
    184,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_focus_0": [
    207,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_focus_1": [
    230,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_focus_2": [
    253,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_tranquility_0": [
    276,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_tranquility_1": [
    299,
-   365,
+   406,
    22,
    35
   ],
   "bigspool_pattern_tranquility_2": [
    322,
-   365,
+   406,
    22,
    35
   ],
   "camp_open": [
    345,
-   365,
+   406,
    33,
    33
   ],
   "camp_cleared": [
    379,
-   365,
+   406,
    33,
    33
   ],
   "camp_locked": [
    413,
-   365,
+   406,
    33,
    33
   ],
   "quest_open": [
    447,
-   365,
+   406,
    33,
    33
   ],
   "quest_ready": [
    481,
-   365,
+   406,
    33,
    33
   ],
   "quest_done": [
    515,
-   365,
+   406,
    33,
    33
   ],
   "quest_locked": [
    549,
-   365,
+   406,
    33,
    33
   ],
   "node_glow_0": [
    583,
-   365,
+   406,
    31,
    31
   ],
   "node_glow_1": [
    615,
-   365,
+   406,
    31,
    31
   ],
   "node_glow_2": [
    647,
-   365,
+   406,
    31,
    31
   ],
   "star_l": [
    679,
-   365,
+   406,
    25,
    25
   ],
   "star_l_off": [
    705,
-   365,
+   406,
    25,
    25
   ],
   "panel": [
    731,
-   365,
+   406,
    24,
    24
   ],
   "panel_gold": [
    756,
-   365,
+   406,
    24,
    24
   ],
   "panel_red": [
    781,
-   365,
+   406,
    24,
    24
   ],
   "big_up": [
    806,
-   365,
+   406,
    24,
    24
   ],
   "big_hover": [
    831,
-   365,
+   406,
    24,
    24
   ],
   "big_down": [
    856,
-   365,
+   406,
    24,
    24
   ],
   "big_off": [
    881,
-   365,
+   406,
    24,
    24
   ],
   "card_locked": [
    906,
-   365,
+   406,
    24,
    24
   ],
   "bigstardust": [
    931,
-   365,
+   406,
    24,
    24
   ],
   "bigsoulstar": [
    956,
-   365,
+   406,
    24,
    24
   ],
   "card_common": [
    981,
-   365,
+   406,
    24,
    24
   ],
   "card_elite": [
    0,
-   401,
+   442,
    24,
    24
   ],
   "card_heroic": [
    25,
-   401,
+   442,
    24,
    24
   ],
   "card_mythic": [
    50,
-   401,
+   442,
    24,
    24
   ],
   "card_ashen": [
    75,
-   401,
+   442,
    24,
    24
   ],
   "card_silver": [
    100,
-   401,
+   442,
    24,
    24
   ],
   "card_gilded": [
    125,
-   401,
+   442,
    24,
    24
   ],
   "podium": [
    150,
-   401,
+   442,
    64,
    22
   ],
   "node_open": [
    215,
-   401,
+   442,
    21,
    21
   ],
   "node_cleared": [
    237,
-   401,
+   442,
    21,
    21
   ],
   "node_locked": [
    259,
-   401,
+   442,
    21,
    21
   ],
   "node_boss": [
    281,
-   401,
+   442,
    21,
    21
   ],
   "ring_ally": [
    303,
-   401,
+   442,
    56,
    20
   ],
   "ring_enemy": [
    360,
-   401,
+   442,
    56,
    20
   ],
   "ring_active_0": [
    417,
-   401,
+   442,
    56,
    20
   ],
   "ring_target_0": [
    474,
-   401,
+   442,
    56,
    20
   ],
   "ring_heal_0": [
    531,
-   401,
+   442,
    56,
    20
   ],
   "ring_active_1": [
    588,
-   401,
+   442,
    56,
    20
   ],
   "ring_target_1": [
    645,
-   401,
+   442,
    56,
    20
   ],
   "ring_heal_1": [
    702,
-   401,
+   442,
    56,
    20
   ],
   "ring_active_2": [
    759,
-   401,
+   442,
    56,
    20
   ],
   "ring_target_2": [
    816,
-   401,
+   442,
    56,
    20
   ],
   "ring_heal_2": [
    873,
-   401,
+   442,
    56,
    20
   ],
   "banner": [
    930,
-   401,
+   442,
    32,
    18
   ],
   "tut_hand": [
    963,
-   401,
+   442,
    15,
    18
   ],
   "spool_pattern_pulse_0": [
    979,
-   401,
+   442,
    18,
    18
   ],
   "spool_pattern_pulse_1": [
    998,
-   401,
+   442,
    18,
    18
   ],
   "spool_pattern_pulse_2": [
    0,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_sunder_0": [
    19,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_sunder_1": [
    38,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_sunder_2": [
    57,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_ward_0": [
    76,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_ward_1": [
    95,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_ward_2": [
    114,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_vigor_0": [
    133,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_vigor_1": [
    152,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_vigor_2": [
    171,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_needle_0": [
    190,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_needle_1": [
    209,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_needle_2": [
    228,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_apex_0": [
    247,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_apex_1": [
    266,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_apex_2": [
    285,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_focus_0": [
    304,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_focus_1": [
    323,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_focus_2": [
    342,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_tranquility_0": [
    361,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_tranquility_1": [
    380,
-   426,
+   467,
    18,
    18
   ],
   "spool_pattern_tranquility_2": [
    399,
-   426,
+   467,
    18,
    18
   ],
   "btn_up": [
    418,
-   426,
+   467,
    16,
    16
   ],
   "btn_hover": [
    435,
-   426,
+   467,
    16,
    16
   ],
   "btn_down": [
    452,
-   426,
+   467,
    16,
    16
   ],
   "btn_off": [
    469,
-   426,
+   467,
    16,
    16
   ],
   "well": [
    486,
-   426,
+   467,
    16,
    16
   ],
   "mi_summon": [
    503,
-   426,
+   467,
    16,
    16
   ],
   "mi_campaign": [
    520,
-   426,
+   467,
    16,
    16
   ],
   "mi_champions": [
    537,
-   426,
+   467,
    16,
    16
   ],
   "mi_academy": [
    554,
-   426,
+   467,
    16,
    16
   ],
   "mi_options": [
    571,
-   426,
+   467,
    16,
    16
   ],
   "mi_back": [
    588,
-   426,
+   467,
    16,
    16
   ],
   "mi_fight": [
    605,
-   426,
+   467,
    16,
    16
   ],
   "mi_play": [
    622,
-   426,
+   467,
    16,
    16
   ],
   "mi_weaving": [
    639,
-   426,
+   467,
    16,
    16
   ],
   "arrow_l": [
    656,
-   426,
+   467,
    10,
    15
   ],
   "arrow_r": [
    667,
-   426,
+   467,
    10,
    15
   ],
   "emblem_azure_crown": [
    678,
-   426,
+   467,
    15,
    15
   ],
   "emblem_sanguine_dominion": [
    694,
-   426,
+   467,
    15,
    15
   ],
   "emblem_court_of_root": [
    710,
-   426,
+   467,
    15,
    15
   ],
   "emblem_ashveil_reign": [
    726,
-   426,
+   467,
    15,
    15
   ],
   "tab_on": [
    742,
-   426,
+   467,
    16,
    14
   ],
   "tab_off": [
    759,
-   426,
+   467,
    16,
    14
   ],
   "lock": [
    776,
-   426,
+   467,
    11,
    13
   ],
   "star_m": [
    788,
-   426,
+   467,
    13,
    13
   ],
   "star_m_off": [
    802,
-   426,
+   467,
    13,
    13
   ],
   "rose_0": [
    816,
-   426,
+   467,
    13,
    13
   ],
   "rose_1": [
    830,
-   426,
+   467,
    13,
    13
   ],
   "rose_2": [
    844,
-   426,
+   467,
    13,
    13
   ],
   "rose_3": [
    858,
-   426,
+   467,
    13,
    13
   ],
   "rose_4": [
    872,
-   426,
+   467,
    13,
    13
   ],
   "rose_5": [
    886,
-   426,
+   467,
    13,
    13
   ],
   "rose_135": [
    900,
-   426,
+   467,
    13,
    13
   ],
   "stardust": [
    914,
-   426,
+   467,
    11,
    11
   ],
   "soulstar": [
    926,
-   426,
+   467,
    11,
    11
   ],
   "gem_ember": [
    938,
-   426,
+   467,
    11,
    11
   ],
   "gem_bloom": [
    950,
-   426,
+   467,
    11,
    11
   ],
   "gem_tide": [
    962,
-   426,
+   467,
    11,
    11
   ],
   "crown": [
    974,
-   426,
+   467,
    13,
    10
   ],
   "chevron_red": [
    988,
-   426,
+   467,
    11,
    9
   ],
   "chevron_gold": [
    1000,
-   426,
+   467,
    11,
    9
   ],
   "chevron_green": [
    1012,
-   426,
+   467,
    11,
    9
   ],
   "new": [
    0,
-   445,
+   486,
    19,
    9
   ],
   "star_s": [
    20,
-   445,
+   486,
    9,
    9
   ],
   "star_s_off": [
    30,
-   445,
+   486,
    9,
    9
   ],
   "role_Tank": [
    40,
-   445,
+   486,
    9,
    9
   ],
   "role_Damage": [
    50,
-   445,
+   486,
    9,
    9
   ],
   "role_Support": [
    60,
-   445,
+   486,
    9,
    9
   ],
   "check": [
    70,
-   445,
+   486,
    9,
    8
   ],
   "g_auto": [
    80,
-   445,
+   486,
    7,
    8
   ],
   "g_restart": [
    88,
-   445,
+   486,
    7,
    8
   ],
   "divider": [
    96,
-   445,
+   486,
    40,
    7
   ],
   "g_speed": [
    137,
-   445,
+   486,
    7,
    7
   ],
   "g_pause": [
    145,
-   445,
+   486,
    5,
    7
   ],
   "g_play": [
    151,
-   445,
+   486,
    5,
    7
   ]
@@ -1793,283 +1847,301 @@
  "portraits": {
   "sir_siroslav": [
    0,
-   456,
+   497,
    28,
    28
   ],
   "coffins_legs": [
    29,
-   456,
+   497,
    28,
    28
   ],
   "wraith": [
    58,
-   456,
+   497,
    28,
    28
   ],
   "haruspex": [
    87,
-   456,
+   497,
    28,
    28
   ],
   "crossbowman": [
    116,
-   456,
+   497,
    28,
    28
   ],
   "overlord_ofentol": [
    145,
-   456,
+   497,
    28,
    28
   ],
   "verdant_luminary": [
    174,
-   456,
+   497,
+   28,
+   28
+  ],
+  "war_tigress": [
+   203,
+   497,
+   28,
+   28
+  ],
+  "hex_warden": [
+   232,
+   497,
+   28,
+   28
+  ],
+  "transfusionist": [
+   261,
+   497,
    28,
    28
   ],
   "captain_gareth": [
-   203,
-   456,
+   290,
+   497,
    28,
    28
   ],
   "rime_scholar": [
-   232,
-   456,
+   319,
+   497,
    28,
    28
   ],
   "follower": [
-   261,
-   456,
+   348,
+   497,
    28,
    28
   ],
   "skirmisher": [
-   290,
-   456,
+   377,
+   497,
    28,
    28
   ],
   "strongman": [
-   319,
-   456,
+   406,
+   497,
    28,
    28
   ],
   "town_guard": [
-   348,
-   456,
+   435,
+   497,
    28,
    28
   ],
   "last_riter": [
-   377,
-   456,
+   464,
+   497,
    28,
    28
   ],
   "archer": [
-   406,
-   456,
+   493,
+   497,
    28,
    28
   ],
   "harvest_specialist": [
-   435,
-   456,
+   522,
+   497,
    28,
    28
   ],
   "sentry": [
-   464,
-   456,
+   551,
+   497,
    28,
    28
   ],
   "junior_ward": [
-   493,
-   456,
+   580,
+   497,
    28,
    28
   ],
   "gravedigger": [
-   522,
-   456,
+   609,
+   497,
    28,
    28
   ],
   "ash_widow": [
-   551,
-   456,
+   638,
+   497,
    28,
    28
   ],
   "toadcap": [
-   580,
-   456,
+   667,
+   497,
    28,
    28
   ],
   "bristleback": [
-   609,
-   456,
+   696,
+   497,
    28,
    28
   ],
   "hive_tender": [
-   638,
-   456,
+   725,
+   497,
    28,
    28
   ],
   "dominion_medic": [
-   667,
-   456,
+   754,
+   497,
    28,
    28
   ],
   "lineholder": [
-   696,
-   456,
+   783,
+   497,
    28,
    28
   ],
   "bloodhound": [
-   725,
-   456,
+   812,
+   497,
    28,
    28
   ],
   "quartermaster": [
-   754,
-   456,
+   841,
+   497,
    28,
    28
   ],
   "enforcer": [
-   783,
-   456,
+   870,
+   497,
    28,
    28
   ],
   "walking_bush": [
-   812,
-   456,
+   899,
+   497,
    28,
    28
   ],
   "wild_speaker": [
-   841,
-   456,
+   928,
+   497,
    28,
    28
   ],
   "jungle_herder": [
-   870,
-   456,
+   957,
+   497,
    28,
    28
   ],
   "associate": [
-   899,
-   456,
+   986,
+   497,
    28,
    28
   ],
   "emissary_handlings": [
-   928,
-   456,
+   0,
+   526,
    28,
    28
   ],
   "black_rhino": [
-   957,
-   456,
+   29,
+   526,
    28,
    28
   ],
   "red_cloak": [
-   986,
-   456,
+   58,
+   526,
    28,
    28
   ],
   "grove_keeper": [
-   0,
-   485,
+   87,
+   526,
    28,
    28
   ],
   "big_ears": [
-   29,
-   485,
+   116,
+   526,
    28,
    28
   ],
   "skeleton": [
-   58,
-   485,
+   145,
+   526,
    28,
    28
   ],
   "rot_hulk": [
-   87,
-   485,
+   174,
+   526,
    28,
    28
   ],
   "bellringer": [
-   116,
-   485,
+   203,
+   526,
    28,
    28
   ],
   "necromancer": [
-   145,
-   485,
+   232,
+   526,
    28,
    28
   ],
   "automated_soul": [
-   174,
-   485,
+   261,
+   526,
    28,
    28
   ],
   "irving_wellbington": [
-   203,
-   485,
+   290,
+   526,
    28,
    28
   ],
   "paladin": [
-   232,
-   485,
+   319,
+   526,
    28,
    28
   ],
   "chief_engineer_cj": [
-   261,
-   485,
+   348,
+   526,
    28,
    28
   ],
   "forest_gargoyle": [
-   290,
-   485,
+   377,
+   526,
    28,
    28
   ],
   "dead_knight_amstron": [
-   319,
-   485,
+   406,
+   526,
    28,
    28
   ]

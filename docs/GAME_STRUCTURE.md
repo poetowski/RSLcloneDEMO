@@ -62,6 +62,9 @@ The roster today:
 | Overlord Ofentol (`overlord_ofentol`) | Elite | Bloom | Tank | Azure Crown | summoned |
 | Verdant Luminary (`verdant_luminary`) | Elite | Bloom | Support | Azure Crown | summoned |
 | Emissary Handlings (`emissary_handlings`) | Elite | Tide (a stand-in) | Tank | Azure Crown | summoned |
+| War Tigress (`war_tigress`) | Elite | Ember (a stand-in) | Damage | Sanguine Dominion | summoned |
+| Hex Warden (`hex_warden`) | Elite | Ember (a stand-in) | Tank | Sanguine Dominion | summoned |
+| Transfusionist (`transfusionist`) | Elite | Tide (a stand-in) | Support | Sanguine Dominion | summoned |
 | Black Rhino (`black_rhino`) | Elite | Bloom (a stand-in) | Tank | Sanguine Dominion | summoned |
 | Red Cloak (`red_cloak`) | Elite | Bloom (a stand-in) | Damage | Sanguine Dominion | summoned |
 | Grove Keeper (`grove_keeper`) | Elite | Tide (a stand-in) | Support | Court of Root | summoned |
