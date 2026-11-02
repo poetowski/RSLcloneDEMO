@@ -4526,3 +4526,35 @@ A1's 1.25, A2's 0.5 x 3 and A3's 0.8, his stats, the lore line, that he is summo
 (the cut of the plate and its gold, the crown and its rays, the cloak's ivory, his face, hair and tail, the rapier's hilt,
 runes and sparks, the stance and the lunge, the three cuts, the salute with the sparks streaming up, the lines of light his
 cuts leave, the flare at the blade's tip and the chevrons rising over each ally).
+
+## 75. Lycan (received 2026-11-02)
+
+Jakub's brief: a Heroic Damage of the Ashveil Reign, Tide. "I want new champion. Damage heroic tide ashveil reign. Name
+"Lycan". Define creative lycanthrope design and kit which heals from damage output and speed buff debuff." So the name, the
+four categories and the two ideas, healing from damage dealt and speed buffs and debuffs, are his; the design and the kit are
+mine and stand in until he sets them.
+
+He is a soldier of the Reign gone to the wolf, hunched on two legs: ash-grey fur, cold and a little violet in its shadow,
+with a pale ruff down his neck and over his chest; arms that hang past the knee ending in black-nailed claws; a long wolf's
+head with pale eyes (the light in the Reign's sockets), a notch torn out of one ear, a scar across the muzzle and fangs that
+show whenever the jaw opens; a heavy tail. What is left of the man: torn charcoal breeches, a sash of the Reign's plum across
+his chest with its two ragged ends hanging, and an iron shackle on his near wrist with a few links of broken chain.
+
+- **Ravening Claws** (A1): one enemy, two rakes of 0.55 (1.1 in all); he heals by 25% of the damage dealt.
+- **Hunter's Howl** (A2, CD 4): all enemies, 0.5, Slow for 2 turns on each and SPD Up for 2 turns on all allies, himself
+  included; he heals by 30% of the damage dealt.
+- **Moonlit Maul** (A3, CD 5): leaps on one enemy, 1.5, and half as hard again (x1.3 on the norm) below 40% HP, the execute
+  of the War Tigress's Blood Pounce; he heals by 50% of the damage dealt.
+- **Moon-Mad** (passive, `overdrive`): the first time he drops below 40% HP, SPD Up for 2 turns.
+- Stats HP 1200, ATK 118, DEF 58, SPD 114, CRIT 6%, score 437. Impact 79%, over the band like the other Heroics (MDA T22).
+  Summoned.
+
+Read by the game: the healing is a share of the damage a skill actually deals, so a Shield on the target soaks first and
+heals nothing; the Hunter's Howl heals him once for each enemy it strikes; the Slow is certain but meets RES like every
+debuff; "all allies" includes him; the maul's bonus counts the target's HP before the blow; nothing new in the rules: the
+kit is `lifesteal`, `execute`, the leap and `overdrive`, all of which exist.
+
+Stand-ins until he sets them: the names Ravening Claws, Hunter's Howl, Moonlit Maul and Moon-Mad and their texts, every
+number, his stats, the lore line, that he is summoned, and every detail of his art and effects (the fur's grey and its ruff,
+the notch and the scar, the sash, the shackle and its chain, the rag at his hip, the rakes, the jaws that close in the maul,
+the howl at the moon with its pale rings, the streaks of speed through each ally, the crescent that rises when Moon-Mad wakes).

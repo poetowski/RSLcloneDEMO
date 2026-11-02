@@ -50,6 +50,26 @@ const WOOD = MAT.wood.ramp, IRON = MAT.iron.ramp, AZF = MAT.blue.ramp;
 /** splinters of the shaft */
 const SPLINTER = ramps.wood;
 /** the pale light in his gorget, which his Pinning Shot carries */
+/** Lycan's claws and teeth: grey to a pale edge; his howl and haste are the pale light of the Reign's sockets */
+const FANG: RGBA[] = [DU[0], DU[2], DU[4], ACCENT.ashEye, W];
+const PALE: RGBA[] = [DU[1], DU[3], ACCENT.ashEyeDim, ACCENT.ashEye, W];
+/** a rake of three claws, slanted `dir` (1: down to the right, -1: up to the right) */
+function clawRake(b: Bitmap, i: number, dir: 1 | -1, seed: number) {
+  const cx = 30, cy = 30;
+  for (const k of [-1, 0, 1]) {
+    const y0 = cy - dir * 20 + k * 2, y1 = cy + dir * 18 + k * 2;
+    if (i < 4) cut(b, cx - 14 + k * 7, y0, cx + 10 + k * 7, y1, dir * 4, [2.4, 2.8, 2, 1.1][i], FANG, [1.3, 1.15, 0.85, 0.5][i], [0.6, 1, 1, 1][i]);
+  }
+  if (i >= 1) sparks(b, cx, cy, 10, 20, (i - 1) / 4, DULL, seed, 6);
+}
+/** a row of teeth along an arc: `n` triangles pointing `down` (1) or up (-1), `gap` px off the line */
+function teeth(b: Bitmap, cx: number, cy: number, gap: number, down: 1 | -1, fade: number) {
+  for (let k = -3; k <= 3; k++) {
+    const x = cx + k * 6, h = 11 - Math.abs(k) * 1.4;
+    const y = cy + down * (gap + Math.abs(k) * 1.2);
+    polyFill(b, [[x - 2.6, y], [x + 2.6, y], [x, y + down * h]], (px, py) => (dith(px, py, fade) ? rampDither(FANG, 2.6 + (Math.abs(py - y) < 2 ? 1.2 : 0), px, py) : 0));
+  }
+}
 /** the Wraith's talons tearing: dark grey to a pale edge */
 const TALON: RGBA[] = [MAT.shroud.ramp[0], MAT.shroud.ramp[2], MAT.shroud.ramp[4], MAT.shroud.ramp[5], W];
 /** shreds of the Wraith's shroud */
@@ -832,6 +852,94 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
       }
       const rr = 24 - t * 10;
       if (i >= 3) ellipseRing(b, cx, gy, rr, rr * 0.28, 1.3, (x, y, a) => (dith(x, y, fade) ? (Math.sin(a) > 0.3 ? ACCENT.ashEyeDim : OMEN[2]) : 0));
+    },
+  },
+
+  // --- Lycan (section 75) ----------------------------------------------------
+  /** Ravening Claws, the first rake: three claws tear down through the enemy, tufts of grey shaken off. Matter. */
+  lycan_rake: {
+    w: 60, h: 60, n: 6, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 6, 2],
+    draw: (b, t, i) => clawRake(b, i, 1, 1001),
+  },
+  /** Ravening Claws, the second rake: the other paw tears back up through it. Matter. */
+  lycan_rake_back: {
+    w: 60, h: 60, n: 6, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 6, 2],
+    draw: (b, t, i) => clawRake(b, i, -1, 1009),
+  },
+  /** Moonlit Maul: a great jaw closes on the enemy, the teeth meeting in a dull flash, a ring of the bite pressed out, grey chips and a few pale sparks flying. Matter. */
+  maul_bite: {
+    w: 64, h: 72, n: 9, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 4, 8, 4],
+    draw: (b, t, i) => {
+      const cx = 32, cy = 36;
+      const gap = [18, 13, 8, 3, 2, 2, 2, 2, 2][i];
+      const fade = i < 6 ? 1 : [0.7, 0.45, 0.25][i - 6];
+      teeth(b, cx, cy, gap, 1, fade);
+      teeth(b, cx, cy, gap, -1, fade);
+      if (i >= 3 && i <= 6) burst(b, cx, cy, 8, 2, [10, 15, 12, 8][i - 3], 1.3, DULL, 0.3);
+      if (i >= 4) ring(b, cx, cy, 6 + (i - 4) * 4, 4 + (i - 4) * 2.4, 1.3, DULL, 1.1 - (i - 4) * 0.14);
+      if (i >= 3) sparks(b, cx, cy, 12, 26, (i - 3) / 5, PALE, 1021, 14);
+    },
+  },
+  /** Hunter's Howl at his muzzle (the snout of the raised head, 14 px behind the head point and 9 above it): rings of pale sound going up and out from the raised snout, motes of the light torn off them. Light. */
+  howl_rings: {
+    w: 110, h: 100, n: 12, ms: 55, ax: 0.629, ay: 0.589, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      soundRings(b, 55, 50, i, 4, 2, 6.4, 7, PALE);
+      motes(b, 55, 50, 44, 14, 10, t, PALE, 1031);
+    },
+  },
+  /** Hunter's Howl reaches an enemy: the howl breaks over it in a pale flash, motes of the light sinking slowly round it as it slows. Light. */
+  howl_hit: {
+    w: 60, h: 72, n: 9, ms: 65, ax: 0.5, ay: 0.55, pad: [2, 2, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 30, cy = 36;
+      if (i < 3) burst(b, cx, cy, 8, 1, [8, 13, 9][i], 1.2, PALE, 0.4);
+      if (i >= 1 && i < 6) ring(b, cx, cy + 4, 8 + i * 3, 4 + i * 1.4, 1.2, PALE, 1.2 - i * 0.16);
+      const m = rng(1041);
+      for (let k = 0; k < 9; k++) {
+        const x0 = cx + (m() - 0.5) * 30, start = 0.1 + m() * 0.3;
+        const tt = (t - start) / (1 - start);
+        if (tt <= 0) continue;
+        const x = Math.round(x0 + Math.sin(tt * 4 + k) * 2), y = Math.round(cy - 12 + tt * 30);
+        if (!dith(x, y, 1 - tt * 0.7)) continue;
+        b.set(x, y, tt < 0.5 ? PALE[3] : PALE[1]);
+        if (k % 3 === 0 && tt < 0.6) b.set(x, y - 1, PALE[2]);
+      }
+    },
+  },
+  /** Hunter's Howl reaches each ally: pale streaks of speed run through it to the right, a ring settles at its feet, motes of the howl rise. Light. */
+  pack_spur: {
+    w: 64, h: 76, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const cx = 32, cy = 34;
+      if (i >= 1) ring(b, cx, cy + 32, 8 + t * 14, 3 + t * 3.6, 1.2, PALE, 1.1 - t * 0.6);
+      for (const [dy, len, lag] of [[-12, 22, 0], [-2, 28, 1], [8, 20, 2], [16, 16, 1]] as const) {
+        const tt = (i - lag) / 6;
+        if (tt <= 0 || tt > 1) continue;
+        const x1 = Math.round(cx - 22 + tt * 52), x0 = x1 - Math.round(len * (1 - tt * 0.3));
+        for (let x = x0; x <= x1; x++) {
+          const f = (x - x0) / Math.max(1, x1 - x0);
+          if (dith(x, cy + dy, (1 - tt * 0.6) * (0.3 + f))) b.set(x, cy + dy, PALE[f > 0.8 ? 4 : f > 0.4 ? 3 : 1]);
+        }
+      }
+      motes(b, cx, cy + 24, 22, 46, 12, t, PALE, 1051);
+    },
+  },
+  /** Moon-Mad: a pale crescent of the moon rises behind him as he goes wild, a ring at his feet, motes streaming up. Light. */
+  moon_mad: {
+    w: 80, h: 100, n: 12, ms: 60, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 40, gy = 94;
+      const fade = i < 3 ? [0.4, 0.75, 1][i] : i < 8 ? 1 : [0.7, 0.45, 0.25, 0.1][i - 8];
+      for (let y = 8; y <= 46; y++) {
+        for (let x = 14; x <= 62; x++) {
+          const a = Math.hypot(x - 40, y - 28), c2 = Math.hypot(x - 47, y - 25);
+          if (a > 17 || c2 <= 15) continue;
+          if (dith(x, y, fade)) b.set(x, y, a > 15 ? PALE[4] : PALE[3]);
+        }
+      }
+      ellipseRing(b, cx, gy, 6 + t * 18, (6 + t * 18) * 0.3, 1.3, (x, y, a) => (dith(x, y, 1 - t * 0.7) ? rampDither(PALE, 3.2 - t + Math.sin(a) * 0.5, x, y) : 0));
+      motes(b, cx, gy - 4, 28, 80, 12, t, PALE, 1061);
     },
   },
 };

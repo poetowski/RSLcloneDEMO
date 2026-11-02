@@ -83,6 +83,7 @@ The roster today:
 | Haruspex (`haruspex`, a stand-in name) | Elite | Tide (a stand-in) | Support | Ashveil Reign | summoned |
 | Astronomer Royal (`astronomer_royal`) | Heroic | Ember (a stand-in) | Support | Azure Crown | summoned |
 | Azul the Blade (`azul_the_blade`) | Heroic | Ember | Damage | Azure Crown | summoned |
+| Lycan (`lycan`) | Heroic | Tide | Damage | Ashveil Reign | summoned |
 | Paladin (`paladin`) | Heroic | Ember | Tank | Azure Crown | summoned (the reward of a quest line Jakub designs later) |
 | Chief Engineer CJ (`chief_engineer_cj`) | Heroic | Bloom | Tank | Sanguine Dominion | summoned |
 | Sir Siroslav (`sir_siroslav`) | Heroic | Ember | Support | Sanguine Dominion | summoned |
