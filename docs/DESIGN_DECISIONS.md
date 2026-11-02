@@ -4348,7 +4348,7 @@ stay consistent with the Court's look: grown, not issued (no insignia; 3.3), in 
 is one of the kinds its record names: a beast, a feral intelligence, a thing nobody can place. Their affinities even
 the Court's Elites at two each of Ember, Bloom and Tide. As with sections 65-67, each has an A1, an A2 and a passive.
 
-An Elite Damage, Tide: a great old jungle spider, her own eight-legged rig (`solveSpider` in spirit: the pose gives the
+An Elite Damage, Tide: a great old jungle spider, her own eight-legged rig (`legsOf`: the pose gives the
 body, and the knees always arch up). Bark-brown, tall arched legs, moss and fern on her abdomen with pale chevrons,
 eight amber eyes, pale fangs.
 

@@ -6,7 +6,7 @@
 // eyes, two pale fangs. No insignia: the Court shares a nature, not a hierarchy. Her
 // affinity (Tide) sets nothing here (Jakub, 2026-10-11).
 //
-// The rig is her own (solveSpider): the shared pose gives the body (x, y, torso tilt)
+// The rig is her own (legsOf): the shared pose gives the body (x, y, torso tilt)
 // and p carries the rest: p.walk the legs' phase, p.step how far they stride, p.front
 // lifts the front pair (0-1), p.fang opens the fangs, p.abd tips the abdomen up (deg),
 // p.curl folds every leg in under her (0-1, her death). Dims make the shared solver's
