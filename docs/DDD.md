@@ -61,6 +61,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Kept meter | the actor ends its turn with this meter instead of 0 (the Paladin's Beacon: 35%, shown over him as `+35% TURN` as his turn ends) | `selfTm`, `Unit.pendingTm` |
 | Purge | a passive that, at the start of its holder's turn, lifts one random debuff from every ally (Chief Engineer CJ's Master's Eye) | `PassiveDef.kind: 'purge'`, `Battle.purge` |
 | Brace | a passive that gives its holder statuses at the start of its turn (the Forest Gargoyle's Heartwood) | `PassiveDef.kind: 'brace'`, `Battle.brace` |
+| Raise all | a revive of every fallen ally at once (the Cinder Sylph's Rise From Ash) | `SkillDef.reviveAll`, `Battle.useSkill` |
 | Given turn | a turn an ally's skill gives, taken next, ahead of the meters (the Astronomer Royal's Hour of Destiny) | `SkillDef.grantTurn`, `Battle.advance`, `Unit.keptTm` |
 | Alignment | a passive giving the other ally lowest on turn meter a share at the start of its holder's turn (Fixed Stars) | `PassiveDef.kind: 'alignment'`, `Battle.alignment` |
 | Renewal | a passive that heals every ally by a share of its holder's max HP at the start of its turn (Rootfather's Sap Rises) | `PassiveDef.kind: 'renewal'`, `Battle.renewal` |

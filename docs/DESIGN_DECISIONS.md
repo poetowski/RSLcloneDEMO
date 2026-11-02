@@ -4437,8 +4437,8 @@ round his boots and growing into the ground; a crooked wooden staff with a lumin
   Poison for 2 turns.
 - **Sap Rises** (passive, new kind `renewal`): at the start of his turn, a skipped one too, every ally, himself included,
   heals for 10% of his max HP. Heal Block stops it. It shows only when someone is hurt.
-- Stats HP 900, ATK 118, DEF 80, SPD 90, CRIT 2.5%, score 419. Impact 70%, over the band of 40-60%; the passive is most
-  of it, and even at A1 0.3 it was 60%. Summoned.
+- Stats HP 900, ATK 118, DEF 80, SPD 90, CRIT 2.5%, score 419. Impact 70% when built, 66% with the 56 of the roster the same day, over the band of 40-60%; the
+  passive is most of it, and even at A1 0.3 it was 60%. Summoned.
 - Stand-ins until he sets them: the skill names and texts, A3's multiplier and cooldown, the stats, the lore line, and
   that he is summoned. Read by the game: speed down is Slow; "all allies" includes him; the debuffs are certain, meeting RES.
 

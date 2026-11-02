@@ -74,6 +74,8 @@ interface SkillDef {
   selfTm?: number;          // actor ends the turn with this TM instead of 0
   execute?: { below: number; mult: number };
   revive?: number;          // with target 'fallen': the ally raised gets up with this fraction of its max HP, on the last hit (Raise Dead)
+  reviveAll?: boolean;      // with target 'fallen': raises every fallen ally, not one at random (Rise From Ash)
+  grantTurn?: boolean;      // with target 'ally': that ally takes the very next turn and keeps its meter (Hour of Destiny)
   projectile?: string; castFx?: string; actorFx?: string; shake?: number;   // presentation
   volley?: string;          // presentation: `projectile` loosed into the sky on `shoot`, this one coming down on every target (Sundering Volley)
   allyFx?: string;          // presentation: the effect on each ally a buff of an attack reaches (Onrush's gust)
@@ -166,7 +168,7 @@ Three affinities in a cycle (Jakub's, [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)
 | Execute | `mult` bonus against targets below `below` x max HP |
 | Heals | `healAllies` heals every ally on the last hit by a share of each ally's own max HP, or of the healer's with `healOf: 'caster'`; never past the maximum; Heal Block stops it |
 | Turn Meter boost | `tmAllies` adds to every other ally's turn meter on the last hit; `tmLowestAlly` adds to the other ally with the lowest HP share once the skill's heals have landed; `tmTargets` drains enemies |
-| Revive | `target: 'fallen'` with `revive`: on the last hit one fallen ally, chosen at random, gets up with `revive` x its max HP, nothing on it and an empty turn meter; its cooldowns stand as they were when it fell and its once-a-battle passives (Undying, Overdrive) stay spent. The skill is ready only while an ally has fallen, and the AI uses it as soon as it is (Raise Dead: 30%, cooldown 6; Jakub, 2026-10-18). Shows as a `raise` event: the skill's effect on the spot where the ally fell, then the ally gets up through its own `death` played backwards, `RAISED!`; the battle waits for it |
+| Revive | `target: 'fallen'` with `revive`: on the last hit one fallen ally, chosen at random (with `reviveAll`, every fallen ally: the Cinder Sylph's Rise From Ash), gets up with `revive` x its max HP, nothing on it and an empty turn meter; its cooldowns stand as they were when it fell and its once-a-battle passives (Undying, Overdrive) stay spent. The skill is ready only while an ally has fallen, and the AI uses it as soon as it is (Raise Dead: 30%, cooldown 6; Jakub, 2026-10-18). Shows as a `raise` event: the skill's effect on the spot where the ally fell, then the ally gets up through its own `death` played backwards, `RAISED!`; the battle waits for it |
 | Undying (passive) | the first lethal hit leaves the champion at `value` x max HP with every debuff removed |
 | Overdrive (passive) | the first time damage, a hit or a tick of Poison or Burn, leaves the champion alive below `value` x max HP, it gains the passive's `statuses`, once a battle; a lethal hit never triggers it (the Bellringer's Last Peal: DEF Up for 2 turns below 50%). Shows as a `passive` event: the banner, then the passive's `holderFx` on its holder (Last Peal: the bell tolls by itself and gold closes round him), or without one the core-flare and `OVERDRIVE!` |
 | Rebuke (passive) | while the champion is below `value` x max HP **after** a hit, an enemy whose **critical** hit landed on it receives the passive's `statuses` (Cold Rebuke: Freeze, 1 turn); then the passive rests for `cooldown` of the champion's own turns. A hit that kills never triggers it. Shows as a `passive` event with the attacker as `source`: the passive's banner, a burst of ice round the holder, `REBUKE!`, a shard flying to the attacker; the Freeze lands once the attacker is back in formation |
@@ -322,6 +324,7 @@ cleanse { target, status, hit }            dispel  { target, status, hit }
 expire  { target, status }                 tm      { target, delta, hit }
 revive  { target, hp, hit }                death   { target, hit }
 raise   { target, hp, hit }                (a fallen ally raised by a skill: Raise Dead)
+extraTurn { target, hit }                  (an ally given the next turn: Hour of Destiny)
 passive { target, name, hit, effect, source? }   (a passive acts mid-fight: Overdrive; Rebuke names the attacker; a ward, a tend or
                                                   a remedy targets the ally it helps and names its holder; a retaliation targets
                                                   the attacker and names its holder; fallen and defy target the holder)
@@ -425,6 +428,10 @@ The last column is how the game reads his values (a stand-in until he confirms i
 | III. Moonlit Basin | Focus, Tranquility |
 | IV. Earth Scars | Needle, Sunder |
 | V. Snowy Mesa | Apex, Pulse |
+| VI. Golden Expanse | Focus, Ward |
+| VII. Dead Forest | Tranquility, Needle |
+| VIII. Crystal Graveyard | Apex, Vigor |
+| IX. Sleeping Archipelago | Pulse, Tranquility |
 
 | | |
 | --- | --- |
