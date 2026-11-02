@@ -132,6 +132,22 @@ export const ZONES: ZoneDef[] = [
     // a first take: now and then the formation lights the sky, rarely
     flash: { at: [320, 70], every: [16000, 32000], ms: 1600, colors: ['#b89cff', '#7fe0ff', '#ff9ae0'] },
   },
+  {
+    // Zone 9, named and described by Jakub (2026-11-02): the Sleeping Archipelago, emerald islands on a warm turquoise
+    // ocean, white elven arches, towers, temples and bridges, the jungle taking them back
+    id: 'zone9',
+    name: 'Sleeping Archipelago',
+    ambient: 'pollen',
+    // sunlight off the water
+    glow: [255, 240, 190],
+    // the sun stands fairly high
+    shadow: { dx: 4, stretch: 1.15 },
+    tint: { color: '#fff0b8', alpha: 0.04, op: 'soft-light' },
+    // seabirds wheel over the arch and the temple's cliff; butterflies among the vines
+    birds: 3,
+    birdsAt: [[300, 60], [520, 44]],
+    butterflies: [[90, 170], [572, 160], [320, 196]],
+  },
 ];
 
 const byId = new Map(ZONES.map((z) => [z.id, z]));

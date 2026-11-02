@@ -49,7 +49,7 @@ import { LocationDef, StageDef } from './types';
  * area by area: a new area widens it by its stretch, and everything west of the
  * stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 2840, h: 360 };
+export const WORLD_MAP = { w: 3160, h: 360 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];
@@ -97,6 +97,16 @@ const BURIED = 'Ancient crystal structures lie partially buried underground.';
 const CRACKS = 'Deep cracks expose glowing mineral veins.';
 const PASSAGES = 'Narrow passages run between massive formations, under collapsed crystalline arches.';
 const FORMATION = 'A gigantic crystal formation stands at the centre of the region.';
+// Zone 9: Jakub's description of the Sleeping Archipelago (2026-11-02), from the open sea to the courtyards
+const ISLANDS = 'Countless emerald islands rise from turquoise waters on a vast, warm ocean.';
+const ABANDONED = 'Once home to a prosperous elven civilization, these islands have long since been abandoned.';
+const ARCHES = 'Enormous white-stone arches, slender towers and open-air temples stand along the coast.';
+const SPANS = 'Bridges connect the natural rock formations, carved with leaves, waves and branches.';
+const DROWNED = 'Some buildings lie partially submerged; others cling to cliffs above the sea.';
+const PALMS = 'Palm trees grow through cracked marble floors.';
+const VINES = 'Enormous flowering vines wrap around ancient columns.';
+const COURTYARDS = 'Roots penetrate the forgotten courtyards.';
+const TERRACES = 'Small waterfalls descend from overgrown terraces into natural pools.';
 // Zone 5: Jakub's description of the Snowy Mesa (2026-10-19), from the mesa's top to the arbiter on it
 const MESA_TOP = 'The top of a snow-capped tabletop mountain.';
 const MESAS = 'Many more tabletop mountains all round, all connected with many candles.';
@@ -544,6 +554,30 @@ export const LOCATIONS: LocationDef[] = [
       { id: '8-8', blurb: PASSAGES, enemies: [{ champion: 'forest_gargoyle' }, { champion: 'jungle_herder' }, { champion: 'wild_speaker' }], power: 0.76 },
       { id: '8-9', blurb: FORMATION, enemies: [{ champion: 'dead_knight_amstron' }, { champion: 'automated_soul' }, { champion: 'necromancer' }], power: 0.54 },
       { id: '8-10', blurb: `${FORMATION} The last stage of the area.`, enemies: [{ champion: 'chief_engineer_cj', boss: true }, { champion: 'associate' }, { champion: 'grove_keeper' }], power: 0.66 },
+    ],
+  },
+  {
+    // Zone 9, named and described by Jakub (2026-11-02, DESIGN_DECISIONS.md 5.12); he asked for placeholder stages,
+    // ten like the areas before it, whose enemies, powers and texts are stand-ins; no champion joins there
+    id: 'zone9',
+    chapter: 'IX',
+    name: 'Sleeping Archipelago',
+    zone: 'zone9',
+    blurb: 'East of the Crystal Graveyard the land ends at a warm, turquoise ocean: emerald islands and the white arches of an elven civilization long gone, slowly surrendering to the jungle, salt and centuries.',
+    requires: '8-10',
+    map: { x: 3000, y: 200 },
+    patterns: ['pattern_pulse', 'pattern_tranquility'],
+    stages: [
+      { id: '9-1', blurb: ISLANDS, enemies: [{ champion: 'bristleback' }, { champion: 'toadcap' }, { champion: 'hive_tender' }], power: 0.9 },
+      { id: '9-2', blurb: ABANDONED, enemies: [{ champion: 'walking_bush' }, { champion: 'follower' }, { champion: 'wild_speaker' }], power: 1 },
+      { id: '9-3', blurb: ARCHES, enemies: [{ champion: 'lineholder' }, { champion: 'crossbowman' }, { champion: 'quartermaster' }], power: 0.86 },
+      { id: '9-4', blurb: SPANS, enemies: [{ champion: 'hex_warden' }, { champion: 'war_tigress' }, { champion: 'dominion_medic' }], power: 0.78 },
+      { id: '9-5', blurb: DROWNED, enemies: [{ champion: 'coffins_legs' }, { champion: 'wraith' }, { champion: 'haruspex' }], power: 0.72 },
+      { id: '9-6', blurb: PALMS, enemies: [{ champion: 'bog_troll' }, { champion: 'silkfang' }, { champion: 'moth_seer' }], power: 0.74 },
+      { id: '9-7', blurb: VINES, enemies: [{ champion: 'jungle_herder' }, { champion: 'big_ears' }, { champion: 'verdant_luminary' }], power: 0.74 },
+      { id: '9-8', blurb: COURTYARDS, enemies: [{ champion: 'forest_gargoyle' }, { champion: 'silkfang' }, { champion: 'grove_keeper' }], power: 0.72 },
+      { id: '9-9', blurb: TERRACES, enemies: [{ champion: 'paladin' }, { champion: 'crossbowman' }, { champion: 'verdant_luminary' }], power: 0.66 },
+      { id: '9-10', blurb: `${TERRACES} The last stage of the area.`, enemies: [{ champion: 'rootfather', boss: true }, { champion: 'bog_troll' }, { champion: 'moth_seer' }], power: 0.76 },
     ],
   },
 ];

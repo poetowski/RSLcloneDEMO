@@ -31,7 +31,9 @@
 // reaching up, the great holes where the biggest once stood, mist lying still. Beyond
 // it (2026-11-01) the ash ends on dark violet rock and the Crystal Graveyard (Zone 8)
 // begins: thousands of fragments, pillars, broken spires, glowing veins, and at the
-// centre of the region one gigantic formation.
+// centre of the region one gigantic formation. Beyond it (2026-11-02) the rock ends at
+// a warm ocean and the Sleeping Archipelago (Zone 9) begins: emerald islands, turquoise
+// shallows, the road going on from island to island over white elven bridges.
 //
 // Everything is drawn in world pixels, and every random choice is a hash of
 // its position, so the map grows east area by area: widen WORLD_MAP by the new
@@ -42,6 +44,7 @@ import path from 'node:path';
 import { LOCATIONS, WORLD_MAP } from '../../src/game/data/campaign.ts';
 import { dith, ellipseFill, outline, polyFill, rampDither } from './paint.ts';
 import { A, B, Bitmap, G, hash2, hex, mix, R, RGBA, rgba } from './raster.ts';
+import { elfArch, elfBridge, elfColumn, elfTower, JUNGLE, MARBLE, palm, ROCK as ISLE_ROCK, SEA as OCEAN, stoneLeaf, vine } from './zones/zone9.ts';
 import { cluster, CRYS, GROUND as ROCKM, ICE, prism, rock, ROSE, STONEWORK, VEIN } from './zones/zone8.ts';
 
 const W = WORLD_MAP.w, H = WORLD_MAP.h;
@@ -235,7 +238,7 @@ const NODES = LOCATIONS.map((l): P => [l.map.x, l.map.y]);
 
 /** The road: the old road ends at the far lip, takes up again on this side, and runs through every node to the east edge (through the hills' pass). */
 const ROAD_FAR = curve([[-10, 318], [40, 322], [96, 334], [150, 332], [186, 324]]);
-const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [2252, 200], [2306, 190], [2352, 198], NODES[6], [2442, 186], [2532, 194], [2596, 200], [2640, 208], NODES[7], [2762, 200], [W + 12, 196]]);
+const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [2252, 200], [2306, 190], [2352, 198], NODES[6], [2442, 186], [2532, 194], [2596, 200], [2640, 208], NODES[7], [2762, 200], [2852, 196], [2906, 188], [2950, 196], NODES[8], [3052, 192], [3096, 200], [W + 12, 196]]);
 /** the road's bridges of rope over the gulf: from the brink to the arbiter's mesa, and on east toward the storm */
 const MESA_BRIDGES: [P, P, number][] = [
   [[1626, 188], [1714, 197], 5],
@@ -501,6 +504,8 @@ function farGround(x: number, y: number, light: number): RGBA {
 
 function groundAt(x: number, y: number): RGBA {
   // the Dead Forest, the sand thinning out over its black earth
+  // the Sleeping Archipelago, the rock ending at its shore
+  if (x >= ARCH_W && archK(x, y) > 0) return archGround(x, y);
   // the Crystal Graveyard, the ash thinning out over its rock
   if (x >= CRYS_W && crysK(x, y) > 0.14 + vnoise(x, y, 7, 1703) * 0.72) return crysGround(x, y);
   if (x >= DEAD_W) {
@@ -1228,6 +1233,13 @@ function road(b: Bitmap, pts: P[]) {
         if (d > 2.4) continue;
         const X = Math.round(x + dx), Y = Math.round(y + dy);
         if (!inBounds(X, Y) || sdAt(X, Y) < 0 || inRiver(X, Y) > 0) continue;
+        if (X >= ARCH_W && archK(X, Y) > 0) {
+          // on the islands a way of white flags; over the water a deck of the elves' stone, its lower edge in shadow
+          const land = isleAt(X, Y) > 0;
+          if (land && vnoise(X, Y, 11, 1901) > 0.72) continue;
+          b.set(X, Y, rampDither(MARBLE, d > 1.7 ? (dy > 0 ? 1.6 : 5.6) : land ? 4 + (hash2(X, Y, 1902) - 0.5) * 1.4 : 5 + (hash2(X, Y, 1902) - 0.5) * 0.8, X, Y));
+          continue;
+        }
         if (X >= CRYS_W && crysK(X, Y) > 0.5) {
           // through the Graveyard a track of crushed crystal, paler than the rock, dark along its sides
           if (d <= 2.3) b.set(X, Y, rampDither(ROCKM, d > 1.6 ? 1.6 : 9.2 + (hash2(X, Y, 1704) - 0.5) * 1.6, X, Y));
@@ -2639,6 +2651,7 @@ function renderWorld(): Bitmap {
   expanseOverlays(b);
   deadOverlays(b);
   crysOverlays(b);
+  archOverlays(b);
   compass(b, W - 40, H - 44);
   frame(b);
   return b;
@@ -3294,7 +3307,7 @@ function crysOverlays(b: Bitmap) {
   for (let gy = 1; gy < H; gy += 3) {
     for (let gx = CRYS_W; gx < W; gx += 3) {
       const x = gx + Math.floor(hash2(gx, gy, 1741) * 3), y = gy + Math.floor(hash2(gx, gy, 1742) * 3);
-      if (!inBounds(x, y) || crysK(x, y) < 0.7 || roadDist[idx(x, y)] < 2.5 || crysPolish(x, y) > 0.3) continue;
+      if (!inBounds(x, y) || crysK(x, y) < 0.7 || archK(x, y) > -6 || roadDist[idx(x, y)] < 2.5 || crysPolish(x, y) > 0.3) continue;
       const field = vnoise(x, y, 34, 1743);
       if (hash2(gx, gy, 1744) > 0.08 + smooth(0.44, 0.66, field) * 0.5) continue;
       const R0 = rampAt(hash2(gx, gy, 1745));
@@ -3315,7 +3328,7 @@ function crysOverlays(b: Bitmap) {
   for (let gy = 34; gy < H - 22; gy += 13) {
     for (let gx = CRYS_W + 20; gx < W - 6; gx += 17) {
       const x = Math.round(gx + (hash2(gx, gy, 1761) - 0.5) * 13), y = Math.round(gy + (hash2(gx, gy, 1762) - 0.5) * 10);
-      if (!inBounds(x, y) || crysK(x, y) < 0.8 || roadDist[idx(x, y)] < 9 || crysClear(x, y) || crysPolish(x, y) > 0.3) continue;
+      if (!inBounds(x, y) || crysK(x, y) < 0.8 || archK(x, y) > -10 || roadDist[idx(x, y)] < 9 || crysClear(x, y) || crysPolish(x, y) > 0.3) continue;
       const roll = hash2(gx, gy, 1763);
       const h = 9 + hash2(gx, gy, 1764) * 15 + (hash2(gx, gy, 1765) > 0.88 ? 14 : 0), seed = gx * 31 + gy;
       const R0 = rampAt(hash2(gx, gy, 1766));
@@ -3376,6 +3389,156 @@ function crysOverlays(b: Bitmap) {
     rock(b, fx + 46, fy + 5, 17, 6, 1813, 0.5);
     rock(b, fx - 20, fy + 8, 16, 4, 1814, 0.5);
     rock(b, fx + 22, fy + 8, 16, 4, 1815, 0.5);
+  } });
+  things.sort((p, q) => p.y - q.y).forEach((t) => t.draw());
+}
+
+// ---------------------------------------------------------------------------
+// The Sleeping Archipelago (Zone 9, named and described by Jakub, 2026-11-02). East of
+// the Graveyard the rock ends in a beach at a warm ocean, turquoise over the shallows and
+// azure in the deep. Emerald islands stand in it, countless small ones and three that
+// carry the road, which crosses from one to the next on white elven bridges and goes on
+// east out of the world. Arches, slender towers, temples and columns stand along their
+// coasts, some half drowned, with palms through them. Above the node the greatest of the
+// arches stands in the sea, the battle background's own (`elfArch` in zones/zone9.ts).
+// ---------------------------------------------------------------------------
+
+const ARCH_W = 2820;
+/** how far east of the shore a point is: above 0 the sea has begun */
+const archShore = (y: number) => 2858 + 16 * vnoise(0, y, 47, 1901) + 7 * vnoise(0, y, 13, 1903) - 12;
+const archK = (x: number, y: number) => x - archShore(y) + (vnoise(x, y, 11, 1904) - 0.5) * 5;
+
+/** The islands: the three on the road, and the small ones scattered by hash. */
+const ISLES: [number, number, number, number][] = (() => {
+  const list: [number, number, number, number][] = [[2910, 190, 30, 24], [3002, 212, 40, 36], [3092, 196, 28, 26]];
+  for (let gy = 26; gy < H - 16; gy += 46) {
+    for (let gx = 2880; gx < 3150; gx += 52) {
+      if (hash2(gx, gy, 1905) < 0.26) continue;
+      const x = gx + hash2(gx, gy, 1906) * 40, y = gy + hash2(gx, gy, 1907) * 30;
+      // not on the road's way: bridges cross open water
+      if (Math.abs(y - 196) < 46) continue;
+      const big = hash2(gx, gy, 1908);
+      list.push([x, y, 10 + big * 24, 7 + big * 15]);
+    }
+  }
+  return list;
+})();
+
+/** Above 0 inside an island, by how much of its radius; its coast wanders. */
+function isleAt(x: number, y: number): number {
+  let best = -9;
+  for (const [cx, cy, rx, ry] of ISLES) {
+    const d = 1 - Math.hypot((x - cx) / rx, (y - cy) / ry);
+    if (d > best) best = d;
+  }
+  return best + (vnoise(x, y, 13, 1909) - 0.5) * 0.34 + (vnoise(x, y, 5, 1910) - 0.5) * 0.1;
+}
+
+const archClear = (x: number, y: number) => clearing(x, y, NODES[8], 60, 26);
+
+function archGround(x: number, y: number): RGBA {
+  const k = archK(x, y);
+  const v = isleAt(x, y);
+  if (v > 0) {
+    // sand, then the jungle; the node's clearing in pale old flags and short grass
+    if (v < 0.12) return rampDither(ISLE_ROCK, 5.4 + (hash2(x, y, 1911) - 0.5) * 1.4, x, y);
+    if (archClear(x, y)) return rampDither(ISLE_ROCK, 4.4 + (vnoise(x, y, 7, 1912) - 0.5) * 1.6 + (hash2(x, y, 1913) - 0.5) * 0.6, x, y);
+    return rampDither(JUNGLE, clamp(2.6 + (vnoise(x, y, 8, 1914) - 0.5) * 4 + (0.5 - v) * 1 + (hash2(x, y, 1915) - 0.5) * 0.5, 0, JUNGLE.length - 1), x, y);
+  }
+  // the mainland's own beach and shallows run into the same water
+  const fromShore = k;
+  if (fromShore < 7) return rampDither(ISLE_ROCK, 5.2 + (hash2(x, y, 1916) - 0.5) * 1.2, x, y);
+  // the water: bright where it is shallow, near any coast
+  const near = Math.max(smooth(-0.6, 0, v), 1 - smooth(6, 44, fromShore));
+  const swell = Math.sin((y * 0.9 + x * 0.06) * 0.7 + vnoise(x, y, 26, 1917) * 6);
+  if (v > -0.05 || fromShore < 9) return rampDither(OCEAN, dith(x, y, 0.7) ? 10 : 8.4, x, y);
+  return rampDither(OCEAN, clamp(1.6 + near * 5 + swell * 0.5 + (hash2(x, y, 1918) - 0.5) * 0.4, 0, OCEAN.length - 1), x, y);
+}
+
+/** Everything standing in the Archipelago. */
+function archOverlays(b: Bitmap) {
+  // what is under the road where it crosses water: piers and arches of white stone, their shadows on the sea
+  for (let i = 0; i < ROAD_NEAR.length; i++) {
+    const [x, y] = ROAD_NEAR[i];
+    if (x < ARCH_W || !inBounds(Math.round(x), Math.round(y)) || archK(x, y) < 8 || isleAt(x, y) > 0) continue;
+    const X = Math.round(x), Y = Math.round(y);
+    if (X % 14 > 2) {
+      const h = 2 + Math.round(Math.sin(((X % 14) / 14) * Math.PI) * 2);
+      if (inBounds(X, Y + 3)) b.set(X, Y + 3, MARBLE[3]);
+      for (let k = 0; k < 7; k++) if (inBounds(X, Y + 4 + h + k) && dith(X, Y + k, 0.5)) b.set(X, Y + 4 + h + k, OCEAN[0]);
+    } else {
+      for (let k = 3; k < 9; k++) if (inBounds(X, Y + k)) b.set(X, Y + k, MARBLE[k < 5 ? 4 : 2]);
+      if (inBounds(X - 1, Y + 9)) for (let d = -2; d <= 2; d++) if (inBounds(X + d, Y + 9)) b.set(X + d, Y + 9, OCEAN[9]);
+    }
+  }
+  const things: { y: number; draw: () => void }[] = [];
+  const onLand = (x: number, y: number) => inBounds(Math.round(x), Math.round(y)) && isleAt(x, y) > 0.14 && roadDist[idx(Math.round(x), Math.round(y))] > 6 && !archClear(x, y);
+  // the canopy: bumps and palms over the islands
+  for (let gy = 4; gy < H; gy += 6) {
+    for (let gx = ARCH_W + 40; gx < W; gx += 7) {
+      const x = gx + hash2(gx, gy, 1921) * 6, y = gy + hash2(gx, gy, 1922) * 5;
+      if (!onLand(x, y)) continue;
+      const roll = hash2(gx, gy, 1923);
+      if (roll < 0.3) things.push({ y, draw: () => palm(b, x, y, 10 + hash2(gx, gy, 1924) * 7, (hash2(gx, gy, 1925) - 0.5) * 0.4, gx * 31 + gy) });
+      else if (roll < 0.86) things.push({ y, draw: () => {
+        const r = 2.6 + hash2(gx, gy, 1926) * 3;
+        ellipseFill(b, x + 1.5, y + 1, r, r * 0.6, (px, py) => (inBounds(px, py) ? JUNGLE[0] : 0));
+        ellipseFill(b, x, y - 1, r, r * 0.86, (px, py, d) => rampDither(JUNGLE, clamp(5.8 - d * 2.4 - (px - x) * 0.3 - (py - y) * 0.3, 0, JUNGLE.length - 1), px, py));
+      } });
+    }
+  }
+  // along the coasts: towers, columns, little arches, cliffs' temples; on the small islands, from their own hashes
+  ISLES.forEach(([cx, cy, rx, ry], i) => {
+    const seed = 1930 + i;
+    const a = hash2(i, 0, 1927) * Math.PI * 2;
+    const x = cx + Math.cos(a) * rx * 0.5, y = cy + Math.sin(a) * ry * 0.5;
+    const kind = i % 4;
+    if (i < 3) return;
+    if (kind === 0) things.push({ y, draw: () => elfTower(b, x, y, 18 + rx * 0.3, 2.6, 0, seed) });
+    else if (kind === 1) things.push({ y, draw: () => elfArch(b, x, y, 10 + rx * 0.2, 16 + rx * 0.3, 2.2, 0, seed) });
+    else if (kind === 2) things.push({ y, draw: () => {
+      elfColumn(b, x - 6, y, 13, 1.6, 0, seed, true);
+      elfColumn(b, x, y + 1, 18, 1.6, 0, seed + 1);
+      elfColumn(b, x + 6, y, 9, 1.6, 0, seed + 2, true);
+    } });
+    else things.push({ y, draw: () => vine(b, x, y, y - 10, 2, seed, 0.2) });
+  });
+  // the road's first island: a slender tower over the sea, a broken gate
+  things.push({ y: 178, draw: () => elfTower(b, 2894, 178, 40, 4, 0, 1950) });
+  things.push({ y: 182, draw: () => elfArch(b, 2922, 182, 13, 26, 2.8, 0, 1951) });
+  // the road's last island: an open-air temple
+  things.push({ y: 182, draw: () => {
+    for (let k = 0; k < 5; k++) elfColumn(b, 3076 + k * 8, 182, 20, 1.8, 0, 1952 + k, k === 4);
+    polyFill(b, [[3070, 164], [3092, 156], [3096, 148], [3100, 156], [3118, 164], [3112, 166], [3076, 166]], (x, y) => rampDither(MARBLE, clamp(6 - (x - 3094) * 0.04, 0, 7), x, y));
+  } });
+  // half drowned, in the shallows: a dome and columns; columns standing alone out at sea
+  things.push({ y: 112, draw: () => {
+    ellipseFill(b, 2972, 112, 16, 14, (x, y) => (y > 112 ? b.get(x, y) : rampDither(MARBLE, clamp(5 - (x - 2972) * 0.12, 0, 7), x, y)));
+    for (let x = 2954; x < 2992; x++) if (dith(x, 113, 0.8)) b.set(x, 113, OCEAN[9]);
+    elfColumn(b, 2996, 114, 14, 2, -0.3, 1960, true);
+  } });
+  for (const [x, y, h, sd] of [[3126, 276, 16, 1961], [3136, 280, 10, 1962], [2900, 330, 14, 1963], [2912, 334, 8, 1964], [3050, 64, 16, 1965]] as const) {
+    things.push({ y, draw: () => {
+      elfColumn(b, x, y, h, 1.8, -0.2, sd, h < 12);
+      for (let dx = -5; dx <= 5; dx++) if (inBounds(x + dx, y + 1) && dith(x + dx, y + 1, 0.8)) b.set(x + dx, y + 1, OCEAN[9]);
+    } });
+  }
+  // the greatest arch, standing above the node, in the sea behind its island, with towers either side
+  const [nx, ny] = NODES[8];
+  things.push({ y: ny - 38, draw: () => {
+    for (const side of [-1, 1]) {
+      const fx = nx + side * 42, fy = ny - 36;
+      ellipseFill(b, fx, fy, 15, 8, (x, y, d) => (d > 0.72 ? rampDither(JUNGLE, 5 - (x - fx) * 0.1 - (y - fy) * 0.2, x, y) : rampDither(ISLE_ROCK, clamp(4 - (x - fx) * 0.12, 0, 6), x, y)));
+    }
+    elfArch(b, nx, ny - 36, 42, 84, 4.6, 0, 1970);
+    vine(b, nx - 36, ny - 38, ny - 80, 2, 1971, 0.14);
+    vine(b, nx + 34, ny - 38, ny - 74, 2, 1972, 0.14);
+    stoneLeaf(b, nx, ny - 118, -Math.PI / 2, 10, 3, MARBLE, 6);
+    elfTower(b, nx - 62, ny - 30, 38, 3.4, 0, 1973);
+    elfTower(b, nx + 60, ny - 30, 30, 3.2, 0, 1974);
+    elfBridge(b, nx - 58, ny - 56, nx - 42, ny - 58, 1, 6, -0.3, 1975);
+    palm(b, nx - 28, ny - 26, 22, -0.18, 1976);
+    palm(b, nx + 30, ny - 24, 20, 0.2, 1977);
   } });
   things.sort((p, q) => p.y - q.y).forEach((t) => t.draw());
 }

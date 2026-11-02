@@ -776,6 +776,7 @@ Record every change that moves a dynamic out of its band, changes a band, or cha
 | 2026-11-01 | The Gravedigger and the Ash Widow (my proposals on Jakub's word, DESIGN_DECISIONS.md 48-49), new passive kind `keen`. Impact 42% and 45%. Zone 2 powers raised: 2-1 1.32, 2-2 0.80, 2-3 1.04, 2-6 0.91, 2-10 0.80. |
 | 2026-11-01 | The Toadcap, the Bristleback and the Hive Tender (my proposals on Jakub's "go", DESIGN_DECISIONS.md 50-52): six Commons in every faction, two of each class. Impact 41%, 40%, 47%. 2-5's power 0.89. |
 | 2026-11-01 | Zone 8, the Crystal Graveyard (Jakub's brief, DESIGN_DECISIONS.md 5.11): battle background, map 2840 wide, ten placeholder stages, ambient `shards` | AE3 | |
+| 2026-11-02 | Zone 9, the Sleeping Archipelago (Jakub's brief, DESIGN_DECISIONS.md 5.12): battle background, map 3160 wide, ten placeholder stages | AE3 | |
 | 2026-11-01 | Zone 7, the Dead Forest (Jakub's brief, DESIGN_DECISIONS.md 5.10): battle background, map 2520 wide, ten placeholder stages, ambient `ash` | AE3 | |
 | 2026-11-01 | Zone 6, the Golden Expanse (Jakub's brief, DESIGN_DECISIONS.md 5.9): battle background, map 2240 wide with a tunnel, ten placeholder stages, overview four times smaller | AE3 | |
 | 2026-11-01 | The Journey's fourth quest on Jakub's word (DESIGN_DECISIONS.md 53): Beat Campaign 1-10, two spools (Silver Vigor stands in) | AE3 | |

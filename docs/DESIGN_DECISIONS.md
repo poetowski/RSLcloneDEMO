@@ -108,6 +108,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | Zone 7, the Dead Forest: battle background, the world map extended east, ten placeholder stages | 5.10 |
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
+| 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
 | 2026-11-01 | Zone 8, the Crystal Graveyard: battle background, the world map extended east, ten placeholder stages | 5.11 |
 | 2026-11-01 | The Journey gains Beat Campaign 8-10, three spools | 57 |
 | 2026-11-01 | The Crossbowman, an Elite Damage of the Azure Crown, Tide | 58 |
@@ -1228,6 +1229,41 @@ Stand-ins until he sets them: everything his description did not name, including
 moon, the crystals' colours (violet, ice, rose), the veins' colour, the prism fans, the hanging shards,
 the sky flash, the stages' enemies, powers and texts, the spools (Apex and Vigor) and the Stardust (55
 a victory).
+
+### 5.12 Zone 9 — the Sleeping Archipelago (2026-11-02)
+
+Jakub's brief: "Area IX - east from area 8. extend world map, create battle background, create placeholder stages", named
+the Sleeping Archipelago, in his words:
+
+> An ancient tropical archipelago scattered across a vast, warm ocean, where countless emerald islands rise from turquoise
+> waters. Once home to a prosperous elven civilization, these islands have long since been abandoned. Their magnificent
+> architecture remains, slowly surrendering to the jungle, salt and passage of centuries.
+>
+> Elegant elven structures stand along the coastlines: enormous white-stone arches, slender towers, open-air temples and
+> bridges connecting natural rock formations. Their architecture is graceful and organic, with sweeping curves, intricate
+> carvings and delicate ornaments resembling leaves, waves and branches. Some buildings are partially submerged, while
+> others cling precariously to cliffs overlooking the sea.
+>
+> Thick tropical vegetation has reclaimed much of the old civilization. Palm trees grow through cracked marble floors,
+> enormous flowering vines wrap around ancient columns, and roots penetrate the forgotten courtyards. Small waterfalls
+> descend from overgrown terraces into natural pools.
+
+**The battle background (my reading).** Late morning, the sun upper left. A vast elven arch stands in the sea dead centre on
+two stacks of rock, a far island seen through it; a bridge runs to it from a cliff on the left under a slender tower, and
+another from a cliff on the right, which holds an open-air temple on overgrown terraces with a waterfall down to the sea.
+A dome and columns lie half drowned in the shallows. The arena is the marble court of a terrace above the water, its broken
+balustrade the far edge: cracked, mossed slabs dulled to a mid value so champions read, a faded inlay of waves in its middle,
+columns wound with flowering vines, a palm through the marble, roots, and on the right a terrace with a little waterfall
+into a natural pool. What moves: the sea's glints, the waterfalls, the palms a little, clouds, seabirds, butterflies, pollen.
+
+**The stages.** Ten placeholders, 9-1 to 9-10, the boss 9-10 (Rootfather), enemies and powers stand-ins set inside the
+balance bands, the blurbs taken from his description. No champion joins there. Spools: Pulse and Tranquility, stand-ins.
+A victory finds 60 Stardust, following the areas before it.
+
+**The map.** 3160 wide. The Graveyard's rock ends in a beach at a warm ocean, turquoise over the shallows and azure in the
+deep. Small emerald islands stand all over it with palms, towers, little arches and columns, some columns out in the water
+and a dome half drowned. Three islands carry the road, which crosses between them on white elven bridges and goes on east
+out of the world. Above node IX the greatest arch stands in the sea with a tower either side.
 
 ## 6. Cross-cutting
 

@@ -62,7 +62,7 @@ New `fx` names go into `tools/art/fx/<faction>.ts` (or `common.ts`), built from 
 
 ## 5. Campaign placement
 
-Set `recruit` to its id on the stage whose first clear brings the champion (`src/game/data/campaign.ts`); it may be among that stage's enemies or not (the Rime Scholar joins after the first battle without being fought). An enemy goes into a stage's `enemies`; a boss gets `boss: true` (x1.6 HP, crown, boss intro). A new stage needs a `map` position on the world map (`WORLD_MAP` pixels, 2840x360) that does not overlap other nodes; the road follows the stage order automatically after `npm run art -- map`.
+Set `recruit` to its id on the stage whose first clear brings the champion (`src/game/data/campaign.ts`); it may be among that stage's enemies or not (the Rime Scholar joins after the first battle without being fought). An enemy goes into a stage's `enemies`; a boss gets `boss: true` (x1.6 HP, crown, boss intro). A new stage needs a `map` position on the world map (`WORLD_MAP` pixels, 3160x360) that does not overlap other nodes; the road follows the stage order automatically after `npm run art -- map`.
 
 ## 6. Build and verify (all must pass)
 

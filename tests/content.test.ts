@@ -527,7 +527,7 @@ describe('design decisions', () => {
     expect(LOCATIONS[0].stages).toHaveLength(10);
   });
 
-  it('names the areas as Jakub did, the Crystal Graveyard the easternmost with ten placeholder stages after 7-10', () => {
+  it('names the areas as Jakub did, the Sleeping Archipelago the easternmost with ten placeholder stages after 8-10', () => {
     expect(LOCATIONS.map((l) => [l.chapter, l.name, l.zone])).toEqual([
       ['I', 'Fracture Reach', 'zone1'],
       ['II', 'Verdant Grove', 'zone2'],
@@ -537,6 +537,7 @@ describe('design decisions', () => {
       ['VI', 'Golden Expanse', 'zone6'],
       ['VII', 'Dead Forest', 'zone7'],
       ['VIII', 'Crystal Graveyard', 'zone8'],
+      ['IX', 'Sleeping Archipelago', 'zone9'],
     ]);
     const scars = LOCATIONS[3];
     expect([scars.requires, scars.stages.map((s) => s.id)]).toEqual(['3-10', ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6', '4-7', '4-8', '4-9', '4-10']]);
@@ -551,6 +552,9 @@ describe('design decisions', () => {
     const graveyard = LOCATIONS[7];
     expect([graveyard.requires, graveyard.stages.map((s) => s.id)]).toEqual(['7-10', ['8-1', '8-2', '8-3', '8-4', '8-5', '8-6', '8-7', '8-8', '8-9', '8-10']]);
     expect(graveyard.stages.filter((s) => s.recruit)).toEqual([]);
+    const islands = LOCATIONS[8];
+    expect([islands.requires, islands.stages.map((s) => s.id)]).toEqual(['8-10', ['9-1', '9-2', '9-3', '9-4', '9-5', '9-6', '9-7', '9-8', '9-9', '9-10']]);
+    expect(islands.stages.filter((s) => s.recruit)).toEqual([]);
     // none of its stages brings a champion: since 2026-11-01 the Paladin is the Journey's reward for 5-10
     expect(mesa.stages.filter((s) => s.recruit)).toEqual([]);
   });
