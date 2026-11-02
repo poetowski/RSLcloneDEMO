@@ -72,8 +72,12 @@ The roster today:
 | Necromancer (`necromancer`) | Elite | Bloom | Support | Ashveil Reign | summoned |
 | Automated Soul (`automated_soul`) | Elite | Tide | Damage | Ashveil Reign | summoned |
 | Irving Wellbington (`irving_wellbington`) | Elite | Bloom | Tank | Ashveil Reign | summoned |
+| Coffin's Legs (`coffins_legs`) | Elite | Ember (a stand-in) | Tank | Ashveil Reign | summoned |
+| Wraith (`wraith`, a stand-in name) | Elite | Ember (a stand-in) | Damage | Ashveil Reign | summoned |
+| Haruspex (`haruspex`, a stand-in name) | Elite | Tide (a stand-in) | Support | Ashveil Reign | summoned |
 | Paladin (`paladin`) | Heroic | Ember | Tank | Azure Crown | summoned (the reward of a quest line Jakub designs later) |
 | Chief Engineer CJ (`chief_engineer_cj`) | Heroic | Bloom | Tank | Sanguine Dominion | summoned |
+| Sir Siroslav (`sir_siroslav`) | Heroic | Ember | Support | Sanguine Dominion | summoned |
 | Forest Gargoyle (`forest_gargoyle`) | Heroic | Tide | Tank | Court of Root (read from his "root") | summoned |
 | Dead Knight Amstron (`dead_knight_amstron`) | Heroic | Ember | Tank | Ashveil Reign | summoned |
 | Strongman (`strongman`) | Common | Tide | Damage | Azure Crown | summoned |

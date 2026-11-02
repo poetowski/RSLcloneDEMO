@@ -113,6 +113,8 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Crossbowman, an Elite Damage of the Azure Crown, Tide | 58 |
 | 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
 | 2026-11-01 | The Verdant Luminary, an Elite Support of the Azure Crown, Bloom | 60 |
+| 2026-11-01 | Coffin's Legs (first built as the Pallbearer, then Tombstone's Legs), the Wraith and the Haruspex (first built as the Bone Augur), my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Coffin's Legs and the Haruspex his | 61-63 |
+| 2026-11-01 | Sir Siroslav, a Heroic Support of the Sanguine Dominion, the roster's first Heroic Support; Ember, my choice on his word | 64 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
 
 ---
@@ -330,7 +332,9 @@ its second, the Rot Hulk, a Common Tank (section 29), its third, the
 Bellringer, a Common Support (section 30), its fourth, the Necromancer, a
 Support and its first Elite (section 31), its fifth, the Automated Soul, an
 Elite of the Damage role (section 32), and its sixth, Irving Wellbington, an
-Elite Tank (section 33).
+Elite Tank (section 33). Its other three Elites, Coffin's Legs (Tank), the
+Wraith (Damage) and the Haruspex (Support), are my proposals on his word of
+2026-11-01 (sections 61-63).
 
 **Name rationale.** "Reign" puts the faction on the same footing as Crown and
 Dominion — ruling nouns, one set. "Ashveil" gives it a distinctive seat
@@ -4125,3 +4129,155 @@ Stand-ins: the names Envoy's Arrow, Crown's Mandate and Formal Protest, the lore
 stats, and her look past the brief: skin pale as birch, long copper hair, pointed ears, bare feet, a skirt of
 leaves, the cut of the blue and where the crowns sit, a gold circlet, the great bow's living wood, leaves and gold
 caps, the bag's blue flap, the leaves that fall on allies and the gold seal on the attacker.
+
+## 61. Coffin's Legs (received 2026-11-01)
+
+Jakub, for this and sections 62-63, verbatim:
+
+```
+I want to create 3 remaining 3 elites in ashveil reign. Be creative but consistent. I will name  them one by one otherwise implement them and then show summary
+```
+
+The Ashveil Reign had one Elite of each role (the Necromancer, the Automated Soul, Irving Wellbington)
+where the Azure Crown has two, so these are its second Elite Tank, Damage and Support. **All of the
+three is a stand-in until he sets it:** the names above all, which he gives one by one (Coffin's Legs the first, below), and the kits,
+affinities, numbers, lore lines and art. Their affinities even the Reign's Elites at two each of
+Ember, Bloom and Tide. The engine's Undying, Dispel and the turn meter given to every other ally had
+no champion using them; each of the three takes one.
+
+Built first as the Pallbearer, a stand-in; then, mid-build, Jakub named him, verbatim:
+
+```
+Rename pallbearer to Tombstone's Legs
+```
+
+and then:
+
+```
+My base rename it to Coffin's Legs. Hopefully it is coffin
+```
+
+It is a coffin: six-sided, iron straps, the white bone across the lid. So his name is Jakub's,
+Coffin's Legs; the id is `coffins_legs`.
+
+An Elite Tank of the Reign, Ember: a dead giant of a mourner who carries a coffin before him as a
+shield and a ram. A black cowl over a bald grey head, his jaw bound shut with a strip of linen tied
+over his crown (the old way the dead are laid out), the Reign's pale light in his sunken eyes; a
+long charcoal coat to the knees, an iron chain across his chest, boots. The coffin, six-sided and
+taller than his torso, is of old dark wood (`coffin`, added) with iron straps and the Reign's white
+bone across its lid, held upright on his far arm, his near hand on it. When he falls the coffin
+falls flat beside him; when Not Yet Buried holds him he gets up again and takes it back.
+
+- **Lid Crush** (A1): one enemy, 1.0, a 30% chance of ATK Down for 1 turn.
+- **Bear the Dead** (A2, CD 4): Taunt on himself for 2 turns and a Shield of 10% of his max HP on
+  every ally for 2 turns. No attack. The coffin planted before him knocks (`pall_knock`), and the
+  shape of a coffin's lid rises in pale light before each ally (`pall_ward`).
+- **Not Yet Buried** (passive, `undying`): the first blow that would fell him leaves him at 30% of
+  his max HP, every debuff lifted. The roster's first Undying. Built at 20%; raised to 30% on
+  Jakub's word, verbatim: "Raise passive hp after kill of coffins legs to 30% from 20." His impact
+  rose from 61% to 64%.
+- Stats HP 1440, ATK 78, DEF 74, SPD 90, CRIT 2.5%, score 407, the low end of the Elite budget: at
+  HP 1500, ATK 80, a 30% Undying and a 12% Shield he measured an impact of 67%; he stands at 61%, a
+  point over the band, as Overlord Ofentol. Summoned.
+
+## 62. The Wraith (received 2026-11-01)
+
+An Elite Damage of the Reign, Ember: a shade with no body left. It floats a hand above the ground:
+a grave-shroud (`shroud`, added) hangs from its shoulders and runs out behind it in a long ragged
+tail that frays into smoke; a deep hood with its point bent forward over a mask of bone, two holes
+in it with the pale light behind them; long arms of bare bone out of torn sleeves, iron talons on
+its fingers. It glides instead of walking; its death is the shroud falling empty, the mask on it.
+
+- **Grave Talons** (A1): one enemy, two rakes of 0.5.
+- **Strip the Living** (A2, CD 4): it vanishes and comes out of the dark behind one enemy
+  (`blink`), strips every buff from it, then strikes, 1.2. The roster's first Dispel; what the
+  enemy loses flies off it as broken flecks of gold (`wraith_rend`).
+- **Hollow Wail** (A3, CD 5): all enemies, 0.75, and 15% of each one's turn meter. The roster's
+  first drain on every enemy at once.
+- Stats HP 1120, ATK 112, DEF 58, SPD 104, CRIT 5%, score 407: at ATK 122, SPD 110, CRIT 10% and
+  multipliers of 0.55 + 0.55, 1.5, 0.9 with a 20% drain it measured 76%; it stands at 61%, a point
+  over. Summoned.
+
+## 63. The Haruspex (received 2026-11-01)
+
+Built first as the Bone Augur, a stand-in; then Jakub named her, verbatim:
+
+```
+Rename to Haruspex
+```
+
+So her name is Jakub's (a haruspex reads omens in remains, as she reads the bones); the id is `haruspex`.
+
+An Elite Support of the Reign, Tide: a dead seer who reads the fight in knucklebones. An old
+woman, gaunt and a little bent, her eyes bound with a strip of linen knotted behind her head, its
+ends hanging; long hair gone the grey of old bone down her back; a robe of tomb-dust wool to the
+floor (`tombDust`, added) under a fringed charcoal shawl, knucklebones strung round her neck, her
+forearms and feet wrapped. In her far hand a staff of grey wood taller than she is, a ram's skull
+on its head with its horns curling back and strings of bones swaying under it (the silhouette
+feature); with her near hand she casts the bones.
+
+- **Cast the Bones** (A1): one enemy, 1.0, the bones thrown (`knucklebones`), a 30% chance of DEF
+  Down for 1 turn.
+- **Read the Omens** (A2, CD 4): ATK Up on every ally for 2 turns, and 20% turn meter to every
+  ally but her (the engine's `tmAllies`, which no champion used). No attack. The AI uses it when
+  ready.
+- **Ill Omen** (A3, CD 5): ATK Down on every enemy for 2 turns, and 15% of each one's turn meter.
+  No attack: she points the ram's skull at them and a shadow settles over each.
+- Stats HP 1240, ATK 92, DEF 64, SPD 112, CRIT 2.5%, score 412; impact 54%, inside the band as
+  first built. Summoned.
+
+**Readings.** "Remaining 3 elites": one of each role, as the Crown's two of each. "Show summary":
+the summary is given in the session, not in the game. The ATK Down and the DEF Down meet RES like
+every debuff; the drains are certain.
+
+## 64. Sir Siroslav (received 2026-11-01)
+
+Jakub, verbatim:
+
+```
+Now I want to create another champion.
+Name: Sir Siroslav
+Faction sanguine dominion
+Role support
+Affinity balance yourself per faction role
+Rarity elite be very creative and consistent
+```
+
+and, mid-build:
+
+```
+His rarity must be heroic. Change if needed and redesign
+```
+
+So a Heroic Support of the Sanguine Dominion, the roster's first Heroic Support. His name, faction,
+role and rarity are Jakub's.
+
+**Affinity.** Ember, on his word to balance it per faction and role: the Dominion's Supports (the
+Rime Scholar, the Dominion Medic, the Harvest Specialist) were all Tide.
+
+**The look.** A winged knight-commander. Sanguine is life (3.2), so nothing grim: a crimson coat to
+the calf with a gold braid, a black breastplate edged in gold with the Dominion's red hexagon, black
+pauldrons rimmed in gold, a black sash, brown riding boots; a tall cap of black fur with a crimson
+crown, a gold brooch with a red stone and a white heron's plume; a long grey moustache. Rising from
+his back, a wooden frame hung with crimson and black feathers, standing up behind his head and
+curling forward at the top (the silhouette feature); a commander's mace in his near hand, a round
+ribbed head of gold on a gilded haft. As an Elite he was bareheaded, a shaved crown and one forelock;
+the cap and the gold came with Heroic.
+
+- **Mace of Command** (A1): one enemy, 1.0, and 15% turn meter to the ally lowest on HP.
+- **Hold the Line** (A2, CD 4): DEF Up for 2 turns and Counterattack for 1 on every ally. No attack.
+  The first skill to give Counterattack to a whole side.
+- **Winged Charge** (A3, CD 5): heals every ally by 15% of its max HP, SPD Up for 2 turns, and 15%
+  turn meter to every ally but him. No attack. The AI keeps it until an ally is hurt.
+- **Never Retreat** (passive, `overdrive`): the first time he drops below 50% HP, DEF Up and
+  Counterattack on himself for 2 turns.
+- Stats HP 1360, ATK 92, DEF 68, SPD 110, CRIT 2.5%, score 428 of the Heroic 440. Impact 72%,
+  within the Heroics' range (63-80%). Summoned, like the other Heroics but the Paladin.
+
+As an Elite (A1, A2, A3 without a passive, 10% turn meter, a 12% heal, score 412) he measured 60%.
+
+Stand-ins until Jakub sets them: the kit, its names and numbers, the stats, the lore line and every
+detail of the art and effects (the gold flash and ring of `bulawa_strike`, the shout of
+`command_call`, the crimson hexagon of `line_held`, the feathers of `wing_rush` and
+`charge_feathers`).
+

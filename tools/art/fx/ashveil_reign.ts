@@ -50,6 +50,14 @@ const WOOD = MAT.wood.ramp, IRON = MAT.iron.ramp, AZF = MAT.blue.ramp;
 /** splinters of the shaft */
 const SPLINTER = ramps.wood;
 /** the pale light in his gorget, which his Pinning Shot carries */
+/** the Wraith's talons tearing: dark grey to a pale edge */
+const TALON: RGBA[] = [MAT.shroud.ramp[0], MAT.shroud.ramp[2], MAT.shroud.ramp[4], MAT.shroud.ramp[5], W];
+/** shreds of the Wraith's shroud */
+const SHREDS: RGBA[] = MAT.shroud.ramp.slice(1, 6);
+/** its wail: the shroud's grey-green, pale at the front of the sound */
+const WAIL: RGBA[] = [MAT.shroud.ramp[2], MAT.shroud.ramp[3], MAT.shroud.ramp[4], MAT.shroud.ramp[5], ACCENT.ashEye];
+/** the Haruspex's ill omen: the dark */
+const OMEN: RGBA[] = [MAT.blackCloth.ramp[0], MAT.blackCloth.ramp[2], MAT.blackCloth.ramp[4]];
 const SOUL: RGBA[] = [MAT.ashBone.ramp[1], MAT.ashBone.ramp[2], MAT.ashBone.ramp[3], MAT.ashBone.ramp[4], ACCENT.ashEye];
 
 /** One of his arrows pointing right, its point at (x1, y): the shaft from x0, fletching at its tail. */
@@ -550,6 +558,195 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
     draw: (b, t, i) => {
       soundRings(b, 36, 36, i, 10, 3, 4, 6, SOUL);
       motes(b, 36, 36, 26, 20, 8, t, DU, 941);
+    },
+  },
+
+  // --- Coffin's Legs (section 61) -----------------------------------------
+  /** Lid Crush lands: the coffin's flat face meets the enemy in a broad dull flash, dust pressed out in a ring, splinters of old wood thrown off. Matter. */
+  lid_crush: {
+    w: 64, h: 64, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 10, 2],
+    draw: (b, t, i) => {
+      const cx = 32, cy = 30;
+      if (i < 3) {
+        // the coffin's face: a tall flat flash
+        for (let y = cy - 14 + i * 2; y <= cy + 14 - i * 2; y++) for (let x = cx - 3; x <= cx + 3; x++) if (dith(x, y, 1 - i * 0.3)) b.set(x, y, DULL[Math.abs(x - cx) < 2 ? 4 : 3]);
+      }
+      if (i >= 1 && i < 5) burst(b, cx, cy, 10, 2, [14, 18, 13, 8][i - 1], 1.6, DULL, 0.3);
+      if (i >= 2) {
+        const r = 7 + (i - 2) * 4;
+        ring(b, cx, cy, r * 0.6, r, Math.max(0.6, 1.6 - (i - 2) * 0.22), DU, Math.max(0.3, 1.1 - (i - 2) * 0.15));
+        sparks(b, cx, cy, 12, 26, (i - 2) / 6, ramps.wood, 951, 14);
+      }
+    },
+  },
+  /** Bear the Dead's knock: the coffin planted, dull rings carrying out from it. Played at his head on the `cast` event. Matter. */
+  pall_knock: {
+    w: 84, h: 72, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      soundRings(b, 42, 36, i, 3, 3, 5, 6, DULL);
+    },
+  },
+  /** Bear the Dead reaches an ally: the shape of a coffin's lid in pale light rises before it, the white bone across it, and holds, then fades. Anchored at the feet (additive). */
+  pall_ward: {
+    w: 60, h: 84, n: 12, ms: 60, ax: 0.5, ay: 1, pad: [2, 4, 3, 4],
+    draw: (b, t, i) => {
+      const cx = 30, gy = 82;
+      const up = [0.3, 0.65, 0.95, 1, 1, 1, 1, 1, 1, 1, 1, 1][i];
+      const fade = i < 7 ? 1 : [0.8, 0.6, 0.42, 0.26, 0.12][i - 7];
+      ellipseRing(b, cx, gy - 3, 20, 5, 1.2, (x, y, a) => (dith(x, y, fade * (Math.sin(a) > -0.1 ? 1 : 0.45)) ? rampDither(SOUL, 3 + Math.sin(a) * 0.6, x, y) : 0));
+      // the lid: six-sided, its head up, the widest at the shoulders
+      const h = 58 * up, base = gy - 8, top = base - h;
+      const sh = base - h * 0.72;
+      const half = (y: number) => (y > sh ? 6 + ((base - y) / (base - sh)) * 6 : 12 - ((sh - y) / (sh - top)) * 5);
+      for (let y = Math.floor(top); y <= base; y++) {
+        const hw = half(y);
+        for (let x = Math.round(cx - hw); x <= Math.round(cx + hw); x++) {
+          const edge = x <= cx - hw + 1 || x >= cx + hw - 1 || y <= top + 1 || y >= base - 1;
+          if (edge ? dith(x, y, fade) : dith(x, y, fade * 0.18)) b.set(x, y, edge ? SOUL[4] : SOUL[2]);
+        }
+      }
+      if (up >= 1) {
+        const by = Math.round(sh + 3);
+        for (let x = cx - 7; x <= cx + 7; x++) for (const dy of [0, 1]) if (dith(x, by + dy, fade)) b.set(x, by + dy, W);
+        for (const sx of [-8, 7]) for (const [dx, dy] of [[0, -1], [1, -1], [0, 2], [1, 2]]) if (dith(cx + sx + dx, by + dy, fade)) b.set(cx + sx + dx, by + dy, W);
+      }
+      motes(b, cx, gy - 10, 18, 48, 6, t, SOUL, 957);
+    },
+  },
+
+  // --- the Wraith (section 62) -----------------------------------------------
+  /** Grave Talons, the first rake: three ragged pale tears down through the enemy, shreds of grey thrown off. Matter. */
+  talon_rake: {
+    w: 56, h: 56, n: 6, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 6, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      for (const k of [-1, 0, 1]) if (i < 4) cut(b, cx - 8 + k * 6, cy - 18, cx + 6 + k * 6, cy + 16, 4, [2.2, 2.6, 1.8, 1.1][i], TALON, [1.2, 1.1, 0.8, 0.5][i], [0.6, 1, 1, 1][i]);
+      if (i >= 1) sparks(b, cx, cy, 10, 18, (i - 1) / 4, SHREDS, 961, 6);
+    },
+  },
+  /** Grave Talons, the second rake: the far talons back up through the enemy, three tears the other way. Matter. */
+  talon_rake_back: {
+    w: 56, h: 56, n: 6, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 6, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      for (const k of [-1, 0, 1]) if (i < 4) cut(b, cx - 8 + k * 6, cy + 16, cx + 8 + k * 6, cy - 18, -4, [2.2, 2.6, 1.8, 1.1][i], TALON, [1.2, 1.1, 0.8, 0.5][i], [0.6, 1, 1, 1][i]);
+      if (i >= 1) sparks(b, cx, cy, 10, 18, (i - 1) / 4, SHREDS, 967, 6);
+    },
+  },
+  /** Strip the Living lands: the talons tear through in a dark cross, and what kept the enemy safe flies off it as broken flecks of gold, dimming and falling. Matter. */
+  wraith_rend: {
+    w: 72, h: 72, n: 9, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 10, 2],
+    draw: (b, t, i) => {
+      const cx = 36, cy = 34;
+      if (i < 5) {
+        cut(b, cx - 16, cy - 20, cx + 14, cy + 18, 6, [3, 3.4, 2.6, 1.8, 1][i], TALON, 1.2 - i * 0.2, [0.5, 1, 1, 1, 1][i]);
+        cut(b, cx + 14, cy - 20, cx - 14, cy + 18, -6, [3, 3.4, 2.6, 1.8, 1][i], TALON, 1.2 - i * 0.2, [0.5, 1, 1, 1, 1][i]);
+      }
+      if (i >= 1 && i < 4) burst(b, cx, cy, 10, 2, [12, 16, 10][i - 1], 1.4, SHREDS, 0.2);
+      if (i >= 1) sparks(b, cx, cy, 14, 30, (i - 1) / 7, GOLD, 971, 22);
+      if (i >= 2) sparks(b, cx, cy, 10, 22, (i - 2) / 6, SHREDS, 977, 4);
+    },
+  },
+  /** Hollow Wail at the Wraith's head: rings of grey-green going out from the hood, wisps torn off them. Matter. */
+  wail_rings: {
+    w: 96, h: 80, n: 12, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      soundRings(b, 48, 40, i, 4, 2, 5.4, 7, WAIL);
+      motes(b, 48, 40, 40, 10, 10, t, SHREDS, 983);
+    },
+  },
+  /** Hollow Wail reaches an enemy: the wail breaks over it, grey wisps whirling round it and dragging down, a dull flash. Matter. */
+  wail_hit: {
+    w: 60, h: 72, n: 8, ms: 70, ax: 0.5, ay: 0.55, pad: [2, 2, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 30, cy = 38;
+      if (i < 3) burst(b, cx, cy, 8, 1, [8, 12, 9][i], 1.2, WAIL, 0.6);
+      for (let k = 0; k < 3; k++) {
+        const ph = t * Math.PI * 3 + k * 2.1;
+        const y = cy - 22 + t * 34 + k * 4;
+        for (let s2 = 0; s2 < 8; s2++) {
+          const a = ph - s2 * 0.28;
+          const x = Math.round(cx + Math.cos(a) * 14), yy = Math.round(y + Math.sin(a) * 4 - s2 * 0.6);
+          if (dith(x, yy, Math.max(0.4, Math.min(1, 1.8 * (1 - t))) * (1 - s2 / 10))) { b.set(x, yy, WAIL[s2 < 2 ? 4 : s2 < 5 ? 3 : 2]); if (s2 < 4) b.set(x, yy + 1, WAIL[s2 < 2 ? 3 : 2]); }
+        }
+      }
+    },
+  },
+
+  // --- the Haruspex (section 63) -------------------------------------------
+  /** Her cast: a handful of knucklebones tumbling through the air, flying right. */
+  knucklebones: {
+    w: 22, h: 14, n: 3, ms: 60, ax: 0.8, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      const R = MAT.bone.ramp;
+      for (const [x, y, ph] of [[18, 7, 0], [13, 4, 1], [12, 10, 2], [7, 7, 1]] as const) {
+        const f = (i + ph) % 3;
+        const pts = f === 0 ? [[0, 0], [1, 0], [-1, 0]] : f === 1 ? [[0, 0], [0, 1], [0, -1]] : [[0, 0], [1, 1], [-1, -1]];
+        for (const [dx, dy] of pts) b.set(x + dx, y + dy, R[dx === 0 && dy === 0 ? 5 : 4]);
+        b.set(x - 2, y, R[2]);
+      }
+    },
+  },
+  /** Cast the Bones lands: a small dull flash and the bones scattering off the enemy, tumbling down. Matter. */
+  bones_strike: {
+    w: 52, h: 52, n: 7, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 12, 2],
+    draw: (b, t, i) => {
+      const cx = 26, cy = 26;
+      if (i < 3) burst(b, cx, cy, 7, 1, [7, 11, 8][i], 1.2, DULL, 0.3);
+      sparks(b, cx, cy, 8, 20, t, MAT.bone.ramp.slice(1, 6), 991, 18);
+      if (i >= 1) ring(b, cx, cy, 4 + i * 2.6, 3 + i * 2, Math.max(0.6, 1.4 - i * 0.2), DU, Math.max(0.2, 1 - i * 0.15));
+    },
+  },
+  /** Read the Omens and Ill Omen at her raised skull: a pale flare, and the shape of the ram's horns curling out of it, fading. Additive. */
+  omen_skull: {
+    w: 72, h: 64, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 36, cy = 32;
+      if (i < 4) burst(b, cx, cy, 10, 2, [8, 14, 11, 7][i], 1.4, SOUL, 0.2);
+      const fade = i < 4 ? 1 : 1 - (i - 3) / 7;
+      for (const sx of [-1, 1]) {
+        for (let k = 0; k < 26; k++) {
+          const a = k * 0.26 + 0.2, r = 4 + k * 0.62 + t * 6;
+          const x = Math.round(cx + sx * Math.cos(a) * r), y = Math.round(cy - Math.sin(a) * r * 0.8);
+          if (dith(x, y, fade * (1 - k / 32))) b.set(x, y, SOUL[k < 8 ? 4 : 3]);
+        }
+      }
+      motes(b, cx, cy, 30, 24, 8, t, SOUL, 997);
+    },
+  },
+  /** Read the Omens reaches an ally: knucklebones circling round it and rising, pale motes of favour going up with them. Anchored at the feet (additive). */
+  omen_favour: {
+    w: 60, h: 84, n: 12, ms: 60, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 30, gy = 78;
+      const R = MAT.bone.ramp;
+      for (let k = 0; k < 5; k++) {
+        const a = t * Math.PI * 4 + (k / 5) * Math.PI * 2;
+        const x = Math.round(cx + Math.cos(a) * 16), y = Math.round(gy - 6 - t * 54 + Math.sin(a) * 4);
+        if (Math.sin(a) < -0.2 && i > 2) continue;
+        b.set(x, y, R[5]); b.set(x + 1, y, R[4]); b.set(x - 1, y, R[3]);
+      }
+      ellipseRing(b, cx, gy, 16 + t * 4, 4 + t, 1, (x, y) => (dith(x, y, 1 - t) ? SOUL[3] : 0));
+      motes(b, cx, gy - 6, 26, 62, 10, t, GOLD, 1009);
+    },
+  },
+  /** Ill Omen reaches an enemy: a shadow settling over it from above, black motes sinking through it, a dark ring closing at its feet. Matter. */
+  ill_omen: {
+    w: 60, h: 84, n: 12, ms: 60, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 30, gy = 78;
+      const fall = Math.min(1, t * 2);
+      const fade = i < 8 ? 1 : 1 - (i - 7) / 5;
+      for (let y = 4; y < 4 + 56 * fall; y++) {
+        const hw = 10 + Math.sin(y * 0.3 + t * 6) * 2;
+        for (let x = Math.round(cx - hw); x <= Math.round(cx + hw); x++) if (dith(x, y, fade * 0.22 * (1 - Math.abs(x - cx) / (hw + 1)))) b.set(x, y, OMEN[1]);
+      }
+      for (let k = 0; k < 10; k++) {
+        const x = Math.round(cx + Math.sin(k * 7.3) * 12), y = Math.round(8 + ((k * 13) % 30) + t * 40);
+        if (y < gy && dith(x, y, fade)) { b.set(x, y, OMEN[0]); b.set(x, y - 1, OMEN[2]); b.set(x, y - 2, ACCENT.ashEyeDim); }
+      }
+      const rr = 24 - t * 10;
+      if (i >= 3) ellipseRing(b, cx, gy, rr, rr * 0.28, 1.3, (x, y, a) => (dith(x, y, fade) ? (Math.sin(a) > 0.3 ? ACCENT.ashEyeDim : OMEN[2]) : 0));
     },
   },
 };

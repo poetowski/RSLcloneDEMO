@@ -909,6 +909,7 @@ describe('summoning', () => {
     q.reliquary.recruit('chief_engineer_cj');
     q.reliquary.recruit('forest_gargoyle');
     q.reliquary.recruit('dead_knight_amstron');
+    q.reliquary.recruit('sir_siroslav');
     const odds = rarityOdds(summonPool(q));
     expect(odds.heroic).toBe(0);
     expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);
