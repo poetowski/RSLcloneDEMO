@@ -194,6 +194,9 @@ export const unbreached = fixture('unbreached', { stats: { hp: 1700 }, passive: 
 /** A1 strikes and places DEF Down and ATK Down, both certain. */
 export const breaker = fixture('breaker', { skills: [skill('break', 1, { statuses: [{ status: 'def_down', turns: 2, to: 'targets' }, { status: 'atk_down', turns: 2, to: 'targets' }] })] });
 
+/** Renewal: at the start of its turn every ally, itself included, heals for 10% of its max HP. */
+export const wellspring = fixture('wellspring', { stats: { hp: 1000 }, passive: { id: 'renewal', name: 'Renewal', desc: '', kind: 'renewal', value: 0.1 } });
+
 /** Brace: at the start of its turn it takes DEF Up for 1 turn. */
 export const sentinel = fixture('sentinel', { passive: { id: 'brace', name: 'Brace', desc: '', kind: 'brace', value: 0, statuses: [{ status: 'def_up', turns: 1 }] } });
 

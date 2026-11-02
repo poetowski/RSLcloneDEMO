@@ -252,6 +252,7 @@ export class Battle {
     const events: BattleEvent[] = [];
     this.purge(u, events);
     this.brace(u, events);
+    this.renewal(u, events);
     if (this.has(u, 'poison')) this.applyDamage(u, Math.round(u.maxHp * POISON_PCT), false, 0, 0, events, 'poison');
     if (u.alive && this.has(u, 'burn')) this.applyDamage(u, Math.round(u.maxHp * BURN_PCT), false, 0, 0, events, 'burn');
     if (u.alive && this.has(u, 'regen')) this.heal(u, Math.round(u.maxHp * REGEN_PCT), 0, events);
@@ -620,6 +621,24 @@ export class Battle {
     if (p?.kind !== 'brace') return;
     events.push({ kind: 'passive', target: u.uid, name: p.name, hit: 0, effect: 'brace', source: u.uid });
     for (const st of p.statuses ?? []) this.tryApply(u, u, st.status, st.turns, undefined, undefined, 0, events);
+  }
+
+  /**
+   * Renewal (passive): at the start of its holder's turn, before anything ticks and
+   * on a turn it will skip too, every living ally, the holder included, heals by a
+   * share of the holder's max HP (Rootfather's Sap Rises: 10%). It shows only on
+   * those it can reach: nobody at full HP, and Heal Block stops it as it stops any heal.
+   */
+  private renewal(u: Unit, events: BattleEvent[]) {
+    const p = u.champion.passive;
+    if (p?.kind !== 'renewal') return;
+    let named = false;
+    for (const a of this.allies(u)) {
+      if (a.hp >= a.maxHp) continue;
+      events.push({ kind: 'passive', target: a.uid, name: p.name, hit: 0, effect: 'renewal', source: u.uid, ...(named ? { quiet: true } : {}) });
+      this.heal(a, Math.round(u.maxHp * p.value), 0, events);
+      named = true;
+    }
   }
 
   /**

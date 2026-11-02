@@ -84,6 +84,7 @@ The roster today:
 | Paladin (`paladin`) | Heroic | Ember | Tank | Azure Crown | summoned (the reward of a quest line Jakub designs later) |
 | Chief Engineer CJ (`chief_engineer_cj`) | Heroic | Bloom | Tank | Sanguine Dominion | summoned |
 | Sir Siroslav (`sir_siroslav`) | Heroic | Ember | Support | Sanguine Dominion | summoned |
+| Rootfather (`rootfather`) | Heroic | Ember | Support | Court of Root | summoned |
 | Forest Gargoyle (`forest_gargoyle`) | Heroic | Tide | Tank | Court of Root (read from his "root") | summoned |
 | Dead Knight Amstron (`dead_knight_amstron`) | Heroic | Ember | Tank | Ashveil Reign | summoned |
 | Strongman (`strongman`) | Common | Tide | Damage | Azure Crown | summoned |

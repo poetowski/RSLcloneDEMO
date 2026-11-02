@@ -105,6 +105,7 @@ export function auditChampion(c: ChampionDef): string[] {
   if (p?.kind === 'fallen' && (!p.stat || !p.max)) out.push(`${p.id}: a fallen passive needs a stat and a cap`);
   if (p?.kind === 'keen' && ((!p.statuses?.length && !p.value) || p.statuses?.some((st) => !STATUSES[st.status].buff))) out.push(`${p.id}: a keen passive gives a heal or buffs`);
   if (p?.kind === 'purge' && (p.statuses?.length || p.value)) out.push(`${p.id}: a purge passive only lifts debuffs`);
+  if (p?.kind === 'renewal' && !p.value) out.push(`${p.id}: a renewal passive needs a heal`);
   if (p?.kind === 'immune' && (!p.immuneTo || STATUSES[p.immuneTo].buff)) out.push(`${p.id}: an immune passive names a debuff`);
   if (p?.kind === 'brace' && (!p.statuses?.length || p.statuses.some((st) => !STATUSES[st.status].buff))) out.push(`${p.id}: a brace passive gives its holder buffs`);
   if ((p?.kind === 'tend' || p?.kind === 'ward' || p?.kind === 'retaliate' || p?.kind === 'remedy' || p?.kind === 'reproach') && !p.statuses?.length) out.push(`${p.id}: a ${p.kind} passive needs statuses`);

@@ -114,6 +114,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
 | 2026-11-01 | The Verdant Luminary, an Elite Support of the Azure Crown, Bloom | 60 |
 | 2026-11-01 | Coffin's Legs (first built as the Pallbearer, then Tombstone's Legs), the Wraith and the Haruspex (first built as the Bone Augur), my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Coffin's Legs and the Haruspex his | 61-63 |
+| 2026-11-02 | Rootfather, a Heroic Support of the Court of Root, Ember; his brief and name | 71 |
 | 2026-11-02 | Three Elites of the Court of Root on Jakub's word: Silkfang, the Bog Troll, the Moth Seer; all mine until he sets them; the Transfusionist's healing cut | 67-70 |
 | 2026-11-02 | Three Elites of the Sanguine Dominion on Jakub's word: the War Tigress, the Hex Warden, the Transfusionist; all mine until he sets them | 65-67 |
 | 2026-11-01 | Sir Siroslav, a Heroic Support of the Sanguine Dominion, the roster's first Heroic Support; Ember, my choice on his word | 64 |
@@ -4382,3 +4383,23 @@ wings with an eye-spot on each, a lantern of fireflies on a crooked stick. "It":
 - **Soft Powder** (passive, `ward`): when an enemy skill damages an ally, the Moth Seer included, and leaves it
   standing, a 30% chance of Regen on that ally for 1 turn.
 - Stats HP 1260, ATK 88, DEF 62, SPD 112, CRIT 2.5%, score 404. Impact 42%. Summoned.
+
+## 71. Rootfather (received 2026-11-02)
+
+Jakub's brief, the name his too: a Heroic Support of the Court of Root, Ember. An ancient-looking wanderer, lean and
+weathered; skin like aged bark with faint green veins of light beneath it; moss on his shoulders and forearms, tiny
+flowers in his beard; a crown of twisted branches and antlers with feathers, dried leaves and small bones; a long cloak
+of overlapping leaves, roots and hide over primitive leather armour reinforced with living wood; thick roots coiling
+round his boots and growing into the ground; a crooked wooden staff with a luminous emerald seed floating in its crown.
+
+- **Root Wake** (A1): all enemies, 0.6 (his number: "leave it at 0.6"; 0.8 and 0.3 were tried before it).
+- **Long Winter** (A2, CD 4): Slow on all enemies for 2 turns, 20% Turn Meter to every ally, himself included (`selfTm`
+  for his own). No attack.
+- **Blight Seed** (A3, CD 5): one enemy, 1.3 (the floor of the norms); every buff comes off it before the hit, then
+  Poison for 2 turns.
+- **Sap Rises** (passive, new kind `renewal`): at the start of his turn, a skipped one too, every ally, himself included,
+  heals for 10% of his max HP. Heal Block stops it. It shows only when someone is hurt.
+- Stats HP 900, ATK 118, DEF 80, SPD 90, CRIT 2.5%, score 419. Impact 70%, over the band of 40-60%; the passive is most
+  of it, and even at A1 0.3 it was 60%. Summoned.
+- Stand-ins until he sets them: the skill names and texts, A3's multiplier and cooldown, the stats, the lore line, and
+  that he is summoned. Read by the game: speed down is Slow; "all allies" includes him; the debuffs are certain, meeting RES.

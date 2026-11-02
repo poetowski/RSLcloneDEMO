@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { ALL_CHAMPIONS, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden } from './fixtures';
+import { balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -1038,6 +1038,31 @@ describe('statuses', () => {
     alone.startTurn(her);
     alone.endTurn(her);
     expect(alone.has(her, 'regen')).toBe(false);
+  });
+
+  it('renewal heals every hurt ally by a share of its holder max HP at the start of its turn, a skipped one too, unless Heal Block stops it', () => {
+    const b = new Battle(combatants([wellspring, brute]), combatants([cleaver]), { seed: 5 });
+    const me = b.get('p0'), ally = b.get('p1');
+    me.hp = 100;
+    ally.hp = 100;
+    const st = b.startTurn(me);
+    expect(me.hp).toBe(200);
+    expect(ally.hp).toBe(200);
+    expect(st.events.filter((e) => e.kind === 'passive' && !e.quiet)).toHaveLength(1);
+    b.endTurn(me);
+    // nobody hurt, nothing shown
+    me.hp = me.maxHp;
+    ally.hp = ally.maxHp;
+    expect(b.startTurn(me).events.filter((e) => e.kind === 'passive')).toHaveLength(0);
+    b.endTurn(me);
+    // stunned, it still heals; Heal Block stops it on the ally who carries it
+    me.hp = 100;
+    ally.hp = 100;
+    me.statuses.push({ id: 'stun', turns: 1, source: 'e0' } as never);
+    ally.statuses.push({ id: 'heal_block', turns: 1, source: 'e0' } as never);
+    expect(b.startTurn(me).skip).toBe(true);
+    expect(me.hp).toBe(200);
+    expect(ally.hp).toBe(100);
   });
 
   it('ends every battle down to the last two of any champion in the roster, when both can strike', () => {

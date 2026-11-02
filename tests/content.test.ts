@@ -76,7 +76,7 @@ describe('champions', () => {
       }
       for (const f of [c.passive?.fx, c.passive?.holderFx]) if (f) expect(fx[f], `${c.passive?.id} -> fx ${f}`).toBeTruthy();
       // a passive that acts in the flow of the fight shows on whom it reaches
-      if (c.passive && ['tend', 'ward', 'retaliate', 'remedy', 'purge', 'brace'].includes(c.passive.kind)) expect(c.passive.fx, `${c.passive.id} needs an fx`).toBeTruthy();
+      if (c.passive && ['tend', 'ward', 'retaliate', 'remedy', 'purge', 'brace', 'renewal'].includes(c.passive.kind)) expect(c.passive.fx, `${c.passive.id} needs an fx`).toBeTruthy();
     }
   });
 
@@ -347,6 +347,16 @@ describe('design decisions', () => {
     expect(a2 && [a2.slot, a2.target, a2.cooldown, totalMult(a2), a2.statuses, a2.tmTargets]).toEqual([2, 'enemies', 4, 0, [{ status: 'def_up', turns: 2, to: 'allies' }, { status: 'regen', turns: 1, to: 'allies' }], -7]);
     expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.statuses, totalMult(a3) > 0]).toEqual([3, 'enemies', 4, [{ status: 'stun', turns: 1, chance: 0.35, to: 'targets' }, { status: 'shield', turns: 2, value: 0.15, to: 'lowestMaxHp' }], true]);
     expect(c?.passive?.kind).toBe('purge');
+  });
+
+  it('has Rootfather of his brief: a Heroic Support of the Court of Root, Ember; an A1 on all enemies; an A2 of Slow for 2 turns on all enemies and 20% Turn Meter for all allies, cooldown 4; an A3 on one enemy that strips its buffs and places Poison for 2 turns; a passive healing all allies for 10% of his max HP at the start of his turn', () => {
+    const c = CHAMPIONS.find((x) => x.id === 'rootfather');
+    expect(c && [c.name, c.rarity, c.role, c.faction, c.affinity]).toEqual(['Rootfather', 'heroic', 'Support', 'court_of_root', 'ember']);
+    const [a1, a2, a3] = c?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, a1.statuses ?? [], totalMult(a1) > 0]).toEqual([1, 'enemies', [], true]);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, totalMult(a2), a2.statuses, a2.tmAllies, a2.selfTm]).toEqual([2, 'enemies', 4, 0, [{ status: 'spd_down', turns: 2, to: 'targets' }], 20, 20]);
+    expect(a3 && [a3.slot, a3.target, a3.stripBuffs, a3.statuses, totalMult(a3) > 0]).toEqual([3, 'enemy', true, [{ status: 'poison', turns: 2, to: 'targets' }], true]);
+    expect(c?.passive && [c.passive.kind, c.passive.value]).toEqual(['renewal', 0.1]);
   });
 
   it('has the Forest Gargoyle of his brief: a Heroic Tank; an A1 with a 35% chance of Heal Block for 2 turns; an A2 on all enemies with ATK Down for 1 turn, cooldown 3; an A3 on one enemy with Slow for 2 turns that empties its Turn Meter, cooldown 4; a passive of DEF Up for 1 turn at the start of his turns', () => {
@@ -910,6 +920,7 @@ describe('summoning', () => {
     q.reliquary.recruit('forest_gargoyle');
     q.reliquary.recruit('dead_knight_amstron');
     q.reliquary.recruit('sir_siroslav');
+    q.reliquary.recruit('rootfather');
     const odds = rarityOdds(summonPool(q));
     expect(odds.heroic).toBe(0);
     expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);

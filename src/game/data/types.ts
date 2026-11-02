@@ -192,8 +192,11 @@ export interface PassiveDef {
    *            even one that fells it, `chance` to place `statuses` on the attacker after the
    *            skill's last hit, once for each ally so struck (the Verdant Luminary's Formal
    *            Protest: 70%, ATK Down for 1 turn, 2026-11-01)
+   * renewal:   at the start of each of the champion's turns, a skipped one too, every ally (the
+   *            champion included) heals by `value` x the champion's max HP (Rootfather's Sap
+   *            Rises: 10%, 2026-11-02)
    */
-  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune' | 'keen' | 'reproach';
+  kind: 'undying' | 'overdrive' | 'rebuke' | 'stat' | 'tend' | 'ward' | 'fallen' | 'retaliate' | 'remedy' | 'defy' | 'purge' | 'brace' | 'immune' | 'keen' | 'reproach' | 'renewal';
   value: number;
   statuses?: { status: StatusId; turns: number }[];
   /** rebuke, tend and ward: the champion's own turns the passive rests after it acts (a ward is ready from the start) */

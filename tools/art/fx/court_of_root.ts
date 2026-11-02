@@ -113,7 +113,106 @@ function puff(b: Bitmap, x: number, y: number, r: number, ramp: RGBA[], fade: nu
   disc(b, x, y, r, (px, py, d) => (dith(px, py, fade * (1 - d * 0.6)) ? ramp[d < 0.5 ? k + 1 : k] : 0));
 }
 
+/** Rootfather's seed, as light. */
+const SEED = ramps.green;
+
+/** A root whipping up from the ground at x, leaning `lean` px over its height; `grow` (0-1) is how far it has come. */
+function rootWhip(b: Bitmap, x: number, gy: number, h: number, lean: number, grow: number, thick: number) {
+  const top = h * grow;
+  for (let u = 0; u <= top; u += 0.5) {
+    const k = u / Math.max(1, h);
+    const px = x + lean * k * k + Math.sin(k * 5 + x) * 1.2;
+    const w = thick * (1 - k * 0.8);
+    for (let o = -w; o <= w; o += 0.5) {
+      const qx = Math.round(px + o), qy = Math.round(gy - u);
+      b.set(qx, qy, WOOD[o < -w * 0.3 ? 4 : o > w * 0.4 ? 1 : 3]);
+    }
+  }
+}
+
 export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
+  /** Root Wake: the ground breaks under the enemy, thick roots whip up round it and sink back, earth thrown out. Matter. */
+  root_wake: {
+    w: 84, h: 84, n: 9, ms: 60, ax: 0.5, ay: 0.95, pad: [2, 4, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 42, gy = 79;
+      const grow = [0.25, 0.65, 1, 1, 0.95, 0.75, 0.5, 0.25, 0.08][i];
+      rootWhip(b, cx - 15, gy, 50, 11, grow, 2.6);
+      rootWhip(b, cx + 16, gy, 56, -12, grow, 2.8);
+      rootWhip(b, cx - 5, gy + 1, 34, -8, grow, 2);
+      rootWhip(b, cx + 7, gy + 1, 38, 7, grow, 2);
+      ring(b, cx, gy, 8 + t * 26, 2 + t * 6, 1.2, DU, 1 - t * 0.8);
+      sparks(b, cx, gy - 2, 14, 26, t, ramps.wood, 1103, 14);
+    },
+  },
+  /** Long Winter on an enemy: cold grey-white roots close slowly round its feet, and a few dry leaves come down. */
+  long_winter: {
+    w: 64, h: 68, n: 11, ms: 70, ax: 0.5, ay: 0.95, pad: [2, 2, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 32, gy = 63;
+      const drawn = Math.min(1, (i + 1) / 5);
+      const fade = i < 7 ? 1 : [0.75, 0.5, 0.3, 0.15][i - 7];
+      for (const [ry, ph] of [[3, 0], [4.5, 2], [6, 4]] as const) {
+        ellipseRing(b, cx, gy - ry * 2.2, 12 + ry, ry, 1.2, (x, y, a) => ((a + ph) % 6.28 < drawn * 6.28 && dith(x, y, fade) ? WOOD[a % 1.4 < 0.7 ? 4 : 3] : 0));
+      }
+      for (let k = 0; k < 5; k++) {
+        const x = Math.round(cx - 20 + k * 10 + Math.sin(t * 6 + k) * 3), y = Math.round(((k * 11) % 16) + t * 34);
+        if (!dith(x, y, fade)) continue;
+        b.set(x, y, LEAF[3]);
+        b.set(x + 1, y, LEAF[2]);
+      }
+    },
+  },
+  /** Long Winter from his staff: the seed flares, a slow ring opening round it. Light. */
+  seed_flare: {
+    w: 72, h: 72, n: 10, ms: 65, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const c = 36;
+      const k = [0.4, 0.8, 1, 1, 0.9, 0.75, 0.6, 0.4, 0.25, 0.1][i];
+      burst(b, c, c, 8, 3, 4 + k * 13, 1, SEED, t * 0.5);
+      ring(b, c, c, 5 + t * 26, 5 + t * 26, 1.2, SEED, 1 - t);
+    },
+  },
+  /** Long Winter on an ally: green motes rising fast round it, hurrying it on. Light. */
+  seed_quicken: {
+    w: 56, h: 76, n: 9, ms: 60, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t) => {
+      motes(b, 28, 68, 34, 58, 12, t, SEED, 1117);
+      ring(b, 28, 70, 8 + t * 14, 2 + t * 3, 1, SEED, 1 - t);
+    },
+  },
+  /** Blight Seed in flight: a splinter of the seed, bright at its head, a green thread behind it (drawn pointing right). */
+  seed_bolt: {
+    w: 24, h: 9, n: 2, ms: 70, ax: 0.75, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      for (let x = 2; x <= 15; x++) if ((x + i) % 3 || x > 9) b.set(x, 4, SEED[x > 10 ? 3 : 1]);
+      disc(b, 18, 4, 2.6, (_x, _y, d) => SEED[d < 0.45 ? 4 : 3]);
+      b.set(19, 3, W);
+    },
+  },
+  /** Blight Seed lands: a green flash, sick drops flung off, a thread of it sinking away. Light. */
+  blight_seed: {
+    w: 64, h: 64, n: 8, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 8, 2],
+    draw: (b, t, i) => {
+      const c = 32;
+      if (i < 4) burst(b, c, c, 7, 2, [8, 15, 19, 12][i], 1.2, SEED, 0.3);
+      if (i >= 1) sparks(b, c, c, 12, 24, (i - 1) / 6, GN, 1129, 16);
+    },
+  },
+  /** Sap Rises: a thread of green light climbing from the ground up an ally, motes going on above it. Light. */
+  sap_rises: {
+    w: 52, h: 80, n: 9, ms: 65, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t) => {
+      const cx = 26, gy = 74;
+      for (const s of [-1, 1]) {
+        for (let u = 0; u < t * 56; u++) {
+          const x = Math.round(cx + s * Math.sin(u * 0.22) * 8), y = gy - u;
+          if (dith(x, y, 1 - t * 0.7)) b.set(x, y, SEED[u > t * 44 ? 4 : 2]);
+        }
+      }
+      motes(b, cx, gy - 12, 22, 46, 7, t, SEED, 1151);
+    },
+  },
   /** Fang Bite lands: two white points where the fangs go in, a dull flash, drops of venom flung off. */
   silk_bite: {
     w: 52, h: 52, n: 7, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 4, 8, 4],
