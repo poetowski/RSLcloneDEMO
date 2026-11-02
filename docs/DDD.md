@@ -414,6 +414,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C30 | A ward with a `cooldown` is ready from the start of the battle; after it answers it rests for `cooldown` of its holder's own turns, and while it rests no blow wakes it | `battle.test.ts` (rests a ward with a cooldown) |
 | INV-C31 | An enemy only (`ENEMIES`) is never in the roster (`CHAMPIONS`), the summon pool or a stage's `recruit`, and fights in at least one stage | `content.test.ts` (keeps the enemies only out of the roster) |
 | INV-C32 | A `keen` passive answers each ally's fall while its holder stands, reaching every ally still standing, the holder included | `battle.test.ts` (keens) |
+| INV-C33 | A `reproach` passive answers a critical hit of an enemy skill on an ally of its living holder, even one that fells that ally, once per ally per skill, after the skill's last hit, with its chance, while the attacker stands; the debuff meets the attacker's RES; a holder the hit fells answers nothing | code (`Battle.reproach`); test |
 
 ### 6.2 Catalog
 
