@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { ALL_CHAMPIONS, astronomerRoyal, paladin, cinderSylph, necromancer, rootfather, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { aligner, herald2, balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
+import { aligner, fencer, herald2, balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -478,6 +478,36 @@ describe('statuses', () => {
     b.get('e0').tm = 0;
     r = b.useSkill(b.get('p0'), skill(foreman(0), 'tap'), 'e0');
     expect(r.events.some((e) => e.kind === 'tm')).toBe(false);
+  });
+
+  it("rolls a turn meter drain on each hit, a hit at a time (Azul the Blade's Threefold Flourish)", () => {
+    const tough = { ...striker, stats: { ...striker.stats, hp: 1700 } };
+    // certain on each hit: three events of -10, one on each hit
+    let b = new Battle(combatants([fencer(1)]), combatants([tough]), { seed: 5 });
+    b.get('e0').tm = 50;
+    let r = b.useSkill(b.get('p0'), skill(fencer(1), 'flourish'), 'e0');
+    const tm = r.events.flatMap((e) => (e.kind === 'tm' ? [[e.delta, e.hit]] : []));
+    expect(tm).toEqual([[-10, 0], [-10, 1], [-10, 2]]);
+    expect(b.get('e0').tm).toBe(20);
+    // 50% on each hit: three hits take 15% on average
+    let taken = 0;
+    for (let seed = 1; seed <= 400; seed++) {
+      b = new Battle(combatants([fencer(0.5)]), combatants([tough]), { seed });
+      b.get('e0').tm = 50;
+      b.useSkill(b.get('p0'), skill(fencer(0.5), 'flourish'), 'e0');
+      taken += 50 - b.get('e0').tm;
+    }
+    expect(taken / 400).toBeGreaterThan(13);
+    expect(taken / 400).toBeLessThan(17);
+    // an empty meter has nothing to lose, and shows nothing; a meter of 5 loses just 5
+    b = new Battle(combatants([fencer(1)]), combatants([tough]), { seed: 5 });
+    b.get('e0').tm = 0;
+    r = b.useSkill(b.get('p0'), skill(fencer(1), 'flourish'), 'e0');
+    expect(r.events.some((e) => e.kind === 'tm')).toBe(false);
+    b = new Battle(combatants([fencer(1)]), combatants([tough]), { seed: 5 });
+    b.get('e0').tm = 5;
+    r = b.useSkill(b.get('p0'), skill(fencer(1), 'flourish'), 'e0');
+    expect(r.events.flatMap((e) => (e.kind === 'tm' ? [e.delta] : []))).toEqual([-5]);
   });
 
   it("skips two of its holder's turns with a 2-turn Stun, rolled for each enemy apart", () => {

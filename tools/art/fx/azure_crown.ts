@@ -24,7 +24,7 @@
 // the double cross on it, before each ally; in Trial by Fire the levelled
 // blade roars up along its length, and the sweep passes through each enemy as
 // a flat arc of flame, flames bursting up where it went.
-import { MAT } from '../palette.ts';
+import { ACCENT, MAT } from '../palette.ts';
 import { disc, dith, ellipseRing, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, hash2, RGBA, rng } from '../raster.ts';
 import { burst, cut, flame, FxDef, motes, ramps, ring, soundRings, sparks, W } from './kit.ts';
@@ -116,6 +116,25 @@ function kite(b: Bitmap, cx: number, cy: number, hw: number, hh: number, fade: n
       const x = Math.round(x0 + ((x1 - x0) * s) / n), y = Math.round(y0 + ((y1 - y0) * s) / n);
       if (dith(x, y, fade)) b.set(x, y, k === 0 ? W : GO[4]);
     }
+  }
+}
+
+
+/** Azul's cuts: a thin line of azure-white light, the rapier's own sparks of gold shed along it. */
+function rapierCut(b: Bitmap, i: number, x0: number, y0: number, x1: number, y1: number, bend: number, flash: [number, number, number], seed: number, thick = 1) {
+  const reach = [0.55, 1, 1, 1, 1, 1, 1][i];
+  const heat = [1.4, 1.3, 1.05, 0.8, 0.6, 0.45, 0.3][i];
+  const th = [2.2, 3, 2.4, 1.8, 1.3, 0.9, 0.7][i] * thick;
+  if (i < 6) cut(b, x0, y0, x1, y1, bend, th, ramps.steel, heat, reach);
+  if (i === 1 || i === 2) burst(b, flash[0], flash[1], 6, 1, [9, 6][i - 1], 1, GO, flash[2]);
+  if (i >= 1) sparks(b, flash[0], flash[1], 12, 26, (i - 1) / 5, GO, seed, 14);
+}
+
+/** The Azure Crown's chevron: a small gold arrowhead pointing up (an ATK Up), `fade` 0..1 (screen space). */
+function chevron(b: Bitmap, x: number, y: number, fade: number) {
+  for (let k = -4; k <= 4; k++) {
+    const yy = y + Math.abs(k);
+    for (const o of [0, 1]) if (dith(x + k, yy + o, fade)) b.set(x + k, yy + o, o === 0 ? (Math.abs(k) < 2 ? ACCENT.goldHot : GO[4]) : GO[2]);
   }
 }
 
@@ -870,6 +889,90 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
       const k = Math.sin((i / 6) * Math.PI);
       ring(b, 28, 30, 10 + i * 2, 15 + i * 2, 1.8, ramps.steel, k);
       if (i >= 1) sparks(b, 28, 30, 6, 18, (i - 1) / 6, ramps.gold, 861, 12);
+    },
+  },
+  /**
+   * Piercing Lunge: the point of the rapier goes in through the gap in the guard: a thin line of azure light
+   * from his side to the chest, a small star of gold where it lands, gold sparks off the blade. Drawn from the
+   * left; the battle turns it.
+   */
+  lunge_prick: {
+    w: 80, h: 48, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 6, 4],
+    draw: (b, t, i) => {
+      const reach = [0.5, 1, 1, 1, 1, 1, 1][i];
+      const heat = [1.5, 1.35, 1.05, 0.8, 0.6, 0.42, 0.28][i];
+      const th = [1.8, 2.4, 2.0, 1.6, 1.2, 0.9, 0.7][i];
+      if (i < 6) cut(b, 4, 25, 42, 24, 0, th, ramps.steel, heat, reach);
+      if (i >= 1 && i <= 4) burst(b, 42, 24, 6, 1, [7, 11, 9, 5][i - 1], 1, GO, 0.3);
+      if (i >= 1 && i <= 3) disc(b, 42, 24, [2, 3, 2][i - 1], (x, y, d) => rampDither(CO, 4.4 - d * 2, x, y));
+      if (i >= 1) sparks(b, 42, 24, 12, 28, (i - 1) / 5, GO, 1401, 12);
+    },
+  },
+  /** Threefold Flourish, the first cut: high behind to low in front. */
+  flourish_cut: {
+    w: 72, h: 72, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
+    draw: (b, t, i) => rapierCut(b, i, 12, 10, 62, 60, -2, [38, 36, 0.4], 1411, 1.05),
+  },
+  /** Threefold Flourish, the second cut: the blade turned back, low in front to high behind. */
+  flourish_rise: {
+    w: 72, h: 72, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
+    draw: (b, t, i) => rapierCut(b, i, 12, 58, 62, 14, 2, [38, 36, 0.9], 1423, 1.05),
+  },
+  /** Threefold Flourish, the third cut: straight across, level with the heart. */
+  flourish_across: {
+    w: 76, h: 48, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 6, 8, 6],
+    draw: (b, t, i) => rapierCut(b, i, 6, 27, 70, 21, -4, [40, 24, 0], 1433, 1.1),
+  },
+  /** Crown Salute, on an enemy: a flat arc of azure-white light crosses it, gold sparks flying off. */
+  salute_arc: {
+    w: 96, h: 56, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 4, 14, 4],
+    draw: (b, t, i) => {
+      const grow = [0.45, 0.85, 1, 1, 1, 1, 1][i];
+      const heat = [1.35, 1.25, 1.05, 0.8, 0.6, 0.42, 0.28][i];
+      const a0 = Math.PI * 0.98, a1 = a0 - Math.PI * 0.96 * grow;
+      if (i < 6) flatArc(b, 48, 20, 44, 17, 12 * (1 - t * 0.45), a0, a1, ramps.steel, heat);
+      if (i >= 1) sparks(b, 58, 30, 14, 26, (i - 1) / 5, GO, 1441, 12);
+    },
+  },
+  /**
+   * Crown Salute's flare: the rapier raised in salute, a star of azure-white light bursts at its tip, rings of
+   * gold opening from it, sparks of the blade rising. Played on the skill's `cast` event at the actor's head
+   * point; the tip of his raised blade stands where the star sits.
+   */
+  salute_flare: {
+    w: 96, h: 110, n: 11, ms: 60, ax: 0.5365, ay: 0.799,
+    draw: (b, t, i) => {
+      const cx = 48, cy = 40;
+      const grow = [0.35, 0.7, 1, 1, 0.95, 0.85, 0.7, 0.55, 0.4, 0.25, 0.12][i];
+      star(b, cx, cy, 34 * Math.min(1, grow * 1.2), grow, ramps.steel);
+      if (i < 6) disc(b, cx, cy, [3, 5, 6, 5, 3, 2][i], (x, y, d) => rampDither(CO, 4.4 - d * 2.2, x, y));
+      for (const lag of [0, 3]) {
+        const tt = (i - lag) / 7;
+        if (tt <= 0 || tt > 1) continue;
+        const r = 6 + tt * 32;
+        ring(b, cx, cy, r, r * 0.55, Math.max(1, 3 - tt * 2), GO, 1.3 - tt * 0.8);
+      }
+      motes(b, cx, cy + 14, 26, 40, 14, t, ramps.steel, 1451);
+      if (i >= 1) sparks(b, cx, cy, 10, 30, (i - 1) / 10, GO, 1453, 6);
+    },
+  },
+  /**
+   * Crown Salute on each ally: the light of the salute winds up round it with two gold chevrons rising (ATK Up),
+   * motes of the blade's sparks, a ring settling at its feet. Played at the chest.
+   */
+  salute_spark: {
+    w: 56, h: 72, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [4, 4, 6, 4],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 32;
+      if (i >= 1) ring(b, cx, cy + 30, 8 + t * 12, 3 + t * 3, 1.2, GO, 1.1 - t * 0.6);
+      for (const [k, lag] of [[0, 0], [1, 2]] as const) {
+        const tt = (i - lag) / 7;
+        if (tt <= 0 || tt > 1) continue;
+        chevron(b, cx, Math.round(cy + 14 - tt * 30 - k * 6), 1 - tt * 0.8);
+      }
+      motes(b, cx, cy + 22, 24, 46, 18, t, ramps.steel, 1461);
+      motes(b, cx, cy + 22, 20, 40, 8, t, GO, 1465);
+      if (i >= 1 && i <= 6) sparks(b, cx, cy, 8, 20, (i - 1) / 6, GO, 1463, 0);
     },
   },
 };

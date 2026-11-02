@@ -403,6 +403,12 @@ export class Battle {
         for (const app of skill.statuses ?? []) {
           if (app.perHit && app.to === 'targets' && t.alive) this.tryApply(actor, t, app.status, app.turns, app.chance, app.value, hi, events);
         }
+        // a drain rolled on each hit: Azul's blade nicks the target's turn meter (an empty meter has nothing to lose)
+        if (skill.tmPerHit && t.alive && t.tm > 0 && this.rng.chance(skill.tmPerHit.chance)) {
+          const before = t.tm;
+          t.tm = Math.max(0, t.tm - skill.tmPerHit.amount);
+          events.push({ kind: 'tm', target: t.uid, delta: t.tm - before, hit: hi });
+        }
       }
     });
 

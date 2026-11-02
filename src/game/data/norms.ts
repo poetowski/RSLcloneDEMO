@@ -79,6 +79,7 @@ export function auditChampion(c: ChampionDef): string[] {
     if (s.cooldown < n.cooldown[0] || s.cooldown > n.cooldown[1]) out.push(`${s.id}: cooldown ${s.cooldown} outside ${n.cooldown.join('-')}`);
     if (s.reviveAll && (s.target !== 'fallen' || !s.revive)) out.push(`${s.id}: reviveAll needs a revive on the fallen`);
     if (s.grantTurn && s.target !== 'ally') out.push(`${s.id}: a turn is given to one chosen ally`);
+    if (s.tmPerHit && !(s.tmPerHit.chance > 0 && s.tmPerHit.chance <= 1 && s.tmPerHit.amount > 0 && s.hits.length > 1)) out.push(`${s.id}: a drain on each hit needs a chance between 0 and 1, an amount and several hits`);
     const m = totalMult(s);
     if (m > 0) {
       const [lo, hi] = isAoe(s) ? n.aoe : n.single;

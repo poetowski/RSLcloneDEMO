@@ -45,6 +45,7 @@ import { bogTroll } from './bog_troll.ts';
 import { mothSeer } from './moth_seer.ts';
 import { rootfather } from './rootfather.ts';
 import { astronomerRoyal } from './astronomer_royal.ts';
+import { azulTheBlade } from './azul_the_blade.ts';
 import { cinderSylph } from './cinder_sylph.ts';
 import { hexWarden } from './hex_warden.ts';
 import { transfusionist } from './transfusionist.ts';
@@ -58,7 +59,7 @@ import { walkingBush } from './walking_bush.ts';
 import { wildSpeaker } from './wild_speaker.ts';
 
 export const CHAMPION_ART: Record<string, ChampionArt> = {
-  sir_siroslav: sirSiroslav, coffins_legs: coffinsLegs, wraith, haruspex, crossbowman, overlord_ofentol: overlordOfentol, verdant_luminary: verdantLuminary, war_tigress: warTigress, silkfang, bog_troll: bogTroll, moth_seer: mothSeer, rootfather, astronomer_royal: astronomerRoyal, cinder_sylph: cinderSylph, hex_warden: hexWarden, transfusionist, captain_gareth: captainGareth, rime_scholar: rimeScholar, follower, skirmisher, strongman, town_guard: townGuard, last_riter: lastRiter, archer, harvest_specialist: harvestSpecialist, sentry, junior_ward: juniorWard, gravedigger, ash_widow: ashWidow, toadcap, bristleback, hive_tender: hiveTender, dominion_medic: dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
+  azul_the_blade: azulTheBlade,   sir_siroslav: sirSiroslav, coffins_legs: coffinsLegs, wraith, haruspex, crossbowman, overlord_ofentol: overlordOfentol, verdant_luminary: verdantLuminary, war_tigress: warTigress, silkfang, bog_troll: bogTroll, moth_seer: mothSeer, rootfather, astronomer_royal: astronomerRoyal, cinder_sylph: cinderSylph, hex_warden: hexWarden, transfusionist, captain_gareth: captainGareth, rime_scholar: rimeScholar, follower, skirmisher, strongman, town_guard: townGuard, last_riter: lastRiter, archer, harvest_specialist: harvestSpecialist, sentry, junior_ward: juniorWard, gravedigger, ash_widow: ashWidow, toadcap, bristleback, hive_tender: hiveTender, dominion_medic: dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
   walking_bush: walkingBush, wild_speaker: wildSpeaker, jungle_herder: jungleHerder, associate, emissary_handlings: emissaryHandlings, black_rhino: blackRhino, red_cloak: redCloak, grove_keeper: groveKeeper, big_ears: bigEars, skeleton, rot_hulk: rotHulk, bellringer, necromancer, automated_soul: automatedSoul, irving_wellbington: irvingWellbington, paladin, chief_engineer_cj: chiefEngineerCj, forest_gargoyle: forestGargoyle, dead_knight_amstron: deadKnightAmstron,
 };
 

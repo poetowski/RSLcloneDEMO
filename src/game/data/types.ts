@@ -119,6 +119,8 @@ export interface SkillDef {
   lifestealMote?: { fx: string; trail: string[] };
   /** turn meter change for targets (negative = reduce), on the last hit */
   tmTargets?: number;
+  /** every hit rolls `chance` to take `amount` (a share of a full meter, 10 = 10%) off each target it strikes, a hit at a time (Azul the Blade's Triple Riposte) */
+  tmPerHit?: { chance: number; amount: number };
   /** turn meter change for the actor's allies (not the actor), on the last hit */
   tmAllies?: number;
   /** turn meter change for the ally (not the actor) with the lowest HP share once the skill's heals have landed, on the last hit */

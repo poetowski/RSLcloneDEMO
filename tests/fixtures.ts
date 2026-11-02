@@ -252,3 +252,9 @@ export const piercer = fixture('piercer', { skills: [skill('pierce', 1, { ignore
 export const holdfast = fixture('holdfast', {
   passive: { id: 'holdfast', name: 'Hold Fast', desc: '', kind: 'ward', self: true, value: 0, cooldown: 1, statuses: [{ status: 'def_up', turns: 2 }] },
 });
+
+/** A1 strikes three times (0.5 each); each hit has `chance` to take 10% of the target's turn meter, one hit at a time. */
+export const fencer = (chance: number) =>
+  fixture(`fencer_${chance}`, {
+    skills: [skill('flourish', 1, { hits: [{ mult: 0.5 }, { mult: 0.5 }, { mult: 0.5 }], tmPerHit: { chance, amount: 10 } })],
+  });

@@ -46,6 +46,7 @@ export const CHAPTERS: Chapter[] = [
       { kind: 'figure', id: 'turnmeter' },
       { kind: 'p', text: 'A champion with 120 SPD acts six times while one with 100 SPD acts five times. Speed is the most valuable stat in the game: SPD Up and Slow shift who acts first, and skills that drain or grant Turn Meter can steal a whole turn.' },
       { kind: 'p', text: "An extra turn, like the one the Astronomer Royal's Hour of Destiny gives, comes first of all: nobody else's meter moves, and when it ends the champion's meter is back where it was." },
+      { kind: 'p', text: "A skill of several hits can roll for the meter on every hit: each of Azul the Blade's three cuts has its own chance to take a tenth of its target's." },
       { kind: 'tip', text: 'Meters start with a small random head start, so the first turn is never quite the same twice.' },
     ],
   },

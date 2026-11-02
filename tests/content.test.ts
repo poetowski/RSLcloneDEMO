@@ -359,6 +359,17 @@ describe('design decisions', () => {
     expect(c?.passive && [c.passive.kind, c.passive.value]).toEqual(['alignment', 10]);
   });
 
+  it('has Azul the Blade of his brief: a Heroic Damage of the Azure Crown, Ember; an A1 on one enemy with DEF Down for 1 turn; an A2 of three hits, each a 50% chance to take 10% of the Turn Meter, cooldown 3; an A3 on all enemies with ATK Up for 2 turns on all allies, cooldown 4; a passive immune to ATK Down', () => {
+    const c = CHAMPIONS.find((x) => x.id === 'azul_the_blade');
+    expect(c && [c.name, c.rarity, c.role, c.faction, c.affinity]).toEqual(['Azul the Blade', 'heroic', 'Damage', 'azure_crown', 'ember']);
+    expect(c?.skills).toHaveLength(3);
+    const [a1, a2, a3] = c?.skills ?? [];
+    expect(a1 && [a1.slot, a1.target, a1.statuses, totalMult(a1)]).toEqual([1, 'enemy', [{ status: 'def_down', turns: 1, to: 'targets' }], 1.25]);
+    expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.hits.length, a2.tmPerHit]).toEqual([2, 'enemy', 3, 3, { chance: 0.5, amount: 10 }]);
+    expect(a3 && [a3.slot, a3.target, a3.cooldown, a3.statuses, totalMult(a3) > 0]).toEqual([3, 'enemies', 4, [{ status: 'atk_up', turns: 2, to: 'allies' }], true]);
+    expect(c?.passive && [c.passive.kind, c.passive.immuneTo]).toEqual(['immune', 'atk_down']);
+  });
+
   it('has the Cinder Sylph of his brief: a Heroic of the Ashveil Reign; an A1 on one enemy; an A2 debuff on all enemies; an A3 that raises all fallen allies; a passive that burns enemies', () => {
     const c = CHAMPIONS.find((x) => x.id === 'cinder_sylph');
     expect(c && [c.name, c.rarity, c.faction]).toEqual(['Cinder Sylph', 'heroic', 'ashveil_reign']);
@@ -947,6 +958,7 @@ describe('summoning', () => {
     q.reliquary.recruit('rootfather');
     q.reliquary.recruit('cinder_sylph');
     q.reliquary.recruit('astronomer_royal');
+    q.reliquary.recruit('azul_the_blade');
     const odds = rarityOdds(summonPool(q));
     expect(odds.heroic).toBe(0);
     expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);

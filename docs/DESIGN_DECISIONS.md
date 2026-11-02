@@ -4488,3 +4488,41 @@ her. A long brass telescope is her staff, its lens alight; a star hangs over her
 - Stats HP 1400, ATK 84, DEF 70, SPD 104, CRIT 2.5%, score 419. Impact 58%. Summoned.
 - Stand-ins until he sets them: the skill names and texts (those I proposed), every number, Ember, the lore line, the
   rules read for the given turn, and that she is summoned.
+
+## 74. Azul the Blade (received 2026-11-02)
+
+Jakub's brief: a Heroic Damage of the Azure Crown, Ember. "Generate new hero. Affinity Ember, Role Damage, Faction azure crown,
+Rarity heroic. Name "Azul the Blade". Design - very skilled human swordsman with long thin magic rapier. This guy has no helmet
+and he has ceremonial plate armour in golden and azure colours. Be creative with detail. Make his sword having magic sparks
+around."
+
+The kit is his: "A1 - attack single target. Debuff target with defense down for 1 turn. High multiplier. A2 - attack single
+enemy three times. Each hit has 50% chance to remove target turn meter by 10%. CD 3. A3 - attacks all enemies. Buff all allies
+with attack up for 2 turns. CD 4. A4 passive - this champion is immune to debuff attack down."
+
+He stands in a duellist's stance, the rapier in his near hand and the other hand held back and up: azure plate edged and etched
+in gold, a gold crown on the breast under a fan of etched rays, a gold gorget and gold knees, tasset lames hemmed in gold,
+pauldrons whose lames are rimmed in gold and flare to a gold point; a short ceremonial cloak in ivory; bareheaded, dark hair
+swept back and tied in a short tail, a thin moustache, a calm, sure look. The rapier is the silhouette: a long, thin silver
+blade with runes of pale light along it, a gold cup-hilt with a knuckle bow and two quillons, a grip wound in gold wire, and
+sparks of azure-white and gold that rise off it in every frame, more of them when he salutes.
+
+- **Piercing Lunge** (A1): one enemy, 1.25 (the top of the single-target norm, for "high"), DEF Down for 1 turn.
+- **Threefold Flourish** (A2, CD 3): one enemy, three cuts of 0.5; each cut has a 50% chance to take 10% of its Turn Meter
+  (new `tmPerHit`).
+- **Crown Salute** (A3, CD 4): all enemies, 0.8 on each, ATK Up for 2 turns on all allies, himself included.
+- **Duelist's Poise** (passive, `immune`): ATK Down never lands on him.
+- Stats HP 1100, ATK 122, DEF 60, SPD 112, CRIT 8%, score 440. Impact 77%, over the band like the other Heroics (MDA T22).
+  Summoned.
+
+Read by the game: DEFENSE DOWN, ATTACK UP and "debuff attack down" are DEF Down, ATK Up and ATK Down; the DEF Down is certain
+but meets RES like every debuff; the 50% is rolled on each of the three cuts, each taking 10% of a full Turn Meter off the
+target (a meter already empty loses nothing, one with 5% left loses 5%); a skill that kills the target with its first cut
+does not keep cutting; "all allies" includes him, and the ATK Up, placed on his own turn, lasts through his next two; the
+passive shows IMMUNE.
+
+Stand-ins until he sets them: the names Piercing Lunge, Threefold Flourish, Crown Salute and Duelist's Poise and their texts,
+A1's 1.25, A2's 0.5 x 3 and A3's 0.8, his stats, the lore line, that he is summoned, and every detail of his art and effects
+(the cut of the plate and its gold, the crown and its rays, the cloak's ivory, his face, hair and tail, the rapier's hilt,
+runes and sparks, the stance and the lunge, the three cuts, the salute with the sparks streaming up, the lines of light his
+cuts leave, the flare at the blade's tip and the chevrons rising over each ally).
