@@ -632,7 +632,8 @@ export class Battle {
   private tend(u: Unit, events: BattleEvent[]) {
     const p = u.champion.passive;
     if (p?.kind !== 'tend' || !u.alive || (u.cooldowns[p.id] ?? 0) > 0) return;
-    const ward = this.lowestMaxHp(u);
+    const ward = this.lowestMaxHp(u, !!p.others);
+    if (p.others && ward === u) return;
     // the rest counts the holder's own turns, and this turn's cooldowns tick right after
     u.cooldowns[p.id] = (p.cooldown ?? 0) + 1;
     events.push({ kind: 'passive', target: ward.uid, name: p.name, hit: 0, effect: 'tend', source: u.uid });

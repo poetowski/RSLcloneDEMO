@@ -208,6 +208,8 @@ export interface PassiveDef {
   max?: number;
   /** ward: it guards only the champion itself, not its allies */
   self?: boolean;
+  /** tend: it never reaches the champion itself, and with nobody else standing it does nothing (the Transfusionist's Bedside Rounds) */
+  others?: boolean;
   /** remedy: besides, every hit of an enemy's A1 on an ally, the champion included, adds this much to its turn meter (Overlord Ofentol's Overlord's Round: 7) */
   struckMeter?: number;
   /** presentation: the effect played on the champion the passive reaches (the ally it shields, the enemy it answers) */

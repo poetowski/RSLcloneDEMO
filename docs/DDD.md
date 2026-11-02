@@ -415,6 +415,7 @@ What must always be true, and what holds it true. **Type**: the compiler. **Test
 | INV-C31 | An enemy only (`ENEMIES`) is never in the roster (`CHAMPIONS`), the summon pool or a stage's `recruit`, and fights in at least one stage | `content.test.ts` (keeps the enemies only out of the roster) |
 | INV-C32 | A `keen` passive answers each ally's fall while its holder stands, reaching every ally still standing, the holder included | `battle.test.ts` (keens) |
 | INV-C33 | A `reproach` passive answers a critical hit of an enemy skill on an ally of its living holder, even one that fells that ally, once per ally per skill, after the skill's last hit, with its chance, while the attacker stands; the debuff meets the attacker's RES; a holder the hit fells answers nothing | code (`Battle.reproach`); test |
+| INV-C34 | A `tend` with `others` never reaches its holder and, with nobody else standing, does nothing and does not rest; every champion that can strike ends a battle against itself | code (`Battle.tend`); tests |
 
 ### 6.2 Catalog
 

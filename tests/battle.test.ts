@@ -1020,8 +1020,8 @@ describe('statuses', () => {
     me.hp = 100;
     const before = frail.hp;
     b.useSkill(me, skill(transfusionist, 'open_the_flask'));
-    expect(me.hp).toBe(100 + Math.round(me.maxHp * 0.2));
-    expect(frail.hp).toBe(before + Math.round(frail.maxHp * 0.2));
+    expect(me.hp).toBe(100 + Math.round(me.maxHp * 0.15));
+    expect(frail.hp).toBe(before + Math.round(frail.maxHp * 0.15));
     b.startTurn(me);
     b.endTurn(me);
     expect(b.has(frail, 'regen')).toBe(true);
@@ -1032,6 +1032,29 @@ describe('statuses', () => {
     b.startTurn(me);
     b.endTurn(me);
     expect(b.has(frail, 'regen')).toBe(true);
+    // alone, her rounds reach nobody: she cannot outlast a fight on her own Regen
+    const alone = new Battle(combatants([transfusionist]), combatants([striker]), { seed: 7 });
+    const her = alone.get('p0');
+    alone.startTurn(her);
+    alone.endTurn(her);
+    expect(alone.has(her, 'regen')).toBe(false);
+  });
+
+  it('ends every battle down to the last two of any champion in the roster, when both can strike', () => {
+    for (const c of ALL_CHAMPIONS) {
+      if (!c.skills.some((s) => s.hits.some((h) => h.mult > 0))) continue;
+      const b = new Battle(combatants([c]), combatants([c]), { seed: 11 });
+      for (let turns = 0; !b.winner() && turns < 1200; turns++) {
+        const a = b.advance();
+        const st = b.startTurn(a);
+        if (a.alive && !st.skip && !b.winner()) {
+          const d = decide(b, a);
+          b.useSkill(a, d.skill, d.target);
+        }
+        b.endTurn(a);
+      }
+      expect(b.winner(), `${c.id} against itself`).toBeTruthy();
+    }
   });
 
   it('strikes a second time only on its chance, and a hit that does not come leaves the skill one hit short', () => {

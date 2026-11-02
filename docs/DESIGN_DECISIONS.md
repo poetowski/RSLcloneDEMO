@@ -114,6 +114,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | Overlord Ofentol, an Elite Tank of the Azure Crown, Bloom | 59 |
 | 2026-11-01 | The Verdant Luminary, an Elite Support of the Azure Crown, Bloom | 60 |
 | 2026-11-01 | Coffin's Legs (first built as the Pallbearer, then Tombstone's Legs), the Wraith and the Haruspex (first built as the Bone Augur), my proposals on his word, filling the Ashveil Reign's Elites; names his to give, Coffin's Legs and the Haruspex his | 61-63 |
+| 2026-11-02 | Three Elites of the Court of Root on Jakub's word: Silkfang, the Bog Troll, the Moth Seer; all mine until he sets them; the Transfusionist's healing cut | 67-70 |
 | 2026-11-02 | Three Elites of the Sanguine Dominion on Jakub's word: the War Tigress, the Hex Warden, the Transfusionist; all mine until he sets them | 65-67 |
 | 2026-11-01 | Sir Siroslav, a Heroic Support of the Sanguine Dominion, the roster's first Heroic Support; Ember, my choice on his word | 64 |
 | 2026-11-01 | The whole map shows only the areas' Roman numerals: "in whole map just leave roman letters"; names stay on the campaign map | 5.4a |
@@ -4324,8 +4325,60 @@ grey hair in a bun, gold spectacles; a great glass flask of blood on her back, a
 brass needle in her hand. Its level moves as she works: it rises when she draws and falls when she gives.
 
 - **Draw Blood** (A1): one enemy, 0.9, and a heal of 8% of her max HP on the ally with the lowest max HP but her.
-- **Open the Flask** (A2, CD 4): every ally, herself included, heals 20% of their own max HP. No attack; the AI
+- **Open the Flask** (A2, CD 5): every ally, herself included, heals 15% of their own max HP. No attack; the AI
   keeps it for when an ally is hurt.
-- **Bedside Rounds** (passive, `tend`): at the end of her turn, Regen for 2 turns on the ally with the lowest max
-  HP, herself included; then it rests for 1 of her turns.
-- Stats HP 1300, ATK 86, DEF 66, SPD 106, CRIT 2.5%, score 407. Impact 58%. Summoned.
+- **Bedside Rounds** (passive, `tend` with `others`): at the end of her turn, Regen for 2 turns on the ally with
+  the lowest max HP other than her; alone, it does nothing. Then it rests for 1 of her turns.
+- Stats HP 1300, ATK 86, DEF 66, SPD 106, CRIT 2.5%, score 407. Impact 49%. Summoned.
+- Built at CD 4, a 20% heal and Bedside Rounds reaching herself. Alone she out-healed anything she met one at a
+  time, and against herself the fight never ended (found by the roster's battle test once the roster grew; shipped
+  so in v74 for about a day). So the heal and its cooldown were cut and her rounds reach only others.
+
+## 68. Silkfang (received 2026-11-02)
+
+Jakub, for this and sections 69-70, verbatim:
+
+```
+now proceed with generation of 3 new elite for court of root. be creative but stay consistent in visual art. one can be spider
+```
+
+The Court of Root had one Elite of each role (the Jungle Herder, Big Ears, the Grove Keeper), the other factions
+two. **All of the three is a stand-in until he sets it:** names, kits, affinities, numbers, lore lines and art. They
+stay consistent with the Court's look: grown, not issued (no insignia; 3.3), in bark, moss, leaf and straw, and each
+is one of the kinds its record names: a beast, a feral intelligence, a thing nobody can place. Their affinities even
+the Court's Elites at two each of Ember, Bloom and Tide. As with sections 65-67, each has an A1, an A2 and a passive.
+
+An Elite Damage, Tide: a great old jungle spider, her own eight-legged rig (`solveSpider` in spirit: the pose gives the
+body, and the knees always arch up). Bark-brown, tall arched legs, moss and fern on her abdomen with pale chevrons,
+eight amber eyes, pale fangs.
+
+- **Fang Bite** (A1): one enemy, 1.1, a 35% chance of Poison for 1 turn.
+- **Web Shot** (A2, CD 4): all enemies, 0.6, a 60% chance on each of Slow for 2 turns; the abdomen swings over her
+  back to fling it.
+- **Tripline** (passive, `retaliate`): when an enemy skill damages her and leaves her standing, a 35% chance of Slow
+  on the attacker for 1 turn.
+- Stats HP 1040, ATK 116, DEF 58, SPD 108, CRIT 5%, score 410. Impact 59%. Summoned.
+
+## 69. The Bog Troll (received 2026-11-02)
+
+An Elite Tank, Ember: huge and hunched, a grey-green hide (`trollHide`, added), moss for hair down his great back, a
+rag of pelt, a head thrust forward with an underbite and two yellow tusks, a whole log on his shoulder.
+
+- **Log Swing** (A1): one enemy, 1.0.
+- **Swamp Belch** (A2, CD 4): Taunt on himself for 2 turns, and a 60% chance on each enemy of Poison for 2 turns. No
+  attack: it strikes none.
+- **Moss Grows Back** (passive, `ward` with `self`): when an enemy skill damages him and leaves him standing, a 35%
+  chance that he takes Regen for 1 turn. First built as Regen at the start of every turn; too much sustain.
+- Stats HP 1520, ATK 78, DEF 72, SPD 90, CRIT 2.5%, score 409. Impact 51%. Summoned.
+
+## 70. The Moth Seer (received 2026-11-02)
+
+An Elite Support, Bloom: nobody knows whether it was a person who grew wings or a moth that learned to stand. A hooded
+cloak of soft down, a pale bark mask with two great dark eyes and no other face, feathered antennae, two great pale
+wings with an eye-spot on each, a lantern of fireflies on a crooked stick. "It": the record does not say.
+
+- **Dust Wing** (A1): one enemy, 0.9, a 30% chance of ATK Down for 1 turn; one slow beat of the wings.
+- **Night Powder** (A2, CD 4): one debuff off every ally, and 20% Turn Meter to every other ally. No attack.
+- **Soft Powder** (passive, `ward`): when an enemy skill damages an ally, the Moth Seer included, and leaves it
+  standing, a 30% chance of Regen on that ally for 1 turn.
+- Stats HP 1260, ATK 88, DEF 62, SPD 112, CRIT 2.5%, score 404. Impact 42%. Summoned.

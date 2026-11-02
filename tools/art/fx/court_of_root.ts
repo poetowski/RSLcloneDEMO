@@ -25,6 +25,7 @@
 // Neutral light, dust, their own wood, the bell's bronze, the darts' poison
 // and the grove's green, never their affinities (affinities are abstract,
 // Jakub, 2026-10-11). Light effects are additive in src/game/view/scene.ts.
+import { MAT } from '../palette.ts';
 import { disc, dith, ellipseRing, rampDither } from '../paint.ts';
 import { Bitmap, RGBA, rng, withAlpha } from '../raster.ts';
 import { burst, crescent, cut, FxDef, motes, ramps, ring, shard, soundRings, sparks, W } from './kit.ts';
@@ -100,7 +101,156 @@ function sharpLeaf(b: Bitmap, x: number, y: number, a: number, len: number, w: n
   }
 }
 
+/** Her silk, the Moth Seer's powder, the Bog Troll's gas: their own colours. */
+const SILK = MAT.whiteCloth.ramp;
+const PWD = MAT.furCream.ramp;
+const GAS = MAT.rotGreen.ramp;
+const LEAF = MAT.green.ramp;
+const WOOD = MAT.bark.ramp;
+
+/** A soft puff of gas or powder: a dithered disc (screen space). */
+function puff(b: Bitmap, x: number, y: number, r: number, ramp: RGBA[], fade: number, k = 3) {
+  disc(b, x, y, r, (px, py, d) => (dith(px, py, fade * (1 - d * 0.6)) ? ramp[d < 0.5 ? k + 1 : k] : 0));
+}
+
 export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
+  /** Fang Bite lands: two white points where the fangs go in, a dull flash, drops of venom flung off. */
+  silk_bite: {
+    w: 52, h: 52, n: 7, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 4, 8, 4],
+    draw: (b, t, i) => {
+      const c = 26;
+      if (i < 3) for (const dx of [-6, 6]) burst(b, c + dx, c, 5, 1, [5, 9, 5][i], 1, DULL, 0.4);
+      if (i >= 1) sparks(b, c, c, 8, 18, (i - 1) / 5, GN, 811, 16);
+    },
+  },
+  /** Web Shot in flight: a pale knot of silk trailing a few strands (drawn pointing right). */
+  web_glob: {
+    w: 26, h: 13, n: 2, ms: 70, ax: 0.7, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      disc(b, 19, 6, 3.6, (px, py, d) => SILK[d < 0.5 ? 5 : 4]);
+      for (const [dy, k] of [[-3, 3], [0, 4], [3, 3]] as const) for (let x = 2 + i; x < 16; x++) if ((x + i) % 3) b.set(x, 6 + Math.round(dy * (x / 16)), SILK[k]);
+    },
+  },
+  /** Web Shot lands: a web opens over the target, spokes and rings of pale silk, and stays a moment. */
+  web_snare: {
+    w: 72, h: 72, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const c = 36, grow = Math.min(1, (i + 1) / 4), fade = i < 7 ? 1 : 1 - (i - 6) / 4;
+      const R = 28 * grow;
+      for (let k = 0; k < 9; k++) {
+        const a = (k / 9) * Math.PI * 2 + 0.2;
+        for (let r = 1; r < R; r += 0.8) {
+          const x = Math.round(c + Math.cos(a) * r), y = Math.round(c + Math.sin(a) * r);
+          if (dith(x, y, fade)) b.set(x, y, SILK[r < 12 ? 5 : 4]);
+        }
+      }
+      for (const q of [0.35, 0.65, 0.95]) {
+        const r = R * q;
+        for (let a = 0; a < 6.28; a += 0.04) {
+          const sag = 1 - Math.abs(Math.sin((a - 0.2) * 4.5)) * 0.1;
+          const x = Math.round(c + Math.cos(a) * r * sag), y = Math.round(c + Math.sin(a) * r * sag);
+          if (dith(x, y, fade)) b.set(x, y, SILK[3]);
+        }
+      }
+    },
+  },
+  /** Tripline: a single strand of silk snaps taut across the attacker, and frays. */
+  web_strand: {
+    w: 56, h: 40, n: 7, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const fade = i < 3 ? 1 : 1 - (i - 2) / 5;
+      for (let x = 4; x < 52; x++) {
+        const y = Math.round(20 + Math.sin((x + i * 5) * 0.4) * Math.max(0, i - 1) * 1.1);
+        if (dith(x, y, fade)) b.set(x, y, SILK[5]);
+      }
+    },
+  },
+  /** Log Swing lands: a heavy dull flash, chips of bark thrown out, dust rolling. */
+  log_smash: {
+    w: 88, h: 88, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 8, 12, 8],
+    draw: (b, t, i) => {
+      const c = 44;
+      if (i < 4) burst(b, c, c + 6, 10, 3, [12, 22, 26, 16][i], [2.8, 3.4, 2.6, 1.6][i], DULL, 0.2 + i * 0.12);
+      if (i >= 2) ring(b, c, c + 12, 8 + (i - 2) * 7, (8 + (i - 2) * 7) * 0.45, Math.max(0.8, 2.6 - (i - 2) * 0.4), DU, 1.2 - (i - 2) * 0.15);
+      if (i >= 1) sparks(b, c, c + 4, 14, 36, (i - 1) / 6, WOOD, 827, 30);
+    },
+  },
+  /** Swamp Belch, at his mouth: a thick gust of gas rolling out forward. */
+  belch_breath: {
+    w: 70, h: 54, n: 9, ms: 70, ax: 0.2, ay: 0.5, pad: [2, 4, 2, 2],
+    draw: (b, t, i) => {
+      const fade = i < 5 ? 1 : 1 - (i - 4) / 5;
+      for (const [k, dy, r0] of [[0, 0, 5], [1, -6, 4], [2, 6, 4], [3, -2, 6]] as const) {
+        const d = (i + 1) * (5 + k);
+        puff(b, Math.min(58, 12 + d), 27 + Math.round(dy * (1 + i * 0.12)), Math.min(11, r0 + i * 0.8), GAS, fade, 3);
+      }
+    },
+  },
+  /** Swamp Belch reaches an enemy: gas rolls up round it and thins. Anchored at the chest. */
+  swamp_gas: {
+    w: 72, h: 80, n: 11, ms: 70, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const r = rng(839);
+      const fade = i < 6 ? 1 : 1 - (i - 5) / 6;
+      for (let n = 0; n < 8; n++) {
+        const x0 = 16 + r() * 40, y0 = 58 - r() * 30, s0 = 4 + r() * 4;
+        puff(b, Math.round(x0 + Math.sin(t * 5 + n) * 2), Math.round(y0 - t * 18), Math.min(11, s0 + t * 5), GAS, fade * Math.min(1, (i + 1) / 3), n % 2 ? 3 : 2);
+      }
+    },
+  },
+  /** Moss Grows Back: a ring of small green sprigs comes up at his feet. Anchored at the feet. */
+  moss_sprout: {
+    w: 68, h: 30, n: 8, ms: 70, ax: 0.5, ay: 0.9, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const r = rng(853);
+      const fade = i < 5 ? 1 : 1 - (i - 4) / 4;
+      for (let n = 0; n < 10; n++) {
+        const a = (n / 10) * 6.28, x = Math.round(34 + Math.cos(a) * 24), y0 = Math.round(23 + Math.sin(a) * 3), h = Math.round(Math.min(i + 1, 3 + r() * 5));
+        for (let k = 0; k < h; k++) if (dith(x, y0 - k, fade)) b.set(x + (k > 2 ? (n % 2 ? 1 : -1) : 0), y0 - k, LEAF[Math.min(5, 3 + k)]);
+      }
+    },
+  },
+  /** Dust Wing in flight: a soft puff of pale wing dust (drawn pointing right). */
+  moth_puff: {
+    w: 22, h: 15, n: 2, ms: 90, ax: 0.6, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      puff(b, 13, 7, 5 + i * 0.6, PWD, 0.95, 3);
+      for (const [x, y] of [[3, 6], [6, 3], [5, 10], [1, 8]] as const) b.set(x + i, y, PWD[4]);
+    },
+  },
+  /** Dust Wing lands: a soft pale burst, the dust hanging and sinking. */
+  moth_strike: {
+    w: 56, h: 60, n: 8, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 6, 2],
+    draw: (b, t, i) => {
+      const c = 28;
+      if (i < 3) burst(b, c, c, 7, 1, [7, 12, 8][i], 1, PWD, 0.3);
+      motes(b, c, c + 8, 40, -18, 12, t, PWD, 859);
+    },
+  },
+  /** Night Powder reaches an ally: pale powder and the lantern's sparks sift down round it. Anchored at the feet. */
+  night_powder: {
+    w: 60, h: 92, n: 12, ms: 70, ax: 0.5, ay: 1, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const r = rng(863);
+      for (let n = 0; n < 22; n++) {
+        const x0 = 8 + r() * 44, y0 = 6 + r() * 30, sp = 34 + r() * 44, ph = r() * 6.28;
+        const fade = i === 0 ? 0.5 : i > 8 ? (12 - i) / 4 : 1;
+        const x = Math.round(x0 + Math.sin(t * 6 + ph) * 3), y = Math.round(y0 + t * sp);
+        if (dith(x, y, fade)) b.set(x, y, n % 4 === 0 ? MAT.glowAmber.ramp[5] : PWD[n % 2 ? 5 : 4]);
+      }
+    },
+  },
+  /** Soft Powder settles on an ally: a small pale drift, gone quickly. */
+  soft_powder: {
+    w: 44, h: 48, n: 7, ms: 65, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const r = rng(877);
+      for (let n = 0; n < 10; n++) {
+        const x = Math.round(8 + r() * 28), y = Math.round(4 + r() * 12 + t * 26);
+        if (dith(x, y, i === 0 ? 0.6 : 1 - t * 0.6)) b.set(x, y, PWD[5]);
+      }
+    },
+  },
   /** Snap: two jaws close on the target from the side, a flash where the fangs meet, chips flying on. */
   snap: {
     w: 56, h: 44, n: 6, ms: 40, ax: 0.5, ay: 0.5, pad: [4, 6, 4, 4],

@@ -148,6 +148,8 @@ export const MAT = {
   skinDeep: m('skinDeep', 'skin', ['#1a0c08', '#2e1810', '#4a2a1c', '#6a3e28', '#8a5638', '#ac7450']),
   // the Verdant Luminary: a forest nymph, pale as birch with a little green in it
   skinNymph: m('skinNymph', 'skin', ['#2c2a18', '#5e6638', '#98a860', '#d0da9a', '#eef2c0', '#fdfee6']),
+  // the Bog Troll: a wet grey-green hide, nothing like the dead's rotGreen
+  trollHide: m('trollHide', 'skin', ['#12160f', '#262e20', '#3f4a32', '#5d6a48', '#7f8c60', '#a8b084']),
   skinPale: m('skinPale', 'skin', ['#2a1a2a', '#54405a', '#86708a', '#c2aab8', '#e4d0d8', '#fbf0f2']),
   /** Big Ears' hide: a dusky mauve-grey, a creature of the undergrowth at dusk */
   duskHide: m('duskHide', 'skin', ['#1c1420', '#3a2a3c', '#5c4558', '#84687a', '#aa8c98', '#cfb4b6']),

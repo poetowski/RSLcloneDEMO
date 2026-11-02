@@ -67,6 +67,9 @@ The roster today:
 | Transfusionist (`transfusionist`) | Elite | Tide (a stand-in) | Support | Sanguine Dominion | summoned |
 | Black Rhino (`black_rhino`) | Elite | Bloom (a stand-in) | Tank | Sanguine Dominion | summoned |
 | Red Cloak (`red_cloak`) | Elite | Bloom (a stand-in) | Damage | Sanguine Dominion | summoned |
+| Silkfang (`silkfang`) | Elite | Tide (a stand-in) | Damage | Court of Root | summoned |
+| Bog Troll (`bog_troll`) | Elite | Ember (a stand-in) | Tank | Court of Root | summoned |
+| Moth Seer (`moth_seer`) | Elite | Bloom (a stand-in) | Support | Court of Root | summoned |
 | Grove Keeper (`grove_keeper`) | Elite | Tide (a stand-in) | Support | Court of Root | summoned |
 | Big Ears (`big_ears`) | Elite | Ember (a stand-in) | Damage | Court of Root | summoned |
 | Skeleton (`skeleton`) | Common | Tide | Damage | Ashveil Reign | summoned |
