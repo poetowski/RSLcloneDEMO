@@ -480,7 +480,7 @@ describe('statuses', () => {
     expect(r.events.some((e) => e.kind === 'tm')).toBe(false);
   });
 
-  it("brings a target's Poison due at once: every tick it has left, then it is gone (the Strangler's Reaping Root)", () => {
+  it("brings a target's Poison due at once: every tick it has left, then it is gone (the Orchid Huntress's Root Embrace)", () => {
     const tough = { ...striker, stats: { ...striker.stats, hp: 1700 } };
     let b = new Battle(combatants([reaper]), combatants([tough]), { seed: 5 });
     const t = b.get('e0');

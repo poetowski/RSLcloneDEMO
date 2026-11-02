@@ -1,24 +1,24 @@
 {
  "icons": {
-  "thorn_lash": [
+  "thorn_kiss": [
    0,
    0,
    40,
    40
   ],
-  "spore_burst": [
+  "pollen_veil": [
    41,
    0,
    40,
    40
   ],
-  "reaping_root": [
+  "root_embrace": [
    82,
    0,
    40,
    40
   ],
-  "bitter_sap": [
+  "bitter_nectar": [
    123,
    0,
    40,
@@ -2043,7 +2043,7 @@
   ]
  },
  "portraits": {
-  "strangler": [
+  "orchid_huntress": [
    0,
    538,
    28,

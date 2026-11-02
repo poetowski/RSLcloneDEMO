@@ -106,7 +106,7 @@ export const CHAPTERS: Chapter[] = [
     blocks: [
       { kind: 'p', text: 'Debuffs are harmful effects, shown with a red rim. Many skills only have a chance to place them, and the placer\'s Accuracy (ACC) is compared against the target\'s Resistance (RES): while RES is higher, even a certain debuff can be resisted, the more often the wider the gap. When the roll fails the target shows RESIST. Like buffs, they count down at the end of the holder\'s turns and refresh instead of stacking.' },
       { kind: 'statuses', ids: ['atk_down', 'def_down', 'spd_down', 'poison', 'burn', 'heal_block'] },
-      { kind: 'p', text: "Poison can also come due all at once: the Strangler's Reaping Root makes it deal every tick it has left in one blow, and then it is gone." },
+      { kind: 'p', text: "Poison can also come due all at once: the Orchid Huntress's Root Embrace makes it deal every tick it has left in one blow, and then it is gone." },
     ],
     demo: { skill: 'rimebind', label: 'See Rimebind' },
   },

@@ -130,10 +130,11 @@ function rootWhip(b: Bitmap, x: number, gy: number, h: number, lean: number, gro
   }
 }
 
-/** the Strangler's poison: the bile of his figs, and their plum skins */
+/** the Orchid Huntress's poison: a sour green, and the violet and pale gold of her pollen */
 const VENOM = ramps.bile;
-const FIG = MAT.plum.ramp;
-/** his vine: dark green-brown, a pale thorn on it */
+const FIG = MAT.orchid.ramp;
+const POLLEN = ramps.gold;
+/** her vine: dark green-brown, a pale thorn on it */
 const VINE: RGBA[] = [MAT.moss.ramp[0], MAT.moss.ramp[2], MAT.moss.ramp[4], MAT.moss.ramp[5], W];
 /** a crack of the thorned vine across (x0,y0)-(x1,y1), thorns and drops of poison thrown off */
 function vineCrack(b: Bitmap, i: number, x0: number, y0: number, x1: number, y1: number, bend: number, seed: number) {
@@ -141,10 +142,10 @@ function vineCrack(b: Bitmap, i: number, x0: number, y0: number, x1: number, y1:
   if (i >= 1) sparks(b, (x0 + x1) / 2, (y0 + y1) / 2, 8, 18, (i - 1) / 4, WOOD, seed, 8);
   if (i >= 1) sparks(b, (x0 + x1) / 2, (y0 + y1) / 2, 7, 16, (i - 1) / 4, VENOM, seed + 3, 16);
 }
-/** a puff of spores: a soft dithered ball of bile green and plum, lit on its upper side */
+/** a puff of pollen: a soft dithered ball of pale gold and violet, flecked with the sour green of its poison */
 function sporePuff(b: Bitmap, x: number, y: number, r: number, alpha: number, seed: number) {
   const m = rng(seed);
-  disc(b, x, y, r, (px, py, d) => (dith(px, py, alpha * (1 - d * 0.5)) ? (m() < 0.25 ? FIG[3] : rampDither(VENOM, 3 - d * 1.6 - (py > y ? 0.6 : 0), px, py)) : 0));
+  disc(b, x, y, r, (px, py, d) => (dith(px, py, alpha * (1 - d * 0.5)) ? (m() < 0.2 ? VENOM[3] : m() < 0.45 ? FIG[3] : rampDither(POLLEN, 3.2 - d * 1.6 - (py > y ? 0.6 : 0), px, py)) : 0));
 }
 
 export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
@@ -889,19 +890,19 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
     },
   },
 
-  // --- the Strangler (section 76) --------------------------------------------
-  /** Thorn Lash, the first lash: the vine cracks down across the enemy, thorns and drops of poison thrown off. Matter. */
-  thorn_lash: {
+  // --- the Orchid Huntress (section 76) --------------------------------------
+  /** Thorn Kiss, the first lash: the vine cracks down across the enemy, thorns and drops of poison thrown off. Matter. */
+  thorn_kiss: {
     w: 64, h: 60, n: 6, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 6, 2],
     draw: (b, t, i) => vineCrack(b, i, 6, 12, 58, 44, -6, 1101),
   },
-  /** Thorn Lash, the second lash: back the other way, low to high. Matter. */
-  thorn_lash_back: {
+  /** Thorn Kiss, the second lash: back the other way, low to high. Matter. */
+  thorn_kiss_back: {
     w: 64, h: 60, n: 6, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 6, 2],
     draw: (b, t, i) => vineCrack(b, i, 6, 46, 58, 16, 6, 1111),
   },
-  /** Spore Burst over him: the crushed fig bursts in a cloud of spores, bile green flecked with its plum skin, drifting out and down. Matter. Played at his head point; the fig is crushed over his head. */
-  spore_cloud: {
+  /** Pollen Veil over her: her crown opens and the pollen bursts from it in a cloud, pale gold and violet, drifting out and down. Matter. Played at her head point, round the crown. */
+  pollen_cloud: {
     w: 96, h: 80, n: 11, ms: 60, ax: 0.5, ay: 0.7, pad: [2, 2, 2, 2],
     draw: (b, t, i) => {
       const cx = 48, cy = 34;
@@ -912,10 +913,11 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
       }
       if (i < 3) burst(b, cx, cy, 6, 1, [6, 10, 7][i], 1.2, VENOM, 0.4);
       sparks(b, cx, cy, 12, 34, t, FIG, 1123, 18);
+      motes(b, cx, cy, 40, 20, 12, t, POLLEN, 1125);
     },
   },
-  /** Spore Burst on an enemy: spores settle over it in a slow cloud, a few clinging and sinking. Matter. */
-  spore_hit: {
+  /** Pollen Veil on an enemy: the pollen settles over it in a slow cloud, a few motes clinging and sinking. Matter. */
+  pollen_hit: {
     w: 60, h: 72, n: 10, ms: 65, ax: 0.5, ay: 0.55, pad: [2, 2, 4, 2],
     draw: (b, t, i) => {
       const cx = 30, cy = 36;
@@ -923,11 +925,11 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
         const x = cx + Math.round(Math.sin(k * 2.3) * 12), y = Math.round(cy - 20 + k * 4 + t * 14);
         sporePuff(b, x, y, 3 + (k % 3) + t * 2, (1 - t * 0.85) * (i === 0 ? 0.5 : 1), 1131 + k);
       }
-      motes(b, cx, cy - 18, 26, -30, 10, t, VENOM, 1137);
+      motes(b, cx, cy - 18, 26, -30, 10, t, POLLEN, 1137);
     },
   },
-  /** Reaping Root: roots burst up out of the ground under the enemy, curling round it, thorns on them; earth thrown up; then a bile-green burst as the poison comes due. Matter. Planted at the feet. */
-  reaping_root: {
+  /** Root Embrace: roots rise out of the ground round the enemy, curling about it, thorns on them; earth thrown up; then a sour green burst as the poison comes due. Matter. Planted at the feet. */
+  root_embrace: {
     w: 72, h: 84, n: 11, ms: 55, ax: 0.5, ay: 0.95, pad: [4, 4, 10, 4],
     draw: (b, t, i) => {
       const cx = 36, gy = 80;
@@ -960,8 +962,8 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
       }
     },
   },
-  /** Bitter Sap: drops of amber sap spat at the enemy that struck him, sticking and running, a sour green at their edge. Matter. */
-  sap_sting: {
+  /** Bitter Nectar: drops of amber nectar flung at the enemy that struck her, sticking and running, a sour green at their edge. Matter. */
+  nectar_sting: {
     w: 48, h: 56, n: 8, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 4, 2],
     draw: (b, t, i) => {
       const cx = 24, cy = 26;

@@ -105,6 +105,8 @@ export const MAT = {
   /** the Follower's coat, a grey wolf: grey over the body and the head, a darker saddle along the back and the tail, cream under the belly, the throat and the muzzle */
   furGrey: m('furGrey', 'fur', ['#16151c', '#2b2b34', '#46464f', '#68686e', '#8e8c8c', '#b8b2a8']),
   furSaddle: m('furSaddle', 'fur', ['#0c0b10', '#18171d', '#26252c', '#37363c', '#4c4b4f', '#6a675f']),
+  /** the Orchid Huntress's petals: white, a violet shadow and a deep violet throat */
+  orchid: m('orchid', 'cloth', ['#3a1c44', '#6a3a7c', '#a874b6', '#dcb8e2', '#f4e6f6', '#ffffff']),
   /** Lycan's coat: an ash-grey fur gone cold and violet in its shadow, silver where the light catches it */
   ashFur: m('ashFur', 'fur', ['#0e0d12', '#1c1b23', '#33303c', '#4f4c5c', '#757184', '#a5a1b4']),
   furCream: m('furCream', 'fur', ['#29251f', '#524b42', '#7f766a', '#aba18f', '#cdc4b1', '#ebe5d6']),

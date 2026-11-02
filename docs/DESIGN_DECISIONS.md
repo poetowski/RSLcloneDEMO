@@ -4559,31 +4559,39 @@ number, his stats, the lore line, that he is summoned, and every detail of his a
 the notch and the scar, the sash, the shackle and its chain, the rag at his hip, the rakes, the jaws that close in the maul,
 the howl at the moon with its pale rings, the streaks of speed through each ally, the crescent that rises when Moon-Mad wakes).
 
-## 76. The Strangler (received 2026-11-02)
+## 76. The Orchid Huntress (received 2026-11-02)
 
-Jakub asked: "Propose creative damage kit for heroic court of root". I proposed three (A, the Strangler, a poisoner who
-brings the poison due; B, the Jaguar Shade, an ambush predator; C, the Mantis Duelist, a counter-attacker) and recommended
-A; he answered "Go A". The same day, on his word "Then also fix lycan animations", Lycan's arms were reworked (section 75):
-the far elbow hangs instead of jutting up, the claws are drawn back behind him and driven through at chest height, the
-howl flings the arms down and back clear of the face, and he falls on his side with his head turned up.
+Jakub asked: "Propose creative damage kit for heroic court of root". I proposed three (A, a poisoner who brings the
+poison due; B, the Jaguar Shade, an ambush predator; C, the Mantis Duelist, a counter-attacker) and recommended A; he
+answered "Go A", and I built it as the Strangler, a man of strangler-fig roots. The same day, on his word "Then also fix
+lycan animations", Lycan's arms were reworked (section 75): the far elbow hangs instead of jutting up, the claws are drawn
+back behind him and driven through at chest height, the howl flings the arms down and back clear of the face, and he falls
+on his side with his head turned up.
 
-He is a hunter grown the way a strangler fig grows: tall and lean, a body of grey-brown roots wound round and round, open
-at the breast where a heart of amber sap glows; a long head like a mask of knotted root with two amber eyes and no mouth,
-tendrils of root trailing back like hair with thorns on them; moss over a shoulder; a belt of vine with three ripe figs,
-plum-skinned and sour with poison. The near arm ends in a long thorned vine he uses as a whip; the far hand is a cluster
-of root fingers.
+Then: "I don't like strangler name and his design. So you have to think of different concept but kit should stay." I
+proposed three concepts for the same kit (Mawbloom, a carnivorous pitcher plant; an orchid huntress; Sszara, a jade
+serpent-woman) and recommended the first; he answered "Second, ixa. But call her: "Orchid Huntress" instead. No ixa".
+Shown to him as rendered previews (idle, every animation in both facings, the champion page, the three skills in battle);
+waiting for his yes.
 
-- **Thorn Lash** (A1): one enemy, two lashes of 0.5, each a 40% chance of Poison for 2 turns.
-- **Spore Burst** (A2, CD 4): all enemies, 0.6, a 75% chance of Poison for 2 turns on each and Heal Block for 1 turn.
-- **Reaping Root** (A3, CD 5): one enemy, 1.4; then its Poison deals every tick it has left at once (5% of its max HP for
+She is an elegant and deadly huntress of the jungle, a beautiful lure for prey: tall and slender, a great orchid crown of
+white petals with violet throats that opens wide when she looses its pollen, pale gold pollen drifting from it; dark hair
+down her back and a band of green leaf across her brow (the concept's leaf mask over the eyes hid her face at sprite size,
+so it became a band, my change); a bodice of overlapping leaves with a small violet orchid at the breast; long white and
+violet petals hanging from her hips over leaf-wrapped legs, and back petals that trail when she runs; a thorned vine wound
+round her forearm that uncoils into a whip with a violet bud at its tip; roots running from her feet when she kneels.
+
+- **Thorn Kiss** (A1): one enemy, two lashes of 0.5, each a 40% chance of Poison for 2 turns.
+- **Pollen Veil** (A2, CD 4): all enemies, 0.6, a 75% chance of Poison for 2 turns on each and Heal Block for 1 turn.
+- **Root Embrace** (A3, CD 5): one enemy, 1.4; then its Poison deals every tick it has left at once (5% of its max HP for
   each remaining turn) and is gone (new `detonate`).
-- **Bitter Sap** (passive, `retaliate`): a 35% chance of Poison for 2 turns on an enemy whose attack hits him.
+- **Bitter Nectar** (passive, `retaliate`): a 35% chance of Poison for 2 turns on an enemy whose attack hits her.
 - Stats HP 1150, ATK 120, DEF 58, SPD 110, CRIT 6%, score 429. Impact 61%, just over the band. Summoned.
 
-Read by the game: Poison is one status on a champion, so Reaping Root brings due the turns it has left, after the hit; like
+Read by the game: Poison is one status on a champion, so Root Embrace brings due the turns it has left, after the hit; like
 a tick it ignores a Shield; the debuffs meet RES like every debuff.
 
-Stand-ins until he sets them: the name, Bloom, the names Thorn Lash, Spore Burst, Reaping Root and Bitter Sap and their
-texts, every number, his stats, the lore line, that he is summoned, and every detail of his art and effects (the wound roots,
-the amber heart, the mask and its tendrils, the moss, the figs, the vine whip and its thorns, the fig crushed overhead, the
-plunge into the ground, the roots that burst up under the enemy, the spores, the drops of sap).
+Stand-ins until he sets them: Bloom, the names Thorn Kiss, Pollen Veil, Root Embrace and Bitter Nectar and their texts,
+every number, her stats, the lore line, that she is summoned, and every detail of her art and effects (the crown's petals
+and colours, the pollen, the hair, the leaf band, the bodice and its orchid, the hip and back petals, the leaf-wrapped
+legs, the vine and its bud, the lashes, the crown opening, the kneel and the roots, the pollen cloud, the drops of nectar).

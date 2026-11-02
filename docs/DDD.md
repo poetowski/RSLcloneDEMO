@@ -63,7 +63,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Brace | a passive that gives its holder statuses at the start of its turn (the Forest Gargoyle's Heartwood) | `PassiveDef.kind: 'brace'`, `Battle.brace` |
 | Raise all | a revive of every fallen ally at once (the Cinder Sylph's Rise From Ash) | `SkillDef.reviveAll`, `Battle.useSkill` |
 | Given turn | a turn an ally's skill gives, taken next, ahead of the meters (the Astronomer Royal's Hour of Destiny) | `SkillDef.grantTurn`, `Battle.advance`, `Unit.keptTm` |
-| Poison come due | a skill that makes a target's Poison deal every tick it has left at once, then removes it (the Strangler's Reaping Root) | `SkillDef.detonate`, `Battle.useSkill` |
+| Poison come due | a skill that makes a target's Poison deal every tick it has left at once, then removes it (the Orchid Huntress's Root Embrace) | `SkillDef.detonate`, `Battle.useSkill` |
 | Drain on each hit | a skill whose every hit rolls a chance to take turn meter off its target, a hit at a time (Azul the Blade's Threefold Flourish) | `SkillDef.tmPerHit`, `Battle.useSkill` |
 | Alignment | a passive giving the other ally lowest on turn meter a share at the start of its holder's turn (Fixed Stars) | `PassiveDef.kind: 'alignment'`, `Battle.alignment` |
 | Renewal | a passive that heals every ally by a share of its holder's max HP at the start of its turn (Rootfather's Sap Rises) | `PassiveDef.kind: 'renewal'`, `Battle.renewal` |

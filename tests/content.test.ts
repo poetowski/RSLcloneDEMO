@@ -381,9 +381,9 @@ describe('design decisions', () => {
     expect(c?.passive && [c.passive.kind, c.passive.value, c.passive.statuses]).toEqual(['overdrive', 0.4, [{ status: 'spd_up', turns: 2 }]]);
   });
 
-  it('has the Strangler he chose: a Heroic Damage of the Court of Root; an A1 of two lashes, each a 40% chance of Poison; an A2 on all enemies with Poison and Heal Block, cooldown 4; an A3 on one enemy that brings its Poison due, cooldown 5; a passive poisoning attackers', () => {
-    const c = CHAMPIONS.find((x) => x.id === 'strangler');
-    expect(c && [c.rarity, c.role, c.faction]).toEqual(['heroic', 'Damage', 'court_of_root']);
+  it('has the Orchid Huntress he chose: a Heroic Damage of the Court of Root; an A1 of two lashes, each a 40% chance of Poison; an A2 on all enemies with Poison and Heal Block, cooldown 4; an A3 on one enemy that brings its Poison due, cooldown 5; a passive poisoning attackers', () => {
+    const c = CHAMPIONS.find((x) => x.id === 'orchid_huntress');
+    expect(c && [c.name, c.rarity, c.role, c.faction]).toEqual(['Orchid Huntress', 'heroic', 'Damage', 'court_of_root']);
     const [a1, a2, a3] = c?.skills ?? [];
     expect(a1 && [a1.slot, a1.target, a1.hits.length, a1.statuses]).toEqual([1, 'enemy', 2, [{ status: 'poison', turns: 2, chance: 0.4, to: 'targets', perHit: true }]]);
     expect(a2 && [a2.slot, a2.target, a2.cooldown, a2.statuses]).toEqual([2, 'enemies', 4, [{ status: 'poison', turns: 2, chance: 0.75, to: 'targets' }, { status: 'heal_block', turns: 1, to: 'targets' }]]);
@@ -981,7 +981,7 @@ describe('summoning', () => {
     q.reliquary.recruit('astronomer_royal');
     q.reliquary.recruit('azul_the_blade');
     q.reliquary.recruit('lycan');
-    q.reliquary.recruit('strangler');
+    q.reliquary.recruit('orchid_huntress');
     const odds = rarityOdds(summonPool(q));
     expect(odds.heroic).toBe(0);
     expect(odds.common).toBeCloseTo(0.7 / 0.95, 9);
