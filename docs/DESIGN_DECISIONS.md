@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-03 | The Journey: Beat Campaign 5-10 gives 400 Stardust; a new eighth quest, Beat Campaign 10-10, gives the Paladin | 54, 78 |
 | 2026-11-03 | Zone 10, the Blossom Caldera, inspired by Japan's architecture and blossom: battle background, the world map extended east, ten placeholder stages, ambient `petals` | 5.13 |
 | 2026-11-01 | Zone 8, the Crystal Graveyard: battle background, the world map extended east, ten placeholder stages | 5.11 |
 | 2026-11-01 | The Journey gains Beat Campaign 8-10, three spools | 57 |
@@ -4701,3 +4702,13 @@ haft, the haft wound in crimson at the grip. At rest he stands over the axe, its
 the haft; he swings it up off the ground over his head for Sentence; for Final Verdict the blade bites the ground and he
 wrenches it free. On his word "I don't like executioners balls on his legs. Looks like testicles" the manacles no longer
 hang at his hip: their chain hangs coiled at the back of his sash, behind the far leg, until he whirls them in Shackle.
+
+## 78. The Journey's Beat Campaign 10-10 (received 2026-11-03)
+
+> reward for beating 5-10 should be 400 stardust. and create new journey quest: beat campaign 10-10 and its reward is paladin instead of 5-10.
+
+Built as he said. Beat Campaign 5-10 (section 54) now gives 400 Stardust; the Journey's eighth quest, Beat Campaign 10-10,
+after Beat Campaign 8-10, gives the Paladin, who still joins only through it and is never summoned. A save that claimed
+5-10 before keeps its Paladin and its claim (the claim is stored by the quest's id), so it does not get the 400 Stardust
+for it as well; its 10-10 claim brings him again as a champion already owned. The quest's panel text is a stand-in.
+

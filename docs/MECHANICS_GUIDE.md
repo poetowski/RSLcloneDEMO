@@ -472,8 +472,9 @@ The Challenges are quests to accomplish, in three tabs (Jakub, 2026-10-24, [DESI
 | Beat Campaign 1-3 (his, 2026-10-25; third on his word) | stage 1-3 cleared | a Gilded Sunder spool |
 | Beat Campaign 1-10 (his, 2026-11-01) | stage 1-10 cleared | two spools (his); Silver Vigor, a set's two pieces, stands in |
 | Beat Campaign 3-10 (his, 2026-11-01) | stage 3-10 cleared | 250 Stardust (his) |
-| Beat Campaign 5-10 (his, 2026-11-01) | stage 5-10 cleared | the Paladin joins (his); no summon brings him |
+| Beat Campaign 5-10 (his, 2026-11-01) | stage 5-10 cleared | 400 Stardust (his, 2026-11-03; the Paladin until then) |
 | Beat Campaign 8-10 (his, 2026-11-01) | stage 8-10 cleared | three spools (his); Gilded Apex stands in |
+| Beat Campaign 10-10 (his, 2026-11-03) | stage 10-10 cleared | the Paladin joins (his); no summon brings him |
 
 A reward spool has its quest's pattern and grade; its main stat is drawn by slot and its strands rolled as a found spool's are (section 14), and it comes into storage as a new find. Stardust goes to the Wishing Star (section 16). The spool rewards are stand-ins.
 

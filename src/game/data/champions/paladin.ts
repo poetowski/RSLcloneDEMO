@@ -4,7 +4,7 @@ import { ChampionDef } from '../types';
 // 2026-10-24): a Heroic of the Azure Crown, the roster's first Heroic, Tank
 // ("class = DEFENSE"), Ember (Tide in the brief, Ember on his word the same
 // day: "change his affinity to ember"); the reward of the Journey's Beat
-// Campaign 5-10 (2026-11-01, section 54), never summoned. A tall young knight in silver plate with wide ornate
+// Campaign 10-10 (5-10 from 2026-11-01, section 54; 10-10 since 2026-11-03, section 78), never summoned. A tall young knight in silver plate with wide ornate
 // pauldrons, bareheaded, long blonde hair; a long dark-blue cloak with three
 // white crowns; a big Swiss-shaped shield with a double cross; a wide, very
 // bright sword with flames. The kit is his: "A1 - attack one enemy. cause
@@ -18,7 +18,7 @@ import { ChampionDef } from '../types';
 // Fire and Unbowed and their texts, the multipliers (1.0; 0.7 on each enemy,
 // the floor of the norms, as his kit lifts him over the band, MECHANICS_GUIDE 10),
 // the stats (on the Heroic budget), the lore line and the stage whose first
-// clear brings him until his quest line exists (5-10, the campaign's last).
+// clear brings him until his quest line exists (5-10, then the campaign's last; since 2026-11-03 the Journey's Beat Campaign 10-10).
 // Read by the game: DEFENSE is the Tank role; ATTACK DOWN, DEFENSE UP and
 // SPEED DOWN are ATK Down, DEF Up and Slow; the ATK Down and the Slow are
 // certain, meeting RES like every debuff; "all allies" includes him; the 35%

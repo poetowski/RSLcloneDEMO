@@ -601,7 +601,7 @@ describe('design decisions', () => {
     const caldera = LOCATIONS[9];
     expect([caldera.requires, caldera.stages.map((s) => s.id)]).toEqual(['9-10', ['10-1', '10-2', '10-3', '10-4', '10-5', '10-6', '10-7', '10-8', '10-9', '10-10']]);
     expect(caldera.stages.filter((s) => s.recruit)).toEqual([]);
-    // none of its stages brings a champion: since 2026-11-01 the Paladin is the Journey's reward for 5-10
+    // none of its stages brings a champion: the Paladin is the Journey's reward, for 5-10 from 2026-11-01 and 10-10 since 2026-11-03
     expect(mesa.stages.filter((s) => s.recruit)).toEqual([]);
   });
 });
@@ -790,7 +790,7 @@ describe('challenges and the tutorial', () => {
     expect(JOURNEY[0].title).toBe('Finish Tutorial');
     // Jakub, 2026-10-25: "new journey quest: beat campaign 1-3. reward can be 100 summoning fragments", then
     // "swap quests: weave a spool make sooner and after that make beat campaign 1-3 ... swap also rewards"
-    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3', 'Beat Campaign 1-10', 'Beat Campaign 3-10', 'Beat Campaign 5-10', 'Beat Campaign 8-10']);
+    expect(JOURNEY.map((q) => q.title)).toEqual(['Finish Tutorial', 'Weave a Spool', 'Beat Campaign 1-3', 'Beat Campaign 1-10', 'Beat Campaign 3-10', 'Beat Campaign 5-10', 'Beat Campaign 8-10', 'Beat Campaign 10-10']);
     expect([JOURNEY[1].goal, JOURNEY[1].reward]).toEqual([{ kind: 'weave' }, { kind: 'fragments', amount: 100 }]);
     expect([JOURNEY[2].goal, JOURNEY[2].reward.kind]).toEqual([{ kind: 'stage', stage: '1-3' }, 'spool']);
   });
@@ -846,24 +846,33 @@ describe('challenges and the tutorial', () => {
     const dustBefore = p.fragments;
     expect(claimQuest(p, between.id)).toEqual({ kind: 'fragments', amount: 250 });
     expect(p.fragments).toBe(dustBefore + 250);
-    // Beat Campaign 5-10 waits for its stage, then the Paladin joins, new, and only then
+    // Beat Campaign 5-10 waits for its stage, then gives its 400 Stardust (Jakub, 2026-11-03)
     const fifth = JOURNEY[5];
-    expect(p.reliquary.has('paladin')).toBe(false);
     expect(questState(p, fifth)).toBe('open');
     for (const s of allStages().slice(0, 50)) recordClear(p, s.id, 2);
-    expect(p.reliquary.has('paladin')).toBe(false);
     expect(questState(p, fifth)).toBe('ready');
-    expect(claimQuest(p, fifth.id)).toEqual({ kind: 'champion', champion: 'paladin', already: false });
-    expect(p.reliquary.has('paladin')).toBe(true);
+    const dust5 = p.fragments;
+    expect(claimQuest(p, fifth.id)).toEqual({ kind: 'fragments', amount: 400 });
+    expect(p.fragments).toBe(dust5 + 400);
     // Beat Campaign 8-10 waits for its stage, then gives its three spools
-    const last = JOURNEY[6];
-    expect(questState(p, last)).toBe('open');
+    const eighth = JOURNEY[6];
+    expect(questState(p, eighth)).toBe('open');
     for (const s of allStages().slice(0, 80)) recordClear(p, s.id, 2);
-    expect(questState(p, last)).toBe('ready');
+    expect(questState(p, eighth)).toBe('ready');
     const spoolsBefore = p.reliquary.spools().length;
-    const three = claimQuest(p, last.id);
+    const three = claimQuest(p, eighth.id);
     expect(three?.kind === 'spool' && three.more?.length).toBe(2);
     expect(p.reliquary.spools()).toHaveLength(spoolsBefore + 3);
+    // Beat Campaign 10-10 waits for its stage, then the Paladin joins, new, and only then
+    const last = JOURNEY[7];
+    expect(last.goal).toEqual({ kind: 'stage', stage: '10-10' });
+    expect(p.reliquary.has('paladin')).toBe(false);
+    expect(questState(p, last)).toBe('open');
+    for (const s of allStages().slice(0, 100)) recordClear(p, s.id, 2);
+    expect(p.reliquary.has('paladin')).toBe(false);
+    expect(questState(p, last)).toBe('ready');
+    expect(claimQuest(p, last.id)).toEqual({ kind: 'champion', champion: 'paladin', already: false });
+    expect(p.reliquary.has('paladin')).toBe(true);
     expect(currentQuest(p)).toBeUndefined();
   });
 
@@ -950,7 +959,7 @@ describe('summoning', () => {
     expect(p.fragments).toBe(won.fragments);
     // the first battle alone stays short of a summon: the third champion comes with the Journey's Stardust (his design)
     expect(fragmentDrop('1-1', 3)).toBeLessThan(FRAGMENTS_PER_SHARD);
-    expect(JOURNEY.flatMap((q) => (q.reward.kind === 'fragments' ? [q.reward.amount] : []))).toEqual([FRAGMENTS_PER_SHARD, 250]);
+    expect(JOURNEY.flatMap((q) => (q.reward.kind === 'fragments' ? [q.reward.amount] : []))).toEqual([FRAGMENTS_PER_SHARD, 250, 400]);
   });
 
   it('merges 100 Stardust into a Soulstar, and spends a Soulstar on a champion not yet owned', () => {
@@ -1068,7 +1077,7 @@ describe('summoning', () => {
   it('tells how each champion comes, and when the lesson on summoning is due', () => {
     expect(joinsBy(STARTERS[0])).toEqual({ kind: 'start' });
     expect(joinsBy('rime_scholar')).toEqual({ kind: 'stage', stage: '1-1' });
-    expect(joinsBy('paladin')).toEqual({ kind: 'quest', title: 'Beat Campaign 5-10' });
+    expect(joinsBy('paladin')).toEqual({ kind: 'quest', title: 'Beat Campaign 10-10' });
     expect(joinsBy('chief_engineer_cj')).toEqual({ kind: 'summon' });
     const p = newArchivist();
     expect(summonLessonDue(p)).toBe(false);

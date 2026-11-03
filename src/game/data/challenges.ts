@@ -85,13 +85,14 @@ export const JOURNEY: readonly QuestDef[] = [
     goal: { kind: 'stage', stage: '3-10' },
     reward: { kind: 'fragments', amount: 250 },
   },
-  // his (2026-11-01): "beat campaign 5-10. reward is Paladin hero acquired. it will get unclocked once reward collected"
+  // his (2026-11-01): "beat campaign 5-10. reward is Paladin hero acquired. it will get unclocked once reward collected";
+  // since 2026-11-03 on his word "reward for beating 5-10 should be 400 stardust", the Paladin moving to 10-10
   {
     id: 'beat_5_10',
     title: 'Beat Campaign 5-10',
     text: 'Clear stage 5-10 of the campaign, the last of the Snowy Mesa.',
     goal: { kind: 'stage', stage: '5-10' },
-    reward: { kind: 'champion', champion: 'paladin' },
+    reward: { kind: 'fragments', amount: 400 },
   },
   // his (2026-11-01): "new quest beating campaign 8-10. reward is 3 spools"; which three is a stand-in
   {
@@ -100,5 +101,13 @@ export const JOURNEY: readonly QuestDef[] = [
     text: 'Clear stage 8-10 of the campaign, the last of the Crystal Graveyard.',
     goal: { kind: 'stage', stage: '8-10' },
     reward: { kind: 'spool', pattern: 'pattern_apex', grade: 2, count: 3 },
+  },
+  // his (2026-11-03): "create new journey quest: beat campaign 10-10 and its reward is paladin instead of 5-10"
+  {
+    id: 'beat_10_10',
+    title: 'Beat Campaign 10-10',
+    text: 'Clear stage 10-10 of the campaign, the last of the Blossom Caldera.',
+    goal: { kind: 'stage', stage: '10-10' },
+    reward: { kind: 'champion', champion: 'paladin' },
   },
 ];
