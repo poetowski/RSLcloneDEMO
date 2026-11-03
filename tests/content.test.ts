@@ -812,8 +812,9 @@ describe('challenges and the tutorial', () => {
     const before = p.reliquary.spools().length;
     const find = claimQuest(p, first.id)!;
     expect(find.kind === 'spool' && first.reward.kind === 'spool' && [find.spool.pattern, find.spool.grade]).toEqual([first.reward.kind === 'spool' && first.reward.pattern, first.reward.kind === 'spool' && first.reward.grade]);
-    expect(p.reliquary.spools()).toHaveLength(before + 1);
-    expect(p.reliquary.freshCount()).toBe(1);
+    expect(find.kind === 'spool' && find.more?.length).toBe(1);
+    expect(p.reliquary.spools()).toHaveLength(before + 2);
+    expect(p.reliquary.freshCount()).toBe(2);
     expect(claimQuest(p, first.id)).toBeNull();
     // Weave a Spool, its goal met before it opened, is ready the moment it opens; its Stardust is a summon
     expect([questState(p, first), questState(p, second)]).toEqual(['claimed', 'ready']);
@@ -837,8 +838,11 @@ describe('challenges and the tutorial', () => {
     expect(questState(p, fourth)).toBe('ready');
     const had = p.reliquary.spools().length;
     const won = claimQuest(p, fourth.id);
-    expect(won?.kind === 'spool' && won.more?.length).toBe(1);
-    expect(p.reliquary.spools()).toHaveLength(had + 2);
+    // two Gilded Vigor and two Gilded Sunder spools (Jakub, 2026-11-03)
+    expect(won?.kind === 'spool' && [won.spool, ...(won.more ?? [])].map((s) => [s.pattern, s.grade])).toEqual([
+      ['pattern_vigor', 2], ['pattern_vigor', 2], ['pattern_sunder', 2], ['pattern_sunder', 2],
+    ]);
+    expect(p.reliquary.spools()).toHaveLength(had + 4);
     // Beat Campaign 3-10 waits for its stage, then gives its 5000 Gold (Jakub, 2026-11-03)
     const between = JOURNEY[4];
     expect(between.id).toBe('beat_3_10');

@@ -29,10 +29,16 @@ export type QuestGoal = { kind: 'tutorial' } | { kind: 'stage'; stage: string } 
 /**
  * What claiming a quest gives: a spool of one Weave Pattern and grade (0
  * Ashen, 1 Silver, 2 Gilded), its main stat drawn by slot; or Stardust, the
- * fragments that merge into Soulstars; or Gold, the Merchant's coin. `count`: how many spools, one when absent.
+ * fragments that merge into Soulstars; or Gold, the Merchant's coin. `count`: how many spools, one when absent;
+ * `also`: spools of a second pattern and grade given with them.
  * Or a champion: it joins only through this quest, and is never summoned.
  */
-export type QuestReward = { kind: 'spool'; pattern: PatternId; grade: 0 | 1 | 2; count?: number } | { kind: 'fragments'; amount: number } | { kind: 'gold'; amount: number } | { kind: 'champion'; champion: string };
+export interface SpoolGift {
+  pattern: PatternId;
+  grade: 0 | 1 | 2;
+  count?: number;
+}
+export type QuestReward = ({ kind: 'spool'; also?: SpoolGift } & SpoolGift) | { kind: 'fragments'; amount: number } | { kind: 'gold'; amount: number } | { kind: 'champion'; champion: string };
 
 export interface QuestDef {
   id: string;
@@ -50,7 +56,8 @@ export const JOURNEY: readonly QuestDef[] = [
     title: 'Finish Tutorial',
     text: 'Walk the tutorial to its end: the Sanctum, the campaign and your first battle.',
     goal: { kind: 'tutorial' },
-    reward: { kind: 'spool', pattern: 'pattern_vigor', grade: 1 },
+    // his (2026-11-03): "reward for finishing tutorial should be 2 ashen vigor spool"
+    reward: { kind: 'spool', pattern: 'pattern_vigor', grade: 0, count: 2 },
   },
   // his placeholder, a quest of my own; second on his word, with the second place's 100 Stardust (his):
   // the summon of the third champion, the first one drawn at random
@@ -61,21 +68,22 @@ export const JOURNEY: readonly QuestDef[] = [
     goal: { kind: 'weave' },
     reward: { kind: 'fragments', amount: 100 },
   },
-  // his (2026-10-25), third on his word, with the spool the third place gave
+  // his (2026-10-25), third on his word; since 2026-11-03 "reward for finishing beating 1-3 is 2 silver sunder spool"
   {
     id: 'beat_1_3',
     title: 'Beat Campaign 1-3',
     text: 'Clear stage 1-3 of the campaign.',
     goal: { kind: 'stage', stage: '1-3' },
-    reward: { kind: 'spool', pattern: 'pattern_sunder', grade: 2 },
+    reward: { kind: 'spool', pattern: 'pattern_sunder', grade: 1, count: 2 },
   },
-  // his (2026-11-01): "to beat campaign 1-10. reward can be 2 spools"; which two is a stand-in
+  // his (2026-11-01): "to beat campaign 1-10. reward can be 2 spools"; since 2026-11-03 "reward for beating 1-10
+  // should be 2 gilded vigor spools and 2 sunder spools" (the Sunder ones read as Gilded too)
   {
     id: 'beat_1_10',
     title: 'Beat Campaign 1-10',
     text: 'Clear stage 1-10 of the campaign, the last of the Fracture Reach.',
     goal: { kind: 'stage', stage: '1-10' },
-    reward: { kind: 'spool', pattern: 'pattern_vigor', grade: 1, count: 2 },
+    reward: { kind: 'spool', pattern: 'pattern_vigor', grade: 2, count: 2, also: { pattern: 'pattern_sunder', grade: 2, count: 2 } },
   },
   // his (2026-11-01): "beat 3-10 campaign. reward for this is 250 spawning fragments";
   // since 2026-11-03 "change rewards of quest beating 3-10 is 5000 gold"

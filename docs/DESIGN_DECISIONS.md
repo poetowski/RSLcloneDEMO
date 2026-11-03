@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-03 | The Journey's spools: Finish Tutorial 2 Ashen Vigor, 1-3 2 Silver Sunder, 1-10 2 Gilded Vigor and 2 Sunder | 82 |
 | 2026-11-03 | The Journey: Beat Campaign 3-10 gives 5000 Gold, 5-10 300 Stardust, 8-10 10000 Gold | 81 |
 | 2026-11-03 | The Merchant trades spools: sell 100 / 300 / 500 Gold by grade, buy at 20x; wares of 5 Ashen, 3 Silver, 2 Gilded, rotated for 5000 Gold | 80 |
 | 2026-11-03 | Gold, the game's coin (0 to start), and the Merchant: a stall in the Sanctum, a screen with the Gold held, BUY and SELL to come | 79 |
@@ -4782,3 +4783,21 @@ reward becomes his Gold:
 
 Gold is now a quest reward: claiming it puts it in the purse; the quest shows the coin above its knot and in its panel. A
 save that claimed a quest before keeps what it was given then. The panel's texts for a Gold reward are stand-ins.
+
+## 82. The Journey's spool rewards (received 2026-11-03)
+
+> reward for finishing tutorial should be 2 ashen vigor spool.
+> reward for finishing beating 1-3 is 2 silver sunder spool.
+> reward for beating 1-10 should be 2 gilded vigor spools and 2 sunder spools.
+
+Built as he said; the spool rewards that stood in are his now:
+
+| Quest | Reward |
+| --- | --- |
+| Finish Tutorial | 2 Ashen Vigor spools (was a Silver Vigor spool) |
+| Beat Campaign 1-3 | 2 Silver Sunder spools (was a Gilded Sunder spool) |
+| Beat Campaign 1-10 | 2 Gilded Vigor and 2 Gilded Sunder spools (was 2 Silver Vigor spools) |
+
+The grade of 1-10's Sunder spools was not said: read as Gilded, like the Vigor ones beside them (my reading). A quest can
+now give spools of two patterns; its panel names both and shows the four found as icons. A save that claimed a quest
+before keeps what it was given then.

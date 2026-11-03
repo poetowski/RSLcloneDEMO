@@ -48,8 +48,9 @@ export function claimQuest(a: MasterArchivist, id: string, rng: () => number = M
   if (!q || questState(a, q) !== 'ready') return null;
   let find: QuestFind;
   if (q.reward.kind === 'spool') {
-    const reward = q.reward;
-    const spools = Array.from({ length: reward.count ?? 1 }, () => rollSpool(reward.pattern, reward.grade, rollMainStat(rng), rng));
+    const spools = [q.reward, ...(q.reward.also ? [q.reward.also] : [])].flatMap((g) =>
+      Array.from({ length: g.count ?? 1 }, () => rollSpool(g.pattern, g.grade, rollMainStat(rng), rng)),
+    );
     for (const s of spools) a.reliquary.addSpool(s, true);
     const [spool, ...more] = spools;
     find = more.length ? { kind: 'spool', spool, more } : { kind: 'spool', spool };

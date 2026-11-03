@@ -467,16 +467,16 @@ The Challenges are quests to accomplish, in three tabs (Jakub, 2026-10-24, [DESI
 
 | Quest | Goal | Reward |
 | --- | --- | --- |
-| Finish Tutorial (his) | the tutorial finished: its first victory | a Silver Vigor spool |
+| Finish Tutorial (his) | the tutorial finished: its first victory | two Ashen Vigor spools (his, 2026-11-03) |
 | Weave a Spool (stand-in for his placeholder; second on his word, 2026-10-25) | any spool woven into any champion's Weaver Matrix | 100 Stardust (his): the third champion's summon |
-| Beat Campaign 1-3 (his, 2026-10-25; third on his word) | stage 1-3 cleared | a Gilded Sunder spool |
-| Beat Campaign 1-10 (his, 2026-11-01) | stage 1-10 cleared | two spools (his); Silver Vigor, a set's two pieces, stands in |
+| Beat Campaign 1-3 (his, 2026-10-25; third on his word) | stage 1-3 cleared | two Silver Sunder spools (his, 2026-11-03) |
+| Beat Campaign 1-10 (his, 2026-11-01) | stage 1-10 cleared | two Gilded Vigor and two Sunder spools (his, 2026-11-03; the Sunder ones Gilded too, my reading) |
 | Beat Campaign 3-10 (his, 2026-11-01) | stage 3-10 cleared | 5000 Gold (his, 2026-11-03; 250 Stardust until then) |
 | Beat Campaign 5-10 (his, 2026-11-01) | stage 5-10 cleared | 300 Stardust (his, 2026-11-03; the Paladin, then 400 Stardust, until then) |
 | Beat Campaign 8-10 (his, 2026-11-01) | stage 8-10 cleared | 10000 Gold (his, 2026-11-03; three spools until then) |
 | Beat Campaign 10-10 (his, 2026-11-03) | stage 10-10 cleared | the Paladin joins (his); no summon brings him |
 
-A reward spool has its quest's pattern and grade; its main stat is drawn by slot and its strands rolled as a found spool's are (section 14), and it comes into storage as a new find. Stardust goes to the Wishing Star (section 16), Gold to the purse (section 17). The spool rewards are stand-ins.
+A reward spool has its quest's pattern and grade; its main stat is drawn by slot and its strands rolled as a found spool's are (section 14), and it comes into storage as a new find. Stardust goes to the Wishing Star (section 16), Gold to the purse (section 17). The spool rewards are his (2026-11-03).
 
 **The tutorial** (`src/game/tutorial.ts`) starts on its own on a save whose tutorial was neither finished nor skipped and that has no stage cleared; from the Journey anyone can start it (START TUTORIAL) or play it again (REPLAY TUTORIAL). Skipping it marks it skipped (the quest stays open); its first victory marks it finished, after which its cards only lead to the Challenges, and closing them changes nothing. Its battle is an ordinary stage 1-1.
 

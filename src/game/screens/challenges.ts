@@ -16,7 +16,7 @@ import { claimQuest, currentQuest, QuestFind, questState, QuestState } from '../
 import { zoneOf } from '../data/campaign';
 import { champion } from '../data/champions';
 import { RARITIES } from '../data/meta';
-import { CHALLENGE_TABS, ChallengeTab, JOURNEY, QuestDef } from '../data/challenges';
+import { CHALLENGE_TABS, ChallengeTab, JOURNEY, QuestDef, SpoolGift } from '../data/challenges';
 import { GRADES, pattern, patternBonusText } from '../data/matrix';
 import { FRAGMENTS_PER_SHARD, SUMMONING } from '../data/summoning';
 import { summonsReady } from '../summoning';
@@ -296,7 +296,8 @@ export class ChallengesScreen extends BaseScreen {
     ctx.globalAlpha = st === 'claimed' ? 0.45 : st === 'locked' ? 0.6 : 1;
     if (q.reward.kind === 'spool') {
       ui.blit(ctx, `spool_${q.reward.pattern}_${q.reward.grade}`, x - 9, py + 4);
-      if ((q.reward.count ?? 1) > 1) ui.text(ctx, `x${q.reward.count}`, x + 2, py + 17, { color: COLORS.text });
+      const n = (q.reward.count ?? 1) + (q.reward.also ? q.reward.also.count ?? 1 : 0);
+      if (n > 1) ui.text(ctx, `x${n}`, x + 2, py + 17, { color: COLORS.text });
     } else if (q.reward.kind === 'champion') {
       const r = this.a.ui.json.portraits[q.reward.champion];
       ctx.drawImage(this.a.ui.img, r[0], r[1], r[2], r[3], x - 11, py + 2, 22, 22);
@@ -358,9 +359,17 @@ export class ChallengesScreen extends BaseScreen {
     if (rw.kind === 'spool') {
       const p = pattern(rw.pattern);
       ui.blit(ctx, `bigspool_${rw.pattern}_${rw.grade}`, rx, py + 27);
+      const gift = (g: SpoolGift) => `${(g.count ?? 1) > 1 ? `${g.count} ` : ''}${GRADES[g.grade]} ${patternName(g.pattern)} ${(g.count ?? 1) > 1 ? 'spools' : 'spool'}`;
       const many = (rw.count ?? 1) > 1;
-      ui.text(ctx, `${many ? `${rw.count} ` : ''}${GRADES[rw.grade]} ${patternName(rw.pattern)} ${many ? 'spools' : 'spool'}`, rx + 30, py + 30, { color: PATTERN_TINT[rw.pattern] });
-      if (found?.kind === 'spool') {
+      ui.text(ctx, gift(rw), rx + 30, py + 30, { color: PATTERN_TINT[rw.pattern] });
+      if (rw.also) {
+        // a second kind of spool: its name under the first, the found ones as icons in a row
+        ui.text(ctx, `and ${gift(rw.also)}`, rx + 30, py + 42, { color: PATTERN_TINT[rw.also.pattern] });
+        if (found?.kind === 'spool') {
+          [found.spool, ...(found.more ?? [])].forEach((s, i) => ui.blit(ctx, spoolIcon(s), rx + 30 + i * 22, py + 55));
+          ui.text(ctx, 'Found: in Weaving now.', rx + 30, py + 76, { color: COLORS.good });
+        } else ui.para(ctx, st === 'claimed' ? 'Taken, into Weaving.' : 'Their main stats are drawn when you claim them.', rx + 30, py + 55, 152, { color: COLORS.faint });
+      } else if (found?.kind === 'spool') {
         ui.blit(ctx, spoolIcon(found.spool), rx + 30, py + 42);
         ui.text(ctx, statText(found.spool.main.stat, found.spool.main.value), rx + 51, py + 47, { color: COLORS.text });
         // a second spool beside the first
@@ -371,7 +380,7 @@ export class ChallengesScreen extends BaseScreen {
         }
         ui.text(ctx, 'Found: in Weaving now.', rx + 30, py + 63, { color: COLORS.good });
       } else ui.para(ctx, st === 'claimed' ? 'Taken, into Weaving.' : many ? 'Their main stats are drawn when you claim them.' : 'Its main stat is drawn when you claim it.', rx + 30, py + 42, 152, { color: COLORS.faint });
-      if (p) ui.para(ctx, `${p.pieces} ${p.name} spools in a matrix weave ${patternBonusText(p)}.`, rx, py + 82, 180, { color: COLORS.faint });
+      if (p && !rw.also) ui.para(ctx, `${p.pieces} ${p.name} spools in a matrix weave ${patternBonusText(p)}.`, rx, py + 82, 180, { color: COLORS.faint });
     } else if (rw.kind === 'champion') {
       const c = champion(rw.champion);
       const r = this.a.ui.json.portraits[rw.champion];
