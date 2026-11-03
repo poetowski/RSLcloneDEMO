@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-03 | The Merchant trades spools: sell 100 / 300 / 500 Gold by grade, buy at 20x; wares of 5 Ashen, 3 Silver, 2 Gilded, rotated for 5000 Gold | 80 |
 | 2026-11-03 | Gold, the game's coin (0 to start), and the Merchant: a stall in the Sanctum, a screen with the Gold held, BUY and SELL to come | 79 |
 | 2026-11-03 | The Journey: Beat Campaign 5-10 gives 400 Stardust; a new eighth quest, Beat Campaign 10-10, gives the Paladin | 54, 78 |
 | 2026-11-03 | Zone 10, the Blossom Caldera, inspired by Japan's architecture and blossom: battle background, the world map extended east, ten placeholder stages, ambient `petals` | 5.13 |
@@ -4733,3 +4734,34 @@ Built as he said ("cool" read as "call"):
 Stand-ins until he sets them: the name Gold (his "for now"), the stall's look and place, its name (The Merchant's Stall),
 the screen's layout and texts, and the coin's look.
 
+## 80. The spools' prices and the Merchant's wares (received 2026-11-03)
+
+> now we need to assign gold value for all spools.
+
+Asked whether by grade only, by pattern and grade, or a base by grade with more for strands:
+
+> by grade only. buy price is always 20x higher than sell price.
+> ashen sell price is 100 gold. silver sell price is 300 gold. gilded sell price is 500 gold.
+> in buy section, generate 5 random ashen spools for sale, 3 random silver spools for sale and 2 random gilded spools for sale. also updates md files
+
+> player can rotate merchant wares if player pays 5000 gold, then it regenerates wares for sale
+
+Built as he said (`src/game/data/economy.ts`, rules in `src/game/merchant.ts`, MECHANICS_GUIDE.md 17); BUY and SELL, which
+section 79 left for later, now trade:
+
+| Grade | Sell (his) | Buy (20x, his) |
+| --- | --- | --- |
+| Ashen | 100 | 2000 |
+| Silver | 300 | 6000 |
+| Gilded | 500 | 10000 |
+
+- **The wares**: 5 Ashen, 3 Silver and 2 Gilded spools, each of a random pattern and a random main stat (drawn by slot,
+  as a found spool's) with its strands rolled. Rolled the first time the Merchant is opened and kept in the save; a ware
+  bought is SOLD until the wares are rotated.
+- **Rotating** (ROTATE WARES, under the wares): 5000 Gold, then ten fresh wares in place of all of them.
+- **Buying** takes the price and puts the spool in storage as a new find (NEW in Weaving).
+- **Selling** lists the loose spools in storage, best grade first, and pays the grade's price; the spool leaves for good.
+  A woven spool is not listed: it must be taken out of its slot in Weaving first, as for unravelling (my reading).
+
+Stand-ins until he sets them: that the wares are rolled on the first visit and change only when rotated, that every
+pattern is equally likely among them, that selling takes only loose spools, and the screen's layout and texts.

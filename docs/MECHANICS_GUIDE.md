@@ -504,3 +504,27 @@ Champions are summoned (Jakub, 2026-10-25, [DESIGN_DECISIONS.md](DESIGN_DECISION
 **The menu:** the SUMMON label counts the summons waiting (Soulstars and whole hundreds of Stardust, no more than the champions left to find), with the NEW badge while there is one; the Wishing Star shines brighter then.
 
 **Balance:** `npm run balance` section 4 grows each roster as summoning would: the starters, 1-1's Rime Scholar, and a summon for every 100 Stardust the first clears before a stage find at one star, plus the Journey's 100 when their quest can first be claimed (Weave a Spool: after the first battle, which finds a spool to weave); eight rosters, each summoned in its own seeded order at these odds without a wish, up to 60 of their teams each.
+
+## 17. Gold and the Merchant (`src/game/merchant.ts`, `src/game/data/economy.ts`)
+
+Jakub's (DESIGN_DECISIONS.md 79, 80): the game's coin, **Gold** (a name "for now", one constant: `CURRENCY`), 0 on a new
+account (`STARTING_GOLD`). Nothing else finds or spends it yet; it comes from selling spools.
+
+| Spool grade | The Merchant pays (`SPOOL_SELL_PRICE`) | A spool costs (`BUY_FACTOR` 20x) |
+| --- | --- | --- |
+| Ashen | 100 | 2000 |
+| Silver | 300 | 6000 |
+| Gilded | 500 | 10000 |
+
+- **Wares** (`MERCHANT_WARES`): 5 Ashen, 3 Silver, 2 Gilded spools, a random pattern each (all eight alike), the main
+  stat drawn by slot and the strands rolled as a found spool's (section 14). `stockMerchant` rolls them the first time
+  the Merchant opens; the save keeps them (`wares`), each sold once.
+- **Rotating** (`rotateWares`, `ROTATE_PRICE` 5000): with 5000 Gold in the purse, the price is taken and ten fresh wares
+  replace all of them, none sold.
+- **Buying** (`buyWare`): a ware not sold, with its price in the purse: the price is taken, the ware is SOLD and the spool
+  comes into storage as a new find.
+- **Selling** (`sellSpool`): a loose spool in storage leaves for good and pays its grade's price; a woven one must be taken
+  out of its slot first (as for unravelling, section 14).
+
+**In the save:** `gold` and `wares` (each a spool and whether it is sold). A save from before them holds 0 Gold and no
+wares, which are rolled on the first visit.

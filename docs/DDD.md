@@ -111,8 +111,9 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Stardust, Soulstar | the summoning currency (names proposed, his to choose): Stardust, the fragments every campaign victory finds; a Soulstar, 100 Stardust merged, spent on one summon | `MasterArchivist.fragments`, `MasterArchivist.shards`, `fragmentDrop`, `mergeShard`, `FRAGMENTS_PER_SHARD` |
 | Wish | the faction and role the Archivist hopes for: within the rarity drawn, each part a champion matches makes it twice as likely; never a promise | `Wish`, `MasterArchivist.wish`, `wishWeight`, `wishChance` |
 | Wishing Star | the Sanctum's place in the sky where Stardust is merged and champions summoned | `SummonScreen`, the `summon` place of `menu.json` |
-| Gold | the game's coin, held in the save; its name may change (Jakub's "for now"); nothing finds or spends it yet | `MasterArchivist.gold`, `CURRENCY`, `STARTING_GOLD` |
-| Merchant | the place where Gold will buy and sell items: the Merchant's Stall in the Sanctum and its screen | `MerchantScreen`, the `merchant` place of `menu.json` |
+| Gold | the game's coin, held in the save; its name may change (Jakub's "for now"); earned by selling spools, spent on buying them and on rotating the wares | `MasterArchivist.gold`, `CURRENCY`, `STARTING_GOLD` |
+| Merchant | the place where Gold buys and sells spools: the Merchant's Stall in the Sanctum and its screen | `MerchantScreen`, the `merchant` place of `menu.json` |
+| Ware | a spool on the Merchant's counter, sold once; ten of them, rolled on the first visit and when rotated | `Ware`, `MasterArchivist.wares`, `stockMerchant`, `rotateWares`, `buyWare` |
 | Still scattered | the champions a summon can still bring: not owned, not a starter, brought by no stage | `summonPool` |
 | Starters | the champions owned from the start | `STARTERS` |
 | Roster | the champions the player owns | `roster()` |

@@ -188,7 +188,7 @@ export class Reliquary {
 }
 
 /** A spool from saved data, or null when it is malformed. */
-function readSpool(raw: unknown): ThreadSpool | null {
+export function readSpool(raw: unknown): ThreadSpool | null {
   if (!raw || typeof raw !== 'object') return null;
   const s = raw as { pattern?: unknown; grade?: unknown; main?: { stat?: unknown }; strands?: { stat?: unknown; value?: unknown }[] };
   try {

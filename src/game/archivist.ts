@@ -16,7 +16,8 @@ import { Wish } from './data/summoning';
 import { LocationDef, Stats } from './data/types';
 import { fragmentDrop, rollDrops } from './reliquary/drops';
 import { Grade, rollSpool, sameSpool, ThreadSpool, wovenStats } from './reliquary/matrix';
-import { Reliquary, ReliquaryJson } from './reliquary/reliquary';
+import { readSpool, Reliquary, ReliquaryJson } from './reliquary/reliquary';
+import type { Ware } from './merchant';
 
 export interface MasterArchivist {
   /** best stars per stage id, 1..3 (missing = never cleared) */
@@ -44,6 +45,8 @@ export interface MasterArchivist {
   lessons: string[];
   /** the coin, for the Merchant (data/economy.ts) */
   gold: number;
+  /** the Merchant's spools for sale, rolled on the first visit (merchant.ts); none until then */
+  wares: Ware[];
 }
 
 export type TutorialState = 'todo' | 'skipped' | 'done';
@@ -65,8 +68,9 @@ interface SaveJson {
   wish?: Wish;
   summons?: number;
   lessons?: string[];
-  /** since the Merchant (2026-11-03); a save without it holds the starting Gold */
+  /** since the Merchant (2026-11-03); a save without it holds the starting Gold and no wares yet */
   gold?: number;
+  wares?: { spool: unknown; sold?: boolean }[];
 }
 
 /**
@@ -88,7 +92,7 @@ const OLD_KEYS = ['tlrol.save.v2', 'oathbound.profile.v1'];
 export function newArchivist(): MasterArchivist {
   const reliquary = new Reliquary(MATRIX_LAYOUT);
   for (const id of STARTERS) reliquary.recruit(id, false);
-  return { stars: {}, team: [...STARTERS], read: [], settings: { speed: 1, auto: false }, reliquary, tutorial: 'todo', claimed: [], fragments: 0, shards: 0, wish: {}, summons: 0, lessons: [], gold: STARTING_GOLD };
+  return { stars: {}, team: [...STARTERS], read: [], settings: { speed: 1, auto: false }, reliquary, tutorial: 'todo', claimed: [], fragments: 0, shards: 0, wish: {}, summons: 0, lessons: [], gold: STARTING_GOLD, wares: [] };
 }
 
 /**
@@ -112,6 +116,10 @@ export function readSave(raw: string | null, rawOld: string | null = null): Mast
       a.shards = count(s.shards);
       a.summons = count(s.summons);
       if (s.gold !== undefined) a.gold = count(s.gold);
+      if (Array.isArray(s.wares)) a.wares = s.wares.flatMap((w) => {
+        const spool = readSpool(w?.spool);
+        return spool ? [{ spool, sold: w.sold === true }] : [];
+      });
       if (s.wish && typeof s.wish === 'object') a.wish = { faction: s.wish.faction, role: s.wish.role };
       if (Array.isArray(s.lessons)) a.lessons = s.lessons.filter((id) => typeof id === 'string');
       keepHabits(a, s);
@@ -182,7 +190,7 @@ export function loadArchivist(): MasterArchivist {
 export function writeSave(a: MasterArchivist): string {
   const s: SaveJson = {
     version: 3, stars: a.stars, team: a.team, read: a.read, settings: a.settings, reliquary: a.reliquary.toJSON(), tutorial: a.tutorial, claimed: a.claimed,
-    fragments: a.fragments, shards: a.shards, wish: a.wish, summons: a.summons, lessons: a.lessons, gold: a.gold,
+    fragments: a.fragments, shards: a.shards, wish: a.wish, summons: a.summons, lessons: a.lessons, gold: a.gold, wares: a.wares,
   };
   return JSON.stringify(s);
 }

@@ -151,6 +151,7 @@ The Master Archivist (`src/game/archivist.ts`) is the player and their save, sto
 | `summons` | champions summoned so far |
 | `lessons` | the tutorial's later lessons shown or closed (`summon`: the first summon) |
 | `gold` | the Gold held, for the Merchant (data/economy.ts: 0 to start, his); never below 0, 0 in a save from before it |
+| `wares` | the Merchant's spools for sale, each with whether it was bought; rolled on the first visit, replaced when rotated ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 17) |
 
 A save from before 2026-10-25 reads none of the last five: no Stardust, no Soulstar, no wish, no summons, no lessons.
 
@@ -197,7 +198,7 @@ Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `r
 | Challenges | `screens/challenges.ts` | `?screen=challenges&tab=daily` (opens on the Journey) |
 | Recruit ceremony | `screens/recruit.ts` | `?screen=recruit&champion=rime_scholar` (also a summon's ceremony) |
 | Summon (the Wishing Star) | `screens/summon.ts` | `?screen=summon` (`&stardust=250`, `&soulstars=2` set what the save holds) |
-| Merchant (the Merchant's Stall) | `screens/merchant.ts` | `?screen=merchant&tab=sell` (opens on BUY); the Gold held, buying and selling to come |
+| Merchant (the Merchant's Stall) | `screens/merchant.ts` | `?screen=merchant&tab=sell` (opens on BUY): the Gold held; BUY the wares (ROTATE WARES for 5000 Gold), SELL loose spools |
 | Skill demo | `screens/battle.ts` (demo mode) | `?demo=iron_blow` |
 
 The main menu is the Sanctum (`src/game/view/sanctum.ts`, art `tools/art/sanctum.ts`): the island under the broken Loom, whose places are the menu: the Starbridge Gate (campaign), the Reliquary (champions), the Weaver's Spire (Weaving), the Observatory (Academy), the astrolabe (options), the Herald's Board (Challenges), the Merchant's Stall (the Merchant) and, in its sky, the Wishing Star (summoning); a few owned champions, a different few each visit, stand on its plaza ([UI_GUIDE.md](UI_GUIDE.md) 4).

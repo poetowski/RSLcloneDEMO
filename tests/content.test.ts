@@ -13,7 +13,8 @@ import { STATUSES } from '../src/game/data/statuses';
 import { ChampionDef, StatusId } from '../src/game/data/types';
 import { ZONES } from '../src/game/data/zones';
 import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, recordVictory, spoolsHeld, stageOpen, stockSample, tutorialDue, writeSave } from '../src/game/archivist';
-import { CURRENCY, STARTING_GOLD } from '../src/game/data/economy';
+import { buyPrice, CURRENCY, ROTATE_PRICE, sellPrice, STARTING_GOLD } from '../src/game/data/economy';
+import { buyWare, rotateWares, sellSpool, stockMerchant } from '../src/game/merchant';
 import { claimQuest, currentQuest, questState, readyCount } from '../src/game/challenges';
 import { CHALLENGE_TABS, JOURNEY } from '../src/game/data/challenges';
 import { PATTERN_IDS, SPOOL_STATS } from '../src/game/data/matrix';
@@ -875,6 +876,38 @@ describe('challenges and the tutorial', () => {
     expect(claimQuest(p, last.id)).toEqual({ kind: 'champion', champion: 'paladin', already: false });
     expect(p.reliquary.has('paladin')).toBe(true);
     expect(currentQuest(p)).toBeUndefined();
+  });
+
+  it('prices spools by grade, buys at twenty times the sell price, lays out 5 Ashen, 3 Silver and 2 Gilded, and rotates them for 5000 Gold (Jakub, 2026-11-03)', () => {
+    expect([0, 1, 2].map((g) => [sellPrice(g as 0 | 1 | 2), buyPrice(g as 0 | 1 | 2)])).toEqual([[100, 2000], [300, 6000], [500, 10000]]);
+    expect(ROTATE_PRICE).toBe(5000);
+    const p = newArchivist();
+    expect(p.wares).toEqual([]);
+    expect(stockMerchant(p)).toBe(true);
+    expect(stockMerchant(p)).toBe(false);
+    expect(p.wares.map((w) => w.spool.grade)).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 2, 2]);
+    // the wares keep through a save, bought ones as bought
+    p.wares[2].sold = true;
+    const back = readSave(writeSave(p));
+    expect(back.wares.map((w) => [w.spool.pattern, w.spool.grade, w.sold])).toEqual(p.wares.map((w) => [w.spool.pattern, w.spool.grade, w.sold]));
+    // buying: not without the price, once, into storage as a new find
+    expect(buyWare(p, 0)).toBe('too dear');
+    p.gold = 2500;
+    const before = p.reliquary.spools().length;
+    expect(buyWare(p, 0)).toBe('bought');
+    expect([p.gold, p.reliquary.spools().length, p.reliquary.freshCount() > 0]).toEqual([500, before + 1, true]);
+    expect(buyWare(p, 0)).toBe('sold out');
+    expect(buyWare(p, 2)).toBe('sold out');
+    // selling: a loose spool leaves storage for its price; one not loose pays nothing
+    const spool = p.wares[0].spool;
+    expect(sellSpool(p, spool)).toBe(100);
+    expect([p.gold, p.reliquary.spools().length]).toEqual([600, before]);
+    expect(sellSpool(p, spool)).toBe(0);
+    // rotating: not without 5000, then ten fresh wares, none sold
+    expect(rotateWares(p)).toBe(false);
+    p.gold = 5200;
+    expect(rotateWares(p)).toBe(true);
+    expect([p.gold, p.wares.length, p.wares.some((w) => w.sold)]).toEqual([200, 10, false]);
   });
 
   it('starts every account with no Gold and keeps the Gold through a save; an older save holds none (Jakub, 2026-11-03)', () => {
