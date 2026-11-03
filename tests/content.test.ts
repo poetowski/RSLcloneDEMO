@@ -13,6 +13,7 @@ import { STATUSES } from '../src/game/data/statuses';
 import { ChampionDef, StatusId } from '../src/game/data/types';
 import { ZONES } from '../src/game/data/zones';
 import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, recordVictory, spoolsHeld, stageOpen, stockSample, tutorialDue, writeSave } from '../src/game/archivist';
+import { CURRENCY, STARTING_GOLD } from '../src/game/data/economy';
 import { claimQuest, currentQuest, questState, readyCount } from '../src/game/challenges';
 import { CHALLENGE_TABS, JOURNEY } from '../src/game/data/challenges';
 import { PATTERN_IDS, SPOOL_STATS } from '../src/game/data/matrix';
@@ -742,7 +743,7 @@ describe('main menu sanctum', () => {
   };
 
   it('has a place for every way on from the menu, each made of sprites that exist, with its outline and label', () => {
-    expect(menu.hotspots.map((h) => h.id).sort()).toEqual(['academy', 'campaign', 'challenges', 'champions', 'options', 'summon', 'weaving']);
+    expect(menu.hotspots.map((h) => h.id).sort()).toEqual(['academy', 'campaign', 'challenges', 'champions', 'merchant', 'options', 'summon', 'weaving']);
     for (const h of menu.hotspots) {
       expect(h.sprites.length, h.id).toBeGreaterThan(0);
       for (const s of h.sprites) expect(menu.sprites[s], `${h.id} -> ${s}`).toBeTruthy();
@@ -874,6 +875,20 @@ describe('challenges and the tutorial', () => {
     expect(claimQuest(p, last.id)).toEqual({ kind: 'champion', champion: 'paladin', already: false });
     expect(p.reliquary.has('paladin')).toBe(true);
     expect(currentQuest(p)).toBeUndefined();
+  });
+
+  it('starts every account with no Gold and keeps the Gold through a save; an older save holds none (Jakub, 2026-11-03)', () => {
+    expect(STARTING_GOLD).toBe(0);
+    expect(CURRENCY.name).toBe('Gold');
+    const p = newArchivist();
+    expect(p.gold).toBe(0);
+    p.gold = 125;
+    expect(readSave(writeSave(p)).gold).toBe(125);
+    const save = JSON.parse(writeSave(newArchivist())) as Record<string, unknown>;
+    delete save.gold;
+    expect(readSave(JSON.stringify(save)).gold).toBe(0);
+    expect(readSave(JSON.stringify({ ...save, gold: -4.5 })).gold).toBe(0);
+    expect(ui.parts.gold && ui.parts.biggold).toBeTruthy();
   });
 
   it('keeps the tutorial and the claims through a save; an older save reads them as never done, and claims stay in order', () => {

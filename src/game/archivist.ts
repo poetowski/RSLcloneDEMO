@@ -9,6 +9,7 @@
 import { LOCATIONS, STARTERS, allStages, stage } from './data/campaign';
 import { JOURNEY } from './data/challenges';
 import { champion, CHAMPIONS } from './data/champions';
+import { STARTING_GOLD } from './data/economy';
 import { MATRIX_LAYOUT, PATTERN_IDS, SPOOL_STATS } from './data/matrix';
 import { FACTIONS, ROLES } from './data/meta';
 import { Wish } from './data/summoning';
@@ -41,6 +42,8 @@ export interface MasterArchivist {
   summons: number;
   /** the tutorial's later lessons shown to their end or closed ('summon': the first summon) */
   lessons: string[];
+  /** the coin, for the Merchant (data/economy.ts) */
+  gold: number;
 }
 
 export type TutorialState = 'todo' | 'skipped' | 'done';
@@ -62,6 +65,8 @@ interface SaveJson {
   wish?: Wish;
   summons?: number;
   lessons?: string[];
+  /** since the Merchant (2026-11-03); a save without it holds the starting Gold */
+  gold?: number;
 }
 
 /**
@@ -83,7 +88,7 @@ const OLD_KEYS = ['tlrol.save.v2', 'oathbound.profile.v1'];
 export function newArchivist(): MasterArchivist {
   const reliquary = new Reliquary(MATRIX_LAYOUT);
   for (const id of STARTERS) reliquary.recruit(id, false);
-  return { stars: {}, team: [...STARTERS], read: [], settings: { speed: 1, auto: false }, reliquary, tutorial: 'todo', claimed: [], fragments: 0, shards: 0, wish: {}, summons: 0, lessons: [] };
+  return { stars: {}, team: [...STARTERS], read: [], settings: { speed: 1, auto: false }, reliquary, tutorial: 'todo', claimed: [], fragments: 0, shards: 0, wish: {}, summons: 0, lessons: [], gold: STARTING_GOLD };
 }
 
 /**
@@ -106,6 +111,7 @@ export function readSave(raw: string | null, rawOld: string | null = null): Mast
       a.fragments = count(s.fragments);
       a.shards = count(s.shards);
       a.summons = count(s.summons);
+      if (s.gold !== undefined) a.gold = count(s.gold);
       if (s.wish && typeof s.wish === 'object') a.wish = { faction: s.wish.faction, role: s.wish.role };
       if (Array.isArray(s.lessons)) a.lessons = s.lessons.filter((id) => typeof id === 'string');
       keepHabits(a, s);
@@ -176,7 +182,7 @@ export function loadArchivist(): MasterArchivist {
 export function writeSave(a: MasterArchivist): string {
   const s: SaveJson = {
     version: 3, stars: a.stars, team: a.team, read: a.read, settings: a.settings, reliquary: a.reliquary.toJSON(), tutorial: a.tutorial, claimed: a.claimed,
-    fragments: a.fragments, shards: a.shards, wish: a.wish, summons: a.summons, lessons: a.lessons,
+    fragments: a.fragments, shards: a.shards, wish: a.wish, summons: a.summons, lessons: a.lessons, gold: a.gold,
   };
   return JSON.stringify(s);
 }

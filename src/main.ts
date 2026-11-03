@@ -13,6 +13,7 @@ import { ChallengesScreen } from './game/screens/challenges';
 import { ChampionScreen } from './game/screens/champion';
 import { CollectionScreen } from './game/screens/collection';
 import { MainMenu } from './game/screens/menu';
+import { MerchantScreen } from './game/screens/merchant';
 import { OptionsScreen } from './game/screens/options';
 import { RecruitScreen } from './game/screens/recruit';
 import { SummonScreen } from './game/screens/summon';
@@ -90,12 +91,13 @@ async function boot() {
     options: () => app.go(() => new OptionsScreen(app)),
     recruit: (id) => app.go(() => new RecruitScreen(app, id, () => app.router.campaign())),
     summon: () => app.go(() => new SummonScreen(app)),
+    merchant: (tab) => app.go(() => new MerchantScreen(app, tab)),
     summoned: (id, wished) => app.go(() => new RecruitScreen(app, id, () => app.router.summon(), { wished })),
     demo: (skill, back) => app.go(() => new BattleScreen(app, { demo: skill, back })),
   };
 
-  // deep links: ?screen=campaign|team|battle|collection|champion|weaving|academy|challenges|options|recruit|summon
-  //   &stage=1-2 &team=captain_gareth,rime_scholar &champion=captain_gareth &chapter=buffs &tab=daily   ?demo=<skill id>
+  // deep links: ?screen=campaign|team|battle|collection|champion|weaving|academy|challenges|options|recruit|summon|merchant
+  //   &stage=1-2 &team=captain_gareth,rime_scholar &champion=captain_gareth &chapter=buffs &tab=daily (merchant: &tab=sell)   ?demo=<skill id>
   //   &zone=zone2 (battle, team: the stage on another background)
   const r = app.router;
   const demo = params.get('demo');
@@ -136,6 +138,9 @@ async function boot() {
       break;
     case 'summon':
       r.summon();
+      break;
+    case 'merchant':
+      r.merchant(params.get('tab') === 'sell' ? 'sell' : undefined);
       break;
     default:
       r.menu();

@@ -6,6 +6,7 @@ import { H, Screen as Canvas, W } from '../engine/screen';
 import { loadArchivist, MasterArchivist, saveArchivist } from './archivist';
 import type { ChallengeTab } from './data/challenges';
 import type { ChampionAt } from './screens/champion';
+import type { MerchantTab } from './screens/merchant';
 import type { WeavingAt } from './screens/weaving';
 import { Assets } from './view/assets';
 
@@ -144,6 +145,8 @@ export interface Router {
   recruit(id: string): void;
   /** the Wishing Star: Stardust, Soulstars, the wish and the summon */
   summon(): void;
+  /** the Merchant: the Gold held, BUY and SELL (their wares come later) */
+  merchant(tab?: MerchantTab): void;
   /** the ceremony of a summoned champion, and whether the wish came true; CONTINUE goes back to the Wishing Star */
   summoned(id: string, wished: boolean): void;
   demo(skillId: string, back: () => void): void;

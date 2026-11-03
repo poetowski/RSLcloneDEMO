@@ -16,7 +16,8 @@
 // rim's break, the Observatory (the Academy), and an astrolabe on a rock
 // drifting below (the options); since 2026-10-24 the Herald's Board on a rock
 // off the west end (the Challenges), and since 2026-10-25 the Wishing Star
-// hanging from one of the Loom's threads in the sky over the Gate (summoning).
+// hanging from one of the Loom's threads in the sky over the Gate (summoning),
+// and since 2026-11-03 the Merchant's stall on the plaza by the Spire (the Merchant).
 // Everything here is a first take of mine: names, places and look.
 //
 // Writes public/assets/menu/ (sky.png, scene.png, menu.json) and the preview
@@ -1706,6 +1707,114 @@ function lanterns(): { body: Bitmap; glow: Bitmap } {
   return { body: b, glow };
 }
 
+// ---------------------------------------------------------------------------
+// The Merchant's stall (the Merchant; Jakub, 2026-11-03: "create a screen for
+// Merchant and put object on main menu and make it navigational"): on the
+// plaza's east side between the Reliquary and the Spire, a trader's stall of
+// dark timber under an awning striped plum and cream, a cloth with a gold hem
+// over its counter, a pair of gold scales, a stack of coins and a small chest on
+// it, jars of blue light on the shelf behind, a lantern hanging from the
+// awning's corner and a sign with a coin on its post. A first take of mine.
+// ---------------------------------------------------------------------------
+
+export const MERCHANT = { cx: 404, base: 250 };
+const AWNING = H(['#22081c', '#3c1030', '#5a1a48', '#7c2862', '#a03c7e', '#c45c9a']);
+const CREAM = H(['#4a3c34', '#7a6a58', '#ac9a80', '#d8c8a8', '#f4ead2']);
+
+function merchantStall(): { body: Bitmap; glow: Bitmap } {
+  const b = new Bitmap(W, HT), glow = new Bitmap(W, HT);
+  const { cx, base: g } = MERCHANT;
+  const L = cx - 18, R = cx + 18;
+  const IRON = MAT.iron.ramp;
+  // its shadow on the flags, cast away from the pole star
+  ellipseFill(b, cx + 4, g, 24, 3, (x, y, d) => (dith(x, y, (1 - d) * 1.2) ? ROCK[1] : 0));
+  // the back wall in shade, a shelf across it with jars of blue light
+  for (let y = g - 36; y < g - 12; y++) for (let x = L + 2; x <= R - 1; x++) put(b, x, y, WOOD, 1.3 + ((x - L) % 6 === 0 ? -0.7 : 0) + (hash2(x, y, 601) - 0.5) * 0.4);
+  for (let x = L + 2; x <= R - 1; x++) {
+    b.set(x, g - 24, WOOD[4]);
+    b.set(x, g - 23, WOOD[1]);
+  }
+  for (let k = 0; k < 5; k++) {
+    const jx = L + 6 + k * 6, tall = 3 + (k % 2) * 2;
+    for (let y = g - 24 - tall; y < g - 24; y++) {
+      for (let x = jx - 1; x <= jx + 1; x++) {
+        put(b, x, y, CRYS, 3.6 - (x - jx) * 1.2 + (y === g - 24 - tall ? 1 : 0));
+        put(glow, x, y, CRYS, 4.4);
+      }
+    }
+    b.set(jx, g - 25 - tall, WOOD[5]);
+  }
+  // the posts: squared timbers, lit on their west faces
+  for (const px of [L - 1, R - 1]) {
+    for (let y = g - 41; y < g; y++) for (let x = px; x < px + 3; x++) put(b, x, y, WOOD, (x === px ? 5.4 : x === px + 1 ? 3.8 : 2.2) + (hash2(x, Math.floor(y / 4), 602) - 0.5) * 0.6);
+  }
+  // the counter: a lit top of planks, a plum cloth over its front in folds, hemmed in gold
+  const ct = g - 13;
+  for (let y = ct; y < g; y++) {
+    for (let x = L - 2; x <= R + 2; x++) {
+      const u = (x - L) / (R - L);
+      if (y < ct + 2) put(b, x, y, WOOD, (y === ct ? 6.4 : 4.6) - u * 1.4);
+      else if (y > g - 4) put(b, x, y, GOLD, (y === g - 3 ? 4 : 2.6) - u * 1.2);
+      else put(b, x, y, AWNING, 3.4 - u * 1.4 + Math.sin((x - L) * 0.85) * 0.7);
+    }
+  }
+  // the scales on the counter: a gold post, the beam tipped toward the heavier pan
+  const sx = cx - 7;
+  for (let y = ct - 11; y < ct; y++) b.set(sx, y, GOLD[y < ct - 9 ? 5 : 3]);
+  for (let x = sx - 6; x <= sx + 6; x++) b.set(x, ct - 10 + (x > sx + 2 ? 1 : 0), GOLD[x < sx ? 5 : 3]);
+  for (const [px, py] of [[sx - 6, ct - 4], [sx + 6, ct - 3]] as const) {
+    for (let y = ct - 9; y < py; y++) if ((y + px) % 2 === 0) b.set(px, y, GOLD[2]);
+    for (let x = px - 2; x <= px + 2; x++) b.set(x, py, GOLD[x < px ? 5 : 3]);
+    for (let x = px - 1; x <= px + 1; x++) b.set(x, py + 1, GOLD[2]);
+  }
+  // a stack of coins, and a small chest with gold glinting under its lid
+  for (let k = 0; k < 4; k++) for (let x = cx + 3; x <= cx + 6; x++) b.set(x, ct - 1 - k, x === cx + 3 ? GOLD[5] : GOLD[k % 2 ? 4 : 3]);
+  for (let y = ct - 6; y < ct; y++) {
+    for (let x = cx + 9; x <= cx + 16; x++) {
+      const lid = y < ct - 4;
+      b.set(x, y, lid ? (x < cx + 12 ? WOOD[6] : WOOD[4]) : x === cx + 9 || x === cx + 16 ? IRON[3] : WOOD[x < cx + 12 ? 5 : 3]);
+    }
+  }
+  for (let x = cx + 10; x <= cx + 15; x++) b.set(x, ct - 6, GOLD[x < cx + 13 ? 5 : 4]);
+  b.set(cx + 12, ct - 3, GOLD[5]);
+  // the awning: a slope of stripes over the stall, wider toward us, a scalloped valance along its front
+  const aTop = g - 48, aFront = g - 39;
+  const stripeAt = (x: number, y: number) => Math.floor((x - cx + 64 + (y - aTop) * 0.35) / 4) % 2 === 1;
+  for (let y = aTop; y <= aFront; y++) {
+    const t = (y - aTop) / (aFront - aTop);
+    const half = 17 + t * 6;
+    for (let x = Math.round(cx - half); x <= Math.round(cx + half); x++) {
+      const u = (x - cx) / half, st = stripeAt(x, y);
+      put(b, x, y, st ? CREAM : AWNING, (st ? 3.2 : 4.4) - u * 1.3 + (1 - t) * 0.6 + (y === aTop ? 0.8 : 0));
+    }
+  }
+  for (let x = cx - 23; x <= cx + 23; x++) {
+    const drop = Math.round(Math.sin((((x - cx + 23) % 6) / 6) * Math.PI) * 3);
+    const st = stripeAt(x, aFront);
+    for (let k = 1; k <= drop + 1; k++) put(b, x, aFront + k, st ? CREAM : AWNING, (st ? 2.6 : 3.4) - k * 0.5 - (x - cx) * 0.03);
+  }
+  // a gold finial on the ridge
+  for (const [dx, dy, c] of [[0, -2, 5], [-1, -1, 4], [0, -1, 5], [1, -1, 3], [0, 0, 3]] as const) b.set(cx + dx, aTop - 1 + dy, GOLD[c]);
+  // the lantern hanging from the awning's east corner
+  const lx = R + 5, ly = aFront + 7;
+  for (let y = aFront + 1; y < ly; y++) b.set(lx, y, IRON[2]);
+  for (let y = ly; y < ly + 6; y++) {
+    for (let x = lx - 2; x <= lx + 2; x++) {
+      if (y === ly || y === ly + 5 || x === lx - 2 || x === lx + 2) b.set(x, y, IRON[x < lx ? 3 : 1]);
+      else {
+        put(b, x, y, WARM, 3.6 - (x - lx) * 0.4);
+        put(glow, x, y, WARM, 5);
+      }
+    }
+  }
+  // the sign on the west post: a small board with a coin painted on it
+  const bx0 = L - 9, by0 = g - 32;
+  for (let x = bx0 + 2; x <= L - 1; x++) b.set(x, by0 - 1, IRON[2]);
+  for (let y = by0; y < by0 + 9; y++) for (let x = bx0; x < bx0 + 9; x++) put(b, x, y, WOOD, x === bx0 || y === by0 || x === bx0 + 8 || y === by0 + 8 ? 2.4 : 5 - (x - bx0) * 0.2);
+  ellipseFill(b, bx0 + 4.5, by0 + 4.5, 2.6, 2.6, (x, y) => GOLD[x + y < bx0 + by0 + 9 ? 5 : 3]);
+  return { body: b, glow };
+}
+
 /** Fragments of the rim's break drifting near it: short pieces of the gold band, runes and all. */
 export const FRAGMENTS: [number, number, number, number][] = [
   // x, y, length, angle
@@ -1861,7 +1970,7 @@ export interface MenuSprite {
 
 /** A place to click: the sprites that make it (their pixels are what the pointer hits), its hover outline, where its label hangs. */
 export interface MenuHotspot {
-  id: 'campaign' | 'champions' | 'weaving' | 'academy' | 'options' | 'challenges' | 'summon';
+  id: 'campaign' | 'champions' | 'weaving' | 'academy' | 'options' | 'challenges' | 'summon' | 'merchant';
   /** the place's name in the sanctum (a first take) */
   name: string;
   sprites: string[];
@@ -1952,6 +2061,9 @@ export function buildSanctum(out: string) {
   add('spire', [sp.body], 'building');
   add('spire_glow', [sp.glow], 'building', 'pulse', 4100);
   add('spool', loopFrames(16, spoolFrame), 'building', 'loop', 190);
+  const stall = merchantStall();
+  add('merchant', [stall.body], 'building');
+  add('merchant_glow', [stall.glow], 'building', 'pulse', 3800);
   const ob = observatory();
   add('observatory', [ob.body], 'building');
   add('observatory_glow', [ob.glow], 'building', 'pulse', 4700);
@@ -2001,6 +2113,8 @@ export function buildSanctum(out: string) {
     { id: 'challenges', name: "The Herald's Board", sprites: ['herald_rock', 'herald', 'herald_flag'], label: [HERALD.cx, 342] },
     // its label hangs on its thread above it, in the sky between the Gate and the Reliquary
     { id: 'summon', name: 'The Wishing Star', sprites: ['wish'], label: [WISH.cx, WISH.cy - WISH_STAR.up - 34] },
+    // its label hangs over its awning, in the sky between the Reliquary and the Spire
+    { id: 'merchant', name: "The Merchant's Stall", sprites: ['merchant'], label: [MERCHANT.cx - 4, MERCHANT.base - 72] },
   ];
   const hotspots: MenuHotspot[] = [];
   for (const h of spotsDef) {
@@ -2041,6 +2155,7 @@ export function buildSanctum(out: string) {
       { x: GATE.cx, y: GATE.spring + 12, rx: 34, ry: 46, rgb: [150, 110, 255], k: 0.5, rate: 0.7 },
       { x: REL.cx, y: 173, rx: 30, ry: 30, rgb: [110, 160, 255], k: 0.38, rate: 0.45 },
       { x: SPIRE.cx, y: SPIRE.spoolY, rx: 30, ry: 30, rgb: [255, 214, 120], k: 0.42, rate: 0.8 },
+      { x: MERCHANT.cx + 23, y: MERCHANT.base - 29, rx: 16, ry: 12, rgb: [255, 170, 90], k: 0.4, rate: 0.9 },
       ...LANTERNS.map(([x, y], i) => ({ x, y: y - 21, rx: 18, ry: 14, rgb: [255, 170, 90] as [number, number, number], k: 0.45, rate: 1.1 - i * 0.2 })),
     ],
   };

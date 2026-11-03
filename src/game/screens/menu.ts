@@ -8,7 +8,7 @@
 // campaign, the Reliquary to the champions, the Weaver's Spire to Weaving, the
 // Observatory to the Academy, the astrolabe to the options, the Herald's Board
 // on its own drifting rock to the Challenges, the Wishing Star in the sky to
-// summoning. A place lights up
+// summoning, the Merchant's stall on the plaza to the Merchant. A place lights up
 // under the pointer (its own pixels, not a box) or the keyboard's focus, and
 // its label carries what the old buttons said: the frontier, the roster, the
 // spools, the unread chapters, the summons waiting, the NEW badges.
@@ -19,6 +19,7 @@ import { readyCount } from '../challenges';
 import { CHAMPIONS } from '../data/champions';
 import { CHAPTERS } from '../data/codex';
 import { summonsReady } from '../summoning';
+import { goldText } from '../ui/gold';
 import { COLORS } from '../ui/ui';
 import { MenuPlace, Rect4 } from '../view/assets';
 import { SanctumView } from '../view/sanctum';
@@ -96,6 +97,8 @@ export class MainMenu extends BaseScreen {
       { id: 'challenges', label: 'CHALLENGES', note: ready ? `${ready} ready` : undefined, badge: ready > 0, go: () => r.challenges() },
       // summoning (Jakub, 2026-10-25: "new object in main menu, somewhere on the sky, where people can click and merge fragments ... and then summon heroes"): NEW while a summon waits
       { id: 'summon', label: 'SUMMON', note: summons ? `${summons} ready` : undefined, badge: summons > 0, go: () => r.summon() },
+      // the Merchant (Jakub, 2026-11-03: "put object on main menu and make it navigational to a new merchant screen"): the Gold held
+      { id: 'merchant', label: 'MERCHANT', note: goldText(a.gold), go: () => r.merchant() },
     ];
   }
 

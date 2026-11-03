@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-03 | Gold, the game's coin (0 to start), and the Merchant: a stall in the Sanctum, a screen with the Gold held, BUY and SELL to come | 79 |
 | 2026-11-03 | The Journey: Beat Campaign 5-10 gives 400 Stardust; a new eighth quest, Beat Campaign 10-10, gives the Paladin | 54, 78 |
 | 2026-11-03 | Zone 10, the Blossom Caldera, inspired by Japan's architecture and blossom: battle background, the world map extended east, ten placeholder stages, ambient `petals` | 5.13 |
 | 2026-11-01 | Zone 8, the Crystal Graveyard: battle background, the world map extended east, ten placeholder stages | 5.11 |
@@ -4711,4 +4712,24 @@ Built as he said. Beat Campaign 5-10 (section 54) now gives 400 Stardust; the Jo
 after Beat Campaign 8-10, gives the Paladin, who still joins only through it and is never summoned. A save that claimed
 5-10 before keeps its Paladin and its claim (the claim is stored by the quest's id), so it does not get the 400 Stardust
 for it as well; its 10-10 claim brings him again as a champion already owned. The quest's panel text is a stand-in.
+
+## 79. Gold and the Merchant (received 2026-11-03)
+
+> i want to implement ingame currency and merchant. lets cool currency as gold for now, but maybe i will rename it. also create a screen for Merchant and put object on main menu and make it navigational to a new merchant screen. on merchant screen player see their current gold and they will be able to buy and sell items, but this will be implemented later. make starting gold of players 0.
+
+Built as he said ("cool" read as "call"):
+
+- **Gold**, the game's coin: its name is one constant (`CURRENCY` in `src/game/data/economy.ts`), so renaming it is a
+  one-line change; a new account starts with 0 (`STARTING_GOLD`, his); the save keeps it (`gold`), a save from before
+  holds 0. Nothing finds or spends Gold yet. Its icon is a coin of old gold with the Loom's eight-pointed star raised on
+  it (`gold`, and `biggold` with a second coin behind it).
+- **The Merchant's Stall** in the Sanctum, on the plaza between the Reliquary and the Weaver's Spire: a trader's stall of
+  dark timber under an awning striped plum and cream, a cloth with a gold hem over its counter, gold scales, a stack of
+  coins and a small chest on it, jars of blue light on the shelf behind, a lantern at the awning's corner, a sign with a
+  coin. Its label, MERCHANT with the Gold held, hangs above it; it leads to the Merchant.
+- **The Merchant** (`screens/merchant.ts`, `?screen=merchant`): the purse with the Gold held, and two tabs, BUY and
+  SELL, whose counters hold empty slots and the word that buying and selling come later.
+
+Stand-ins until he sets them: the name Gold (his "for now"), the stall's look and place, its name (The Merchant's Stall),
+the screen's layout and texts, and the coin's look.
 
