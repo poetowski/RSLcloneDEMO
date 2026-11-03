@@ -54,6 +54,11 @@ export class AcademyScreen extends BaseScreen {
     this.scroll = Math.max(0, Math.min(this.maxScroll, this.scroll + Math.sign(dy) * 22));
   }
 
+  /** A finger (or the mouse) dragging the chapter's text. */
+  drag(_dx: number, dy: number) {
+    this.scroll = Math.max(0, Math.min(this.maxScroll, this.scroll - dy));
+  }
+
   protected draw(ctx: CanvasRenderingContext2D) {
     const ui = this.ui;
     this.diorama.draw(ctx, this.t, 0.8);
@@ -88,7 +93,7 @@ export class AcademyScreen extends BaseScreen {
     ctx.beginPath();
     ctx.rect(px + 6, top, pw - 12, bottom - top);
     ctx.clip();
-    this.layout(ctx, cx, top - this.scroll, cw);
+    this.layout(ctx, cx, top - Math.round(this.scroll), cw);
     ctx.restore();
     if (this.maxScroll > 0) {
       // scrollbar

@@ -21,11 +21,12 @@ page.on('console', (m) => {
 });
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
 await page.goto(url);
-const scale = Math.floor(Math.min(Number(w) / 640, Number(h) / 360));
-const ox = (Number(w) - 640 * scale) / 2, oy = (Number(h) - 360 * scale) / 2;
-const at = (s: string) => {
+// game coordinates -> page coordinates, as the game itself maps them (engine/screen.ts)
+const at = async (s: string) => {
   const [x, y] = s.split(':').map(Number);
-  return [ox + x * scale, oy + y * scale] as const;
+  await page.waitForFunction(() => !!(window as unknown as { app?: unknown }).app);
+  const p = await page.evaluate(([gx, gy]) => (window as unknown as { app: { canvas: { toClient(x: number, y: number): { x: number; y: number } } } }).app.canvas.toClient(gx, gy), [x, y]);
+  return [p.x, p.y] as const;
 };
 let n = 0;
 for (const st of steps.split(',')) {
@@ -35,8 +36,8 @@ for (const st of steps.split(',')) {
     const file = `${out}_${n++}.png`;
     await page.screenshot({ path: file });
     console.log('shot', file);
-  } else if (op === 'c') await page.mouse.click(...at(arg));
-  else if (op === 'm') await page.mouse.move(...at(arg));
+  } else if (op === 'c') await page.mouse.click(...(await at(arg)));
+  else if (op === 'm') await page.mouse.move(...(await at(arg)));
   else if (op === 'k') await page.keyboard.press(arg);
   else if (op === 'W') await page.mouse.wheel(0, Number(arg));
   else if (op === 'B') {

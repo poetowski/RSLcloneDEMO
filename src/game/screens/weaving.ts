@@ -137,6 +137,11 @@ export class WeavingScreen extends BaseScreen {
     if (!this.dialog) this.scroll.by(Math.sign(dy) * Math.min(CH + GAP, Math.max(36, Math.abs(dy))));
   }
 
+  /** A finger (or the mouse) dragging the spools. */
+  drag(_dx: number, dy: number) {
+    if (!this.dialog) this.scroll.shift(-dy);
+  }
+
   key(k: string) {
     const page = VIEW[3] - 40;
     if (this.dialog) super.key(k);

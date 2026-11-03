@@ -68,6 +68,11 @@ export class CollectionScreen extends BaseScreen {
     this.scroll.by(Math.sign(dy) * Math.min(CH + GAP, Math.max(36, Math.abs(dy))));
   }
 
+  /** A finger (or the mouse) dragging the grid. */
+  drag(_dx: number, dy: number) {
+    this.scroll.shift(-dy);
+  }
+
   key(k: string) {
     const page = VIEW[3] - 40;
     if (k === 'PageDown') this.scroll.by(page);

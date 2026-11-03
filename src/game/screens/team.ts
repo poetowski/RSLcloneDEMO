@@ -50,6 +50,11 @@ export class TeamScreen extends BaseScreen {
     this.strip.by(Math.sign(d) * Math.min(138, Math.max(46, Math.abs(d))));
   }
 
+  /** A finger (or the mouse) dragging the roster strip sideways. */
+  drag(dx: number) {
+    this.strip.shift(-dx);
+  }
+
   private matchup(c: ChampionDef) {
     let strong = 0, weak = 0;
     for (const e of this.s.enemies) {

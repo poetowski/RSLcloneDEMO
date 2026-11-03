@@ -147,6 +147,8 @@ export class Tutorial implements TutorialControl {
   private holeAt = '';
   /** the layer over the overlay: the corners and the hand */
   private fx: HTMLCanvasElement;
+  /** the corners and the hand in game pixels, before they are laid over the frame */
+  private fxBuf: HTMLCanvasElement;
   /** where the corners stand, gliding after the spot */
   private fxRect: Rect4 | null = null;
   private ui: Ui;
@@ -164,6 +166,9 @@ export class Tutorial implements TutorialControl {
     this.hole = document.createElement('div');
     this.hole.className = 'tut-hole';
     document.body.appendChild(this.hole);
+    this.fxBuf = document.createElement('canvas');
+    this.fxBuf.width = W;
+    this.fxBuf.height = H;
     this.fx = document.createElement('canvas');
     this.fx.className = 'tut-fx';
     this.fx.hidden = true;
@@ -517,13 +522,17 @@ export class Tutorial implements TutorialControl {
     }
     const el = document.createElement('div');
     el.className = 'tut-card';
+    // painted at the next whole scale and shown at the game's: at a fractional scale the
+    // browser smooths it down, as the frame is (engine/screen.ts), its pixels staying even
+    const k = Math.max(1, Math.ceil(g.scale - 1e-9));
     const canvas = document.createElement('canvas');
-    canvas.width = Math.round(w * g.scale);
-    canvas.height = Math.round(h * g.scale);
+    canvas.width = w * k;
+    canvas.height = h * k;
     canvas.style.width = `${w * scale}px`;
     canvas.style.height = `${h * scale}px`;
+    if (!Number.isInteger(g.scale)) canvas.style.imageRendering = 'auto';
     el.appendChild(canvas);
-    const card = { el, canvas, buttons, w, h, scale: g.scale };
+    const card = { el, canvas, buttons, w, h, scale: k };
     for (const b of buttons) {
       // links are not buttons to the focus: Enter on a click step must not skip
       const btn = document.createElement(b.kind === 'button' ? 'button' : 'span');
@@ -610,17 +619,28 @@ export class Tutorial implements TutorialControl {
       fx.width = d.width;
       fx.height = d.height;
     }
+    // laid exactly over the game's canvas, whatever the browser takes 100vh for
+    if (fx.style.width !== d.style.width || fx.style.height !== d.style.height) {
+      fx.style.width = d.style.width;
+      fx.style.height = d.style.height;
+    }
     fx.hidden = false;
-    const ctx = fx.getContext('2d')!;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, fx.width, fx.height);
+    const out = fx.getContext('2d')!;
+    out.clearRect(0, 0, fx.width, fx.height);
     if (!step.spot || this.confirming) {
       this.fxRect = null;
       return;
     }
-    const g = this.canvas.grid;
-    ctx.setTransform(g.scale, 0, 0, g.scale, g.ox, g.oy);
+    // drawn in game pixels, then laid over the frame as the frame itself is presented
+    const ctx = this.fxBuf.getContext('2d')!;
+    ctx.clearRect(0, 0, W, H);
     ctx.imageSmoothingEnabled = false;
+    this.drawCorners(ctx, step, dt);
+    this.canvas.paint(out, this.fxBuf);
+  }
+
+  private drawCorners(ctx: CanvasRenderingContext2D, step: Step, dt: number) {
+    if (!step.spot) return;
     const to = onScreen(step.spot);
     const k = Math.min(1, dt / 70);
     this.fxRect = this.fxRect ? (this.fxRect.map((v, i) => v + (to[i] - v) * k) as Rect4) : to;

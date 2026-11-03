@@ -16,12 +16,12 @@ Step-by-step recipes live in the project skills: [new champion](../.claude/skill
 | --- | --- |
 | Tile | **32 x 32 px** |
 | Virtual screen | **640 x 360** (20 x 11.25 tiles) |
-| Scaling | whole numbers only (x2 = 1280x720, x3 = 1920x1080); letterbox the rest |
+| Scaling | as large as the window allows (DESIGN_DECISIONS.md 83): exact at whole numbers (x2 = 1280x720, x3 = 1920x1080); between them blown up by the next whole number, then smoothed down to fit, so the pixels stay even; bars where the window is not 16:9 |
 | Sub-pixel positions | never: everything is drawn at integer coordinates in the 640x360 buffer |
 | Rotation / scaling of art | only inside the 640x360 buffer, never on the upscaled image (no "mixels"); the only 2x art is the champion showcase (detail page, recruit ceremony), drawn at exactly 2x |
 | Smooth gradients, anti-aliased shapes | never; gradients are posterized bands or 4x4 Bayer dithering (`ui.bands`, `ui.glow`, `rampDither`) |
 
-All art is authored at 1x. The game renders into a 640x360 canvas and the browser upscales it with nearest-neighbour filtering.
+All art is authored at 1x. The game renders into a 640x360 canvas, which `src/engine/screen.ts` scales up to fill the window: nearest-neighbour at a whole-number scale, sharp scaling between them.
 
 ## 2. Champions
 

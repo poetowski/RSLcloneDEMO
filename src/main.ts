@@ -20,6 +20,7 @@ import { SummonScreen } from './game/screens/summon';
 import { TeamScreen } from './game/screens/team';
 import { WeavingScreen } from './game/screens/weaving';
 import { Tutorial } from './game/tutorial';
+import { turnHint } from './game/ui/turn';
 import { loadAssets } from './game/view/assets';
 
 async function boot() {
@@ -48,6 +49,7 @@ async function boot() {
     (k) => (progress = k),
   );
   loading = false;
+  canvas.hint = turnHint(assets.font);
 
   const app = new App(canvas, assets);
   const params = new URLSearchParams(location.search);
@@ -159,13 +161,14 @@ async function boot() {
   else if (tut === '1' || (tut !== '0' && !demo && !params.get('screen') && tutorialDue(app.archivist))) tutorial.start(true);
 
   const pos = (e: PointerEvent | WheelEvent) => canvas.toVirtual(e.clientX, e.clientY);
-  // on screens that can be dragged (the campaign map) a press becomes a click on
-  // release, unless the pointer travelled more than a few pixels: then it was a drag
-  let press: { x: number; y: number; moved: boolean } | null = null;
+  // on screens that can be dragged (the campaign map, the Journey, the lists) a press becomes
+  // a click on release, unless the pointer travelled further than its slop (in CSS pixels,
+  // wider for a finger than for the mouse): then it was a drag
+  let press: { x: number; y: number; cx: number; cy: number; slop: number; moved: boolean } | null = null;
   canvas.display.addEventListener('pointermove', (e) => {
     const p = pos(e);
     if (press && app.scene?.drag) {
-      if (!press.moved && Math.hypot(p.x - press.x, p.y - press.y) > 3) press.moved = true;
+      if (!press.moved && Math.hypot(e.clientX - press.cx, e.clientY - press.cy) > press.slop) press.moved = true;
       if (press.moved) {
         app.scene.drag(p.x - press.x, p.y - press.y);
         press.x = p.x;
@@ -181,7 +184,7 @@ async function boot() {
     const p = pos(e);
     app.scene?.pointerMove(p.x, p.y);
     if (app.scene?.drag) {
-      press = { x: p.x, y: p.y, moved: false };
+      press = { x: p.x, y: p.y, cx: e.clientX, cy: e.clientY, slop: e.pointerType === 'mouse' ? 5 : 10, moved: false };
       canvas.display.setPointerCapture(e.pointerId);
     } else app.scene?.click(p.x, p.y);
   });
@@ -194,6 +197,8 @@ async function boot() {
   };
   canvas.display.addEventListener('pointerup', (e) => release(e, false));
   canvas.display.addEventListener('pointercancel', (e) => release(e, true));
+  // a long press on a phone opens no menu over the game
+  canvas.display.addEventListener('contextmenu', (e) => e.preventDefault());
   canvas.display.addEventListener('wheel', (e) => {
     e.preventDefault();
     // some browsers report lines or pages instead of pixels

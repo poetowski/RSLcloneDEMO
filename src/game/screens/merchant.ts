@@ -79,6 +79,11 @@ export class MerchantScreen extends BaseScreen {
     if (this.tab === 'sell') this.scroll.by(Math.sign(dy) * Math.min(CH + GAP, Math.max(36, Math.abs(dy))));
   }
 
+  /** A finger (or the mouse) dragging the spools on SELL. */
+  drag(_dx: number, dy: number) {
+    if (this.tab === 'sell') this.scroll.shift(-dy);
+  }
+
   private setTab(t: MerchantTab) {
     this.tab = t;
     this.note = null;

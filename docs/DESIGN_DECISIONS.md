@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-03 | The game fills the browser window, PC or phone; touch drags the lists; FULLSCREEN in Options | 83 |
 | 2026-11-03 | The Journey's spools: Finish Tutorial 2 Ashen Vigor, 1-3 2 Silver Sunder, 1-10 2 Gilded Vigor and 2 Sunder | 82 |
 | 2026-11-03 | The Journey: Beat Campaign 3-10 gives 5000 Gold, 5-10 300 Stardust, 8-10 10000 Gold | 81 |
 | 2026-11-03 | The Merchant trades spools: sell 100 / 300 / 500 Gold by grade, buy at 20x; wares of 5 Ashen, 3 Silver, 2 Gilded, rotated for 5000 Gold | 80 |
@@ -4801,3 +4802,51 @@ Built as he said; the spool rewards that stood in are his now:
 The grade of 1-10's Sunder spools was not said: read as Gilded, like the Vigor ones beside them (my reading). A quest can
 now give spools of two patterns; its panel names both and shows the four found as icons. A save that claimed a quest
 before keeps what it was given then.
+
+## 83. The game fills the window (received 2026-11-03)
+
+> i want to make this game to maximaze on browser window where it got opened. right now when i open it on mobile, it is very small and i need to make other players play this game on pc browsers. make the game to maximaze the window it is open inside. properly analyze and deliver on this. then check if all is ok.
+
+What was wrong: the 640x360 frame was shown only at whole-number scales, the largest that fit the window, so a window
+between two of them got the smaller one. A 1080p screen's browser window (1920x969 once the browser's bars are taken)
+got 1280x720, half the window; a 1366x657 laptop window got 640x360, a quarter of it; a phone held upright 8% of its
+screen. On a phone the lists could not be scrolled by finger: only the mouse wheel moved them.
+
+Built (`src/engine/screen.ts`):
+
+- **The frame fills the window** as far as its 16:9 allows, centred, with dark bars at the sides (or above and below)
+  where the window is not 16:9. At a whole-number scale, or within 4% above one, every art pixel is an exact square of
+  screen pixels, as before. Between whole numbers the frame is blown up by the next whole number and smoothed down to
+  fit, so the pixels stay sharp and even, never two sizes side by side. The canvas matches the screen's own pixels
+  (high-density screens, Windows scaling, browser zoom) and refits when the window is resized or turned, or moves to
+  another screen.
+- **Touch**: a finger drags every list (Champions, Weaving's spools, the Merchant's SELL, the Team roster, the Academy's
+  chapters) as it drags the campaign map and the Journey; a tap that wanders up to 10 CSS pixels is still a tap (5 for
+  the mouse); no pinch zoom, pull-to-refresh, long-press menu or tap flash over the game.
+- **A phone held upright** shows "Turn your phone sideways to play" under the frame, with a phone turning onto its side,
+  in the game's font: held sideways the frame is three times the size.
+- **FULLSCREEN in Options** (ON / OFF), where the browser allows it (PC browsers and Android; not an iPhone, nor a frame
+  that does not permit it): the game fills the whole screen without the browser's bars, and on Android the screen is
+  held sideways.
+- The tutorial's card, its gold corners and its hand follow the frame at any scale.
+
+How much of the window the frame fills (`npx tsx tools/viewports.ts`):
+
+| Window | Before | After |
+| --- | --- | --- |
+| 1920x969, a 1080p screen's browser window | 50% | 90% |
+| 2560x1305, a 1440p screen's browser window | 62% | 91% |
+| 1366x657, a laptop's browser window | 26% | 86% |
+| 1536x730 at 125% Windows scaling | 53% | 85% |
+| 1440x789, a Retina Mac | 81% | 97% |
+| 844x390, a phone held sideways | 70% | 82% |
+| 915x356, an Android phone sideways with its address bar | 41% | 69% |
+| 390x844, a phone held upright | 8% | 26% |
+| 1920x1080 in fullscreen | 100% | 100% |
+
+A 16:9 frame fills a window of another shape only along one side; what is left are the bars.
+
+Stand-ins until he sets them: the hint's words and look, the FULLSCREEN row and its words (my addition, for the
+browser's bars on a phone), the tap's slop (10 CSS pixels for a finger, 5 for the mouse) and the 4% snap to a whole
+scale. Not built: a layout for a phone held upright (the game stays 16:9), and an app to install on a phone's home
+screen, which would need an icon (art).

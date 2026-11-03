@@ -1,5 +1,6 @@
-// Options: battle defaults, the demo shortcut that unlocks everything, and a
-// guarded progress reset.
+// Options: battle defaults, fullscreen where the browser allows it, the demo
+// shortcut that unlocks everything, and a guarded progress reset.
+import { canFullscreen, isFullscreen, setFullscreen } from '../../engine/fullscreen';
 import { W } from '../../engine/screen';
 import { App } from '../app';
 import { newArchivist, saveArchivist, unlockEverything } from '../archivist';
@@ -32,7 +33,8 @@ export class OptionsScreen extends BaseScreen {
     const p = this.archivist;
     this.diorama.draw(ctx, this.t, 0.72);
     this.header(ctx, 'OPTIONS');
-    const w = 380, h = 226, x = Math.round(W / 2 - w / 2), y = 60;
+    const full = canFullscreen();
+    const w = 380, h = 226 + (full ? 34 : 0), x = Math.round(W / 2 - w / 2), y = full ? 46 : 60;
     ui.panel(ctx, 'gold', x, y, w, h);
     let cy = y + 16;
     const label = (text: string, sub: string) => {
@@ -49,6 +51,13 @@ export class OptionsScreen extends BaseScreen {
     ui.button(ctx, 'auto_on', x + w - 16 - 88, cy, 42, 20, 'ON', { kind: 'small', active: p.settings.auto, click: () => this.set({ auto: true }) });
     ui.button(ctx, 'auto_off', x + w - 16 - 42, cy, 42, 20, 'OFF', { kind: 'small', active: !p.settings.auto, click: () => this.set({ auto: false }) });
     cy += 34;
+    if (full) {
+      const on = isFullscreen();
+      label('FULLSCREEN', 'The game fills the whole screen.');
+      ui.button(ctx, 'full_on', x + w - 16 - 88, cy, 42, 20, 'ON', { kind: 'small', active: on, click: () => setFullscreen(true) });
+      ui.button(ctx, 'full_off', x + w - 16 - 42, cy, 42, 20, 'OFF', { kind: 'small', active: !on, click: () => setFullscreen(false) });
+      cy += 34;
+    }
     ui.divider(ctx, x + 12, cy, w - 24);
     cy += 14;
 

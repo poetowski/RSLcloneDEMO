@@ -33,6 +33,7 @@ A turn-based hero collector in the style of **RAID: Shadow Legends** and **Star 
 - **A collection** of champions in groups by faction, the rarest first and one rarity per row, filtered by affinity and by class, with locked silhouettes, and a detail page with every animation and skill.
 - **The Academy**: an in-game codex that teaches combat, the turn meter, damage, affinities, all buffs, debuffs and special mechanics, with live demonstrations.
 - **Real mechanics**: turn meter, A1/A2/A3 cooldowns, 15 statuses, the affinity cycle (Ember beats Bloom, Bloom beats Tide, Tide beats Ember), accuracy against resistance for debuffs, counterattacks, dispels, lifesteal, execute, turn meter boosts, passives (Undying, Overdrive, Rebuke, which answers a critical hit, stat passives that raise a stat in every battle, Shields given to the frailest at the end of a turn, to an ally just struck or to the struck one himself, a crit that grows as allies fall, Poison answering a blow, Regen answering a debuff, and Taunt with a heal answering a critical hit that leaves its holder standing), a cleanse, a blow that heals its user, a buff placed before the blow, a fallen ally raised, bosses, stars, auto battle and speed controls.
+- **Any browser window, PC or phone**: the game fills the window it is opened in, as far as its 16:9 allows, its pixels sharp and even at any size; a finger taps and drags the lists and the map; held upright a phone is asked to turn sideways; FULLSCREEN in Options where the browser allows it.
 - **Guardrails** that keep new content consistent: balance norms and a balance simulator, content tests, an art audit, and two project skills for adding champions and backgrounds.
 
 | | |
@@ -258,7 +259,7 @@ The checks behind them: `npm test` (rules and content), `npm run balance` (stat 
 
 ```
 src/
-  engine/            640x360 screen with whole-number scaling, game clock, bitmap font, particles
+  engine/            640x360 screen scaled to fill the window (sharp at any scale), fullscreen, game clock, bitmap font, particles
   game/data/         champions, statuses, categories, campaign, zones, Academy text, balance norms
   game/archivist.ts  the Master Archivist: the save, its migration, unlocks
   game/reliquary/    Hero Soul Files and the Weaver Matrix: Thread Spools, strands, Weave Patterns, drops
