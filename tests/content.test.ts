@@ -569,7 +569,7 @@ describe('design decisions', () => {
     expect(LOCATIONS[0].stages).toHaveLength(10);
   });
 
-  it('names the areas as Jakub did, the Sleeping Archipelago the easternmost with ten placeholder stages after 8-10', () => {
+  it('names the areas as Jakub did, the Blossom Caldera the easternmost with ten placeholder stages after 9-10', () => {
     expect(LOCATIONS.map((l) => [l.chapter, l.name, l.zone])).toEqual([
       ['I', 'Fracture Reach', 'zone1'],
       ['II', 'Verdant Grove', 'zone2'],
@@ -580,6 +580,7 @@ describe('design decisions', () => {
       ['VII', 'Dead Forest', 'zone7'],
       ['VIII', 'Crystal Graveyard', 'zone8'],
       ['IX', 'Sleeping Archipelago', 'zone9'],
+      ['X', 'Blossom Caldera', 'zone10'],
     ]);
     const scars = LOCATIONS[3];
     expect([scars.requires, scars.stages.map((s) => s.id)]).toEqual(['3-10', ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6', '4-7', '4-8', '4-9', '4-10']]);
@@ -597,6 +598,9 @@ describe('design decisions', () => {
     const islands = LOCATIONS[8];
     expect([islands.requires, islands.stages.map((s) => s.id)]).toEqual(['8-10', ['9-1', '9-2', '9-3', '9-4', '9-5', '9-6', '9-7', '9-8', '9-9', '9-10']]);
     expect(islands.stages.filter((s) => s.recruit)).toEqual([]);
+    const caldera = LOCATIONS[9];
+    expect([caldera.requires, caldera.stages.map((s) => s.id)]).toEqual(['9-10', ['10-1', '10-2', '10-3', '10-4', '10-5', '10-6', '10-7', '10-8', '10-9', '10-10']]);
+    expect(caldera.stages.filter((s) => s.recruit)).toEqual([]);
     // none of its stages brings a champion: since 2026-11-01 the Paladin is the Journey's reward for 5-10
     expect(mesa.stages.filter((s) => s.recruit)).toEqual([]);
   });

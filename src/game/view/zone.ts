@@ -5,7 +5,7 @@
 // sand, drifting star-dust with shooting stars, autumn leaves tumbling in the
 // wind, pollen drifting in the sunlight, glowing spores drifting in their
 // halos, feather-grass seeds sailing on the wind, or snow flurries blown in
-// ahead of a storm; circling birds, butterflies, heat haze, now and then a flash of
+// ahead of a storm, or blossom petals on the wind; circling birds, butterflies, heat haze, now and then a flash of
 // strange light across the sky or a shooting star), light pools, a mood tint
 // and the vignette. Everything zone-specific
 // comes from the zone's JSON (art) and ZoneDef (behaviour), so a new zone
@@ -60,6 +60,8 @@ const MOTH_TONES: [string, string][] = [
 const ASH = 44;
 /** How many motes of crystal dust hang in the air at once (ambient 'shards'). */
 const SHARDS = 40;
+/** How many blossom petals drift on the wind at once (ambient 'petals'). */
+const PETALS = 36;
 
 /** Wings open, half raised, closed: W wing, E its dark tips, B the body. */
 const BUTTERFLY_FRAMES = [
@@ -137,7 +139,7 @@ export class ZoneView {
     this.tilesLayer = this.bakeTiles();
     this.light = makeGlow(64, 40, def.glow);
     this.vignette = makeVignette();
-    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'seeds' ? SEEDS : def.ambient === 'flurries' ? FLURRIES : def.ambient === 'ash' ? ASH : def.ambient === 'shards' ? SHARDS : def.ambient === 'spores' ? 0 : 70;
+    const n = def.ambient === 'snow' ? 90 : def.ambient === 'leaves' ? 34 : def.ambient === 'pollen' ? 22 : def.ambient === 'seeds' ? SEEDS : def.ambient === 'flurries' ? FLURRIES : def.ambient === 'ash' ? ASH : def.ambient === 'shards' ? SHARDS : def.ambient === 'petals' ? PETALS : def.ambient === 'spores' ? 0 : 70;
     for (let i = 0; i < n; i++) this.spawnAmbient(Math.random() * W, Math.random() * H);
     if (def.ambient === 'spores') {
       this.sporeHalos = SPORE_HALO.map((c) => [makeHalo(6, c), makeHalo(9, c)]);
@@ -308,6 +310,29 @@ export class ZoneView {
       });
       return;
     }
+    if (this.def.ambient === 'petals') {
+      // blossom petals drifting on a gentle wind from the left, turning over as they go (the pink side, the pale side);
+      // slower than the autumn leaves, a few close to the camera
+      const respawn = x < 0;
+      const near = Math.random() < 0.22;
+      const [c, alt] = [['#f2b2c2', '#c86e8a'], ['#fad0da', '#e290a6'], ['#fff0f4', '#d8ccd2']][Math.floor(Math.random() * 3)];
+      const fromLeft = respawn && Math.random() < 0.6;
+      this.ambient.add({
+        x: respawn ? (fromLeft ? -4 : Math.random() * W) : x,
+        y: respawn ? (fromLeft ? Math.random() * H * 0.7 : -4) : y,
+        vx: near ? 16 + Math.random() * 10 : 7 + Math.random() * 8,
+        vy: near ? 8 + Math.random() * 6 : 4 + Math.random() * 5,
+        life: Infinity,
+        size: near ? 2 : 1,
+        w: near ? 2 : 1,
+        h: near ? 2 : 1,
+        color: c,
+        alt,
+        spin: 1 + Math.random() * 1.6,
+        sway: near ? 14 : 8,
+      });
+      return;
+    }
     if (this.def.ambient === 'leaves') {
       // autumn leaves tumbling across in the wind from the left, a few close to the camera
       const respawn = x < 0;
@@ -467,7 +492,7 @@ export class ZoneView {
     amb.update(dt * speedUp);
     for (const p of amb.list) if (p.y > H + 4 || p.y < -6 || p.x > W + 8 || p.x < -60) p.life = 0;
     // the spores are their own system (spawnSpore), not particles
-    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'seeds' ? SEEDS : this.def.ambient === 'flurries' ? FLURRIES : this.def.ambient === 'ash' ? ASH : this.def.ambient === 'shards' ? SHARDS : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
+    const target = this.def.ambient === 'snow' ? 90 : this.def.ambient === 'motes' ? 46 : this.def.ambient === 'leaves' ? 34 : this.def.ambient === 'pollen' ? 22 : this.def.ambient === 'seeds' ? SEEDS : this.def.ambient === 'flurries' ? FLURRIES : this.def.ambient === 'ash' ? ASH : this.def.ambient === 'shards' ? SHARDS : this.def.ambient === 'petals' ? PETALS : this.def.ambient === 'spores' ? 0 : this.gust > 0 ? 150 : 70;
     while (amb.list.length < target) this.spawnAmbient();
     if (this.def.ambient === 'sand') {
       // every few seconds a gust sweeps a veil of sand across the arena

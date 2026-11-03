@@ -148,6 +148,22 @@ export const ZONES: ZoneDef[] = [
     birdsAt: [[300, 60], [520, 44]],
     butterflies: [[90, 170], [572, 160], [320, 196]],
   },
+  {
+    // Zone 10, named and described by Jakub (2026-11-03): the Blossom Caldera, a colossal dormant volcano over meadows
+    // and ancient flowering trees, springs steaming, petals on the wind; Japan's architecture and blossom on his word
+    id: 'zone10',
+    name: 'Blossom Caldera',
+    ambient: 'petals',
+    // the low sun's warm light
+    glow: [255, 214, 170],
+    // late afternoon: the sun is low on the left, the shadows long
+    shadow: { dx: 6, stretch: 1.3 },
+    tint: { color: '#ffd8b4', alpha: 0.05, op: 'soft-light' },
+    // cranes wheeling slowly over the meadow and the volcano's flank; butterflies in the flowers
+    birds: 3,
+    birdsAt: [[236, 66], [404, 50]],
+    butterflies: [[96, 206], [560, 300], [330, 198]],
+  },
 ];
 
 const byId = new Map(ZONES.map((z) => [z.id, z]));

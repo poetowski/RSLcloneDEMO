@@ -49,7 +49,7 @@ import { LocationDef, StageDef } from './types';
  * area by area: a new area widens it by its stretch, and everything west of the
  * stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 3160, h: 360 };
+export const WORLD_MAP = { w: 3480, h: 360 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];
@@ -97,6 +97,16 @@ const BURIED = 'Ancient crystal structures lie partially buried underground.';
 const CRACKS = 'Deep cracks expose glowing mineral veins.';
 const PASSAGES = 'Narrow passages run between massive formations, under collapsed crystalline arches.';
 const FORMATION = 'A gigantic crystal formation stands at the centre of the region.';
+// Zone 10: Jakub's description of the Blossom Caldera (2026-11-03), from the volcano on the skyline to its smoke
+const VOLCANO = 'A gigantic dormant volcano dominates the distant skyline.';
+const BASALT = 'Dark volcanic ridges, black basalt cliffs and irregular rock formations surround the region.';
+const MEADOWS = 'Rolling hills and fertile valleys are covered in colourful flowering meadows.';
+const FLOWS = 'Ancient solidified lava flows form winding black stone paths through the vegetation.';
+const SPRINGS = 'Geothermal springs, small turquoise pools and steaming fissures appear throughout the landscape.';
+const FALLS = 'Several waterfalls descend from elevated mountain formations.';
+const ANCIENT_TREES = 'Enormous ancient flowering trees spread wide pink, white and lavender canopies.';
+const VENTS = 'Giant flowers grow near the vents; minerals glow in deep rock crevices.';
+const SUMMIT = 'Pink petals drift through the wind; thin smoke rises from the distant summit.';
 // Zone 9: Jakub's description of the Sleeping Archipelago (2026-11-02), from the open sea to the courtyards
 const ISLANDS = 'Countless emerald islands rise from turquoise waters on a vast, warm ocean.';
 const ABANDONED = 'Once home to a prosperous elven civilization, these islands have long since been abandoned.';
@@ -578,6 +588,31 @@ export const LOCATIONS: LocationDef[] = [
       { id: '9-8', blurb: COURTYARDS, enemies: [{ champion: 'forest_gargoyle' }, { champion: 'silkfang' }, { champion: 'grove_keeper' }], power: 0.72 },
       { id: '9-9', blurb: TERRACES, enemies: [{ champion: 'paladin' }, { champion: 'crossbowman' }, { champion: 'verdant_luminary' }], power: 0.66 },
       { id: '9-10', blurb: `${TERRACES} The last stage of the area.`, enemies: [{ champion: 'rootfather', boss: true }, { champion: 'bog_troll' }, { champion: 'moth_seer' }], power: 0.76 },
+    ],
+  },
+  {
+    // Zone 10, named and described by Jakub (2026-11-03, DESIGN_DECISIONS.md 5.13), inspired by Japan's architecture
+    // and its blossom trees on his word; he asked for placeholder stages, ten like the areas before it, whose enemies,
+    // powers and texts are stand-ins; no champion joins there
+    id: 'zone10',
+    chapter: 'X',
+    name: 'Blossom Caldera',
+    zone: 'zone10',
+    blurb: 'East of the Archipelago the sea breaks on black basalt, and beyond it a colossal dormant volcano rises over fertile slopes in blossom: meadows in flower, ancient flowering trees, steaming springs, and old shrines no one tends.',
+    requires: '9-10',
+    map: { x: 3318, y: 214 },
+    patterns: ['pattern_sunder', 'pattern_ward'],
+    stages: [
+      { id: '10-1', blurb: VOLCANO, enemies: [{ champion: 'town_guard' }, { champion: 'sentry' }, { champion: 'gravedigger' }], power: 0.9 },
+      { id: '10-2', blurb: BASALT, enemies: [{ champion: 'rot_hulk' }, { champion: 'skeleton' }, { champion: 'last_riter' }], power: 1 },
+      { id: '10-3', blurb: MEADOWS, enemies: [{ champion: 'junior_ward' }, { champion: 'archer' }, { champion: 'harvest_specialist' }], power: 0.86 },
+      { id: '10-4', blurb: FLOWS, enemies: [{ champion: 'emissary_handlings' }, { champion: 'red_cloak' }, { champion: 'associate' }], power: 0.78 },
+      { id: '10-5', blurb: SPRINGS, enemies: [{ champion: 'automated_soul' }, { champion: 'necromancer' }, { champion: 'ash_widow' }], power: 0.72 },
+      { id: '10-6', blurb: FALLS, enemies: [{ champion: 'black_rhino' }, { champion: 'war_tigress' }, { champion: 'transfusionist' }], power: 0.74 },
+      { id: '10-7', blurb: ANCIENT_TREES, enemies: [{ champion: 'orchid_huntress' }, { champion: 'silkfang' }, { champion: 'moth_seer' }], power: 0.74 },
+      { id: '10-8', blurb: VENTS, enemies: [{ champion: 'lycan' }, { champion: 'wraith' }, { champion: 'haruspex' }], power: 0.68 },
+      { id: '10-9', blurb: SUMMIT, enemies: [{ champion: 'azul_the_blade' }, { champion: 'crossbowman' }, { champion: 'astronomer_royal' }], power: 0.62 },
+      { id: '10-10', blurb: `${SUMMIT} The last stage of the area.`, enemies: [{ champion: 'executioner', boss: true }, { champion: 'hex_warden' }, { champion: 'dominion_medic' }], power: 0.8 },
     ],
   },
 ];

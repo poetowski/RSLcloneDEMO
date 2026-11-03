@@ -117,7 +117,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Collection | every champion, owned or locked | `CollectionScreen` |
 | Open / cleared / locked | a stage the player may fight / has won / may not fight yet | `stageOpen`, `cleared` |
 | Frontier | the newest playable stage | `frontier()` |
-| World map | the campaign map in world pixels (3160x360, growing east area by area), scrolled sideways under a camera: the campaign is a line of areas crossed from left to right | `WORLD_MAP`, `CampaignScreen` |
+| World map | the campaign map in world pixels (3480x360, growing east area by area), scrolled sideways under a camera: the campaign is a line of areas crossed from left to right | `WORLD_MAP`, `CampaignScreen` |
 | Stars | 3, 2 or 1 by champions lost; the best is kept | `starsFor`, `MasterArchivist.stars` |
 | Master Archivist | the player and their save: stars, last team, Academy chapters read, settings, the tutorial's state and lessons, the Journey's claims, the Stardust, Soulstars, wish and summons, and the Reliquary | `MasterArchivist`, `loadArchivist`, `saveArchivist`, `readSave`, `writeSave` |
 | Challenges | the main-menu place of quests, in three tabs: Daily and Persistent (placeholders) and the Journey | `ChallengesScreen`, `CHALLENGE_TABS` |

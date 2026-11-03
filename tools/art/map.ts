@@ -33,7 +33,10 @@
 // begins: thousands of fragments, pillars, broken spires, glowing veins, and at the
 // centre of the region one gigantic formation. Beyond it (2026-11-02) the rock ends at
 // a warm ocean and the Sleeping Archipelago (Zone 9) begins: emerald islands, turquoise
-// shallows, the road going on from island to island over white elven bridges.
+// shallows, the road going on from island to island over white elven bridges. Beyond
+// it (2026-11-03) the sea breaks on black basalt and the Blossom Caldera (Zone 10) begins:
+// a colossal dormant volcano, meadows in flower, old lava flows, hot springs, blossom
+// trees in groves, a pagoda, shrines and torii.
 //
 // Everything is drawn in world pixels, and every random choice is a hash of
 // its position, so the map grows east area by area: widen WORLD_MAP by the new
@@ -45,6 +48,7 @@ import { LOCATIONS, WORLD_MAP } from '../../src/game/data/campaign.ts';
 import { dith, ellipseFill, outline, polyFill, rampDither } from './paint.ts';
 import { A, B, Bitmap, G, hash2, hex, mix, R, RGBA, rgba } from './raster.ts';
 import { elfArch, elfBridge, elfColumn, elfTower, JUNGLE, MARBLE, palm, ROCK as ISLE_ROCK, SEA as OCEAN, stoneLeaf, vine } from './zones/zone9.ts';
+import { BARK, BASALT, blackPine, blossomTree, FLOWERS_FAR, lantern, LAVA, LAVBLOOM, MEADOW, pagoda, SAKURA, shrine, STEAM, torii, TURQ, VERM, WHITEBLOOM } from './zones/zone10.ts';
 import { cluster, CRYS, GROUND as ROCKM, ICE, prism, rock, ROSE, STONEWORK, VEIN } from './zones/zone8.ts';
 
 const W = WORLD_MAP.w, H = WORLD_MAP.h;
@@ -238,7 +242,7 @@ const NODES = LOCATIONS.map((l): P => [l.map.x, l.map.y]);
 
 /** The road: the old road ends at the far lip, takes up again on this side, and runs through every node to the east edge (through the hills' pass). */
 const ROAD_FAR = curve([[-10, 318], [40, 322], [96, 334], [150, 332], [186, 324]]);
-const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [2252, 200], [2306, 190], [2352, 198], NODES[6], [2442, 186], [2532, 194], [2596, 200], [2640, 208], NODES[7], [2762, 200], [2852, 196], [2906, 188], [2950, 196], NODES[8], [3052, 192], [3096, 200], [W + 12, 196]]);
+const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [2252, 200], [2306, 190], [2352, 198], NODES[6], [2442, 186], [2532, 194], [2596, 200], [2640, 208], NODES[7], [2762, 200], [2852, 196], [2906, 188], [2950, 196], NODES[8], [3052, 192], [3096, 200], [3150, 196], [3204, 198], [3262, 204], NODES[9], [3384, 206], [3440, 200], [W + 12, 202]]);
 /** the road's bridges of rope over the gulf: from the brink to the arbiter's mesa, and on east toward the storm */
 const MESA_BRIDGES: [P, P, number][] = [
   [[1626, 188], [1714, 197], 5],
@@ -504,6 +508,8 @@ function farGround(x: number, y: number, light: number): RGBA {
 
 function groundAt(x: number, y: number): RGBA {
   // the Dead Forest, the sand thinning out over its black earth
+  // the Blossom Caldera, beyond the sea
+  if (x >= CALD_W && caldK(x, y) > 0) return caldGround(x, y);
   // the Sleeping Archipelago, the rock ending at its shore
   if (x >= ARCH_W && archK(x, y) > 0) return archGround(x, y);
   // the Crystal Graveyard, the ash thinning out over its rock
@@ -1233,6 +1239,11 @@ function road(b: Bitmap, pts: P[]) {
         if (d > 2.4) continue;
         const X = Math.round(x + dx), Y = Math.round(y + dy);
         if (!inBounds(X, Y) || sdAt(X, Y) < 0 || inRiver(X, Y) > 0) continue;
+        if (X >= CALD_W && caldK(X, Y) > 0) {
+          // through the Caldera a way of old lava, its black flags set close, darker along its sides
+          b.set(X, Y, rampDither(LAVA, d > 1.7 ? 1.4 : 4.6 + (vnoise(X, Y, 2.6, 2030) - 0.5) * 2.6 + (hash2(X, Y, 2031) - 0.5) * 0.6, X, Y));
+          continue;
+        }
         if (X >= ARCH_W && archK(X, Y) > 0) {
           // on the islands a way of white flags; over the water a deck of the elves' stone, its lower edge in shadow
           const land = isleAt(X, Y) > 0;
@@ -2652,6 +2663,7 @@ function renderWorld(): Bitmap {
   deadOverlays(b);
   crysOverlays(b);
   archOverlays(b);
+  caldOverlays(b);
   compass(b, W - 40, H - 44);
   frame(b);
   return b;
@@ -3460,7 +3472,7 @@ function archOverlays(b: Bitmap) {
   // what is under the road where it crosses water: piers and arches of white stone, their shadows on the sea
   for (let i = 0; i < ROAD_NEAR.length; i++) {
     const [x, y] = ROAD_NEAR[i];
-    if (x < ARCH_W || !inBounds(Math.round(x), Math.round(y)) || archK(x, y) < 8 || isleAt(x, y) > 0) continue;
+    if (x < ARCH_W || !inBounds(Math.round(x), Math.round(y)) || archK(x, y) < 8 || isleAt(x, y) > 0 || caldK(x, y) > -2) continue;
     const X = Math.round(x), Y = Math.round(y);
     if (X % 14 > 2) {
       const h = 2 + Math.round(Math.sin(((X % 14) / 14) * Math.PI) * 2);
@@ -3472,7 +3484,7 @@ function archOverlays(b: Bitmap) {
     }
   }
   const things: { y: number; draw: () => void }[] = [];
-  const onLand = (x: number, y: number) => inBounds(Math.round(x), Math.round(y)) && isleAt(x, y) > 0.14 && roadDist[idx(Math.round(x), Math.round(y))] > 6 && !archClear(x, y);
+  const onLand = (x: number, y: number) => inBounds(Math.round(x), Math.round(y)) && caldK(x, y) < -4 && isleAt(x, y) > 0.14 && roadDist[idx(Math.round(x), Math.round(y))] > 6 && !archClear(x, y);
   // the canopy: bumps and palms over the islands
   for (let gy = 4; gy < H; gy += 6) {
     for (let gx = ARCH_W + 40; gx < W; gx += 7) {
@@ -3493,7 +3505,7 @@ function archOverlays(b: Bitmap) {
     const a = hash2(i, 0, 1927) * Math.PI * 2;
     const x = cx + Math.cos(a) * rx * 0.5, y = cy + Math.sin(a) * ry * 0.5;
     const kind = i % 4;
-    if (i < 3) return;
+    if (i < 3 || caldK(x, y) > -6) return;
     if (kind === 0) things.push({ y, draw: () => elfTower(b, x, y, 18 + rx * 0.3, 2.6, 0, seed) });
     else if (kind === 1) things.push({ y, draw: () => elfArch(b, x, y, 10 + rx * 0.2, 16 + rx * 0.3, 2.2, 0, seed) });
     else if (kind === 2) things.push({ y, draw: () => {
@@ -3542,6 +3554,231 @@ function archOverlays(b: Bitmap) {
   } });
   things.sort((p, q) => p.y - q.y).forEach((t) => t.draw());
 }
+
+// ---------------------------------------------------------------------------
+// The Blossom Caldera (Zone 10, named and described by Jakub, 2026-11-03; Japan's
+// architecture and its blossom trees on his word). East of the Archipelago the sea breaks
+// on a coast of black basalt. Beyond it a colossal dormant volcano stands in the north of
+// the stretch, snow in its gullies, thin smoke leaning east off its crater, blossom on its
+// lower slopes; meadows in flower roll round it, old lava flows run out of it as black
+// stone, a stream falls over the coast into the sea, blossom trees, pink, white and
+// lavender, stand in groves among dark pines, hot springs steam, ridges of black rock run
+// along the north and south. A torii stands in the sea below a shrine on the coast; the road
+// comes ashore, crosses the stream on a red bridge, passes a pagoda and goes under a torii
+// to the node, then on east, its flags of old lava. The battle background's own buildings
+// (zones/zone10.ts) are drawn small here.
+// ---------------------------------------------------------------------------
+
+const CALD_W = 3150;
+/** how far east of the Caldera's coast a point is: above 0 the land has begun */
+const caldShore = (y: number) => 3191 + 16 * vnoise(0, y, 52, 2001) + 6 * vnoise(0, y, 12, 2002);
+const caldK = (x: number, y: number) => x - caldShore(y) + (vnoise(x, y, 9, 2003) - 0.5) * 3;
+const CONE = { x: 3334, top: 30, base: 146, R: 98, ry: 15 };
+const MVOLC = ramp(['#1e1a28', '#2a2434', '#383042', '#483e50', '#5a4e5e', '#6e5e6c', '#84707a', '#9a8488', '#b29a98']);
+const MVSNOW = ramp(['#8e88b4', '#b0a8c8', '#d4cade', '#f2eaee']);
+const CPINE = ramp(['#0e1a16', '#16261e', '#203428', '#2c4432']);
+
+/** The cone: inside it, `u` across it (-1 its west edge, 1 its east) and `t` down it (0 the crater, 1 its foot). */
+function coneAt(x: number, y: number): { u: number; t: number } | undefined {
+  if (y < CONE.top - 2) return undefined;
+  const dx = x - CONE.x;
+  if (y <= CONE.base) {
+    const t = clamp((y - CONE.top) / (CONE.base - CONE.top));
+    // steep at the top, flaring at the foot
+    const r = 9 + (CONE.R - 9) * (1 - Math.pow(1 - t, 0.54)) + (vnoise(x, y, 6, 2004) - 0.5) * 3;
+    return Math.abs(dx) > r ? undefined : { u: dx / r, t };
+  }
+  // its foot bulges toward us
+  const k = dx / CONE.R;
+  if (Math.abs(k) > 1 || y > CONE.base + CONE.ry * Math.sqrt(1 - k * k) + (vnoise(x, y, 7, 2005) - 0.5) * 4) return undefined;
+  return { u: k, t: 1 };
+}
+
+function coneGround(x: number, y: number, { u, t }: { u: number; t: number }): RGBA {
+  // the crater: a dark bowl at the top, its far lip lit
+  const cr = Math.hypot((x - CONE.x) / 10, (y - CONE.top - 3) / 3.4);
+  if (cr < 1) return rampDither(MVOLC, y < CONE.top + 2 && cr > 0.7 ? 5 : 0.6 + cr * 1.4, x, y);
+  const ph = u * 26 + vnoise(x, y, 9, 2006) * 2.4;
+  const rib = Math.sin(ph), face = Math.cos(ph);
+  const sun = 0.56 - u * 0.62;
+  // snow in the gullies near the top
+  if (t < 0.17 + (rib < 0 ? -rib * 0.13 : 0) + (vnoise(x, y, 4, 2008) - 0.5) * 0.08 && (rib < 0.3 || t < 0.07)) return rampDither(MVSNOW, clamp(sun * 3.6 + 0.2, 0, 3), x, y);
+  // blossom and forest over its lower slopes
+  if (t > 0.6) {
+    const belt = vnoise(x, y * 1.6, 3.2, 2009) * 0.6 + vnoise(x, y, 12, 2010) * 0.4;
+    if (belt > 0.66 && dith(x, y, (belt - 0.66) * 5)) return rampDither(SAKURA, clamp(2.4 + sun * 3 + (belt - 0.66) * 4, 0, 7), x, y);
+    if (belt < 0.24) return rampDither(CPINE, clamp(0.6 + sun * 2.6, 0, 3), x, y);
+  }
+  let v = 0.8 + sun * 6.4 + face * 0.8 * (1 - t * 0.5) + (hash2(x, y, 2007) - 0.5) * 0.5 - t * 0.6;
+  // old flows down some of the gullies
+  if (Math.sin(u * 12 + 0.7) > 0.93 && t > 0.2) v -= 1.4;
+  return rampDither(MVOLC, clamp(v, 0, MVOLC.length - 1), x, y);
+}
+
+const caldClear = (x: number, y: number) => clearing(x, y, NODES[9], 54, 24);
+/** the hot springs: [x, y, rx, ry] */
+const CALD_SPRINGS: [number, number, number, number][] = [[3404, 264, 10, 4.2], [3290, 292, 8, 3.4], [3450, 150, 9, 3.6], [3436, 314, 7, 3], [3226, 290, 6, 2.6]];
+const caldSpring = (x: number, y: number) => CALD_SPRINGS.find(([cx, cy, rx, ry]) => ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 < 1);
+/** the stream off the volcano's west flank, falling over the coast into the sea */
+const CALD_STREAM = polyline(curve([[3268, 150], [3258, 170], [3262, 188], [3252, 206], [3238, 224], [3222, 240], [3206, 254], [3188, 262]], 2));
+/** the old lava flows, out from the volcano's foot */
+const CALD_FLOWS = [
+  curve([[3352, 162], [3360, 190], [3372, 228], [3366, 262], [3382, 300], [3376, 340], [3388, 372]], 1),
+  curve([[3420, 142], [3440, 160], [3458, 186], [3490, 196]], 1),
+  curve([[3250, 146], [3234, 160], [3222, 176], [3214, 190]], 1),
+];
+const ridgeN = (x: number) => 14 + vnoise(x, 0, 23, 2013) * 14;
+const ridgeS = (x: number) => 338 - vnoise(x, 0, 29, 2014) * 16;
+
+function caldGround(x: number, y: number): RGBA {
+  const k = caldK(x, y);
+  // the coast: a lip of black basalt over the sea, its columns facing the low sun
+  if (k < 8) {
+    // the cliff's columns side by side, their tops lit, a fringe of grass along its top
+    if (k > 6.4) return rampDither(MEADOW, 2.4 + hash2(x, y, 2012) * 1.4, x, y);
+    const col = Math.floor((y + hash2(Math.floor(y / 3), 0, 2010) * 2) / 3);
+    return rampDither(BASALT, clamp((k < 1.4 ? 2 : k > 5.2 ? 6 : 4.2) + (hash2(col, 1, 2011) - 0.5) * 1.6 + ((y % 3) === 0 ? -1.4 : 0), 0, 7), x, y);
+  }
+  const c = coneAt(x, y);
+  if (c) return coneGround(x, y, c);
+  const sp = caldSpring(x, y);
+  if (sp) {
+    const d = Math.hypot((x - sp[0]) / sp[2], (y - sp[1]) / sp[3]);
+    return d > 0.78 ? rampDither(BASALT, 4.4 - (y - sp[1]) * 0.4, x, y) : rampDither(TURQ, clamp(2 + (0.78 - d) * 6, 0, 7), x, y);
+  }
+  // ridges of black rock along the north and south edges
+  if (y < ridgeN(x) || y > ridgeS(x)) return rampDither(BASALT, clamp(2.4 + (vnoise(x, y, 4, 2015) - 0.5) * 3 + (vnoise(x, y, 11, 2016) - 0.5) * 2, 0, 7), x, y);
+  const light = relief(x, y);
+  if (caldClear(x, y)) return rampDither(MEADOW, clamp(5.2 + light + (vnoise(x, y, 6, 2017) - 0.5) * 1.4, 0, 8), x, y);
+  // the meadows: flowers in drifts, petals fallen in the grass
+  const field = vnoise(x, y, 19, 2018) * 0.7 + vnoise(x, y, 6, 2019) * 0.3;
+  if (field > 0.6 && dith(x, y, (field - 0.6) * 6)) return FLOWERS_FAR[Math.floor(vnoise(x + 77, y, 48, 2020) * 3.99)][Math.floor(hash2(x, y, 2021) * 2.99)];
+  if (hash2(x, y, 2022) > 0.986) return SAKURA[6];
+  return rampDither(MEADOW, clamp(3.8 + light * 1.6 + (vnoise(x, y, 6, 2023) - 0.5) * 1.2 + (vnoise(x, y, 23, 2024) - 0.5), 0, 8), x, y);
+}
+
+/** A crag of black rock: a ragged peak lit on its west face. */
+function crag(b: Bitmap, cx: number, by: number, w: number, h: number, seed: number) {
+  for (let x = Math.floor(cx - w); x <= cx + w; x++) {
+    const k = Math.abs(x + 0.5 - cx) / w;
+    const top = by - h * (1 - k) * (0.8 + vnoise(x, 0, 3, seed) * 0.4);
+    for (let y = Math.ceil(top); y <= by; y++) {
+      if (!inBounds(x, y)) continue;
+      b.set(x, y, rampDither(BASALT, clamp((x < cx ? 4.6 : 2) + (y - top < 1.2 ? 1.4 : 0) - (y - top) * 0.06 + (hash2(x, y, seed) - 0.5) * 0.8, 0, 7), x, y));
+    }
+  }
+}
+
+/** Steam off a spring: a few soft puffs rising, leaning east. */
+function steamMap(b: Bitmap, x0: number, y0: number, n: number, seed: number) {
+  for (let k = n - 1; k >= 0; k--) {
+    const t = k / n;
+    const x = x0 + k * 0.9 + Math.sin(k * 0.8 + seed) * 1.2, y = y0 - k * 2.2;
+    const r = 1.6 + k * 0.5;
+    ellipseFill(b, x, y, r, r * 0.8, (px, py, d) => (inBounds(px, py) && dith(px, py, (1 - t * 0.7) * (1.2 - d * 0.7)) ? rampDither(STEAM, clamp(3 - ((px - x) / r) * 0.8 - t * 1.4, 0, 3), px, py) : 0));
+  }
+}
+
+function caldOverlays(b: Bitmap) {
+  // the sea breaking white on the basalt
+  for (let y = 0; y < H; y++) {
+    const sx = Math.floor(caldShore(y));
+    for (let k = 1; k <= 4; k++) {
+      const x = sx - k;
+      if (inBounds(x, y) && caldK(x, y) <= 0 && dith(x, y + Math.round(surfJ(y) * 3), 0.9 - k * 0.2)) b.set(x, y, OCEAN[k > 2 ? 9 : 10]);
+    }
+  }
+  // the old flows, black stone winding through the flowers
+  for (const f of CALD_FLOWS) {
+    f.forEach(([x, y], i) => {
+      const r = 3.2 - (i / f.length) * 1.2 + vnoise(x, y, 9, 2031) * 1.6;
+      ellipseFill(b, x, y, r, r * 0.7, (px, py, d) => {
+        if (!inBounds(px, py) || roadDist[idx(px, py)] < 3.4 || coneAt(px, py) || caldSpring(px, py)) return 0;
+        return rampDither(LAVA, clamp(4 - ((px - x) / r) * 1.4 - ((py - y) / r) * 1.2 - d * 0.6 + (hash2(px, py, 2032) - 0.5) * 1.2, 0, 7), px, py);
+      });
+    });
+  }
+  // the stream, and where it falls over the coast into the sea
+  for (const [x, y] of curve([[3268, 150], [3258, 170], [3262, 188], [3252, 206], [3238, 224], [3222, 240], [3206, 254], [3188, 262]], 0.5)) {
+    for (let d = -1; d <= 1; d++) {
+      const X = Math.round(x + d), Y = Math.round(y);
+      if (!inBounds(X, Y) || roadDist[idx(X, Y)] < 3 || coneAt(X, Y)) continue;
+      b.set(X, Y, d ? WATERF[1] : hash2(X, Y, 2033) > 0.8 ? WATERF[3] : WATERF[2]);
+    }
+  }
+  const fy = 262, fx = Math.floor(caldShore(fy));
+  for (let k = 0; k < 9; k++) for (let d = -1; d <= 1; d++) if (inBounds(fx - 2 + d, fy + k)) b.set(fx - 2 + d, fy + k, WATERF[k > 6 ? 3 : 2 + (d === 0 ? 1 : 0)]);
+  for (let k = 0; k < 14; k++) b.set(fx - 5 + Math.round(hash2(k, 0, 2034) * 7), fy + 9 + Math.round(hash2(k, 1, 2034) * 2), OCEAN[10]);
+
+  const things: Thing[] = [];
+  const free = (x: number, y: number, pad: number) => {
+    const X = Math.round(x), Y = Math.round(y);
+    if (!inBounds(X, Y) || caldK(x, y) < 8 || coneAt(x, y + 2) || caldClear(x, y) || roadDist[idx(X, Y)] < pad || y < ridgeN(x) + 6 || y > ridgeS(x) - 2) return false;
+    if (CALD_SPRINGS.some(([cx, cy, rx]) => Math.hypot(x - cx, (y - cy) * 2) < rx + 6)) return false;
+    if (nearest(CALD_STREAM, x, y).d < 4) return false;
+    return !CALD_FLOWS.some((f) => f.some(([fx2, fy2]) => Math.hypot(x - fx2, y - fy2) < 5));
+  };
+  // groves of blossom among dark pines, thick in places, open meadow between
+  const TONES = [SAKURA, SAKURA, SAKURA, SAKURA, WHITEBLOOM, WHITEBLOOM, LAVBLOOM];
+  for (let gy = 4; gy < H; gy += 7) {
+    for (let gx = CALD_W + 40; gx < W; gx += 8) {
+      const x = gx + hash2(gx, gy, 2041) * 6, y = gy + hash2(gx, gy, 2042) * 5;
+      const grove = vnoise(x, y, 38, 2043);
+      if (grove < 0.56 || hash2(gx, gy, 2049) > (grove - 0.56) * 4 || !free(x, y, 6)) continue;
+      const roll = hash2(gx, gy, 2044);
+      if (roll < 0.14) things.push({ y, draw: () => blackPine(b, x, y, 9 + hash2(gx, gy, 2045) * 5, (hash2(gx, gy, 2046) - 0.5) * 0.5, gx + gy) });
+      else things.push({ y, draw: () => blossomTree(b, x, y, 2.6 + hash2(gx, gy, 2047) * 2, TONES[Math.floor(hash2(gx, gy, 2048) * TONES.length)], gx * 13 + gy) });
+    }
+  }
+  // the great old cherries standing alone
+  for (const [x, y, r] of [[3420, 250, 9], [3262, 304, 8], [3458, 326, 7], [3236, 120, 7]] as const) things.push({ y, draw: () => blossomTree(b, x, y, r, SAKURA, x + y) });
+  // the springs' steam
+  CALD_SPRINGS.forEach(([x, y, rx], i) => things.push({ y: y - 1, draw: () => steamMap(b, x - rx * 0.3, y - 2, 5 + Math.round(rx * 0.4), i) }));
+  // the pagoda west of the volcano, the shrine on the coast and its torii out in the sea
+  things.push({ y: 152, draw: () => pagoda(b, 3224, 152, 34) });
+  const SEA_TORII: P = [Math.round(caldShore(290)) - 12, 290];
+  things.push({ y: 286, draw: () => shrine(b, SEA_TORII[0] + 34, 286, 16) });
+  things.push({ y: SEA_TORII[1], draw: () => {
+    const [tx, ty] = SEA_TORII;
+    torii(b, tx, ty, 18);
+    for (const dx of [-9, 9]) for (let d = -2; d <= 2; d++) if (dith(tx + dx + d, ty + 1, 0.7)) b.set(tx + dx + d, ty + 1, OCEAN[10]);
+  } });
+  // the red bridge where the road crosses the stream
+  let best: P = [3256, 200], bd = 99;
+  for (const [x, y] of CALD_STREAM.pts) {
+    const X = Math.round(x), Y = Math.round(y);
+    if (inBounds(X, Y) && roadDist[idx(X, Y)] < bd) [bd, best] = [roadDist[idx(X, Y)], [x, y]];
+  }
+  things.push({ y: best[1] + 3, draw: () => {
+    const [bx, by] = best;
+    for (let dy = -5; dy <= 5; dy++) {
+      const t = dy / 5, rise = Math.round((1 - t * t) * 2);
+      for (const side of [-3, 3]) b.set(Math.round(bx + side - rise * 0.5), Math.round(by + dy), VERM[side < 0 ? 4 : 2]);
+      for (let k = -2; k <= 2; k++) b.set(Math.round(bx + k - rise * 0.5), Math.round(by + dy), rampDither(BARK, 3.4 - k * 0.3, bx + k, by + dy));
+    }
+  } });
+  // the road's torii before the node, and stone lanterns along it
+  things.push({ y: 211, draw: () => torii(b, 3290, 211, 16) });
+  for (const [x, y] of [[3246, 196], [3246, 212], [3352, 206], [3352, 222]] as const) things.push({ y, draw: () => lantern(b, x, y, 7, x + y, 0.3) });
+  // crags along the ridges, clear of the volcano's top
+  for (let x = CALD_W + 54; x < W; x += 9) {
+    if (Math.abs(x - CONE.x) < 30) continue;
+    const yn = ridgeN(x) + 2, ys = ridgeS(x) + 6;
+    things.push({ y: yn, draw: () => crag(b, x + hash2(x, 0, 2051) * 4, yn, 5 + hash2(x, 1, 2051) * 3, 8 + hash2(x, 2, 2051) * 10, x) });
+    things.push({ y: ys + 20, draw: () => crag(b, x + hash2(x, 3, 2051) * 4, ys + 20, 5 + hash2(x, 4, 2051) * 3, 10 + hash2(x, 5, 2051) * 10, x + 1) });
+  }
+  things.sort((p, q) => p.y - q.y).forEach((t) => t.draw());
+  // the thin smoke off the crater, leaning east on the wind
+  for (let k = 22; k >= 0; k--) {
+    const t = k / 22;
+    const x = CONE.x + 2 + Math.pow(t, 1.2) * 92, y = CONE.top - 4 - (1 - Math.pow(1 - Math.min(1, t * 1.8), 2)) * 16 + t * 6;
+    const r = 1.6 + t * 6;
+    ellipseFill(b, x, y, r * 1.3, r * 0.7, (px, py, d) => (inBounds(px, py) && dith(px, py, (1 - t) * 1.1 * (1.1 - d * d)) ? rampDither(MSMOKE, clamp(3.2 - ((px - x) / r) * 0.8 - ((py - y) / r) * 1.1 - t * 1.4, 0, 4), px, py) : 0));
+  }
+}
+const surfJ = (y: number) => vnoise(0, y, 5, 2035);
+const WATERF = ramp(['#4a7c90', '#6e9eb0', '#9cc4d0', '#e4f4f6']);
+const MSMOKE = ramp(['#6c6080', '#8a7c96', '#a898ac', '#c8b6c0', '#e6d2d0']);
 
 /** The scrolling world. */
 export function buildMap(out: string) {

@@ -114,7 +114,7 @@ Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8):
 - A **stage** lists up to three enemies in formation order (front, back-top, back-bottom), a `power` multiplier for their HP and ATK, an optional boss flag per enemy (x1.6 HP, a crown), a map position (world pixels, see below) and the champion its first clear brings (`recruit`), who need not be among its enemies: the second champion joins after the first battle without being fought there. Since summoning (2026-10-25) only 1-1 has one.
 - A stage opens when the previous stage of its location is cleared; the first stage of a location opens when the location does.
 - Difficulty follows the curve in [MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) section 10; tune `power` with `npm run balance`.
-- The **world map** is `WORLD_MAP` (3160x360, about five screens wide and one tall, growing east area by area: ART_GUIDE.md 10; no overview: the whole-map popup was removed on 2026-11-01, so a wider map needs a smaller overview): the campaign is a line of areas crossed from left to right (DESIGN_DECISIONS.md 5.1). Location `map` positions are in its pixels. The campaign screen scrolls it under a camera: drag to move (a click fires on release), Left and Right step between areas in campaign order and the camera keeps the focused node in view, `W` `A` `S` `D` or `Shift` + arrows slide it, and `M` (or WHOLE MAP) shows the overview, the same world drawn at half the size on one screen; clicking the overview goes there. Coming back from team select or a battle opens the stage list on that stage.
+- The **world map** is `WORLD_MAP` (3480x360, about five and a half screens wide and one tall, growing east area by area: ART_GUIDE.md 10; no overview: the whole-map popup was removed on 2026-11-01, so a wider map needs a smaller overview): the campaign is a line of areas crossed from left to right (DESIGN_DECISIONS.md 5.1). Location `map` positions are in its pixels. The campaign screen scrolls it under a camera: drag to move (a click fires on release), Left and Right step between areas in campaign order and the camera keeps the focused node in view, `W` `A` `S` `D` or `Shift` + arrows slide it, and `M` (or WHOLE MAP) shows the overview, the same world drawn at half the size on one screen; clicking the overview goes there. Coming back from team select or a battle opens the stage list on that stage.
 
 | Location | Zone | Stages |
 | --- | --- | --- |
@@ -127,6 +127,7 @@ Names, looks and kits are Jakub's Starter Heroes record (DESIGN_DECISIONS.md 8):
 | VII. Dead Forest (after 6-10) | `zone7` | 7-1 to 7-10, placeholders Jakub asked for (2026-11-01); 7-10 is the boss |
 | VIII. Crystal Graveyard (after 7-10) | `zone8` | 8-1 to 8-10, placeholders Jakub asked for (2026-11-01); 8-10 is the boss |
 | IX. Sleeping Archipelago (after 8-10) | `zone9` | 9-1 to 9-10, placeholders Jakub asked for (2026-11-02); 9-10 is the boss |
+| X. Blossom Caldera (after 9-10) | `zone10` | 10-1 to 10-10, placeholders Jakub asked for (2026-11-03); 10-10 is the boss |
 
 Every victory finds Stardust for the Wishing Star as well as spools ([MECHANICS_GUIDE.md](MECHANICS_GUIDE.md) 14, 16). Until 2026-10-25 the stages of Zones 1 to 5 brought the champions one by one (1-4 to 1-10, 2-1 to 2-9, 3-1 to 3-3, 4-1 to 4-3, 5-10); now they are summoned.
 

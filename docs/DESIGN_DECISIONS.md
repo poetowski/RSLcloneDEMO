@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-03 | Zone 10, the Blossom Caldera, inspired by Japan's architecture and blossom: battle background, the world map extended east, ten placeholder stages, ambient `petals` | 5.13 |
 | 2026-11-01 | Zone 8, the Crystal Graveyard: battle background, the world map extended east, ten placeholder stages | 5.11 |
 | 2026-11-01 | The Journey gains Beat Campaign 8-10, three spools | 57 |
 | 2026-11-01 | The Crossbowman, an Elite Damage of the Azure Crown, Tide | 58 |
@@ -1264,6 +1265,54 @@ A victory finds 60 Stardust, following the areas before it.
 deep. Small emerald islands stand all over it with palms, towers, little arches and columns, some columns out in the water
 and a dome half drowned. Three islands carry the road, which crosses between them on white elven bridges and goes on east
 out of the world. Above node IX the greatest arch stands in the sea with a tower either side.
+
+### 5.13 Zone 10 — the Blossom Caldera (2026-11-03)
+
+Jakub's brief: "generate new area. extend world map to eastern part, east from area 9. also create placeholder stages and
+battle background animated. name of area = Blossom Caldera", with a description of his (kept whole in the session, its
+points here): a spectacular fusion of ancient volcanic terrain and extraordinary flowering ecosystems round a colossal
+dormant volcano dominating the distant skyline; dark volcanic ridges, black basalt cliffs and irregular rock formations
+round the region; rolling hills and fertile valleys under colourful flowering meadows; ancient solidified lava flows as
+winding black stone paths through the vegetation; geothermal springs, small turquoise pools and occasional steaming
+fissures; several waterfalls from elevated formations; enormous ancient flowering trees with twisted trunks and wide pink,
+white and lavender canopies; wildflowers in crimson, violet, gold and pale pink; dense blossom groves; unusual giant flowers
+near the vents; grass and moss between the rocks, growing organically, never in gardens or symmetrical patterns; pink petals
+on the wind, thin smoke from the summit, steam from the springs, small streams through the flowers, black rock against the
+colour, glowing minerals in deep crevices, wildlife in the trees and meadows; late-afternoon sun, soft volumetric light,
+distant haze, layered clouds, warm light breaking through; vibrant and full of life, the volcano a constant sense of scale
+and ancient power; a coherent wilderness, not a cultivated garden; no modern buildings, futuristic things, excessive magic,
+cartoon styling or uniformly spread vegetation. While it was being built: "make the area inspired by japan architecture and
+their blossom trees".
+
+**The battle background (my reading).** Late afternoon, the sun upper left over a cliff of black basalt columns, its rays
+slanting faintly through the haze. The volcano fills the skyline: a cone with a cut-off top, steep near the crater and
+flaring at its foot, snow lying in its gullies, its lower slopes in belts of blossom fading into haze, a long torn bank of
+cloud across its middle, thin smoke leaning east off the crater. For Japan: a small shrine hall and a black pine on the
+cliff, two waterfalls coming down the columns into a turquoise pool; a five-storey pagoda on the hill beyond among blossom
+trees; a red arched bridge over the stream; a vermilion torii where the old lava flow comes down out of the hills; mossy
+stone lanterns along the flow. The arena is a meadow in flower either side of that flow, which winds between the two sides,
+its old ropes of stone cracked into plates with moss in the cracks. An enormous ancient cherry leans in over the right, its
+crown over the corner; a hot spring with a bamboo spout steams at the left edge, giant flowers by its vent (a crimson lily,
+a violet bell, a gold cup, their hearts faintly aglow); a fissure glows amber in the near ground and steams; wildflowers
+crowd the near right corner. What moves: the smoke, the waterfalls, the steam of the springs and the fissure, the cherry's
+crown swaying a little, the fissure's glow breathing, clouds drifting, cranes wheeling, butterflies, and petals on the wind
+(a new ambient, `petals`). The hot spring stands clear of the battle HUD, which covers the bottom corners.
+
+**The stages.** Ten placeholders, 10-1 to 10-10, the boss 10-10 (the Executioner), enemies and powers stand-ins set inside
+the balance bands, the blurbs taken from his description. No champion joins there. Spools: Sunder and Ward, stand-ins.
+A victory finds 65 Stardust, following the areas before it.
+
+**The map.** 3480 wide. The Archipelago's sea breaks white on a coast of black basalt columns. Beyond it the volcano stands
+in the north of the stretch with snow in its gullies, blossom on its lower slopes and its smoke leaning east; meadows in
+drifts of flowers roll round it, old lava flows run out of it as black stone, a stream comes off its west flank and falls
+over the coast into the sea, blossom trees (pink, white, lavender) stand in groves among dark pines with open meadow between,
+hot springs steam, and ridges of black crags run along the north and south edges. A torii stands in the sea below a shrine
+on the coast; the road comes ashore off the last white bridge, crosses the stream on a red bridge, passes a pagoda and two
+pairs of lanterns, goes under a torii to node X and on east out of the world, its flags of old lava.
+
+Stand-ins until he sets them: everything his description did not name (the shrine, the pagoda, the torii, the bridge, the
+lanterns and the spout, my reading of "japan architecture"; the snow, the cloud bank and the cranes; the composition, the
+light and everything that moves), the stages' enemies, powers and texts, the spools and the Stardust.
 
 ## 6. Cross-cutting
 

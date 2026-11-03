@@ -320,9 +320,10 @@ export interface ZoneDef {
    * flurries: snow blown in from the right ahead of a storm, thinning out as it
    * goes (the Snowy Mesa); ash: ash coming down through still air, slower than
    * snow, each flake turning over as it falls (the Dead Forest); shards: crystal dust hanging in
-   * the air, kindling and going out (the Crystal Graveyard)
+   * the air, kindling and going out (the Crystal Graveyard); petals: blossom petals drifting on a
+   * gentle wind from the left, turning over as they go (the Blossom Caldera)
    */
-  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen' | 'spores' | 'seeds' | 'flurries' | 'ash' | 'shards';
+  ambient: 'snow' | 'sand' | 'motes' | 'leaves' | 'pollen' | 'spores' | 'seeds' | 'flurries' | 'ash' | 'shards' | 'petals';
   /** color of brazier light pools */
   glow: [number, number, number];
   /** unit shadows: offset away from the key light and horizontal stretch */

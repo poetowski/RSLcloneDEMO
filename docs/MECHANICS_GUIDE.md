@@ -439,6 +439,7 @@ The last column is how the game reads his values (a stand-in until he confirms i
 | VII. Dead Forest | Tranquility, Needle |
 | VIII. Crystal Graveyard | Apex, Vigor |
 | IX. Sleeping Archipelago | Pulse, Tranquility |
+| X. Blossom Caldera | Sunder, Ward |
 
 | | |
 | --- | --- |
