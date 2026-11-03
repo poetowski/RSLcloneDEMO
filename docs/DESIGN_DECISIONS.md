@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-03 | The Journey: Beat Campaign 3-10 gives 5000 Gold, 5-10 300 Stardust, 8-10 10000 Gold | 81 |
 | 2026-11-03 | The Merchant trades spools: sell 100 / 300 / 500 Gold by grade, buy at 20x; wares of 5 Ashen, 3 Silver, 2 Gilded, rotated for 5000 Gold | 80 |
 | 2026-11-03 | Gold, the game's coin (0 to start), and the Merchant: a stall in the Sanctum, a screen with the Gold held, BUY and SELL to come | 79 |
 | 2026-11-03 | The Journey: Beat Campaign 5-10 gives 400 Stardust; a new eighth quest, Beat Campaign 10-10, gives the Paladin | 54, 78 |
@@ -4722,7 +4723,7 @@ Built as he said ("cool" read as "call"):
 
 - **Gold**, the game's coin: its name is one constant (`CURRENCY` in `src/game/data/economy.ts`), so renaming it is a
   one-line change; a new account starts with 0 (`STARTING_GOLD`, his); the save keeps it (`gold`), a save from before
-  holds 0. Nothing finds or spends Gold yet. Its icon is a coin of old gold with the Loom's eight-pointed star raised on
+  holds 0. Nothing finds or spends Gold yet (since: sections 80, 81). Its icon is a coin of old gold with the Loom's eight-pointed star raised on
   it (`gold`, and `biggold` with a second coin behind it).
 - **The Merchant's Stall** in the Sanctum, on the plaza between the Reliquary and the Weaver's Spire: a trader's stall of
   dark timber under an awning striped plum and cream, a cloth with a gold hem over its counter, gold scales, a stack of
@@ -4765,3 +4766,19 @@ section 79 left for later, now trade:
 
 Stand-ins until he sets them: that the wares are rolled on the first visit and change only when rotated, that every
 pattern is equally likely among them, that selling takes only loose spools, and the screen's layout and texts.
+
+## 81. The Journey's rewards in Gold (received 2026-11-03)
+
+> change rewards of quest beating 3-10 is 5000 gold. reward for beating 5-10 is 300 stardust. i want to have also quest between beating campaign 5-10 and 10-10 to beat campaign 8-10. reward for beating campaign 8-10 is 10000 gold.
+
+Built as he said. Beat Campaign 8-10 (section 57) already stood between 5-10 and 10-10, so it keeps its place and its
+reward becomes his Gold:
+
+| Quest | Reward |
+| --- | --- |
+| Beat Campaign 3-10 | 5000 Gold (was 250 Stardust, section 55) |
+| Beat Campaign 5-10 | 300 Stardust (was 400, section 78) |
+| Beat Campaign 8-10 | 10000 Gold (was three Gilded Apex spools, section 57) |
+
+Gold is now a quest reward: claiming it puts it in the purse; the quest shows the coin above its knot and in its panel. A
+save that claimed a quest before keeps what it was given then. The panel's texts for a Gold reward are stand-ins.

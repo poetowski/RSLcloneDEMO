@@ -22,6 +22,7 @@ import { FRAGMENTS_PER_SHARD, SUMMONING } from '../data/summoning';
 import { summonsReady } from '../summoning';
 import { Scroller } from '../ui/scroll';
 import { PATTERN_TINT, patternName, spoolIcon, statText } from '../ui/spools';
+import { GOLD_TINT, goldText } from '../ui/gold';
 import { STARDUST_TINT } from '../ui/stardust';
 import { COLORS } from '../ui/ui';
 import { blit, nine, Rect4 } from '../view/assets';
@@ -300,7 +301,7 @@ export class ChallengesScreen extends BaseScreen {
       const r = this.a.ui.json.portraits[q.reward.champion];
       ctx.drawImage(this.a.ui.img, r[0], r[1], r[2], r[3], x - 11, py + 2, 22, 22);
     } else {
-      const r = ui.part('stardust');
+      const r = ui.part(q.reward.kind === 'gold' ? 'gold' : 'stardust');
       blit(ctx, this.a.ui.img, r, x - Math.floor(r[2] / 2), py + 13 - Math.floor(r[3] / 2));
     }
     ctx.globalAlpha = 1;
@@ -379,6 +380,12 @@ export class ChallengesScreen extends BaseScreen {
       ui.text(ctx, `${RARITIES[c.rarity].name} ${c.role}`, rx + 36, py + 43, { color: COLORS.dim });
       const already = found?.kind === 'champion' && found.already;
       ui.para(ctx, already ? 'Already with you.' : st === 'claimed' ? 'Joined your champions.' : 'Joins your champions when you claim this. No summon brings him.', rx, py + 62, 180, { color: found || st === 'claimed' ? COLORS.good : COLORS.faint });
+    } else if (rw.kind === 'gold') {
+      ui.blit(ctx, 'biggold', rx, py + 27);
+      ui.text(ctx, goldText(rw.amount), rx + 30, py + 30, { color: GOLD_TINT });
+      if (found) ui.text(ctx, 'Found: in your purse now.', rx + 30, py + 44, { color: COLORS.good });
+      else ui.para(ctx, st === 'claimed' ? 'Taken, into your purse.' : 'Goes into your purse when you claim this.', rx + 30, py + 44, 152, { color: COLORS.faint });
+      ui.para(ctx, 'The Merchant on the Sanctum plaza trades spools for it.', rx, py + 82, 180, { color: COLORS.faint });
     } else {
       ui.blit(ctx, 'bigstardust', rx, py + 27);
       ui.text(ctx, `${rw.amount} ${SUMMONING.fragment}`, rx + 30, py + 30, { color: STARDUST_TINT });

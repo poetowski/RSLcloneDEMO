@@ -471,12 +471,12 @@ The Challenges are quests to accomplish, in three tabs (Jakub, 2026-10-24, [DESI
 | Weave a Spool (stand-in for his placeholder; second on his word, 2026-10-25) | any spool woven into any champion's Weaver Matrix | 100 Stardust (his): the third champion's summon |
 | Beat Campaign 1-3 (his, 2026-10-25; third on his word) | stage 1-3 cleared | a Gilded Sunder spool |
 | Beat Campaign 1-10 (his, 2026-11-01) | stage 1-10 cleared | two spools (his); Silver Vigor, a set's two pieces, stands in |
-| Beat Campaign 3-10 (his, 2026-11-01) | stage 3-10 cleared | 250 Stardust (his) |
-| Beat Campaign 5-10 (his, 2026-11-01) | stage 5-10 cleared | 400 Stardust (his, 2026-11-03; the Paladin until then) |
-| Beat Campaign 8-10 (his, 2026-11-01) | stage 8-10 cleared | three spools (his); Gilded Apex stands in |
+| Beat Campaign 3-10 (his, 2026-11-01) | stage 3-10 cleared | 5000 Gold (his, 2026-11-03; 250 Stardust until then) |
+| Beat Campaign 5-10 (his, 2026-11-01) | stage 5-10 cleared | 300 Stardust (his, 2026-11-03; the Paladin, then 400 Stardust, until then) |
+| Beat Campaign 8-10 (his, 2026-11-01) | stage 8-10 cleared | 10000 Gold (his, 2026-11-03; three spools until then) |
 | Beat Campaign 10-10 (his, 2026-11-03) | stage 10-10 cleared | the Paladin joins (his); no summon brings him |
 
-A reward spool has its quest's pattern and grade; its main stat is drawn by slot and its strands rolled as a found spool's are (section 14), and it comes into storage as a new find. Stardust goes to the Wishing Star (section 16). The spool rewards are stand-ins.
+A reward spool has its quest's pattern and grade; its main stat is drawn by slot and its strands rolled as a found spool's are (section 14), and it comes into storage as a new find. Stardust goes to the Wishing Star (section 16), Gold to the purse (section 17). The spool rewards are stand-ins.
 
 **The tutorial** (`src/game/tutorial.ts`) starts on its own on a save whose tutorial was neither finished nor skipped and that has no stage cleared; from the Journey anyone can start it (START TUTORIAL) or play it again (REPLAY TUTORIAL). Skipping it marks it skipped (the quest stays open); its first victory marks it finished, after which its cards only lead to the Challenges, and closing them changes nothing. Its battle is an ordinary stage 1-1.
 
@@ -508,7 +508,7 @@ Champions are summoned (Jakub, 2026-10-25, [DESIGN_DECISIONS.md](DESIGN_DECISION
 ## 17. Gold and the Merchant (`src/game/merchant.ts`, `src/game/data/economy.ts`)
 
 Jakub's (DESIGN_DECISIONS.md 79, 80): the game's coin, **Gold** (a name "for now", one constant: `CURRENCY`), 0 on a new
-account (`STARTING_GOLD`). Nothing else finds or spends it yet; it comes from selling spools.
+account (`STARTING_GOLD`). It comes from selling spools and from the Journey (Beat Campaign 3-10 5000, 8-10 10000; section 15).
 
 | Spool grade | The Merchant pays (`SPOOL_SELL_PRICE`) | A spool costs (`BUY_FACTOR` 20x) |
 | --- | --- | --- |
