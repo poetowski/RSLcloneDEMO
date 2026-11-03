@@ -4593,7 +4593,7 @@ Then: "I don't like strangler name and his design. So you have to think of diffe
 proposed three concepts for the same kit (Mawbloom, a carnivorous pitcher plant; an orchid huntress; Sszara, a jade
 serpent-woman) and recommended the first; he answered "Second, ixa. But call her: "Orchid Huntress" instead. No ixa".
 Shown to him as rendered previews (idle, every animation in both facings, the champion page, the three skills in battle);
-waiting for his yes.
+approved on his "All looks fine" of 2026-11-03, with the redraws of Lycan, the Executioner, the Toadcap and the Bristleback.
 
 She is an elegant and deadly huntress of the jungle, a beautiful lure for prey: tall and slender, a great orchid crown of
 white petals with violet throats that opens wide when she looses its pollen, pale gold pollen drifting from it; dark hair
@@ -4623,7 +4623,7 @@ Jakub asked for the count of heroes; the one open slot in the grid was a Heroic 
 to hear suggestions first": I proposed three (the Crimson Countess, a blood-mage who spends her own HP; the Headsman, the
 Dominion's executioner; the Red Bombardier, a siege engineer) and recommended the first. He answered: "Go with option two,
 but rename hero to "Executioner". Make his design wearing white instead of black". Shown to him as rendered previews;
-waiting for his yes.
+approved on his "All looks fine" of 2026-11-03, with the redraws of Lycan, the Executioner, the Toadcap and the Bristleback.
 
 He is the Dominion's headsman, huge and broad: a white leather hood over his whole head with two eye holes, its cape over
 his shoulders; a bare, scarred torso; a long crimson tabard with the Dominion's black hexagon hanging from a white leather
