@@ -880,9 +880,9 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
       if (i >= 3) sparks(b, cx, cy, 12, 26, (i - 3) / 5, PALE, 1021, 14);
     },
   },
-  /** Hunter's Howl at his muzzle (the snout of the raised head, 14 px behind the head point and 9 above it): rings of pale sound going up and out from the raised snout, motes of the light torn off them. Light. */
+  /** Hunter's Howl at his muzzle (the snout of the raised head, 10 px behind the head point and 12 above it): rings of pale sound going up and out from the raised snout, motes of the light torn off them. Light. */
   howl_rings: {
-    w: 110, h: 100, n: 12, ms: 55, ax: 0.629, ay: 0.589, pad: [2, 2, 2, 2],
+    w: 110, h: 100, n: 12, ms: 55, ax: 0.5945, ay: 0.621, pad: [2, 2, 2, 2],
     draw: (b, t, i) => {
       soundRings(b, 55, 50, i, 4, 2, 6.4, 7, PALE);
       motes(b, 55, 50, 44, 14, 10, t, PALE, 1031);

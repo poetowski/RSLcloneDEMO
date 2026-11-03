@@ -4559,6 +4559,15 @@ number, his stats, the lore line, that he is summoned, and every detail of his a
 the notch and the scar, the sash, the shackle and its chain, the rag at his hip, the rakes, the jaws that close in the maul,
 the howl at the moon with its pale rings, the streaks of speed through each ally, the crescent that rises when Moon-Mad wakes).
 
+Redrawn on his word of 2026-11-03, "Regenerate lycan art and executioner art. Be a bit different this time ... This includes
+their animations as well. No kit redesign": a great hunched beast on digitigrade wolf's legs, a deep barrel chest and heavy
+shoulders over a narrow waist, a coat of grizzled brown-black fur, a shaggy silver-grey mane over the neck and shoulders
+that bristles in the howl, a long wolf's head with a cream muzzle and throat, the Reign's pale light in the eyes, a notch in
+one tall ear and a scar across the muzzle, huge hands with long pale claws, a heavy brush of a tail, the plum sash knotted at
+the waist and iron shackles on both wrists, broken chain swinging from the near one. New animations: a menacing hunched
+idle, a gallop on all fours, two rakes drawn back past the ear, a howl rearing up off the hands with the mantle bristling,
+a spring from all fours with the claws out and the jaws on the target, a fall on the belly. The kit and every number stay.
+
 ## 76. The Orchid Huntress (received 2026-11-02)
 
 Jakub asked: "Propose creative damage kit for heroic court of root". I proposed three (A, a poisoner who brings the
@@ -4622,3 +4631,12 @@ Stand-ins until he sets them: Tide, the names Sentence, Shackle, Final Verdict a
 his stats, the lore line, that he is summoned, and every detail of his art and effects (the hood, its peak and eye holes,
 the scars, the tabard and hexagon, the white leathers, the manacles and chain, the axe's haft, grip and blade, the chop, the
 whirl and throw, the slow lift and fall of the verdict, the streaks, the iron ring of the chain, the ring of the blow).
+
+Redrawn on his word of 2026-11-03 (with Lycan, section 75, the kit unchanged): a massive man, broad as a door; the white
+cowl falls in a long mantle over his shoulders and chest, its scalloped edge stitched in crimson; a long white leather
+headsman's apron to his shins over loose white trousers and tall white boots; a crimson sash with an iron buckle cast as
+the hexagon; white strips wrapping his bare forearms; a great bearded headsman's axe, its long edge running back down the
+haft, the haft wound in crimson at the grip. At rest he stands over the axe, its head on the ground, both hands stacked on
+the haft; he swings it up off the ground over his head for Sentence; for Final Verdict the blade bites the ground and he
+wrenches it free. On his word "I don't like executioners balls on his legs. Looks like testicles" the manacles no longer
+hang at his hip: their chain hangs coiled at the back of his sash, behind the far leg, until he whirls them in Shackle.
