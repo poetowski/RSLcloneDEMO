@@ -1,9 +1,12 @@
 // The Bristleback (docs/DESIGN_DECISIONS.md section 51, 2026-11-01, my proposal on
 // Jakub's word): a Common Tank of the Court of Root, a heavy old boar on four
 // legs. Dark brown bristled hide, a black crest along his spine, a heavy wedge of a
-// head, a flat snout, two curved bone tusks, small ears; moss on his back and a
-// little sapling growing out of his shoulders (the silhouette: the hump, the
-// sapling and the tusks). No collar: the Court shares a nature, not a hierarchy.
+// head, a flat snout, two curved bone tusks, small ears. Redrawn on Jakub's word of
+// 2026-11-03 ("his plant on back his vertical and looks weird, maybe make it a bit
+// different mossy back"): no sapling; a thick carpet of moss over his whole back, built up
+// into a mossy mound over the hump, ferns arching back from it, small white flowers, two bracket fungi on his flank and a
+// wren nesting in the moss, who flutters up when he charges or gores (the silhouette:
+// the hump of moss and the tusks). No collar: the Court shares a nature, not a hierarchy.
 // The rig is the Follower's, with a boar's proportions. His affinity (Tide) sets
 // nothing here (Jakub, 2026-10-11).
 import { BuildInfo, ChampionArt, CharDef, cycle, keys, tween } from '../char.ts';
@@ -29,7 +32,7 @@ const D: Dims = {
   hipF: 0,
 };
 
-const HD = MAT.furBrown, BK = MAT.furBlack, MS = MAT.moss, TK = MAT.bone, BR = MAT.bark, LF = MAT.green;
+const HD = MAT.furBrown, BK = MAT.furBlack, MS = MAT.moss, TK = MAT.bone, LF = MAT.pine, FG = MAT.calabash, WR = MAT.leather;
 
 /** The body's centre stands this far behind the pivot (x of every pose). */
 const BACK = -6;
@@ -90,7 +93,7 @@ function build(d: Draw, s: Skel, info: BuildInfo) {
   leg_(d, g.hN, 'hN', 29.5, 0, 7.6, 3.2);
   body(d, g, 30);
   mane(d, g, P.bristle ?? 0, 31);
-  mossBack(d, g, P.wave ?? 0, 32);
+  mossBack(d, g, P, 32);
   neck(d, g, 40);
   head(d, Hd, snout, P, 44, HEAD);
 }
@@ -131,19 +134,64 @@ function mane(d: Draw, g: Boar, bristle: number, z: number) {
   d.poly({ mat: BK, z, group: 'mane', line: 'soft' }, [...pts, ...back], { kind: 'bevel', w: 1 });
 }
 
-/** Moss in patches over his rump and a small sapling growing out of his shoulders, its leaves stirring. */
-function mossBack(d: Draw, g: Boar, wave: number, z: number) {
+/**
+ * The forest growing on him: a thick carpet of moss over his whole back from the rump to the
+ * hump, its edge hanging in tufts down his flanks; three ferns lying back along it, stirring;
+ * a few small white flowers in the moss; two bracket fungi on his flank; and a little wren
+ * nesting in the moss, who flutters up off him when he charges or gores (`bird` 0..1).
+ */
+function mossBack(d: Draw, g: Boar, P: Record<string, number>, z: number) {
   const B = g.B;
-  d.poly({ mat: MS, z, group: 'moss', line: 'soft', tex: fur }, [B(-22, -5.8), B(-14, -8.2), B(-6, -8.8), B(-3, -5.6), B(-8, -3), B(-14, -4), B(-20, -2)], { kind: 'dome', c: B(-12, -5), r: 9, bevel: 1 });
-  const r = B(9, -11.4);
-  const a = 100 + Math.sin(wave) * 2;
-  const m = at(r, a, 9), t = at(m, a - 14, 9);
-  d.ribbon({ mat: BR, z: z + 0.1, group: 'sapling' }, [r, m, t], [1.1, 0.8, 0.5]);
-  const b1 = at(m, a + 50, 4.4);
-  d.ribbon({ mat: BR, z: z + 0.1, group: 'sapling' }, [m, b1], [0.6, 0.4]);
-  for (const [p, rot] of [[t, 0], [b1, 1], [at(m, a - 60, 3.4), 2]] as const) {
-    d.ellipse({ mat: LF, z: z + 0.2, group: 'leaf' + rot }, p, 2.6, 1.7, a - 20 + rot * 40 + Math.sin(wave + rot) * 6);
+  const wave = P.wave ?? 0;
+  d.poly(
+    { mat: MS, z, group: 'moss', tex: fur },
+    [B(-27.4, -0.4), B(-25, -6.4), B(-21, -9), B(-19, -11.6), B(-16, -12.6), B(-13, -16), B(-10, -17.4), B(-7, -21), B(-4, -21.6), B(-1, -24), B(2, -23), B(5, -21.6), B(7, -19.6), B(9, -17), B(11.4, -11.6), B(8, -7.4), B(5, -8.6), B(2, -5.8), B(-1.4, -7.8), B(-5, -4.6), B(-8.6, -6.6), B(-12, -3.4), B(-15.6, -5.6), B(-19, -2.2), B(-22, -4), B(-24.6, 0.6)],
+    { kind: 'dome', c: B(-5, -10), r: 20, bevel: 1.2 },
+  );
+  // a lighter, sunlit crown along the top of the moss
+  d.ribbon({ mat: MS, z: z + 0.05, group: 'moss', line: 'none', shade: 1, tex: fur }, [B(-24, -6.2), B(-16, -11.6), B(-8, -19), B(-1, -22.4), B(5, -20.4), B(8.6, -16.4)], [1.2, 1.6, 1.8, 1.8, 1.4, 1]);
+  // the ferns, rooted in the moss and lying back along his spine, each frond a stem with leaflets on both sides
+  for (const [u, w, len, k] of [[4, -21, 15, 0], [-3, -22.6, 13, 1], [-13, -15.4, 11, 2]] as const) {
+    const sw = Math.sin(wave + k * 1.7) * 1.2;
+    const root = B(u, w);
+    const pts = [root, B(u - len * 0.3, w - 5 + sw * 0.3), B(u - len * 0.7, w - 5.6 + sw * 0.7), B(u - len, w - 3 + sw)];
+    d.ribbon({ mat: LF, z: z + 0.2 + k * 0.01, group: 'fern' + k, line: 'soft' }, pts, [0.7, 0.6, 0.5, 0.3]);
+    const leaf: { p: V; c: RGBA }[] = [];
+    for (let i = 1; i < 7; i++) {
+      const t = i / 7, uu = u - len * t, ww = w - 5.4 * Math.sin(t * Math.PI * 0.85) + sw * t;
+      const l = 1.8 * (1 - t * 0.6);
+      leaf.push({ p: B(uu, ww - l), c: LF.ramp[4] }, { p: B(uu - 0.6, ww - l - 0.6), c: LF.ramp[5] }, { p: B(uu, ww + l * 0.6), c: LF.ramp[2] });
+    }
+    d.pixels({ mat: LF, z: z + 0.25 + k * 0.01, group: 'fern' + k, line: 'none' }, leaf);
   }
+  // small white flowers in the moss
+  d.pixels({ mat: MS, z: z + 0.3, group: 'flowers', line: 'none', outline: false }, [
+    { p: B(-20, -8.4), c: ACCENT.white }, { p: B(-19.4, -9), c: ACCENT.goldHot }, { p: B(-9, -16.6), c: ACCENT.white }, { p: B(-8.4, -17.2), c: ACCENT.goldHot }, { p: B(6, -17), c: ACCENT.white }, { p: B(-15, -12), c: ACCENT.white },
+  ]);
+  // two bracket fungi on his flank, shelves of pale ochre with a dark gill line
+  for (const [u, w, r] of [[-9, 2.4, 3.2], [-12.4, 4.6, 2.2]] as const) {
+    const c = B(u, w);
+    d.ellipse({ mat: FG, z: z + 0.35, group: 'fungus' + u, line: 'soft' }, c, r, r * 0.45, 0);
+    d.line({ mat: FG, z: z + 0.36, group: 'fungus' + u, line: 'none' }, v(c.x - r + 1, c.y - r * 0.3), v(c.x + r - 1, c.y - r * 0.3), FG.ramp[1]);
+  }
+  wren(d, g, P, z + 0.5);
+}
+
+/** The wren that nests in his moss: a round brown body, its tail cocked up, a pale brow; it flutters up on `bird`. */
+function wren(d: Draw, g: Boar, P: Record<string, number>, z: number) {
+  const up = P.bird ?? 0;
+  const flap = Math.sin((P.wave ?? 0) * 3) > 0 ? 1 : -1;
+  const c0 = g.B(0.6, -25.6);
+  const c = v(c0.x - up * 3, c0.y + up * 10);
+  if (up > 0.2) {
+    for (const s of [1, -0.6]) d.ribbon({ mat: WR, z: z - 0.05 * (s < 0 ? 1 : -1), group: 'wrenWing' + s, line: 'soft', shade: s < 0 ? -1 : 0 }, [c, v(c.x - 1.4, c.y + flap * 3.6 * s), v(c.x - 3.4, c.y + flap * 4.4 * s)], [1.2, 1, 0.3]);
+  }
+  d.ribbon({ mat: WR, z, group: 'wrenTail', line: 'soft' }, [v(c.x - 1.6, c.y + 0.4), v(c.x - 3, c.y + 2.6), v(c.x - 3.4, c.y + 4)], [1, 0.8, 0.4]);
+  d.ellipse({ mat: WR, z: z + 0.1, group: 'wren' }, c, 2.4, 1.9, 0);
+  d.circle({ mat: WR, z: z + 0.15, group: 'wren' }, v(c.x + 1.8, c.y + 1.4), 1.4);
+  d.pixels({ mat: WR, z: z + 0.2, group: 'wren', line: 'none', outline: false }, [
+    { p: v(c.x + 2.2, c.y + 1.8), c: INK.eye }, { p: v(c.x + 1.6, c.y + 2.6), c: WR.ramp[5] }, { p: v(c.x + 3.4, c.y + 1.4), c: ACCENT.eyeAmber }, { p: v(c.x + 0.4, c.y - 0.6), c: WR.ramp[4] },
+  ]);
 }
 
 function neck(d: Draw, g: Boar, z: number) {
@@ -213,7 +261,7 @@ function run(t: number): Pose {
   const [fNx, fNy] = paw(11, a, 8, 5), [fFx, fFy] = paw(13, a + 0.7, 8, 5);
   const [hNx, hNy] = paw(-23, a + Math.PI, 8, 5), [hFx, hFy] = paw(-21, a + Math.PI + 0.7, 8, 5);
   return boar(
-    { y: Math.round(Math.sin(2 * a)) - 1, torso: Math.round(Math.sin(a + 0.6) * 2), head: 8, p: { snout: -24, jaw: 0, tail: -150, bristle: 0.5, wave: a * 2 } },
+    { y: Math.round(Math.sin(2 * a)) - 1, torso: Math.round(Math.sin(a + 0.6) * 2), head: 8, p: { snout: -24, jaw: 0, tail: -150, bristle: 0.5, wave: a * 2, bird: 1 } },
     [fNx, fFx, hNx, hFx],
     [fNy, fFy, hNy, hFy],
   );
@@ -221,14 +269,14 @@ function run(t: number): Pose {
 
 // Tusk Gore: he drops his head low, then hooks it up and through.
 const TG_LOW = boar({ x: -5, y: -3, torso: -3, head: -8, p: { snout: -40, jaw: 0, tail: -150, bristle: 1 } }, [8, 11, -26, -23]);
-const TG_HOOK = boar({ x: 5, y: -1, torso: 6, head: 30, p: { snout: 18, jaw: 0.6, tail: -168, bristle: 1 } }, [15, 18, -21, -18]);
-const TG_HOLD = boar({ x: 3, y: -1, torso: 3, head: 20, p: { snout: -6, jaw: 0.2, tail: -150, bristle: 0.6 } }, [15, 18, -21, -18]);
+const TG_HOOK = boar({ x: 5, y: -1, torso: 6, head: 30, p: { snout: 18, jaw: 0.6, tail: -168, bristle: 1, bird: 1, wave: 1 } }, [15, 18, -21, -18]);
+const TG_HOLD = boar({ x: 3, y: -1, torso: 3, head: 20, p: { snout: -6, jaw: 0.2, tail: -150, bristle: 0.6, bird: 0.6, wave: 1.6 } }, [15, 18, -21, -18]);
 
 // Dig In: a stamp of the front hooves, head down, crest up, a long snort.
 const DI_REAR = boar({ x: -2, y: 1, torso: 8, head: 26, p: { snout: -8, jaw: 0, tail: -120, bristle: 0.4 } }, [11, 14, -24, -21], [5, 3, 0, 0]);
 const DI_PLANT = boar({ x: 0, y: -3, torso: -2, head: 2, p: { snout: -32, jaw: 0.3, tail: -110, bristle: 1 } }, [12, 15, -26, -23]);
 
-const HURT = boar({ x: -4, y: -1, torso: 3, head: 24, p: { snout: -6, jaw: 0.5, tail: -100, bristle: 0.4 } }, [7, 10, -26, -23]);
+const HURT = boar({ x: -4, y: -1, torso: 3, head: 24, p: { snout: -6, jaw: 0.5, tail: -100, bristle: 0.4, bird: 0.8, wave: 1 } }, [7, 10, -26, -23]);
 const DEATH_SAG = boar({ x: -2, y: -9, torso: -5, head: -6, p: { snout: -34, jaw: 0.1, tail: -104, bristle: 0 } }, [13, 16, -22, -19]);
 const DEATH_DOWN = boar({ y: -13, torso: 0, head: -8, p: { snout: -8, jaw: 0, tail: -170, dead: 1, lie: 1, bristle: 0 } }, [23, 26, -8, -5]);
 

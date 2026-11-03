@@ -3978,6 +3978,12 @@ When it dies the cap topples off.
   for 1 turn.
 - Stats HP 1000, ATK 106, DEF 58, SPD 104, CRIT 2.5%, score 383. Summoned.
 
+Redrawn on his word of 2026-11-03, "We also need to change art design of toadcap as he is not interesting and should have
+some fancy detail funny ... Be creative and consistent": its cap is now a red toadstool's with white warts, its stalk has
+big round eyes, rosy cheeks and a cheeky grin, and the joke of its name sits on top: a fat olive toad with a pale belly and
+bulging gold eyes, living on the cap; it blinks and puffs out its throat at rest, is flung off the cap when the Toadcap
+butts and lands back, and sits on the toppled cap, quite unbothered, when it falls. The kit stays.
+
 ## 51. The Bristleback (received 2026-11-01)
 
 A Common Tank of the Court of Root, Tide: a heavy old boar on four legs (the Follower's rig), dark
@@ -3988,6 +3994,12 @@ No collar.
 - **Dig In** (A2, CD 4): Taunt for 1 turn and DEF Up for 2 turns on himself. No attack. A Tank
   without a Taunt draws no fire (MDA T20), so this stayed and a passive went.
 - Stats HP 1400, ATK 78, DEF 70, SPD 92, CRIT 2.5%, score 397. Summoned.
+
+Redrawn the same day, on his word "redesign art of bristtleback as his plant on back his vertical and looks weird, maybe
+make it a bit different mossy back or something": no sapling. A thick carpet of moss over his whole back, built up into a
+mossy mound over the hump with its edge hanging in tufts down his flanks; three ferns arching back from it; small white
+flowers in the moss; two bracket fungi on his flank; and a little wren nesting on top, who flutters up when he charges,
+gores or is hit, and settles again. The kit stays.
 
 ## 52. The Hive Tender (received 2026-11-01)
 

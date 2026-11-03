@@ -3,11 +3,17 @@
 // fat stalk with stubby arms and root feet, a huge russet cap with pale warts and
 // gills beneath (the silhouette), two small dark eyes in the stalk under the cap,
 // spores drifting off it. It butts with the cap; when
-// it dies the cap topples off. Its affinity (Ember) sets nothing here (Jakub,
+// it dies the cap topples off.
+// Redrawn on Jakub's word of 2026-11-03 ("not interesting and should have some fancy detail
+// funny"): the cap a red toadstool's with white warts, big round eyes, rosy cheeks and a cheeky
+// grin in the stalk, and the joke of its name: a fat toad living on the cap, blinking, puffing
+// out its throat, thrown up off the cap when it butts and landing back, and sitting on the
+// toppled cap, quite unbothered, when the Toadcap falls. Its affinity (Ember) sets nothing here (Jakub,
 // 2026-10-11).
 import { BuildInfo, ChampionArt, CharDef, cycle, keys, tween } from '../char.ts';
 import { compose, glyph } from '../icons.ts';
 import { ACCENT, INK, MAT } from '../palette.ts';
+import { RGBA } from '../raster.ts';
 import { arm, leg, torsoPts } from '../parts.ts';
 import { Dims, Draw, ease, lerpPose, pose, Pose, Skel, tweak, V, v } from '../rig.ts';
 
@@ -28,7 +34,7 @@ const D: Dims = {
   hipF: 3,
 };
 
-const ST = MAT.linen, CP = MAT.terracotta, GL = MAT.bone, RT = MAT.bark;
+const ST = MAT.linen, CP = MAT.red, GL = MAT.bone, RT = MAT.bark, TD = MAT.green, TB = MAT.straw;
 const E = ACCENT;
 
 function build(d: Draw, s: Skel, info: BuildInfo) {
@@ -40,8 +46,14 @@ function build(d: Draw, s: Skel, info: BuildInfo) {
   leg(d, s, 'N', legCfg(40, 0));
   arm(d, s, 'N', armCfg(60, 0));
   face(d, s, P, 38);
-  if (P.drop) fallenCap(d, 56);
-  else cap(d, s, P, 50);
+  if (P.drop) {
+    fallenCap(d, 56);
+    toad(d, (x, y) => v(10 + x * 1.4, 15 + y * 1.4), P, 58);
+  } else {
+    cap(d, s, P, 50);
+    const q = P.squash ?? 0;
+    toad(d, (x, y) => s.H(x * 1.4 * (1 + q * 0.2), y * 1.4 + 13.2 * (1 - q * 0.3) + (P.hop ?? 0)), P, 52);
+  }
   spores(d, s, P);
 }
 
@@ -67,14 +79,58 @@ function stalk(d: Draw, s: Skel, z: number) {
   d.ribbon({ mat: GL, z: z + 0.5, group: 'frill' }, [s.T(13, -7.2), s.T(12, -2), s.T(12.6, 3), s.T(12, 7.4)], [1.0, 1.3, 1.3, 1.0]);
 }
 
+/** Its face in the stalk under the cap: two big round eyes, rosy cheeks, a wide cheeky grin with one tooth; a grimace when it strikes (`grit`), crosses for eyes when it falls. */
 function face(d: Draw, s: Skel, P: Record<string, number>, z: number) {
-  const open = P.dead ? 0 : 1;
-  const px: { p: V; c: typeof INK.eye }[] = [];
-  if (open) {
-    px.push({ p: s.T(18.6, 3.0), c: INK.eye }, { p: s.T(19.6, 3.0), c: INK.eye }, { p: s.T(18.6, 6.0), c: INK.eye }, { p: s.T(19.6, 6.0), c: INK.eye });
-    if (P.grit) px.push({ p: s.T(16, 3.6), c: INK.eye }, { p: s.T(16, 4.6), c: INK.eye }, { p: s.T(16, 5.6), c: INK.eye });
-  } else px.push({ p: s.T(19, 3.0), c: ST.ramp[1] }, { p: s.T(19, 4.0), c: ST.ramp[1] }, { p: s.T(19, 6.0), c: ST.ramp[1] });
+  const T = s.T;
+  const px: { p: V; c: RGBA }[] = [];
+  if (!P.dead) {
+    for (const w of [2.4, 5.6]) {
+      px.push({ p: T(16.0, w), c: INK.eye }, { p: T(16.0, w + 1), c: INK.white }, { p: T(15.0, w), c: INK.eye }, { p: T(15.0, w + 1), c: INK.eye }, { p: T(17.0, w), c: INK.eye }, { p: T(17.0, w + 1), c: INK.eye });
+      px.push({ p: T(17.2, w - 0.4), c: ST.ramp[1] }, { p: T(17.4, w + 0.8), c: ST.ramp[1] });
+    }
+    px.push({ p: T(13.0, 1.4), c: INK.blush }, { p: T(13.0, 7.8), c: INK.blush }, { p: T(12.6, 8.4), c: INK.blush });
+    if (P.grit) for (let w = 2.6; w <= 7; w += 1) px.push({ p: T(11.6, w), c: w === 4.6 ? INK.white : INK.eye });
+    else {
+      px.push({ p: T(12.0, 2.4), c: INK.eye }, { p: T(11.2, 3.4), c: INK.eye }, { p: T(11.0, 4.4), c: INK.eye }, { p: T(11.0, 5.4), c: INK.eye }, { p: T(11.2, 6.4), c: INK.eye }, { p: T(12.0, 7.4), c: INK.eye });
+      px.push({ p: T(11.9, 5.4), c: INK.white });
+    }
+  } else {
+    for (const w of [2.4, 5.6]) px.push({ p: T(16.0, w), c: ST.ramp[1] }, { p: T(15.0, w + 1), c: ST.ramp[1] }, { p: T(15.0, w), c: ST.ramp[1] }, { p: T(16.0, w + 1), c: ST.ramp[1] });
+    px.push({ p: T(11.4, 4), c: ST.ramp[1] }, { p: T(11.4, 5), c: ST.ramp[1] });
+  }
   d.pixels({ mat: ST, z, group: 'eyes', outline: false, line: 'none' }, px);
+}
+
+/**
+ * The toad that lives on its cap, the joke of its name: fat and olive-green with a pale belly,
+ * two bulging gold eyes, a wide mouth; it blinks (`blink`), puffs out its throat (`croak`), and is
+ * thrown up off the cap when the Toadcap butts (`hop`), its legs splayed.
+ */
+function toad(d: Draw, F: (x: number, y: number) => V, P: Record<string, number>, z: number) {
+  const hop = P.hop ?? 0;
+  const spread = Math.min(1, hop / 3);
+  // the back leg: folded under when sitting, kicked out behind when it flies
+  d.ellipse({ mat: TD, z, group: 'toadLeg', shade: -1 }, F(-3 - spread * 2, 1.6 - spread), 2.4, 1.6, spread * -30);
+  d.ellipse({ mat: TD, z: z + 0.1, group: 'toad' }, F(0.6, 3), 4.8, 3.2, 8);
+  d.ellipse({ mat: TB, z: z + 0.15, group: 'toadBelly', line: 'none' }, F(2.2, 1.8), 2.8, 1.5, 8);
+  // warts on the back
+  d.pixels({ mat: TD, z: z + 0.2, group: 'toad', line: 'none' }, [{ p: F(-1.6, 4.8), c: TD.ramp[5] }, { p: F(0.4, 5.6), c: TD.ramp[4] }, { p: F(-3, 3.4), c: TD.ramp[4] }]);
+  // the front leg, planted on the cap or reaching down
+  d.ribbon({ mat: TD, z: z + 0.25, group: 'toadArm', line: 'soft' }, [F(3.4, 1.8), F(4.4 + spread, 0.4 - spread), F(5.4 + spread * 1.4, -0.4 - spread * 2)], [1.1, 0.9, 0.9]);
+  // the throat, puffed out when it croaks
+  const cr = P.croak ?? 0;
+  if (cr > 0.1) d.circle({ mat: TB, z: z + 0.3, group: 'toadSac', line: 'soft' }, F(4.6, 1.6), 1 + cr * 1.8);
+  // the wide mouth
+  d.line({ mat: TD, z: z + 0.32, group: 'toad', line: 'none' }, F(5.2, 2.6), F(2.6, 2.4), TD.ramp[0]);
+  // the eyes on top, bulging
+  for (const [x, y, k] of [[3.2, 5.6, 0], [1.4, 6, 1]] as const) {
+    const c = F(x, y);
+    d.circle({ mat: TD, z: z + 0.35 - k * 0.02, group: 'toadEye' + k, shade: k ? -1 : 0 }, c, 1.4);
+    const closed = (P.blink ?? 0) > 0.5 || P.dead;
+    d.pixels({ mat: TD, z: z + 0.4, group: 'toadEye' + k, line: 'none', outline: false }, closed
+      ? [{ p: c, c: TD.ramp[1] }, { p: v(c.x + 1, c.y), c: TD.ramp[1] }]
+      : [{ p: c, c: ACCENT.eyeAmber }, { p: v(c.x + 1, c.y), c: INK.eye }]);
+  }
 }
 
 /** The cap on the head's frame: gills under it, a wide russet dome, pale warts. `squash` flattens and widens it. */
@@ -90,7 +146,7 @@ function cap(d: Draw, s: Skel, P: Record<string, number>, z: number) {
 function warts(d: Draw, H: (x: number, y: number) => V, z: number) {
   const W = GL.ramp;
   const px: { p: V; c: (typeof W)[number] }[] = [];
-  for (const [x, y, r] of [[-10, 3, 2], [-3, 8, 2], [4, 3, 3], [10, 5, 1], [-6, 0, 1], [13, 0, 1], [-13, 0, 1], [1, 11, 1]] as const) {
+  for (const [x, y, r] of [[-11, 3, 3], [-4, 8, 3], [4, 3, 3], [10, 6, 2], [-6, 0, 2], [13, 1, 2], [-14, 0, 1], [1, 11, 2], [7, 10, 1], [-9, 8, 1]] as const) {
     for (let a = 0; a < r; a++) for (let b = 0; b < r; b++) px.push({ p: H(x + a * 1.1, y + b * 1.1), c: W[a + b ? 4 : 5] });
   }
   d.pixels({ mat: CP, z, group: 'warts', outline: false, line: 'none' }, px);
@@ -136,7 +192,8 @@ const IDLE: Pose = pose({
 function idle(t: number): Pose {
   const a = t * Math.PI * 2;
   const b = Math.round((1 - Math.cos(a)) / 2);
-  return tweak(IDLE, { y: -1 - b, head: 90 + Math.round(Math.sin(a)), p: { wave: a } });
+  const i = Math.round(t * 8);
+  return tweak(IDLE, { y: -1 - b, head: 90 + Math.round(Math.sin(a)), p: { wave: a, blink: i === 5 ? 1 : 0, croak: i === 2 ? 0.6 : i === 3 ? 1 : 0 } });
 }
 
 function run(t: number): Pose {
@@ -152,10 +209,10 @@ function run(t: number): Pose {
 
 // Spore Slap: it rears back, the cap tipped behind it, and bows hard into the enemy.
 const SS_BACK = tweak(IDLE, { x: -3, y: 0, torso: 106, head: 118, legN: { ik: v(-7, 3) }, legF: { ik: v(7, 3) }, armN: { up: -120, lo: -80 }, armF: { up: -120, lo: -80 } });
-const SS_BUTT = tweak(IDLE, { x: 9, y: -3, torso: 52, head: 26, legN: { ik: v(-10, 3) }, legF: { ik: v(8, 3) }, armN: { up: -100, lo: -70 }, armF: { up: -100, lo: -70 }, p: { grit: 1, squash: 0.3 } });
-const SS_HOLD = tweak(SS_BUTT, { x: 7, torso: 60, head: 40, p: { grit: 0, squash: 0 } });
+const SS_BUTT = tweak(IDLE, { x: 9, y: -3, torso: 52, head: 26, legN: { ik: v(-10, 3) }, legF: { ik: v(8, 3) }, armN: { up: -100, lo: -70 }, armF: { up: -100, lo: -70 }, p: { grit: 1, squash: 0.3, hop: 6 } });
+const SS_HOLD = tweak(SS_BUTT, { x: 7, torso: 60, head: 40, p: { grit: 0, squash: 0, hop: 3, croak: 1 } });
 
-const HURT = tweak(IDLE, { x: -4, y: -2, torso: 104, head: 112, p: { squash: 0.3, grit: 1 } });
+const HURT = tweak(IDLE, { x: -4, y: -2, torso: 104, head: 112, p: { squash: 0.3, grit: 1, hop: 2, blink: 1 } });
 const DEATH_SAG = tweak(IDLE, { y: -7, torso: 74, head: 54, legN: { ik: v(-9, 3) }, legF: { ik: v(8, 3) }, p: { squash: 0.3, dead: 1 } });
 const DEATH_DOWN = pose({
   x: -4, y: -10, torso: 172, head: 172,
@@ -165,7 +222,7 @@ const DEATH_DOWN = pose({
 });
 
 // Victory: a little hop, the arms up.
-const HOP = tweak(IDLE, { y: 5, armN: { up: 50, lo: 80 }, armF: { up: 50, lo: 80 }, p: { squash: 0 } });
+const HOP = tweak(IDLE, { y: 5, armN: { up: 50, lo: 80 }, armF: { up: 50, lo: 80 }, p: { squash: 0, hop: 4, croak: 1 } });
 const LAND = tweak(IDLE, { y: -3, armN: { up: 30, lo: 60 }, armF: { up: 30, lo: 60 }, p: { squash: 0.5 } });
 
 const mid = (a: Pose, b: Pose, t: number) => lerpPose(a, b, t, D);
