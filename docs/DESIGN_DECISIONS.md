@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-04 | The main menu redesigned: Loomfall, a town at dusk under the broken Loom, each way on a place of its own; Extra Combat, its Arena shut until 10-10 is won, no screen yet | 87 |
 | 2026-11-04 | The world map ends past area 10 (3780 wide): the blossom runs on, then two unlike tears of the broken Loom, the faded broken land beyond | 86 |
 | 2026-11-04 | The Champions screen filters by rarity too, beside affinity and class; its tabs show one, two and three swords | 85 |
 | 2026-11-04 | The champion screen's background by faction: Court of Root the Verdant Grove, Ashveil Reign the Dead Forest, Sanguine Dominion Earth Scars, Azure Crown the Snowy Mesa | 84 |
@@ -4907,3 +4908,49 @@ map); those 56 held the old east frame and the compass, which moved east with th
 
 Stand-ins until he sets them: the tears' shapes and sizes, which tear is which, the wedge's slabs, the floating pieces
 and what stands on them, and that the road runs into the second tear.
+
+## 87. Loomfall, the main menu redesigned; Extra Combat (received 2026-11-04)
+
+> now i want you to totally redesign main menu diorama. be creative and consistent and also make each navigational menu an object, building or something. be creative and consistent. then also reanalyze if we need to rewire tutorial or some other things. make sure everything works. do not reuse environment or how it looks right now. i dont want to have floating islands in space like now. be creative.
+
+> prepare a navigational object and place for new content, do not invent screen yet, i will define later. just call it "Extra Combat"
+
+> extra combat should be locked until player win campaign 10-10.
+
+Built (`tools/art/loomfall.ts`, `src/game/view/loomfall.ts`, `src/game/screens/menu.ts`); the Sanctum of section 10 and its
+island in space are gone. **Loomfall** is a town on a terrace over a valley at dusk, where the Archivist keeps the
+legends recollected. Beyond the valley the broken Loom stands as a colossal ruin: the west upright whole, built of
+great drums of stone banded in gold, carrying the stump of the beam, snapped short of the middle, a curtain of warp
+threads hanging from it, some torn, a block of the beam dangling; the east upright leaning, snapped off. The title
+hangs in the gap where the beam fell. The sun has just gone down behind the western mountains (the key light from
+the top-left, as everywhere): the low sky burns, the first stars come out, a crescent moon, banks of cloud lit from
+below, a lake in the valley. Each way on is a place of the town, its label hung where no champion can cover it:
+
+| Way on | Place |
+| --- | --- |
+| Campaign | the Wayfarers' Gate on the east edge, the four factions' banners on its towers, the road going down into the valley through its arch, torches either side |
+| Champions | the Reliquary at the head of the square: a gold dome, a pediment with the broken Loom in gold, a colonnade, bronze doors ajar on lamplight, braziers on its stair |
+| Weaving | the Weavers' Mill: timber and plaster, a waterwheel turned by an aqueduct, cloth in the four factions' colours drying, a great spool for its sign |
+| Academy | the Athenaeum: a library tower, its windows full of books, an owl on its balcony |
+| Options | the Clocktower on the west edge: its face keeps your own time, its works turn behind three arches |
+| Summon | the Wishing Well in the square: the Wishing Star hangs under its roof over the water |
+| Merchant | the Merchant's Wagon in the square's west corner, its wares on a counter, a lantern swaying |
+| Challenges | the Herald's Board in the square's east corner, its notes sealed in red, a pennant on its roof |
+| Extra Combat | the Arena across the lake: dark under a seal of the Loom's light until 10-10 is won, then lit, flags flying |
+
+Champions stand three and three either side of the well (his 2026-11-01 "3 vs 3 in a row"). What moves, calmly (his rule):
+the stars, light running down the threads, a flight of birds now and then, chimney smoke, the wheel and its water, the
+cloth and the banners, the works, the torches and braziers, the owl's blink, the windows breathing, fireflies, souls
+drifting in to the star (brighter while a summon waits).
+
+**Extra Combat** (`src/game/data/extra.ts`): its place and its label (EXTRA COMBAT), shut until stage 10-10 is first
+won (`extraCombatOpen`): a lock on its label, "Win stage 10-10 to open it" under it, and a click says on the menu's bottom
+line that it opens once 10-10 is won. Open, the Arena is lit and a click says it is coming; it has no screen, on his word.
+
+Rewired: the tutorial's cards on the menu go to the side of their place toward the middle (the Gate is on the east edge
+now), and its words name Loomfall and the Wayfarers' Gate; the Summon screen keeps its star, sized from the menu's art,
+over Loomfall's sky; the texts that named the Sanctum name Loomfall (the Journey's first quest, the Academy's chapter on
+summoning, the Merchant's header and the Challenges' line on Gold).
+
+Stand-ins until he sets them: the name Loomfall and every place's name and look, the places' arrangement, the Arena as
+Extra Combat's place, and the words Extra Combat says while shut and once open.

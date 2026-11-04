@@ -11,7 +11,7 @@ import { starCrystal } from '../star.ts';
 const H = (list: string[]) => list.map((h) => hex(h));
 /** Stardust: old gold paling to white */
 const DUST = H(['#3a2810', '#6e4e1c', '#a87a2c', '#d8aa48', '#f4d88a', '#fff4d0', '#ffffff']);
-/** the Soulstar: the Wishing Star's lilac light (tools/art/sanctum.ts SOUL) */
+/** the Soulstar: the Wishing Star's lilac light (tools/art/loomfall.ts SOUL) */
 const SOUL = H(['#1a1230', '#2c2050', '#433474', '#5f4e9c', '#8a78c4', '#b6a8e6', '#e0d8fa', '#ffffff']);
 
 /** A grain that glints: a bright heart, and arms of `arm` px in the dust's colour. */

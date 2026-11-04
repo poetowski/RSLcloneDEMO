@@ -1,4 +1,4 @@
-// How Gold reads on screen (the Merchant, the Sanctum's label): its colour and
+// How Gold reads on screen (the Merchant, its label in Loomfall): its colour and
 // words. The name itself is in data/economy.ts.
 import { CURRENCY } from '../data/economy';
 

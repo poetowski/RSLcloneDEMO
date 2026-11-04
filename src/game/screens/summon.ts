@@ -1,6 +1,6 @@
 // The Wishing Star (summoning; Jakub, 2026-10-25: "new object in main menu,
 // somewhere on the sky, where people can click and merge fragments dropped
-// from campaing nodes and then summon heroes"). Under the Sanctum's sky the
+// from campaing nodes and then summon heroes"). Under Loomfall's sky the
 // star hangs at twice its size on its thread; on the left the Stardust and the
 // Soulstars merged from it, on the right the wish (a faction, a role) and the
 // odds it makes, below the star the summon, along the bottom the champions
@@ -21,7 +21,7 @@ import { blit, nine, Rect4 } from '../view/assets';
 import { champion } from '../data/champions';
 import { BaseScreen } from './base';
 
-/** where the star's heart stands; it is drawn at twice its size in the Sanctum */
+/** where the star's heart stands; it is drawn at twice its size over Loomfall's well */
 const STAR = { x: W / 2, y: 104 };
 const LEFT: Rect4 = [14, 40, 180, 232];
 const RIGHT: Rect4 = [W - 194, 40, 180, 232];
@@ -90,7 +90,7 @@ export class SummonScreen extends BaseScreen {
   protected update(dt: number) {
     for (const m of this.motes) m.t += dt;
     this.motes = this.motes.filter((m) => m.t < m.life);
-    // now and then a soul drifts up into the star, as in the Sanctum
+    // now and then a soul drifts in to the star, as in Loomfall
     if ((this.soulT -= dt) <= 0) {
       this.soulT = 1500 + Math.random() * 2000;
       const a = Math.PI * (0.2 + Math.random() * 0.6), d = 90 + Math.random() * 60;
@@ -163,7 +163,7 @@ export class SummonScreen extends BaseScreen {
     }
   }
 
-  /** The Sanctum's sky, dimmed, its stars twinkling; the thread the star hangs from. */
+  /** Loomfall's sky, dimmed, its stars twinkling; the thread the star hangs from. */
   private sky(ctx: CanvasRenderingContext2D) {
     const m = this.a.menu;
     ctx.drawImage(m.sky, 0, 0);
@@ -179,7 +179,7 @@ export class SummonScreen extends BaseScreen {
     });
     ctx.globalAlpha = 1;
     // the thread, down from above to the star's upper point
-    const top = STAR.y - 2 * 19;
+    const top = STAR.y - 2 * m.json.wishUp;
     for (let y = 30; y < top; y++) {
       ctx.fillStyle = y % 9 === 0 ? '#e6dcff' : '#8a7cb8';
       ctx.fillRect(STAR.x - 1, y, 2, 1);

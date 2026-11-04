@@ -10,6 +10,7 @@ import { LOCATIONS, STARTERS, allStages, stage } from './data/campaign';
 import { JOURNEY } from './data/challenges';
 import { champion, CHAMPIONS } from './data/champions';
 import { STARTING_GOLD } from './data/economy';
+import { EXTRA_COMBAT } from './data/extra';
 import { MATRIX_LAYOUT, PATTERN_IDS, SPOOL_STATS } from './data/matrix';
 import { FACTIONS, ROLES } from './data/meta';
 import { Wish } from './data/summoning';
@@ -229,6 +230,11 @@ export function roster(a: MasterArchivist): string[] {
 
 export function cleared(a: MasterArchivist, stageId: string): boolean {
   return (a.stars[stageId] ?? 0) > 0;
+}
+
+/** Extra Combat opens once its stage is won (Jakub: 10-10); until then its place in Loomfall stays shut. */
+export function extraCombatOpen(a: MasterArchivist): boolean {
+  return cleared(a, EXTRA_COMBAT.opensAfter);
 }
 
 export function locationOpen(a: MasterArchivist, loc: LocationDef): boolean {

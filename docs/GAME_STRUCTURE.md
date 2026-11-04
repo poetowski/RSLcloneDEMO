@@ -198,9 +198,9 @@ Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `r
 | Challenges | `screens/challenges.ts` | `?screen=challenges&tab=daily` (opens on the Journey) |
 | Recruit ceremony | `screens/recruit.ts` | `?screen=recruit&champion=rime_scholar` (also a summon's ceremony) |
 | Summon (the Wishing Star) | `screens/summon.ts` | `?screen=summon` (`&stardust=250`, `&soulstars=2` set what the save holds) |
-| Merchant (the Merchant's Stall) | `screens/merchant.ts` | `?screen=merchant&tab=sell` (opens on BUY): the Gold held; BUY the wares (ROTATE WARES for 5000 Gold), SELL loose spools |
+| Merchant (the Merchant's Wagon) | `screens/merchant.ts` | `?screen=merchant&tab=sell` (opens on BUY): the Gold held; BUY the wares (ROTATE WARES for 5000 Gold), SELL loose spools |
 | Skill demo | `screens/battle.ts` (demo mode) | `?demo=iron_blow` |
 
-The main menu is the Sanctum (`src/game/view/sanctum.ts`, art `tools/art/sanctum.ts`): the island under the broken Loom, whose places are the menu: the Starbridge Gate (campaign), the Reliquary (champions), the Weaver's Spire (Weaving), the Observatory (Academy), the astrolabe (options), the Herald's Board (Challenges), the Merchant's Stall (the Merchant) and, in its sky, the Wishing Star (summoning); a few owned champions, a different few each visit, stand on its plaza ([UI_GUIDE.md](UI_GUIDE.md) 4).
+The main menu is Loomfall (`src/game/view/loomfall.ts`, art `tools/art/loomfall.ts`): a town at dusk under the broken Loom, whose places are the menu: the Wayfarers' Gate (campaign), the Reliquary (champions), the Weavers' Mill (Weaving), the Athenaeum (Academy), the Clocktower (options), the Herald's Board (Challenges), the Merchant's Wagon (the Merchant), the Wishing Well with the Wishing Star (summoning) and the Arena across the lake (Extra Combat: no screen yet, shut until 10-10 is won, `extraCombatOpen`, `src/game/data/extra.ts`); a few owned champions, a different few each visit, stand round its well ([UI_GUIDE.md](UI_GUIDE.md) 4).
 
 All navigation goes through `app.router` (`src/main.ts`), which wraps each switch in a dithered dissolve. `?unlockall=1`, `?reset=1`, `?spools=1`, `?stardust=<n>` and `?soulstars=<n>` change the save before the first screen opens.

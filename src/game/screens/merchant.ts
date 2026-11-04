@@ -1,8 +1,8 @@
 // The Merchant (Jakub, 2026-11-03: "create a screen for Merchant and put object on
 // main menu and make it navigational to a new merchant screen. on merchant screen
 // player see their current gold and they will be able to buy and sell items"; then
-// the spools' prices and wares the same day). Reached from the Merchant's stall in
-// the Sanctum. The purse shows the Gold held. BUY lays out the wares, 5 Ashen, 3
+// the spools' prices and wares the same day). Reached from the Merchant's Wagon in
+// Loomfall's square. The purse shows the Gold held. BUY lays out the wares, 5 Ashen, 3
 // Silver and 2 Gilded spools, each with its price; SELL the loose spools in storage,
 // each with what the Merchant pays. Choosing a spool shows it on the right with its
 // price and the button that trades it. Rules: src/game/merchant.ts.
@@ -103,7 +103,7 @@ export class MerchantScreen extends BaseScreen {
 
   protected draw(ctx: CanvasRenderingContext2D) {
     this.diorama.draw(ctx, this.t, 0.72);
-    this.header(ctx, 'MERCHANT', "The Merchant's Stall");
+    this.header(ctx, 'MERCHANT', "The Merchant's Wagon");
     this.tabs(ctx);
     this.purse(ctx);
     const cards = this.cards();

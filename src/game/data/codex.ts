@@ -169,7 +169,7 @@ export const CHAPTERS: Chapter[] = [
     title: 'Summoning',
     icon: 'mi_summon',
     blocks: [
-      { kind: 'p', text: "Champions answer the Wishing Star, in the Sanctum's sky. Every victory in the campaign finds Stardust; 100 Stardust merge into a Soulstar, and each Soulstar summons one champion you do not have yet." },
+      { kind: 'p', text: "Champions answer the Wishing Star, hanging over the well in Loomfall's square. Every victory in the campaign finds Stardust; 100 Stardust merge into a Soulstar, and each Soulstar summons one champion you do not have yet." },
       { kind: 'list', items: ['Common: 70%.', 'Elite: 25%.', 'Heroic: 5%.'] },
       { kind: 'p', text: 'Once every champion of a rarity is yours, its share goes to the others. Captain Gareth is with you from the start and the first clear of stage 1-1 brings the Rime Scholar; every other champion is summoned.' },
       { kind: 'h', text: 'A wish' },

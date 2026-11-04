@@ -15,7 +15,7 @@ import { buildZones } from './zones/index.ts';
 import { buildUi } from './ui/index.ts';
 import { buildFont } from './font.ts';
 import { buildMap } from './map.ts';
-import { buildSanctum } from './sanctum.ts';
+import { buildLoomfall } from './loomfall.ts';
 
 export const OUT = path.resolve('public/assets');
 
@@ -98,5 +98,5 @@ if (want('zones')) buildZones(OUT, sub);
 if (want('font')) buildFont(OUT);
 if (want('ui')) buildUi(OUT, portraits);
 if (want('map')) buildMap(OUT);
-if (want('menu')) buildSanctum(OUT);
+if (want('menu')) buildLoomfall(OUT);
 console.log(`art done in ${((Date.now() - t0) / 1000).toFixed(1)}s`);

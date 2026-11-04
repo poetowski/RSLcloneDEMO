@@ -291,7 +291,7 @@ export function gem(aff: keyof typeof UIR.affinity): Bitmap {
  * colour, 'l' its lit edge, 's' its shaded edge. A 7-row glyph sits at (4,4),
  * a 9-row one at (3,3).
  */
-const EMBLEMS: Record<keyof typeof UIR.faction, string[]> = {
+export const EMBLEMS: Record<keyof typeof UIR.faction, string[]> = {
   azure_crown: ['.......', '#..#..#', '##.#.##', '#######', '#######', '.......', '#######'],
   sanguine_dominion: ['.......', '..###..', '.#####.', '#######', '.#####.', '..###..', '.......'],
   // a paw: four toe pads over the main pad, its lower edge in three lobes (Jakub, 2026-10-13)

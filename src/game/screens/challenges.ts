@@ -394,7 +394,7 @@ export class ChallengesScreen extends BaseScreen {
       ui.text(ctx, goldText(rw.amount), rx + 30, py + 30, { color: GOLD_TINT });
       if (found) ui.text(ctx, 'Found: in your purse now.', rx + 30, py + 44, { color: COLORS.good });
       else ui.para(ctx, st === 'claimed' ? 'Taken, into your purse.' : 'Goes into your purse when you claim this.', rx + 30, py + 44, 152, { color: COLORS.faint });
-      ui.para(ctx, 'The Merchant on the Sanctum plaza trades spools for it.', rx, py + 82, 180, { color: COLORS.faint });
+      ui.para(ctx, "The Merchant's Wagon in Loomfall trades spools for it.", rx, py + 82, 180, { color: COLORS.faint });
     } else {
       ui.blit(ctx, 'bigstardust', rx, py + 27);
       ui.text(ctx, `${rw.amount} ${SUMMONING.fragment}`, rx + 30, py + 30, { color: STARDUST_TINT });

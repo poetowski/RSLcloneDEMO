@@ -1,5 +1,5 @@
-// The star crystal of summoning: the Wishing Star in the Sanctum's sky
-// (tools/art/sanctum.ts) and the Soulstar merged from Stardust
+// The star crystal of summoning: the Wishing Star over Loomfall's well
+// (tools/art/loomfall.ts) and the Soulstar merged from Stardust
 // (tools/art/ui/summon.ts) are the same eight-pointed crystal, so a Soulstar
 // reads as a piece of the Wishing Star. Faceted and lit from the top-left like
 // everything else: each point split along its axis into a facet toward the

@@ -1,6 +1,6 @@
 // Loads every generated asset (see tools/art/build.ts for the producers):
 // champion atlases, effects, combat backgrounds, the UI atlas, the font, the
-// world map and the main menu's sanctum.
+// world map and the main menu's diorama, Loomfall.
 import { loadImage, loadJson, silhouette } from '../../engine/assets';
 import { BitmapFont, FontJson } from '../../engine/font';
 
@@ -74,34 +74,37 @@ export interface UiJson {
   portraits: Record<string, Rect4>;
 }
 
-/** The main menu's sanctum (tools/art/sanctum.ts SanctumJson). */
+/** The main menu's diorama, Loomfall (tools/art/loomfall.ts LoomfallJson). */
 export interface MenuSprite {
   frames: Rect4[];
   x: number;
   y: number;
-  layer: 'far' | 'island' | 'building' | 'front';
+  layer: 'far' | 'ground' | 'building' | 'front';
   mode: 'static' | 'loop' | 'pulse';
   ms?: number;
-  bob?: { amp: number; ms: number; phase: number };
 }
 
-export type MenuPlace = 'campaign' | 'champions' | 'weaving' | 'academy' | 'options' | 'challenges' | 'summon' | 'merchant';
+export type MenuPlace = 'campaign' | 'champions' | 'weaving' | 'academy' | 'options' | 'challenges' | 'summon' | 'merchant' | 'extra';
 
 export interface MenuJson {
   sprites: Record<string, MenuSprite>;
   order: string[];
   hotspots: { id: MenuPlace; name: string; sprites: string[]; outline: Rect4; ox: number; oy: number; label: [number, number] }[];
+  /** sprites shown only while Extra Combat is shut, or only once it is open */
+  shut: string[];
+  open: string[];
   spots: { x: number; y: number; facing: 'L' | 'R' }[];
   twinkles: [number, number, number][];
-  rings: { cx: number; cy: number; rx: number; ry: number; tilt: number; half: number; rail: number }[];
-  rimBreak: number[];
+  /** the Loom's threads, for light running down them */
   warp: [number, number][][];
-  thread: [number, number][];
-  falls: [number, number][];
-  portal: [number, number];
-  /** the Wishing Star's heart, where the souls it calls drift in */
+  /** the Wishing Star's heart, where the souls it calls drift in, and how far its upper point reaches above it */
   wish: [number, number];
-  lights: { x: number; y: number; rx: number; ry: number; rgb: [number, number, number]; k: number; rate: number }[];
+  wishUp: number;
+  /** the Clocktower's face, for its hands */
+  clock: { cx: number; cy: number; r: number };
+  /** where smoke rises */
+  smokes: [number, number][];
+  lights: { x: number; y: number; rx: number; ry: number; rgb: [number, number, number]; k: number; rate: number; when?: string }[];
 }
 
 export interface ChampionArt {
@@ -125,7 +128,7 @@ export interface Assets {
   fx: { json: FxJson; img: HTMLImageElement };
   zones: Record<string, ZoneArt>;
   ui: { json: UiJson; img: HTMLImageElement };
-  /** the main menu's sanctum: its sky, its scene atlas and their layout */
+  /** the main menu's diorama, Loomfall: its sky, its scene atlas and their layout */
   menu: { json: MenuJson; sky: HTMLImageElement; scene: HTMLImageElement };
   /** the campaign world, larger than the screen */
   map: HTMLImageElement;

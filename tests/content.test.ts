@@ -12,7 +12,10 @@ import { auditChampion, totalMult } from '../src/game/data/norms';
 import { STATUSES } from '../src/game/data/statuses';
 import { ChampionDef, StatusId } from '../src/game/data/types';
 import { cardZone, ZONES } from '../src/game/data/zones';
-import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, recordVictory, spoolsHeld, stageOpen, stockSample, tutorialDue, writeSave } from '../src/game/archivist';
+import { cleared, extraCombatOpen, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, recordVictory, spoolsHeld, stageOpen, stockSample, tutorialDue, writeSave } from '../src/game/archivist';
+import { EXTRA_COMBAT } from '../src/game/data/extra';
+import { BitmapFont } from '../src/engine/font';
+import type { MenuJson } from '../src/game/view/assets';
 import { buyPrice, CURRENCY, ROTATE_PRICE, sellPrice, STARTING_GOLD } from '../src/game/data/economy';
 import { buyWare, rotateWares, sellSpool, stockMerchant } from '../src/game/merchant';
 import { claimQuest, currentQuest, questState, readyCount } from '../src/game/challenges';
@@ -26,6 +29,7 @@ import { canMerge, drawSummon, joinsBy, mergeShard, rarityOdds, summon, summonCh
 import { roseMark } from '../src/game/ui/spools';
 
 const json = (p: string) => JSON.parse(fs.readFileSync(p, 'utf8'));
+const menuJson = json('public/assets/menu/menu.json') as MenuJson;
 const fx = json('public/assets/fx/fx.json').anims as Record<string, unknown>;
 const ui = json('public/assets/ui/ui.json') as { icons: Record<string, unknown>; status: Record<string, unknown>; portraits: Record<string, unknown>; parts: Record<string, unknown> };
 
@@ -697,6 +701,9 @@ describe('font', () => {
       'Done! Claim the reward. Opens once "Finish Tutorial" is claimed. The tutorial was skipped: play it to the end. The tutorial is not finished yet. No spool is woven into a matrix yet.',
       'CLAIM CLAIMED LOCKED START TUTORIAL REPLAY TUTORIAL OPEN WEAVING TO THE JOURNEY Claimed Ready to claim In progress Locked The Journey goes on. Claim a quest to open the next.',
       "Your quests wait on the Journey meanwhile. The Herald's Board 1 ready",
+      // Loomfall, the main menu: its places, Extra Combat's words, the bottom line
+      ...menuJson.hotspots.map((h) => h.name),
+      "EXTRA COMBAT Extra Combat Win stage 10-10 to open it Coming soon Extra Combat opens once stage 10-10 is won. Extra Combat is coming soon. Choose a place in Loomfall.  Arrows + Enter work too. The Merchant's Wagon in Loomfall trades spools for it.",
       // summoning: its names, the Wishing Star's screen, the ceremony, the results, the stage list, the Journey's Stardust
       ...Object.values(SUMMONING),
       'SUMMON The Wishing Star - 0 summoned STARDUST SOULSTARS MERGE 100 70 more for a Soulstar. 100 merge into a Soulstar. Each Soulstar summons one champion. Every victory in the campaign finds Stardust.',
@@ -731,20 +738,13 @@ describe('font', () => {
   });
 });
 
-// Jakub, 2026-10-24: the main menu's own diorama, its places clicked instead of buttons, only the champions changing
-describe('main menu sanctum', () => {
-  const menu = json('public/assets/menu/menu.json') as {
-    sprites: Record<string, { frames: number[][]; layer: string; mode: string; bob?: unknown }>;
-    order: string[];
-    hotspots: { id: string; sprites: string[]; outline: number[]; label: number[] }[];
-    spots: { x: number; y: number }[];
-    warp: unknown[];
-    thread: unknown[];
-    lights: unknown[];
-  };
+// Jakub, 2026-10-24: the main menu's own diorama, its places clicked instead of buttons, only the champions changing;
+// 2026-11-04: Loomfall, the town at dusk under the broken Loom, each way on a place of its own, Extra Combat among them
+describe('main menu: Loomfall', () => {
+  const menu = menuJson;
 
   it('has a place for every way on from the menu, each made of sprites that exist, with its outline and label', () => {
-    expect(menu.hotspots.map((h) => h.id).sort()).toEqual(['academy', 'campaign', 'challenges', 'champions', 'merchant', 'options', 'summon', 'weaving']);
+    expect(menu.hotspots.map((h) => h.id).sort()).toEqual(['academy', 'campaign', 'challenges', 'champions', 'extra', 'merchant', 'options', 'summon', 'weaving']);
     for (const h of menu.hotspots) {
       expect(h.sprites.length, h.id).toBeGreaterThan(0);
       for (const s of h.sprites) expect(menu.sprites[s], `${h.id} -> ${s}`).toBeTruthy();
@@ -758,17 +758,60 @@ describe('main menu sanctum', () => {
     for (const [k, s] of Object.entries(menu.sprites)) {
       expect(s.frames.length, k).toBeGreaterThan(0);
       if (s.mode === 'loop') expect(s.frames.length, `${k} loops`).toBeGreaterThan(1);
-      expect(['far', 'island', 'building', 'front'], k).toContain(s.layer);
+      expect(['far', 'ground', 'building', 'front'], k).toContain(s.layer);
     }
+    for (const k of [...menu.shut, ...menu.open]) expect(menu.sprites[k], k).toBeTruthy();
     expect(fs.existsSync('public/assets/menu/sky.png') && fs.existsSync('public/assets/menu/scene.png')).toBe(true);
   });
 
-  it('has room for champions, and the paths its light runs along', () => {
+  it('has room for champions in the square, and what moves there', () => {
     expect(menu.spots.length).toBeGreaterThanOrEqual(3);
-    for (const s of menu.spots) expect(s.y, 'a champion stands on the island').toBeGreaterThan(240);
+    for (const s of menu.spots) expect(s.y, 'a champion stands in the square').toBeGreaterThan(240);
     expect(menu.warp.length).toBeGreaterThan(0);
-    expect(menu.thread.length).toBeGreaterThan(1);
     expect(menu.lights.length).toBeGreaterThan(0);
+    expect(menu.smokes.length).toBeGreaterThan(0);
+    expect(menu.clock.r).toBeGreaterThan(4);
+  });
+
+  // Jakub, 2026-11-04: "prepare a navigational object and place for new content ... just call it Extra Combat", "locked until player win campaign 10-10"
+  it('keeps Extra Combat shut until 10-10 is won', () => {
+    expect(EXTRA_COMBAT).toEqual({ name: 'Extra Combat', opensAfter: '10-10' });
+    const p = newArchivist();
+    expect(extraCombatOpen(p)).toBe(false);
+    recordClear(p, '10-9', 3);
+    expect(extraCombatOpen(p)).toBe(false);
+    recordClear(p, '10-10', 1);
+    expect(extraCombatOpen(p)).toBe(true);
+  });
+
+  it("hangs every label clear of the others, of the title and of the champions, at its widest", () => {
+    const f = new BitmapFont({} as HTMLImageElement, json('public/assets/ui/font.json') as never);
+    const widest: Record<string, [string, string | null]> = {
+      campaign: ['CAMPAIGN', 'replay'], champions: ['CHAMPIONS', `${CHAMPIONS.length}/${CHAMPIONS.length}`], weaving: ['WEAVING', '999'], academy: ['ACADEMY', `${CHAPTERS.length} new`],
+      options: ['OPTIONS', null], challenges: ['CHALLENGES', `${JOURNEY.length} ready`], summon: ['SUMMON', '99 ready'], merchant: ['MERCHANT', '9999999 Gold'], extra: ['EXTRA COMBAT', 'lock'],
+    };
+    const boxes = menu.hotspots.map((h) => {
+      const [label, note] = widest[h.id];
+      const w = f.measure(label, 'bold') + (note === 'lock' ? 15 : note ? f.measure(note) + 6 : 0) + 26;
+      const x = Math.round(Math.min(640 - 4 - w, Math.max(4, h.label[0] - w / 2)));
+      return { id: h.id, x, y: h.label[1], w, h: 18 };
+    });
+    const meets = (a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+    for (const a of boxes) for (const b of boxes) if (a.id < b.id) expect(meets(a, b), `${a.id} / ${b.id}`).toBe(false);
+    // the title as the menu draws it: the logo, the subtitle's cell, its two dividers
+    const logo = ui.parts.logo as number[], sw = f.measure('RELIQUARY OF LEGENDS', 'display'), sy = 12 + logo[3] + 3;
+    const titles = [
+      { x: Math.round(320 - logo[2] / 2), y: 12, w: logo[2], h: logo[3] },
+      { x: Math.round(320 - sw / 2), y: sy, w: sw, h: f.height('display') },
+      { x: Math.round(320 - sw / 2 - 52), y: sy + 4, w: 44, h: 6 },
+      { x: Math.round(320 + sw / 2 + 8), y: sy + 4, w: 44, h: 6 },
+    ];
+    // the champions: as wide and as tall as the widest and tallest stand
+    const band = { x: Math.min(...menu.spots.map((s) => s.x)) - 45, y: Math.min(...menu.spots.map((s) => s.y)) - 96, w: Math.max(...menu.spots.map((s) => s.x)) - Math.min(...menu.spots.map((s) => s.x)) + 90, h: 96 + 12 };
+    for (const a of boxes) {
+      for (const t of titles) expect(meets(a, t), `${a.id} / the title`).toBe(false);
+      expect(meets(a, band), `${a.id} / the champions`).toBe(false);
+    }
   });
 });
 
@@ -986,11 +1029,11 @@ describe('summoning', () => {
     expect(Object.values(rarityOdds(summonPool(newArchivist()))).reduce((a, b) => a + b, 0)).toBeCloseTo(1, 9);
   });
 
-  it('has its parts: Stardust, the Soulstar, the SUMMON glyph and the Wishing Star in the Sanctum', () => {
+  it('has its parts: Stardust, the Soulstar, the SUMMON glyph and the Wishing Star over the well in Loomfall', () => {
     for (const p of ['stardust', 'bigstardust', 'soulstar', 'bigsoulstar', 'mi_summon']) expect(ui.parts[p], p).toBeTruthy();
     const menu = json('public/assets/menu/menu.json') as { sprites: Record<string, unknown>; wish: number[]; hotspots: { id: string; sprites: string[] }[] };
     expect(menu.sprites.wish && menu.sprites.wish_glow).toBeTruthy();
-    expect(menu.hotspots.find((h) => h.id === 'summon')?.sprites).toEqual(['wish']);
+    expect(menu.hotspots.find((h) => h.id === 'summon')?.sprites).toEqual(['well', 'wish']);
     expect(menu.wish).toHaveLength(2);
   });
 

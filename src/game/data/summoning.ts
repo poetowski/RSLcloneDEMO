@@ -18,7 +18,7 @@ export const SUMMONING = {
   fragment: 'Stardust',
   shard: 'Soulstar',
   shards: 'Soulstars',
-  /** the place in the Sanctum's sky, as a sentence names it */
+  /** the star over Loomfall's well, as a sentence names it */
   place: 'the Wishing Star',
 };
 

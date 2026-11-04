@@ -1,7 +1,7 @@
 // The tutorial (Jakub, 2026-10-24: "create Tutorial. this is for new accounts.
 // use driver.js to highlight spots and teach new plahyer basics. design and be
 // creative. highlight where to click. tutorial should cobver basics and should
-// be short."). It walks a new Archivist from the Sanctum through the campaign
+// be short."). It walks a new Archivist from Loomfall through the campaign
 // to a first battle at stage 1-1, its rewards, and the Challenges, where
 // finishing it is the Journey's first quest. Words: data/tutorial.ts.
 //
@@ -121,7 +121,7 @@ function lessonSkill(sc: BattleScene, actor: Unit): SkillDef {
 }
 
 export class Tutorial implements TutorialControl {
-  /** the run from the Sanctum to the first victory, its steps after it, or the lesson on the first summon */
+  /** the run from Loomfall to the first victory, its steps after it, or the lesson on the first summon */
   private phase: 'core' | 'epilogue' | 'summon' | null = null;
   /** whether a lesson may start on its own when it is due (not on ?tutorial=0) */
   lessons = true;
@@ -179,7 +179,7 @@ export class Tutorial implements TutorialControl {
     return this.phase !== null;
   }
 
-  /** From the start, in the Sanctum; `here` stays on the screen shown (a deep link). */
+  /** From the start, in Loomfall; `here` stays on the screen shown (a deep link). */
   start(here = false) {
     this.phase = 'core';
     this.seen.clear();
@@ -207,7 +207,7 @@ export class Tutorial implements TutorialControl {
     const dt = this.last ? Math.min(100, now - this.last) : 16;
     this.last = now;
     this.t += dt;
-    // the lesson on summoning comes the first time a summon waits, in the Sanctum or at the Wishing Star
+    // the lesson on summoning comes the first time a summon waits, in Loomfall or at the Wishing Star
     if (!this.phase && this.lessons && this.app.settled && (this.app.scene instanceof MainMenu || this.app.scene instanceof SummonScreen) && summonLessonDue(this.app.archivist)) this.startLesson();
     if (!this.phase) return;
     const step = this.situation();
@@ -253,9 +253,9 @@ export class Tutorial implements TutorialControl {
     const epilogue = this.phase === 'epilogue';
     if (s instanceof BattleScreen) return this.inBattle(s.scene);
     if (s instanceof MainMenu) {
-      if (epilogue) return { id: 'board', spot: s.spotOf('challenges'), point: s.middleOf('challenges'), side: 'right', click: true, act: this.region('m_challenges')?.click };
+      if (epilogue) return { id: 'board', spot: s.spotOf('challenges'), point: s.middleOf('challenges'), side: s.sideOf('challenges'), click: true, act: this.region('m_challenges')?.click };
       if (!this.seen.has('welcome')) return { id: 'welcome', next: () => this.seen.add('welcome') };
-      return { id: 'gate', spot: s.spotOf('campaign'), side: 'right', click: true, act: this.region('m_campaign')?.click };
+      return { id: 'gate', spot: s.spotOf('campaign'), side: s.sideOf('campaign'), click: true, act: this.region('m_campaign')?.click };
     }
     if (s instanceof CampaignScreen) {
       if (epilogue) return this.at('home', 'back', 'bottom');
@@ -288,7 +288,7 @@ export class Tutorial implements TutorialControl {
     return null;
   }
 
-  /** The lesson on the first summon: the Wishing Star in the Sanctum, MERGE, the wish, SUMMON, the champion who answers; it ends once the ceremony is left. */
+  /** The lesson on the first summon: the Wishing Star over the well in Loomfall, MERGE, the wish, SUMMON, the champion who answers; it ends once the ceremony is left. */
   private inLesson(s: object): Step | null {
     const a = this.app.archivist;
     // the summon calling, and its ceremony: they have the stage to themselves
@@ -303,7 +303,7 @@ export class Tutorial implements TutorialControl {
       this.stop('end');
       return null;
     }
-    if (s instanceof MainMenu) return { id: 'star', spot: s.spotOf('summon'), point: s.middleOf('summon'), side: 'right', click: true, act: this.region('m_summon')?.click };
+    if (s instanceof MainMenu) return { id: 'star', spot: s.spotOf('summon'), point: s.middleOf('summon'), side: s.sideOf('summon'), click: true, act: this.region('m_summon')?.click };
     if (!(s instanceof SummonScreen)) return null;
     if (a.shards < 1 && canMerge(a)) return this.at('merge', 'merge', 'right', { dust: String(a.fragments) });
     if (!this.seen.has('wish')) return { id: 'wish', spot: s.wishSpot, side: 'left', next: () => this.seen.add('wish') };

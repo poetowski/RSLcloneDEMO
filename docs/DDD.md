@@ -110,9 +110,9 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Summon | spending a Soulstar at the Wishing Star: a rarity drawn at 70 / 25 / 5% (Common, Elite, Heroic), then a champion of it not yet owned, those the wish names likelier; how every champion but the starter and 1-1's comes | `summon`, `drawSummon`, `summonPool`, `SummonScreen`, `MasterArchivist.summons` |
 | Stardust, Soulstar | the summoning currency (names proposed, his to choose): Stardust, the fragments every campaign victory finds; a Soulstar, 100 Stardust merged, spent on one summon | `MasterArchivist.fragments`, `MasterArchivist.shards`, `fragmentDrop`, `mergeShard`, `FRAGMENTS_PER_SHARD` |
 | Wish | the faction and role the Archivist hopes for: within the rarity drawn, each part a champion matches makes it twice as likely; never a promise | `Wish`, `MasterArchivist.wish`, `wishWeight`, `wishChance` |
-| Wishing Star | the Sanctum's place in the sky where Stardust is merged and champions summoned | `SummonScreen`, the `summon` place of `menu.json` |
+| Wishing Star | the star over Loomfall's well where Stardust is merged and champions summoned | `SummonScreen`, the `summon` place of `menu.json` |
 | Gold | the game's coin, held in the save; its name may change (Jakub's "for now"); earned by selling spools, spent on buying them and on rotating the wares | `MasterArchivist.gold`, `CURRENCY`, `STARTING_GOLD` |
-| Merchant | the place where Gold buys and sells spools: the Merchant's Stall in the Sanctum and its screen | `MerchantScreen`, the `merchant` place of `menu.json` |
+| Merchant | the place where Gold buys and sells spools: the Merchant's Wagon in Loomfall and its screen | `MerchantScreen`, the `merchant` place of `menu.json` |
 | Ware | a spool on the Merchant's counter, sold once; ten of them, rolled on the first visit and when rotated | `Ware`, `MasterArchivist.wares`, `stockMerchant`, `rotateWares`, `buyWare` |
 | Still scattered | the champions a summon can still bring: not owned, not a starter, brought by no stage | `summonPool` |
 | Starters | the champions owned from the start | `STARTERS` |
@@ -125,7 +125,7 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Master Archivist | the player and their save: stars, last team, Academy chapters read, settings, the tutorial's state and lessons, the Journey's claims, the Stardust, Soulstars, wish and summons, and the Reliquary | `MasterArchivist`, `loadArchivist`, `saveArchivist`, `readSave`, `writeSave` |
 | Challenges | the main-menu place of quests, in three tabs: Daily and Persistent (placeholders) and the Journey | `ChallengesScreen`, `CHALLENGE_TABS` |
 | Journey, quest | quests in an order, each opened by claiming the one before it; a quest has a goal read from the save and a reward; its state is locked, open, ready or claimed | `JOURNEY`, `QuestDef`, `questState`, `claimQuest`, `MasterArchivist.claimed` |
-| Tutorial | the guided first visit of a new account: the Sanctum, the campaign, stage 1-1 and its rewards, the Challenges; finished by its first victory (the Journey's first quest), or skipped; and a later lesson, the first summon, once a summon waits | `Tutorial`, `tutorialDue`, `summonLessonDue`, `MasterArchivist.tutorial`, `MasterArchivist.lessons` |
+| Tutorial | the guided first visit of a new account: Loomfall, the campaign, stage 1-1 and its rewards, the Challenges; finished by its first victory (the Journey's first quest), or skipped; and a later lesson, the first summon, once a summon waits | `Tutorial`, `tutorialDue`, `summonLessonDue`, `MasterArchivist.tutorial`, `MasterArchivist.lessons` |
 | Fresh (NEW) | recruited or summoned, not yet opened on the champion page | `HeroSoulFile.fresh`, `isFresh`, `Reliquary.markSeen` |
 
 ### 2.4 World, presentation and art
@@ -136,7 +136,8 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Home zone | the zone a faction's champions stand in for the Academy's demonstrations | `homeZone()` |
 | Card zone | the background behind a champion on the champion screen, one per faction (DESIGN_DECISIONS.md 84) | `CARD_ZONE`, `cardZone()` |
 | Diorama | a living zone behind a menu, with champions standing in it | `Diorama`, `Figure` |
-| Sanctum | the main menu's own diorama: the island under the broken Loom, its places (the Starbridge Gate, the Reliquary, the Weaver's Spire, the Observatory, the astrolabe) clicked to go on, a few owned champions on its plaza | `SanctumView`, `MenuPlace`, `MenuJson` |
+| Loomfall | the main menu's own diorama: a town at dusk under the broken Loom, its places (the Wayfarers' Gate, the Reliquary, the Weavers' Mill, the Athenaeum, the Clocktower, the Wishing Well, the Merchant's Wagon, the Herald's Board, the Arena) clicked to go on, a few owned champions round its well | `LoomfallView`, `MenuPlace`, `MenuJson` |
+| Extra Combat | new content Jakub will define: its place in Loomfall (the Arena) and its label, shut until 10-10 is won; no screen yet | `EXTRA_COMBAT`, `extraCombatOpen`, the `extra` place of `menu.json` |
 | Prop, prop kind | a zone sprite and how it behaves: static, loop, pulse, fire (its own flames or the shared one), bob, drift (across the sky, coming round again), roam (to and fro along its row, an animal grazing at each end); in a layer: far, back, floor, fg | `PropKind`, `PropPlacement` |
 | Spark emitter | a line of a zone that sheds sparks (Zone 1's rift) | `SparkEmitter`, `ZoneJson.sparks` |
 | Sky flash | a rare moment when a zone's sky lights up in a strange colour (Zone 1's rift, every 10-25 s) | `ZoneDef.flash`, `ZoneView.drawFlash` |
@@ -603,7 +604,7 @@ Inconsistencies found while writing this document. Close one by fixing it and re
 | DR-13 | low | `src/game/view/scene.ts` | choreography keyed by id: the Arrow Rain volley, projectile trails as hex literals, arcs, slow projectiles, `crack` / `holy` / `ice_spikes`, the `ADDITIVE` list; each new projectile or light effect needs a code edit | R-9 |
 | DR-14 | low | `src/game/view/scene.ts` | `applyEvent` is not exhaustive: a new event kind compiles and shows nothing; `passive` always reads `OVERDRIVE!` whatever the passive | R-5; in part 2026-10-10: the `passive` event carries its `effect`, and a Rebuke has its own cue |
 | DR-15 | low | `src/game/profile.ts` (now `archivist.ts`), screens | profile fields are written from several screens and stored ids are never validated: a renamed champion makes `champion()` throw on load | R-10, R-11; in part 2026-10-08: loading drops unknown ids, and the NEW badge goes through `Reliquary.markSeen`; 2026-10-10: a team whose champions are all gone (the stand-ins renamed to `captain_gareth` and `rime_scholar`) starts over from the starters (test) |
-| DR-16 | low | `src/game/screens/base.ts`, `src/game/screens/menu.ts` | menu dioramas and the Sanctum draw shadows with `ctx.ellipse` (anti-aliased); battle shadows are built pixel by pixel | build the diorama shadow the same way |
+| DR-16 | low | `src/game/screens/base.ts`, `src/game/screens/menu.ts` | menu dioramas and Loomfall draw shadows with `ctx.ellipse` (anti-aliased); battle shadows are built pixel by pixel | build the diorama shadow the same way |
 | DR-17 | low | `src/game/screens/battle.ts` | battle seeds come from `Math.random` and are never shown: a reported battle cannot be replayed | R-12 |
 | DR-18 | low | `tools/balance.ts` | re-implements the mulberry32 generator instead of using `Rng` | import `Rng` |
 | DR-19 | trivial | `src/main.ts` | `?? STARTERS.join(',')` is unreachable (`join` never returns nullish) | simplify |

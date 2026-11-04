@@ -54,7 +54,7 @@ export const JOURNEY: readonly QuestDef[] = [
   {
     id: 'finish_tutorial',
     title: 'Finish Tutorial',
-    text: 'Walk the tutorial to its end: the Sanctum, the campaign and your first battle.',
+    text: 'Walk the tutorial to its end: Loomfall, the campaign and your first battle.',
     goal: { kind: 'tutorial' },
     // his (2026-11-03): "reward for finishing tutorial should be 2 ashen vigor spool"
     reward: { kind: 'spool', pattern: 'pattern_vigor', grade: 0, count: 2 },

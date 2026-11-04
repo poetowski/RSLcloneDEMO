@@ -34,7 +34,7 @@ export interface KeyMods {
 export interface TutorialControl {
   /** while it runs, its steps show where they belong */
   readonly running: boolean;
-  /** from the start, in the Sanctum (a new account, or the Journey's START TUTORIAL) */
+  /** from the start, in Loomfall (a new account, or the Journey's START TUTORIAL) */
   start(): void;
 }
 
