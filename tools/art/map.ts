@@ -36,7 +36,9 @@
 // shallows, the road going on from island to island over white elven bridges. Beyond
 // it (2026-11-03) the sea breaks on black basalt and the Blossom Caldera (Zone 10) begins:
 // a colossal dormant volcano, meadows in flower, old lava flows, hot springs, blossom
-// trees in groves, a pagoda, shrines and torii.
+// trees in groves, a pagoda, shrines and torii. Beyond the volcano (2026-11-04) the
+// blossom runs on a little, and the world ends as it began: torn by the broken Loom,
+// two great tears not alike, the road broken at both, the faded broken land beyond.
 //
 // Everything is drawn in world pixels, and every random choice is a hash of
 // its position, so the map grows east area by area: widen WORLD_MAP by the new
@@ -242,7 +244,7 @@ const NODES = LOCATIONS.map((l): P => [l.map.x, l.map.y]);
 
 /** The road: the old road ends at the far lip, takes up again on this side, and runs through every node to the east edge (through the hills' pass). */
 const ROAD_FAR = curve([[-10, 318], [40, 322], [96, 334], [150, 332], [186, 324]]);
-const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [2252, 200], [2306, 190], [2352, 198], NODES[6], [2442, 186], [2532, 194], [2596, 200], [2640, 208], NODES[7], [2762, 200], [2852, 196], [2906, 188], [2950, 196], NODES[8], [3052, 192], [3096, 200], [3150, 196], [3204, 198], [3262, 204], NODES[9], [3384, 206], [3440, 200], [W + 12, 202]]);
+const ROAD_NEAR = curve([[222, 307], [246, 286], [276, 256], [300, 226], NODES[0], [372, 214], [430, 222], [488, 214], [520, 208], [548, 206], [590, 202], [640, 208], [684, 210], NODES[1], [770, 198], [830, 205], [890, 198], [950, 205], [1012, 208], NODES[2], [1132, 196], [1184, 190], [1236, 186], [1292, 186], [1336, 193], [1394, 197], NODES[3], [1508, 185], [1558, 189], [1612, 187], [1628, 188], [1672, 194], [1714, 197], NODES[4], [1834, 192], [1862, 189], [1890, 186], [1916, 185], [1946, 183], [2030, 197], [2072, 202], NODES[5], [2170, 194], [2252, 200], [2306, 190], [2352, 198], NODES[6], [2442, 186], [2532, 194], [2596, 200], [2640, 208], NODES[7], [2762, 200], [2852, 196], [2906, 188], [2950, 196], NODES[8], [3052, 192], [3096, 200], [3150, 196], [3204, 198], [3262, 204], NODES[9], [3384, 206], [3440, 200], [3492, 202], [3548, 205], [3604, 199], [3662, 204], [3718, 198], [W + 12, 202]]);
 /** the road's bridges of rope over the gulf: from the brink to the arbiter's mesa, and on east toward the storm */
 const MESA_BRIDGES: [P, P, number][] = [
   [[1626, 188], [1714, 197], 5],
@@ -300,6 +302,7 @@ function precompute() {
     for (let x = 0; x < W; x++) {
       const i = idx(x, y);
       height[i] = vnoise(x, y * 1.45, 74, 551) * 0.58 + vnoise(x, y * 1.45, 31, 552) * 0.3 + vnoise(x, y * 1.45, 12, 553) * 0.12;
+      if (x >= END_X) endTears(i, x, y);
       if (x > 330) continue;
       const m = nearest(MAIN, x, y);
       let sd = m.d - mainHalf(m.s, m.side), half = mainHalf(m.s, m.side), kind = 1;
@@ -507,6 +510,11 @@ function farGround(x: number, y: number, light: number): RGBA {
 }
 
 function groundAt(x: number, y: number): RGBA {
+  // the end of the world: the tears, the broken wedge between them, the faded land beyond
+  if (x >= END_X) {
+    const e = endGround(x, y);
+    if (e) return e;
+  }
   // the Dead Forest, the sand thinning out over its black earth
   // the Blossom Caldera, beyond the sea
   if (x >= CALD_W && caldK(x, y) > 0) return caldGround(x, y);
@@ -1058,7 +1066,7 @@ function boulder(b: Bitmap, x: number, y: number, r: number, R2: RGBA[]) {
 // ---------------------------------------------------------------------------
 
 /** A piece of land torn loose and floating in the tear: its top, the rock hanging under it, lit blue from the lips. */
-function fragment(b: Bitmap, cx: number, cy: number, rx: number, ry: number, depth: number, seed: number, cargo?: 'dead' | 'column') {
+function fragment(b: Bitmap, cx: number, cy: number, rx: number, ry: number, depth: number, seed: number, cargo?: 'dead' | 'column' | 'bloom' | 'torii', land: RGBA[] = GRASS) {
   const ox = Math.floor(cx - rx - 3), oy = Math.floor(cy - ry - 3), w = Math.ceil(rx * 2) + 7, h = Math.ceil(ry + depth) + 7;
   const X = cx - ox, Y = cy - oy;
   const top: P[] = [];
@@ -1079,13 +1087,15 @@ function fragment(b: Bitmap, cx: number, cy: number, rx: number, ry: number, dep
     polyFill(s, top, (px, py) => {
       const gx = px + ox, gy = py + oy, u = (px - X) / rx, v = (py - Y) / ry;
       if (v < -0.55 && dith(gx, gy, 0.6)) return LIGHT[2];
-      return rampDither(GRASS, 5 - u * 1.4 - v * 1.6 + (v > 0.55 ? -1.4 : 0) + (hash2(gx, gy, 804) - 0.5) * 1, gx, gy);
+      return rampDither(land, 5 - u * 1.4 - v * 1.6 + (v > 0.55 ? -1.4 : 0) + (hash2(gx, gy, 804) - 0.5) * 1, gx, gy);
     });
   });
   if (cargo === 'dead') {
     broadleaf(b, cx - rx * 0.25, cy - 3, 5, GOLDLEAF, 1.6, seed, true);
     deadTree(b, Math.round(cx + rx * 0.45), Math.round(cy + 1), 7, seed + 1);
   }
+  if (cargo === 'bloom') blossomTree(b, cx - rx * 0.1, cy + 1, Math.max(3, rx * 0.45), SAKURA, seed);
+  if (cargo === 'torii') torii(b, Math.round(cx), Math.round(cy + 1), Math.round(ry * 2.4));
   if (cargo === 'column') {
     for (let k = 0; k < 7; k++) {
       b.set(Math.round(cx + 1), Math.round(cy - k), STONE[6]);
@@ -1129,18 +1139,7 @@ function riverBridge(b: Bitmap) {
 
 /** The light the rift throws: a cold glow over everything near it; the fires' warm glow in the reach. */
 function glow(b: Bitmap, fires: P[]) {
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < Math.min(W, 340); x++) {
-      const i = idx(x, y);
-      const sd = riftSd[i];
-      if (sd <= 0 || sd > 26) continue;
-      const strength = riftKind[i] === 1 ? 1 : 0.12;
-      let k = Math.pow(1 - sd / 26, 2) * strength;
-      k = Math.round((k + ((hash2(x, y, 831) - 0.5) * 0.08)) * 10) / 10;
-      if (k <= 0) continue;
-      b.set(x, y, lift(mix(b.get(x, y), GLOW_BLUE, k * 0.4), k * 0.08));
-    }
-  }
+  riftGlow(b, 0, Math.min(W, 340));
   for (const [fx, fy] of fires) {
     for (let y = fy - 26; y <= fy + 26; y++) {
       for (let x = fx - 34; x <= fx + 34; x++) {
@@ -1154,48 +1153,74 @@ function glow(b: Bitmap, fires: P[]) {
   }
 }
 
+/** The tears' cold glow over everything near them, between x0 and x1. */
+function riftGlow(b: Bitmap, x0: number, x1: number) {
+  for (let y = 0; y < H; y++) {
+    for (let x = x0; x < x1; x++) {
+      const i = idx(x, y);
+      const sd = riftSd[i];
+      if (sd <= 0 || sd > 26) continue;
+      const strength = riftKind[i] === 1 ? 1 : 0.12;
+      let k = Math.pow(1 - sd / 26, 2) * strength;
+      k = Math.round((k + ((hash2(x, y, 831) - 0.5) * 0.08)) * 10) / 10;
+      if (k <= 0) continue;
+      b.set(x, y, lift(mix(b.get(x, y), GLOW_BLUE, k * 0.4), k * 0.08));
+    }
+  }
+}
+
 /** Lightens a colour toward white by k. */
 const lift = (c: RGBA, k: number) => rgba(R(c) + (255 - R(c)) * k, G(c) + (255 - G(c)) * k, B(c) + (255 - B(c)) * k, A(c));
 
 /** Hairline cracks running from the lips into the land, glowing in their depth. */
 function hairlines(b: Bitmap) {
-  for (let k = 0; k < 22; k++) {
-    const s = 20 + hash2(k, 0, 841) * (MAIN.total - 40);
-    const side = hash2(k, 1, 842) < 0.5 ? -1 : 1;
-    const { p, dir } = pointAt(MAIN, s);
+  hairlinesAlong(b, MAIN, mainHalf, 22, 841);
+}
+
+/** `n` hairlines off a tear's lips, its half width given by `half`; `seed` and the five after it. */
+function hairlinesAlong(b: Bitmap, line: Line, half: (s: number, side: number) => number, n: number, seed: number) {
+  for (let k = 0; k < n; k++) {
+    const s = 20 + hash2(k, 0, seed) * (line.total - 40);
+    const side = hash2(k, 1, seed + 1) < 0.5 ? -1 : 1;
+    const { p, dir } = pointAt(line, s);
     const nx = -dir[1] * side, ny = dir[0] * side;
-    let x = p[0] + nx * (mainHalf(s, side) + 0.5), y = p[1] + ny * (mainHalf(s, side) + 0.5);
-    let a = Math.atan2(ny, nx) + (hash2(k, 2, 843) - 0.5) * 1.2;
-    const len = 6 + hash2(k, 3, 844) * 20;
+    let x = p[0] + nx * (half(s, side) + 0.5), y = p[1] + ny * (half(s, side) + 0.5);
+    let a = Math.atan2(ny, nx) + (hash2(k, 2, seed + 2) - 0.5) * 1.2;
+    const len = 6 + hash2(k, 3, seed + 3) * 20;
     for (let t = 0; t < len; t += 0.7) {
-      a += (hash2(k, Math.round(t * 3), 845) - 0.5) * 0.5;
+      a += (hash2(k, Math.round(t * 3), seed + 4) - 0.5) * 0.5;
       x += Math.cos(a) * 0.7;
       y += Math.sin(a) * 0.7;
       const X = Math.round(x), Y = Math.round(y);
       if (!inBounds(X, Y) || sdAt(X, Y) < 0) continue;
       const fade = 1 - t / len;
-      b.set(X, Y, fade > 0.75 && hash2(X, Y, 846) < 0.5 ? LIGHT[1] : mix(b.get(X, Y), SHADOW, 0.35 + fade * 0.4));
+      b.set(X, Y, fade > 0.75 && hash2(X, Y, seed + 5) < 0.5 ? LIGHT[1] : mix(b.get(X, Y), SHADOW, 0.35 + fade * 0.4));
     }
   }
 }
 
 /** Sparks and motes over the tear; embers over the fires. */
 function sparks(b: Bitmap, fires: P[]) {
-  for (let k = 0; k < 120; k++) {
-    const s = hash2(k, 0, 851) * MAIN.total;
-    const { p, dir } = pointAt(MAIN, s);
-    const off = (hash2(k, 1, 852) - 0.5) * 2 * (mainHalf(s, 1) + 26);
-    const x = Math.round(p[0] - dir[1] * off + (hash2(k, 2, 853) - 0.3) * 18), y = Math.round(p[1] + dir[0] * off - hash2(k, 3, 854) * 14);
-    if (!inBounds(x, y)) continue;
-    const big = hash2(k, 4, 855) > 0.86;
-    b.set(x, y, LIGHT[big ? 5 : 3 + Math.floor(hash2(k, 5, 856) * 2)]);
-    if (big) for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(x + dx, y + dy, LIGHT[3]);
-  }
+  motesAlong(b, MAIN, mainHalf, 120, 851);
   for (const [fx, fy] of fires) {
     for (let k = 0; k < 18; k++) {
       const x = Math.round(fx + (hash2(k, fx, 857) - 0.3) * 18), y = Math.round(fy - 6 - hash2(k, fy, 858) * 24);
       b.set(x, y, EMBER[hash2(k, 1, 859) > 0.5 ? 4 : 3]);
     }
+  }
+}
+
+/** `n` motes of light over a tear and round it; `seed` and the five after it. */
+function motesAlong(b: Bitmap, line: Line, half: (s: number, side: number) => number, n: number, seed: number) {
+  for (let k = 0; k < n; k++) {
+    const s = hash2(k, 0, seed) * line.total;
+    const { p, dir } = pointAt(line, s);
+    const off = (hash2(k, 1, seed + 1) - 0.5) * 2 * (half(s, 1) + 26);
+    const x = Math.round(p[0] - dir[1] * off + (hash2(k, 2, seed + 2) - 0.3) * 18), y = Math.round(p[1] + dir[0] * off - hash2(k, 3, seed + 3) * 14);
+    if (!inBounds(x, y)) continue;
+    const big = hash2(k, 4, seed + 4) > 0.86;
+    b.set(x, y, LIGHT[big ? 5 : 3 + Math.floor(hash2(k, 5, seed + 5) * 2)]);
+    if (big) for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(x + dx, y + dy, LIGHT[3]);
   }
 }
 
@@ -2664,6 +2689,7 @@ function renderWorld(): Bitmap {
   crysOverlays(b);
   archOverlays(b);
   caldOverlays(b);
+  endOverlays(b);
   compass(b, W - 40, H - 44);
   frame(b);
   return b;
@@ -3716,6 +3742,8 @@ function caldOverlays(b: Bitmap) {
     if (!inBounds(X, Y) || caldK(x, y) < 8 || coneAt(x, y + 2) || caldClear(x, y) || roadDist[idx(X, Y)] < pad || y < ridgeN(x) + 6 || y > ridgeS(x) - 2) return false;
     if (CALD_SPRINGS.some(([cx, cy, rx]) => Math.hypot(x - cx, (y - cy) * 2) < rx + 6)) return false;
     if (nearest(CALD_STREAM, x, y).d < 4) return false;
+    // at the end of the world: none in a tear or near it, fewer on the broken wedge, none on the faded land beyond
+    if (X >= END_X && (riftSd[idx(X, Y)] < 7 || endPart[idx(X, Y)] === 2 || (endPart[idx(X, Y)] === 1 && hash2(X, Y, 2135) < 0.55))) return false;
     return !CALD_FLOWS.some((f) => f.some(([fx2, fy2]) => Math.hypot(x - fx2, y - fy2) < 5));
   };
   // groves of blossom among dark pines, thick in places, open meadow between
@@ -3764,9 +3792,10 @@ function caldOverlays(b: Bitmap) {
   for (let x = CALD_W + 54; x < W; x += 9) {
     if (Math.abs(x - CONE.x) < 30) continue;
     const yn = ridgeN(x) + 2, ys = ridgeS(x) + 6;
-    things.push({ y: yn, draw: () => crag(b, x + hash2(x, 0, 2051) * 4, yn, 5 + hash2(x, 1, 2051) * 3, 8 + hash2(x, 2, 2051) * 10, x) });
-    things.push({ y: ys + 20, draw: () => crag(b, x + hash2(x, 3, 2051) * 4, ys + 20, 5 + hash2(x, 4, 2051) * 3, 10 + hash2(x, 5, 2051) * 10, x + 1) });
+    if (endClear(x, yn)) things.push({ y: yn, draw: () => crag(b, x + hash2(x, 0, 2051) * 4, yn, 5 + hash2(x, 1, 2051) * 3, 8 + hash2(x, 2, 2051) * 10, x) });
+    if (endClear(x, ys)) things.push({ y: ys + 20, draw: () => crag(b, x + hash2(x, 3, 2051) * 4, ys + 20, 5 + hash2(x, 4, 2051) * 3, 10 + hash2(x, 5, 2051) * 10, x + 1) });
   }
+  endThings(b, things);
   things.sort((p, q) => p.y - q.y).forEach((t) => t.draw());
   // the thin smoke off the crater, leaning east on the wind
   for (let k = 22; k >= 0; k--) {
@@ -3779,6 +3808,185 @@ function caldOverlays(b: Bitmap) {
 const surfJ = (y: number) => vnoise(0, y, 5, 2035);
 const WATERF = ramp(['#4a7c90', '#6e9eb0', '#9cc4d0', '#e4f4f6']);
 const MSMOKE = ramp(['#6c6080', '#8a7c96', '#a898ac', '#c8b6c0', '#e6d2d0']);
+
+// ---------------------------------------------------------------------------
+// the end of the world (Jakub, 2026-11-04: "i want to close campaign after 10 areas
+// ... on the east corner also wider map with terrain being blossoming a bit further
+// with two massive broken loom scars not symetrical, indicating that the broken loom
+// is present always begining to end"). East of the volcano the Caldera's meadows and
+// groves run on a little; then the land is torn by the broken Loom, as it is in the
+// west, by two great tears not alike: the first winding south from the north edge
+// to the south, narrower, widest near its top; the second, the greater, slashing
+// from the north edge down to the east edge, widest in its middle, cutting off the
+// north-east corner as the west's tear cuts off the south-west. Between them a
+// wedge of the blossom land breaking up into tilted slabs, draining of colour toward
+// the edge; beyond the second the faded broken land the world begins with in the
+// west. The road is broken at the first, its bridge stubs on both lips, and runs on
+// into the second; a cherry and the road's torii float in the tears, blossom falls
+// into the first.
+// ---------------------------------------------------------------------------
+
+const END_X = 3480;
+interface Tear {
+  line: Line;
+  /** its greatest half width, and how far along it (0 its north end, 1 its south) that is */
+  max: number;
+  peak: number;
+  seed: number;
+}
+const END_TEARS: Tear[] = [
+  { line: polyline([[3550, -14], [3560, 8], [3556, 30], [3572, 52], [3576, 76], [3592, 98], [3590, 122], [3598, 146], [3588, 170], [3594, 194], [3582, 218], [3590, 242], [3596, 266], [3608, 290], [3610, 314], [3624, 340], [3628, 376]]), max: 17, peak: 0.26, seed: 2101 },
+  { line: polyline([[3646, -14], [3664, 8], [3666, 30], [3690, 52], [3692, 74], [3715, 96], [3717, 118], [3740, 140], [3743, 162], [3766, 184], [3768, 206], [3791, 228], [3806, 262]]), max: 34, peak: 0.45, seed: 2111 },
+];
+/** Half the width of a tear's opening: a seam at its ends, a chasm at its peak, jagged at every turn. */
+function tearHalf(t: Tear, s: number, side: number): number {
+  const u = clamp(s / t.line.total);
+  const body = 3 + t.max * Math.pow(Math.sin(Math.PI * Math.pow(u, Math.log(0.5) / Math.log(t.peak))), 0.85) * (0.82 + 0.36 * vnoise(s, 0, 30, t.seed));
+  return Math.max(1.2, body + jag(s, 5, side > 0 ? t.seed + 1 : t.seed + 2) * 5 + jag(s, 2, side > 0 ? t.seed + 3 : t.seed + 4) * 1.6);
+}
+/** cracks off the tears: into the meadows, across the wedge, out over the faded land */
+const END_CRACKS: { line: Line; w: [number, number] }[] = [
+  { pts: [[3574, 70], [3560, 84], [3546, 94], [3530, 104], [3514, 120]] as P[], w: [2.6, 0.6] as [number, number] },
+  { pts: [[3596, 252], [3612, 262], [3620, 282], [3636, 292]] as P[], w: [2.2, 0.5] as [number, number] },
+  { pts: [[3612, 318], [3634, 312], [3656, 322], [3680, 316]] as P[], w: [1.8, 0.4] as [number, number] },
+  { pts: [[3734, 146], [3716, 156], [3702, 152], [3684, 164]] as P[], w: [2.6, 0.5] as [number, number] },
+  { pts: [[3770, 232], [3758, 250], [3762, 272], [3748, 290]] as P[], w: [2.4, 0.5] as [number, number] },
+  { pts: [[3694, 48], [3712, 40], [3728, 46], [3748, 36], [3770, 40]] as P[], w: [2.4, 0.6] as [number, number] },
+].map((c) => ({ line: polyline(c.pts), w: c.w }));
+/** east of the volcano: 0 this side of the first tear, 1 between the tears, 2 beyond the second */
+const endPart = new Uint8Array(W * H);
+
+/** The tears at x,y, into the rift's fields: as the west's rift is, so the ground, the light and the things keep to them. */
+function endTears(i: number, x: number, y: number) {
+  let sd = 999, half = 0, kind = 0, side = 1;
+  const sides = END_TEARS.map((t) => {
+    const m = nearest(t.line, x, y), h = tearHalf(t, m.s, m.side);
+    if (m.d - h < sd) [sd, half, kind, side] = [m.d - h, h, 1, m.side];
+    return m.side;
+  });
+  for (const c of END_CRACKS) {
+    const n = nearest(c.line, x, y);
+    if (n.d > 30) continue;
+    const h = crackHalf(c, n.s, n.side);
+    if (n.d - h < sd) [sd, half, kind] = [n.d - h, h, 2];
+  }
+  riftSd[i] = sd;
+  riftHalfW[i] = half;
+  riftKind[i] = kind;
+  // the west half of a tear shows no wall; its east wall faces the light
+  far[i] = side > 0 ? 1 : 0;
+  endPart[i] = (sides[0] < 0 ? 1 : 0) + (sides[1] < 0 ? 1 : 0);
+}
+
+/** The ground at the end of the world, or none where the Caldera's own goes on. */
+function endGround(x: number, y: number): RGBA | undefined {
+  const i = idx(x, y);
+  if (riftSd[i] < 0) return riftInside(x, y, i);
+  if (riftKind[i] === 1 && riftSd[i] < 1.2) return rampDither(ROCK, 1.6, x, y);
+  if (endPart[i] === 2) return farGround(x, y, relief(x, y));
+  if (endPart[i] === 1) return brokenBloom(x, y);
+  return undefined;
+}
+
+/**
+ * The wedge between the tears: the meadow broken into slabs that tilt apart, dark
+ * seams between them; the farther east, the wider the seams, the steeper the tilt
+ * and the more its colour drains, the land falling apart toward the end.
+ */
+function brokenBloom(x: number, y: number): RGBA {
+  const apart = clamp((x - 3600) / 150);
+  const sx = x / 28, sy = (y * 1.4) / 28;
+  let d1 = 9, d2 = 9, tilt = 0;
+  for (let j = Math.floor(sy) - 1; j <= Math.floor(sy) + 1; j++) {
+    for (let i = Math.floor(sx) - 1; i <= Math.floor(sx) + 1; i++) {
+      const px = i + hash2(i, j, 2131), py = j + hash2(i, j, 2132);
+      const d = Math.hypot(sx - px, sy - py);
+      if (d < d1) {
+        d2 = d1;
+        d1 = d;
+        tilt = (hash2(i, j, 2133) - 0.5) * (0.6 + apart);
+      } else if (d < d2) d2 = d;
+    }
+  }
+  const seam = (d2 - d1) * 28;
+  if (seam < 0.7 + apart * 0.5) return rampDither(FADED, 0.4, x, y);
+  if (seam < 1 + apart) return rampDither(FADED, 1.6, x, y);
+  let c = caldGround(x, y);
+  const drain = Math.round(clamp((x - 3630) / 110) * 4) / 10;
+  if (drain > 0) c = mix(c, rampDither(FADED, 4.6 + tilt, x, y), drain);
+  return tilt < 0 ? mix(c, SHADOW, Math.round(-tilt * 4) / 10) : lift(c, Math.round(tilt * 1.2) / 10);
+}
+
+/** Whether a crag on a ridge at x,y keeps clear of the tears and of the faded land. */
+function endClear(x: number, y: number): boolean {
+  if (x < END_X) return true;
+  const i = idx(Math.min(W - 1, Math.round(x)), Math.max(0, Math.min(H - 1, Math.round(y))));
+  return riftSd[i] > 10 && endPart[i] !== 2;
+}
+
+/** Crystals grown on the tears' lips, among the things that stand. */
+function endThings(b: Bitmap, things: Thing[]) {
+  END_TEARS.forEach((t, n) => {
+    for (let k = 0; k < 12; k++) {
+      const s = 20 + hash2(k, n, 2151) * (t.line.total - 40), side = hash2(k, n + 4, 2152) < 0.5 ? -1 : 1;
+      const { p, dir } = pointAt(t.line, s);
+      const off = tearHalf(t, s, side) + 3 + hash2(k, n + 8, 2153) * 8;
+      const x = Math.round(p[0] - dir[1] * off * side), y = Math.round(p[1] + dir[0] * off * side);
+      if (inBounds(x, y) && sdAt(x, y) > 1 && roadDist[idx(x, y)] > 4) things.push({ y, draw: () => crystals(b, x, y, 60 + k + n * 20) });
+    }
+  });
+}
+
+function endOverlays(b: Bitmap) {
+  const half = (t: Tear) => (s: number, side: number) => tearHalf(t, s, side);
+  END_TEARS.forEach((t, n) => hairlinesAlong(b, t.line, half(t), 16, 2140 + n * 10));
+  // pieces of the land floating in the tears: a cherry on one, the road's torii on another
+  const float = (n: number, at: number, rx: number, ry: number, depth: number, seed: number, cargo?: 'bloom' | 'torii') => {
+    const { p } = pointAt(END_TEARS[n].line, END_TEARS[n].line.total * at);
+    fragment(b, p[0], p[1], rx, ry, depth, seed, cargo, MEADOW);
+  };
+  float(0, 0.22, 8, 4.5, 11, 31, 'bloom');
+  float(0, 0.5, 5, 3, 7, 32);
+  float(0, 0.08, 3.5, 2.2, 5, 33);
+  float(1, 0.42, 14, 7.5, 18, 34, 'torii');
+  float(1, 0.64, 8, 4.5, 10, 35, 'bloom');
+  float(1, 0.2, 5, 3, 7, 36);
+  // splinters of rock in the dark
+  END_TEARS.forEach((t, n) => {
+    for (let k = 0; k < 24; k++) {
+      const s = hash2(k, n, 2161) * t.line.total, { p, dir } = pointAt(t.line, s);
+      const off = (hash2(k, n + 2, 2162) - 0.5) * tearHalf(t, s, 1) * 1.4;
+      const x = Math.round(p[0] - dir[1] * off), y = Math.round(p[1] + dir[0] * off);
+      if (sdAt(x, y) < -2) {
+        b.set(x, y, ROCK[3]);
+        b.set(x + 1, y, ROCK[1]);
+        b.set(x, y + 1, LIGHT[1]);
+      }
+    }
+  });
+  // the road's bridge, broken off at every lip it crossed
+  const pts = ROAD_NEAR.filter(([x]) => x >= END_X);
+  let wasIn = false;
+  for (let k = 1; k < pts.length; k++) {
+    const [x, y] = pts[k], X = Math.round(x), Y = Math.round(y);
+    const inside = inBounds(X, Y) && riftSd[idx(X, Y)] < 0 && riftKind[idx(X, Y)] === 1;
+    if (inside === wasIn) continue;
+    const d = norm([x - pts[k - 1][0], y - pts[k - 1][1]]);
+    if (inside) bridgeStub(b, pts[k - 1][0], pts[k - 1][1], d, 5);
+    else bridgeStub(b, x, y, [-d[0], -d[1]], 5);
+    wasIn = inside;
+  }
+  riftGlow(b, END_X, W);
+  END_TEARS.forEach((t, n) => motesAlong(b, t.line, half(t), 70, 2170 + n * 10));
+  // blossom blowing off the meadows and falling into the first tear
+  const t = END_TEARS[0];
+  for (let k = 0; k < 90; k++) {
+    const s = hash2(k, 0, 2181) * t.line.total, { p, dir } = pointAt(t.line, s);
+    const off = (hash2(k, 1, 2182) - 0.62) * 2 * (tearHalf(t, s, 1) + 16);
+    const x = Math.round(p[0] - dir[1] * off + (hash2(k, 2, 2183) - 0.5) * 8), y = Math.round(p[1] + dir[0] * off + (hash2(k, 3, 2184) - 0.5) * 8);
+    if (inBounds(x, y)) b.set(x, y, hash2(k, 4, 2185) > 0.7 ? WHITEBLOOM[5] : SAKURA[hash2(k, 5, 2186) > 0.5 ? 6 : 5]);
+  }
+}
 
 /** The scrolling world. */
 export function buildMap(out: string) {

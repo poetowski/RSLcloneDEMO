@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-04 | The world map ends past area 10 (3780 wide): the blossom runs on, then two unlike tears of the broken Loom, the faded broken land beyond | 86 |
 | 2026-11-04 | The Champions screen filters by rarity too, beside affinity and class; its tabs show one, two and three swords | 85 |
 | 2026-11-04 | The champion screen's background by faction: Court of Root the Verdant Grove, Ashveil Reign the Dead Forest, Sanguine Dominion Earth Scars, Azure Crown the Snowy Mesa | 84 |
 | 2026-11-03 | The game fills the browser window, PC or phone; touch drags the lists; FULLSCREEN in Options | 83 |
@@ -4880,3 +4881,29 @@ tabs, a tab for each rarity the roster holds (COMMON, ELITE, HEROIC; Mythic gets
 its icon: one small sword for Common, two for Elite, three for Heroic, in the rarity's colour. It works as the other two
 filters do: a rarity combines with an affinity and a class, a lit tab clicked again lets go of it, ALL lets go of all
 three. The row of tabs is now centred, with a little less space between its groups, to hold the three new tabs.
+
+## 86. The world map's east end (received 2026-11-04)
+
+> i want to extend world whole map. now we have 10 zones and before first zone we have wider space and we have a scar caused of broken loom. i want to close campaign after 10 areas so i want to have on the east corner also wider map with terrain being blossoming a bit further with two massive broken loom scars not symetrical, indicating that the broken loom is present always begining to end. adjust only eastern part of world whole map by extending area 10 with scars at the end like we have area 1 being little wider with loom scar on the west.
+
+Built as he said (`tools/art/map.ts`, the end of the world; `WORLD_MAP` 3780 wide, 300 more): the campaign closes
+after its ten areas, the world ending as it begins.
+
+- **The blossom runs on** east of the volcano: the Caldera's meadows, groves and black ridges, a little further.
+- **Two great tears of the broken Loom**, drawn as the west's rift is (the chasm onto the cosmos, its lit lip and its
+  wall of strata, cracks fanning out, hairline cracks, crystals on the lips, its cold light and motes), and not alike:
+  the first winds south from the north edge to the south edge, narrower, widest near its top; the second, the greater,
+  slashes from the north edge down to the east edge, widest in its middle (about 75 pixels across), and cuts off the
+  north-east corner as the west's tear cuts off the south-west.
+- **Between them** a wedge of the blossom land breaking up into tilted slabs, more broken and drained of colour the
+  farther east it lies, fewer trees on it; **beyond the second** the same faded broken land the world begins with in the
+  west.
+- **The road** from area 10 runs on east: broken at the first tear, its bridge stubs on both lips, then over the wedge
+  into the second. Floating in the tears are pieces of the land, one with a cherry on it, one with a torii, and blossom
+  blows off the meadows into the first.
+
+Only the east changed: every pixel of the map west of the last 56 of the old map is as it was (checked against the old
+map); those 56 held the old east frame and the compass, which moved east with the edge.
+
+Stand-ins until he sets them: the tears' shapes and sizes, which tear is which, the wedge's slabs, the floating pieces
+and what stands on them, and that the road runs into the second tear.

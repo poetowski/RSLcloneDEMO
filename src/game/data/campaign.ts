@@ -49,7 +49,7 @@ import { LocationDef, StageDef } from './types';
  * area by area: a new area widens it by its stretch, and everything west of the
  * stretch keeps its pixels (tools/art/map.ts).
  */
-export const WORLD_MAP = { w: 3480, h: 360 };
+export const WORLD_MAP = { w: 3780, h: 360 };
 
 /** Champions the player owns from the start. */
 export const STARTERS = ['captain_gareth'];
