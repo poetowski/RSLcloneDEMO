@@ -12,7 +12,7 @@ import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../data/meta';
 import { STAT_LIMITS } from '../data/norms';
 import { ATTUNE_BONUS, CORE_WEAVE_PATTERNS, GRADES, MATRIX_LAYOUT, patternBonusText, SLOT_NAMES, SPOOL_STAT_NAME, STAT_NAME } from '../data/matrix';
 import { ChampionDef, StatId } from '../data/types';
-import { homeZone } from '../data/zones';
+import { cardZone } from '../data/zones';
 import { attunedStats, fits, sameSpool, SlotIndex, strandValue, ThreadSpool, WeavePatternEvaluator, WeaverMatrix, wovenStats } from '../reliquary/matrix';
 import { emptyLabel, GRADE_TINT, PATTERN_TINT, patternName, ruleText, spoolSummary, statText, strandText } from '../ui/spools';
 import { COLORS } from '../ui/ui';
@@ -53,7 +53,7 @@ export class ChampionScreen extends BaseScreen {
     this.c = champion(id);
     this.tab = at.tab ?? 'skills';
     this.slot = at.slot ?? 0;
-    this.diorama = new Diorama(app, homeZone(this.c.faction).id);
+    this.diorama = new Diorama(app, cardZone(this.c.faction).id);
     this.seen();
   }
 
@@ -68,7 +68,10 @@ export class ChampionScreen extends BaseScreen {
 
   private cycle(d: number) {
     const i = this.list.indexOf(this.c.id);
+    const from = cardZone(this.c.faction);
     this.c = champion(this.list[(i + d + this.list.length) % this.list.length]);
+    // a champion of another faction stands in front of its own faction's background
+    if (cardZone(this.c.faction) !== from) this.diorama = new Diorama(this.app, cardZone(this.c.faction).id);
     this.anim = 'idle';
     this.seen();
   }

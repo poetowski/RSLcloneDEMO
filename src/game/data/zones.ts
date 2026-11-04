@@ -178,6 +178,24 @@ export function homeZone(faction: FactionId): ZoneDef {
   return faction === 'court_of_root' ? zone('zone2') : ZONES[0];
 }
 
+/**
+ * The background behind a champion on its card, the champion screen: one per
+ * faction (Jakub, 2026-11-04, docs/DESIGN_DECISIONS.md 84): the Court of Root
+ * in the Verdant Grove (area 2), the Ashveil Reign in the Dead Forest (area 7),
+ * the Sanguine Dominion in Earth Scars (area 4), the Azure Crown on the Snowy
+ * Mesa (area 5).
+ */
+export const CARD_ZONE: Record<FactionId, string> = {
+  court_of_root: 'zone2',
+  ashveil_reign: 'zone7',
+  sanguine_dominion: 'zone4',
+  azure_crown: 'zone5',
+};
+
+export function cardZone(faction: FactionId): ZoneDef {
+  return zone(CARD_ZONE[faction]);
+}
+
 export function zone(id: string): ZoneDef {
   const z = byId.get(id);
   if (!z) throw new Error(`unknown zone "${id}"`);

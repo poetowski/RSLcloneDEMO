@@ -133,7 +133,8 @@ One word, one meaning, inside a context. Use these words in code, docs, commit m
 | Term | Meaning | In code |
 | --- | --- | --- |
 | Zone (combat background) | where battles happen: behaviour, art, built layout, runtime renderer | `ZoneDef`, `ZoneArt` (art module), `ZoneJson`, `ZoneView` |
-| Home zone | the zone a faction's champions stand in outside battle | `homeZone()` |
+| Home zone | the zone a faction's champions stand in for the Academy's demonstrations | `homeZone()` |
+| Card zone | the background behind a champion on the champion screen, one per faction (DESIGN_DECISIONS.md 84) | `CARD_ZONE`, `cardZone()` |
 | Diorama | a living zone behind a menu, with champions standing in it | `Diorama`, `Figure` |
 | Sanctum | the main menu's own diorama: the island under the broken Loom, its places (the Starbridge Gate, the Reliquary, the Weaver's Spire, the Observatory, the astrolabe) clicked to go on, a few owned champions on its plaza | `SanctumView`, `MenuPlace`, `MenuJson` |
 | Prop, prop kind | a zone sprite and how it behaves: static, loop, pulse, fire (its own flames or the shared one), bob, drift (across the sky, coming round again), roam (to and fro along its row, an animal grazing at each end); in a layer: far, back, floor, fg | `PropKind`, `PropPlacement` |

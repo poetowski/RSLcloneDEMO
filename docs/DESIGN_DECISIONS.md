@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-04 | The champion screen's background by faction: Court of Root the Verdant Grove, Ashveil Reign the Dead Forest, Sanguine Dominion Earth Scars, Azure Crown the Snowy Mesa | 84 |
 | 2026-11-03 | The game fills the browser window, PC or phone; touch drags the lists; FULLSCREEN in Options | 83 |
 | 2026-11-03 | The Journey's spools: Finish Tutorial 2 Ashen Vigor, 1-3 2 Silver Sunder, 1-10 2 Gilded Vigor and 2 Sunder | 82 |
 | 2026-11-03 | The Journey: Beat Campaign 3-10 gives 5000 Gold, 5-10 300 Stardust, 8-10 10000 Gold | 81 |
@@ -4850,3 +4851,19 @@ Stand-ins until he sets them: the hint's words and look, the FULLSCREEN row and 
 browser's bars on a phone), the tap's slop (10 CSS pixels for a finger, 5 for the mouse) and the 4% snap to a whole
 scale. Not built: a layout for a phone held upright (the game stays 16:9), and an app to install on a phone's home
 screen, which would need an icon (art).
+
+## 84. The champion screen's background by faction (received 2026-11-04)
+
+> i want to define that in champion screen, background of every champion when checking their hero cards should be same per faction. background of area 2 should be background on hero cards for court of root. background of area dead forest should be background also on hero cards for ashveil reign. background of area 4 should be background for faction of sanguine dominion. and azure crown champion cards should have background of area 5.
+
+Built as he said (`CARD_ZONE` in `src/game/data/zones.ts`, used by `src/game/screens/champion.ts`):
+
+| Faction | Background on its champions' cards |
+| --- | --- |
+| Court of Root | the Verdant Grove (area 2) |
+| Ashveil Reign | the Dead Forest (area 7) |
+| Sanguine Dominion | Earth Scars (area 4) |
+| Azure Crown | the Snowy Mesa (area 5) |
+
+Stepping to the next or previous champion (the arrows, Q / E) changes the background with the faction; before, the
+first champion's stayed. The Academy's demonstrations keep their own home zone (`homeZone`), which this did not touch.

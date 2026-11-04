@@ -11,7 +11,7 @@ import { AFFINITIES, FACTIONS, RARITIES, ROLES } from '../src/game/data/meta';
 import { auditChampion, totalMult } from '../src/game/data/norms';
 import { STATUSES } from '../src/game/data/statuses';
 import { ChampionDef, StatusId } from '../src/game/data/types';
-import { ZONES } from '../src/game/data/zones';
+import { cardZone, ZONES } from '../src/game/data/zones';
 import { cleared, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, recordVictory, spoolsHeld, stageOpen, stockSample, tutorialDue, writeSave } from '../src/game/archivist';
 import { buyPrice, CURRENCY, ROTATE_PRICE, sellPrice, STARTING_GOLD } from '../src/game/data/economy';
 import { buyWare, rotateWares, sellSpool, stockMerchant } from '../src/game/merchant';
@@ -1315,5 +1315,12 @@ describe('save', () => {
       [null, null],
     ];
     for (const [raw, rawV1] of saves) expect(writeSave(readSave(raw, rawV1)), `${raw} ${rawV1}`).toBe(fresh);
+  });
+});
+
+describe('champion cards', () => {
+  it('stand every champion in front of its faction background (Jakub, 2026-11-04)', () => {
+    const want = { court_of_root: 'Verdant Grove', ashveil_reign: 'Dead Forest', sanguine_dominion: 'Earth Scars', azure_crown: 'Snowy Mesa' };
+    for (const c of CHAMPIONS) expect([c.id, cardZone(c.faction).name]).toEqual([c.id, want[c.faction]]);
   });
 });
