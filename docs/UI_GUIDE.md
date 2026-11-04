@@ -24,7 +24,7 @@ Every screen is drawn into the same 640x360 buffer as the battle, with the pixel
 | `well` | inset area inside panels (tips, formulas, key tables) |
 | `big_up/hover/down/off` | menu buttons (8 px corners), bold label, optional `mi_*` glyph |
 | `btn_up/hover/down/off` | small HUD and toggle buttons (4 px corners) |
-| `tab_on`, `tab_off` | tab strips (the collection's affinity and class filters, Weaving's slot and state filters, champion page) |
+| `tab_on`, `tab_off` | tab strips (the collection's affinity, class and rarity filters, Weaving's slot and state filters, champion page) |
 | `card_<rarity>`, `card_locked` | card frames with transparent centers: draw the card content first, the frame last |
 | `gem_<affinity>`, `emblem_<faction>`, `role_<role>` | category glyphs; always next to their name the first time a screen shows them |
 | `star_s/m/l(_off)` | stage stars on the map (s), panels (m), results (l) |

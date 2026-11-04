@@ -109,6 +109,7 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-04 | The Champions screen filters by rarity too, beside affinity and class; its tabs show one, two and three swords | 85 |
 | 2026-11-04 | The champion screen's background by faction: Court of Root the Verdant Grove, Ashveil Reign the Dead Forest, Sanguine Dominion Earth Scars, Azure Crown the Snowy Mesa | 84 |
 | 2026-11-03 | The game fills the browser window, PC or phone; touch drags the lists; FULLSCREEN in Options | 83 |
 | 2026-11-03 | The Journey's spools: Finish Tutorial 2 Ashen Vigor, 1-3 2 Silver Sunder, 1-10 2 Gilded Vigor and 2 Sunder | 82 |
@@ -4867,3 +4868,15 @@ Built as he said (`CARD_ZONE` in `src/game/data/zones.ts`, used by `src/game/scr
 
 Stepping to the next or previous champion (the arrows, Q / E) changes the background with the faction; before, the
 first champion's stayed. The Academy's demonstrations keep their own home zone (`homeZone`), which this did not touch.
+
+## 85. The rarity filter (received 2026-11-04)
+
+> i also want to have filter in champion screen based on rarity. be consistent, we already have filters there for affinity and role.
+
+> change icons in champion filter for rarity: common should have small sword icon. elite should have two swords icon. heroic should have three swords icon.
+
+Built as he said (`src/game/screens/collection.ts`, the icons `rarity_<id>` in `tools/art/ui/menu.ts`): after the class
+tabs, a tab for each rarity the roster holds (COMMON, ELITE, HEROIC; Mythic gets one once a champion has it), each with
+its icon: one small sword for Common, two for Elite, three for Heroic, in the rarity's colour. It works as the other two
+filters do: a rarity combines with an affinity and a class, a lit tab clicked again lets go of it, ALL lets go of all
+three. The row of tabs is now centred, with a little less space between its groups, to hold the three new tabs.

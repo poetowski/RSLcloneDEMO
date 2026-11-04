@@ -329,6 +329,26 @@ export function roleIcon(role: keyof typeof UIR.role): Bitmap {
   return outline(b, DARK);
 }
 
+/**
+ * The rarity filter's tab icon (Jakub, 2026-11-04): small swords standing side
+ * by side, one for Common, two for Elite, three for Heroic (four for Mythic),
+ * in their rarity's ramp: a lit tip, the blade, the guard, the grip, the pommel.
+ */
+export function rarityIcon(r: keyof typeof UIR.rarity): Bitmap {
+  const ramp = UIR.rarity[r];
+  const n = { common: 1, elite: 2, heroic: 3, mythic: 4 }[r];
+  const b = new Bitmap(3 * n + 2, 11);
+  for (let k = 0; k < n; k++) {
+    const x = 2 + 3 * k;
+    b.set(x, 1, ramp[4]);
+    for (let y = 2; y <= 6; y++) b.set(x, y, ramp[3]);
+    for (let dx = -1; dx <= 1; dx++) b.set(x + dx, 7, ramp[2]);
+    b.set(x, 8, ramp[1]);
+    b.set(x, 9, ramp[3]);
+  }
+  return outline(b, DARK);
+}
+
 /** Five-point star; filled gold or an empty socket. */
 export function star(size: number, filled: boolean): Bitmap {
   const b = new Bitmap(size, size);

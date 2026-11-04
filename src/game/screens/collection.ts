@@ -23,11 +23,15 @@ import { BaseScreen, Diorama } from './base';
 /** The filter tabs after ALL: one per affinity, then one per class. */
 const AFFINITY_TABS = Object.keys(AFFINITIES) as Affinity[];
 const ROLE_TABS: Role[] = ['Damage', 'Tank', 'Support'];
+/** The rarities the roster holds, the commonest first (a rarity no champion has yet gets no tab). */
+const RARITY_TABS = (Object.keys(RARITIES) as Rarity[]).filter((r) => CHAMPIONS.some((c) => c.rarity === r)).sort((a, b) => RARITIES[a].rank - RARITIES[b].rank);
 /** Rarest first: in a faction's group every rarity has rows of its own (Jakub, 2026-10-12). */
 const RARITY_ROWS = (Object.keys(RARITIES) as Rarity[]).sort((a, b) => RARITIES[b].rank - RARITIES[a].rank);
 
 /** Card grid geometry and the window it scrolls in (below the filter tabs). */
 const CW = 112, CH = 140, GAP = 8, COLS = 5;
+/** Space between the groups of filter tabs (affinity, class, rarity). */
+const GROUP_TAB_GAP = 6;
 const VIEW: Rect4 = [0, 54, W, H - 54];
 /** room above the first row for the NEW badges, and below the last */
 const PAD_TOP = 5, PAD_BOTTOM = 6;
@@ -45,6 +49,7 @@ interface Slot {
 export class CollectionScreen extends BaseScreen {
   private affinity: Affinity | 'all' = 'all';
   private role: Role | null = null;
+  private rarity: Rarity | null = null;
   private diorama: Diorama;
   private hoverSince = new Map<string, number>();
   private scroll = new Scroller();
@@ -82,14 +87,15 @@ export class CollectionScreen extends BaseScreen {
     else super.key(k);
   }
 
-  private setFilter(affinity: Affinity | 'all', role: Role | null) {
+  private setFilter(affinity: Affinity | 'all', role: Role | null, rarity: Rarity | null) {
     this.affinity = affinity;
     this.role = role;
+    this.rarity = rarity;
     this.scroll.to(0);
   }
 
   private passes(c: ChampionDef): boolean {
-    return (this.affinity === 'all' || c.affinity === this.affinity) && (!this.role || c.role === this.role);
+    return (this.affinity === 'all' || c.affinity === this.affinity) && (!this.role || c.role === this.role) && (!this.rarity || c.rarity === this.rarity);
   }
 
   /**
@@ -125,25 +131,30 @@ export class CollectionScreen extends BaseScreen {
     const owned = CHAMPIONS.filter((c) => isUnlocked(this.archivist, c.id)).length;
     this.header(ctx, 'CHAMPIONS', `${owned} / ${CHAMPIONS.length} recruited`);
 
-    // filter tabs: ALL, the affinities, then the classes; an affinity and a class combine,
-    // a lit tab clicked again lets go of its filter, ALL lets go of both
-    let tx = 20;
-    const tab = (id: string, label: string, icon: string | null, on: boolean, click: () => void) => {
-      const w = ui.measure(label) + (icon ? 28 : 16);
-      const hot = ui.hot(id, tx, 36, w, 16);
-      nine(ctx, this.a.ui.img, ui.part(on ? 'tab_on' : 'tab_off'), tx, 36, w, 16, 5);
-      if (icon) {
-        const r = ui.part(icon);
-        ui.blit(ctx, icon, tx + 6 + Math.floor((11 - r[2]) / 2), 36 + Math.floor((16 - r[3]) / 2));
+    // filter tabs: ALL, the affinities, the classes, then the rarities; an affinity, a class and
+    // a rarity combine, a lit tab clicked again lets go of its filter, ALL lets go of all three;
+    // the row is laid out first, then centred
+    type Tab = { id: string; label: string; icon: string | null; on: boolean; click: () => void; gap: number };
+    const tabs: Tab[] = [{ id: 'tab_all', label: 'ALL', icon: null, on: this.affinity === 'all' && !this.role && !this.rarity, click: () => this.setFilter('all', null, null), gap: 0 }];
+    AFFINITY_TABS.forEach((f) => tabs.push({ id: 'tab_' + f, label: AFFINITIES[f].name.toUpperCase(), icon: 'gem_' + f, on: this.affinity === f, click: () => this.setFilter(this.affinity === f ? 'all' : f, this.role, this.rarity), gap: 0 }));
+    ROLE_TABS.forEach((r, i) => tabs.push({ id: 'tab_' + r, label: r.toUpperCase(), icon: 'role_' + r, on: this.role === r, click: () => this.setFilter(this.affinity, this.role === r ? null : r, this.rarity), gap: i ? 0 : GROUP_TAB_GAP }));
+    RARITY_TABS.forEach((r, i) => tabs.push({ id: 'tab_' + r, label: RARITIES[r].name.toUpperCase(), icon: 'rarity_' + r, on: this.rarity === r, click: () => this.setFilter(this.affinity, this.role, this.rarity === r ? null : r), gap: i ? 0 : GROUP_TAB_GAP }));
+    const width = (t: Tab) => ui.measure(t.label) + (t.icon ? 28 : 16);
+    const total = tabs.reduce((s, t, i) => s + t.gap + width(t) + (i ? 4 : 0), 0);
+    let tx = Math.round((W - total) / 2);
+    for (const t of tabs) {
+      tx += t.gap;
+      const w = width(t);
+      const hot = ui.hot(t.id, tx, 36, w, 16);
+      nine(ctx, this.a.ui.img, ui.part(t.on ? 'tab_on' : 'tab_off'), tx, 36, w, 16, 5);
+      if (t.icon) {
+        const r = ui.part(t.icon);
+        ui.blit(ctx, t.icon, tx + 6 + Math.floor((11 - r[2]) / 2), 36 + Math.floor((16 - r[3]) / 2));
       }
-      ui.text(ctx, label, tx + (icon ? 20 : 8), 40, { color: on || hot ? COLORS.goldHi : COLORS.dim });
-      ui.regions.push({ id, x: tx, y: 36, w, h: 16, click });
+      ui.text(ctx, t.label, tx + (t.icon ? 20 : 8), 40, { color: t.on || hot ? COLORS.goldHi : COLORS.dim });
+      ui.regions.push({ id: t.id, x: tx, y: 36, w, h: 16, click: t.click });
       tx += w + 4;
-    };
-    tab('tab_all', 'ALL', null, this.affinity === 'all' && !this.role, () => this.setFilter('all', null));
-    for (const f of AFFINITY_TABS) tab('tab_' + f, AFFINITIES[f].name.toUpperCase(), 'gem_' + f, this.affinity === f, () => this.setFilter(this.affinity === f ? 'all' : f, this.role));
-    tx += 10;
-    for (const r of ROLE_TABS) tab('tab_' + r, r.toUpperCase(), 'role_' + r, this.role === r, () => this.setFilter(this.affinity, this.role === r ? null : r));
+    }
 
     const { slots, heads, height } = this.layout();
     const order = slots.map((s) => s.c);
@@ -160,7 +171,7 @@ export class CollectionScreen extends BaseScreen {
     ctx.clip();
     for (const h of heads) this.head(ctx, h.faction, GRID_X, oy + h.y, GRID_W);
     for (const sl of slots) this.card(ctx, sl.c, sl.x, oy + sl.y, CW, CH, order);
-    if (!slots.length) ui.text(ctx, 'No champion is both of these.', W / 2, vy + 60, { color: COLORS.dim, align: 'center' });
+    if (!slots.length) ui.text(ctx, 'No champion matches all of these.', W / 2, vy + 60, { color: COLORS.dim, align: 'center' });
     ctx.restore();
     this.scrollHints(ctx);
   }

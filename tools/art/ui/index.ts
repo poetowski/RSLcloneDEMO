@@ -10,7 +10,7 @@ import { rampDither } from '../paint.ts';
 import { Bitmap, hex } from '../raster.ts';
 import { solve } from '../rig.ts';
 import { banner, button, chevron, footRing, GLYPHS, panel, skillFrame, smallGlyph } from './kit.ts';
-import { arrow, bigButton, campGlow, campNode, cardFrame, check, crown, divider, emblem, gem, lock, logo, mapNode, MENU_ICONS, newBadge, nodeGlow, podium, questKnot, roleIcon, star, tab, tutHand, well } from './menu.ts';
+import { arrow, bigButton, campGlow, campNode, cardFrame, check, crown, divider, emblem, gem, lock, logo, mapNode, MENU_ICONS, newBadge, nodeGlow, podium, questKnot, rarityIcon, roleIcon, star, tab, tutHand, well } from './menu.ts';
 import { matrixParts } from './matrix.ts';
 import { STATUS_ICONS, statusIcon } from './status.ts';
 import { goldCoin } from './gold.ts';
@@ -94,6 +94,7 @@ export function allParts(): Record<string, Bitmap> {
     biggold: goldCoin(24),
   };
   for (const [r, ramp] of Object.entries(UIR.rarity)) parts['card_' + r] = cardFrame(ramp);
+  for (const r of Object.keys(UIR.rarity) as (keyof typeof UIR.rarity)[]) parts['rarity_' + r] = rarityIcon(r);
   for (const a of Object.keys(UIR.affinity) as (keyof typeof UIR.affinity)[]) parts['gem_' + a] = gem(a);
   for (const f of Object.keys(UIR.faction) as (keyof typeof UIR.faction)[]) parts['emblem_' + f] = emblem(f);
   for (const r of Object.keys(UIR.role) as (keyof typeof UIR.role)[]) parts['role_' + r] = roleIcon(r);
