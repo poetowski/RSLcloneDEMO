@@ -10,7 +10,7 @@ import { LOCATIONS, STARTERS, allStages, stage } from './data/campaign';
 import { JOURNEY } from './data/challenges';
 import { champion, CHAMPIONS } from './data/champions';
 import { STARTING_GOLD } from './data/economy';
-import { EXTRA_COMBAT } from './data/extra';
+import { DoorId, EXTRA_COMBAT, EXTRA_DOORS } from './data/extra';
 import { MATRIX_LAYOUT, PATTERN_IDS, SPOOL_STATS } from './data/matrix';
 import { FACTIONS, ROLES } from './data/meta';
 import { Wish } from './data/summoning';
@@ -48,6 +48,8 @@ export interface MasterArchivist {
   gold: number;
   /** the Merchant's spools for sale, rolled on the first visit (merchant.ts); none until then */
   wares: Ware[];
+  /** the doors of Extra Combat's hall opened, for good (data/extra.ts) */
+  doors: DoorId[];
 }
 
 export type TutorialState = 'todo' | 'skipped' | 'done';
@@ -72,6 +74,8 @@ interface SaveJson {
   /** since the Merchant (2026-11-03); a save without it holds the starting Gold and no wares yet */
   gold?: number;
   wares?: { spool: unknown; sold?: boolean }[];
+  /** since Extra Combat's hall (2026-11-07); a save without it has opened no door */
+  doors?: string[];
 }
 
 /**
@@ -93,7 +97,7 @@ const OLD_KEYS = ['tlrol.save.v2', 'oathbound.profile.v1'];
 export function newArchivist(): MasterArchivist {
   const reliquary = new Reliquary(MATRIX_LAYOUT);
   for (const id of STARTERS) reliquary.recruit(id, false);
-  return { stars: {}, team: [...STARTERS], read: [], settings: { speed: 1, auto: false }, reliquary, tutorial: 'todo', claimed: [], fragments: 0, shards: 0, wish: {}, summons: 0, lessons: [], gold: STARTING_GOLD, wares: [] };
+  return { stars: {}, team: [...STARTERS], read: [], settings: { speed: 1, auto: false }, reliquary, tutorial: 'todo', claimed: [], fragments: 0, shards: 0, wish: {}, summons: 0, lessons: [], gold: STARTING_GOLD, wares: [], doors: [] };
 }
 
 /**
@@ -123,6 +127,7 @@ export function readSave(raw: string | null, rawOld: string | null = null): Mast
       });
       if (s.wish && typeof s.wish === 'object') a.wish = { faction: s.wish.faction, role: s.wish.role };
       if (Array.isArray(s.lessons)) a.lessons = s.lessons.filter((id) => typeof id === 'string');
+      if (Array.isArray(s.doors)) a.doors = EXTRA_DOORS.filter((d) => s.doors!.includes(d.id)).map((d) => d.id);
       keepHabits(a, s);
     } else if (rawOld) {
       const s = JSON.parse(rawOld) as Partial<OldSaveJson>;
@@ -191,7 +196,7 @@ export function loadArchivist(): MasterArchivist {
 export function writeSave(a: MasterArchivist): string {
   const s: SaveJson = {
     version: 3, stars: a.stars, team: a.team, read: a.read, settings: a.settings, reliquary: a.reliquary.toJSON(), tutorial: a.tutorial, claimed: a.claimed,
-    fragments: a.fragments, shards: a.shards, wish: a.wish, summons: a.summons, lessons: a.lessons, gold: a.gold, wares: a.wares,
+    fragments: a.fragments, shards: a.shards, wish: a.wish, summons: a.summons, lessons: a.lessons, gold: a.gold, wares: a.wares, doors: a.doors,
   };
   return JSON.stringify(s);
 }

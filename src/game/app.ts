@@ -147,6 +147,8 @@ export interface Router {
   summon(): void;
   /** the Merchant: the Gold held, BUY and SELL (their wares come later) */
   merchant(tab?: MerchantTab): void;
+  /** Extra Combat's hall: three doors, the first to open */
+  extra(): void;
   /** the ceremony of a summoned champion, and whether the wish came true; CONTINUE goes back to the Wishing Star */
   summoned(id: string, wished: boolean): void;
   demo(skillId: string, back: () => void): void;

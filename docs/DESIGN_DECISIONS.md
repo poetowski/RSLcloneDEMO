@@ -109,6 +109,8 @@ Section 7 lists what is not decided.
 | 2026-11-01 | The Journey gains Beat Campaign 3-10, 250 Stardust, between 1-10 and 5-10; the whole-map popup is removed | 55 |
 | 2026-11-01 | The map's left arrow and A reach the world's west end | 56 |
 | 2026-11-02 | Zone 9, the Sleeping Archipelago: battle background, the world map extended east, ten placeholder stages | 5.12 |
+| 2026-11-07 | Extra Combat's hall: three doors under LOCKED stripes, demonic, celestial and runic; the first opens for good at a click, its stripe falling | 100 |
+| 2026-11-07 | The Astronomer Royal is Bloom (Ember stood in) | 73 |
 | 2026-11-04 | The main menu redesigned: Loomfall, a town at dusk under the broken Loom, each way on a place of its own; Extra Combat, its Arena shut until 10-10 is won, no screen yet | 87 |
 | 2026-11-04 | The world map ends past area 10 (3780 wide): the blossom runs on, then two unlike tears of the broken Loom, the faded broken land beyond | 86 |
 | 2026-11-04 | The Champions screen filters by rarity too, beside affinity and class; its tabs show one, two and three swords | 85 |
@@ -4558,6 +4560,8 @@ her. A long brass telescope is her staff, its lens alight; a star hangs over her
   nobody to take it. The AI gives it to the hardest hitter who can act.
 - **Fixed Stars** (passive, new kind `alignment`): at the start of her turn, a skipped one too, the other ally lowest on
   Turn Meter gains 10%. Alone, nothing.
+
+Her affinity is Bloom, on his word of 2026-11-07 ("astronomer royal should be bloom"; Ember stood in until then).
 - Stats HP 1400, ATK 84, DEF 70, SPD 104, CRIT 2.5%, score 419. Impact 58%. Summoned.
 - Stand-ins until he sets them: the skill names and texts (those I proposed), every number, Ember, the lore line, the
   rules read for the given turn, and that she is summoned.
@@ -5193,3 +5197,47 @@ linen tag on its brow with a violet sigil. When it dies the control drops and th
   Impact 41%. Summoned.
 
 With the three in the summoned pool every stage stays inside its band; no stage power changed.
+
+## 100. Extra Combat's hall (received 2026-11-07)
+
+Jakub, verbatim:
+
+```
+now i want to have a new screen for extra combat.  you should prepare new background, maybe some interior with candles and three doors horizontally on the screen. first door should be demonic satanistic door. it has a big stripe over with LOCKED written on it. second door should be celestial and arcane. also with a stripe over LOCKED. third door should be full of magic runes and blinking in lot of colors. also has a LOCKED over it. prepare and deliver. actually once this screen is unlocked, player can click on first door and its LOCKED stripe would fall down and doors would get permanently open. two other doors stay locked for now. i will later define what is behind first door if player clicks there.
+```
+
+and, while I built it: "you can even make first door LOCKED stripe to look almost fallen, so it is intuitive for user to
+click there and open the door completely."
+
+The Arena in Loomfall (section 87) now leads to the screen once 10-10 is won; until then it stays shut as before.
+
+**The hall** (`tools/art/extra.ts`, `public/assets/extra/`): a vaulted chamber under the Arena lit only by candles, dark
+ashlar, four pillars carrying the ribs of the vault with a sconce of three candles on each, a polished floor mirroring the
+doors. Three doors in a row, left to right:
+
+- **The first, demonic**: a pointed arch of black basalt veined with fire, iron thorns along its back, the skull of a great
+  horned goat over it with red light in its sockets; iron leaves riveted in four plates, a row of spikes, two ring knockers,
+  a reversed pentagram in a circle across both leaves; red light in the seam and under the door. Black candles with red
+  flames at its foot. Its stripe hangs from one nail, its other end dropped, swaying a little: almost fallen.
+- **The second, celestial and arcane**: a round arch of white marble trimmed in gold under a golden winged sun; its leaves
+  the night sky, gold stars and constellations that twinkle, a crescent moon, an arcane circle with a six-pointed star
+  across both. White candles with pale flames.
+- **The third, runic**: a dolmen of standing stones under a heavy lintel, moss in its joints; its slab is panelled and
+  carved with runes, more on the lintel and the stones (33 in all), each lighting up on its own slow beat in the next
+  of eight colours.
+
+**LOCKED**: a broad band of dark crimson between iron edges, an iron plate and a nail at each end, the word in the game's
+title font. On the first door it hangs askew; on the others it lies straight across.
+
+**The first door**: a click (or Enter on it) pulls its stripe: it swings down on its last nail, bounces, drops, topples
+over and lies flat on the floor before the door, upside down, with a puff of dust; then the leaves swing open on dark
+steps going down into a red glow. The door stays open for good: the save keeps the doors opened (`doors`, since this
+version; an older save has opened none), from the moment of the click. A click on it open says what lies beyond is still
+to come: **what is behind it is his to define**.
+
+**The second and third doors**: a click shakes the stripe and says the door is locked. Each door's tooltip names it and
+says what it looks like and whether it is open.
+
+**Stand-ins until he sets them**: the doors' names (the Demonic, the Celestial, the Runic Door) and the lines about them,
+the screen's subtitle ("The hall under the Arena") and bottom line, and every detail of the hall's look and the stripe's
+fall.

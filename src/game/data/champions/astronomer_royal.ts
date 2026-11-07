@@ -14,7 +14,7 @@ export const astronomerRoyal: ChampionDef = {
   name: 'Astronomer Royal',
   role: 'Support',
   rarity: 'heroic',
-  affinity: 'ember',
+  affinity: 'bloom',
   faction: 'azure_crown',
   color: '#ffd860',
   stats: { hp: 1400, atk: 84, def: 70, spd: 104, crit: 0.025, critDmg: 1, acc: 0, res: 0 },

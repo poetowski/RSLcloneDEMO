@@ -11,7 +11,7 @@
 // Athenaeum to the Academy, the Clocktower to the options, the Herald's Board to
 // the Challenges, the Wishing Well to summoning, the Merchant's Wagon to the
 // Merchant, and the Arena across the lake to Extra Combat (Jakub, 2026-11-04:
-// no screen yet, shut until 10-10 is won). A place lights up under the pointer
+// shut until 10-10 is won; its hall of three doors since 2026-11-07). A place lights up under the pointer
 // (its own pixels, not a box) or the keyboard's focus, and its label carries
 // what the old buttons said: the frontier, the roster, the spools, the unread
 // chapters, the summons waiting, the NEW badges.
@@ -115,13 +115,13 @@ export class MainMenu extends BaseScreen {
       { id: 'summon', label: 'SUMMON', note: summons ? `${summons} ready` : undefined, badge: summons > 0, go: () => r.summon() },
       // the Merchant (Jakub, 2026-11-03: "put object on main menu and make it navigational to a new merchant screen"): the Gold held
       { id: 'merchant', label: 'MERCHANT', note: goldText(a.gold), go: () => r.merchant() },
-      // Extra Combat (Jakub, 2026-11-04): no screen until he designs it; shut until 10-10 is won
+      // Extra Combat (Jakub, 2026-11-04): shut until 10-10 is won; then its hall of three doors (2026-11-07)
       {
         id: 'extra',
         label: EXTRA_COMBAT.name.toUpperCase(),
         locked: !extra,
-        says: extra ? 'Coming soon' : `Win stage ${EXTRA_COMBAT.opensAfter} to open it`,
-        go: () => this.say(extra ? `${EXTRA_COMBAT.name} is coming soon.` : `${EXTRA_COMBAT.name} opens once stage ${EXTRA_COMBAT.opensAfter} is won.`),
+        says: extra ? undefined : `Win stage ${EXTRA_COMBAT.opensAfter} to open it`,
+        go: () => (extra ? r.extra() : this.say(`${EXTRA_COMBAT.name} opens once stage ${EXTRA_COMBAT.opensAfter} is won.`)),
       },
     ];
   }

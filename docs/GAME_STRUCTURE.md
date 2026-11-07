@@ -81,7 +81,7 @@ The roster today:
 | Coffin's Legs (`coffins_legs`) | Elite | Ember (a stand-in) | Tank | Ashveil Reign | summoned |
 | Wraith (`wraith`, a stand-in name) | Elite | Ember (a stand-in) | Damage | Ashveil Reign | summoned |
 | Haruspex (`haruspex`, a stand-in name) | Elite | Tide (a stand-in) | Support | Ashveil Reign | summoned |
-| Astronomer Royal (`astronomer_royal`) | Heroic | Ember (a stand-in) | Support | Azure Crown | summoned |
+| Astronomer Royal (`astronomer_royal`) | Heroic | Bloom | Support | Azure Crown | summoned |
 | Azul the Blade (`azul_the_blade`) | Heroic | Ember | Damage | Azure Crown | summoned |
 | Lycan (`lycan`) | Heroic | Tide | Damage | Ashveil Reign | summoned |
 | Orchid Huntress (`orchid_huntress`) | Heroic | Bloom (a stand-in) | Damage | Court of Root | summoned |
@@ -213,6 +213,6 @@ Helpers: `stageOpen`, `locationOpen`, `frontier` (the newest playable stage), `r
 | Merchant (the Merchant's Wagon) | `screens/merchant.ts` | `?screen=merchant&tab=sell` (opens on BUY): the Gold held; BUY the wares (ROTATE WARES for 5000 Gold), SELL loose spools |
 | Skill demo | `screens/battle.ts` (demo mode) | `?demo=iron_blow` |
 
-The main menu is Loomfall (`src/game/view/loomfall.ts`, art `tools/art/loomfall.ts`): a town at dusk under the broken Loom, whose places are the menu: the Wayfarers' Gate (campaign), the Reliquary (champions), the Weavers' Mill (Weaving), the Athenaeum (Academy), the Clocktower (options), the Herald's Board (Challenges), the Merchant's Wagon (the Merchant), the Wishing Well with the Wishing Star (summoning) and the Arena across the lake (Extra Combat: no screen yet, shut until 10-10 is won, `extraCombatOpen`, `src/game/data/extra.ts`); a few owned champions, a different few each visit, stand round its well ([UI_GUIDE.md](UI_GUIDE.md) 4).
+The main menu is Loomfall (`src/game/view/loomfall.ts`, art `tools/art/loomfall.ts`): a town at dusk under the broken Loom, whose places are the menu: the Wayfarers' Gate (campaign), the Reliquary (champions), the Weavers' Mill (Weaving), the Athenaeum (Academy), the Clocktower (options), the Herald's Board (Challenges), the Merchant's Wagon (the Merchant), the Wishing Well with the Wishing Star (summoning) and the Arena across the lake (Extra Combat, shut until 10-10 is won, `extraCombatOpen`, `src/game/data/extra.ts`; then its hall, `src/game/screens/extra.ts`, art `tools/art/extra.ts`: three doors under LOCKED stripes, of which only the first opens, for good, kept in the save as `doors`); a few owned champions, a different few each visit, stand round its well ([UI_GUIDE.md](UI_GUIDE.md) 4).
 
 All navigation goes through `app.router` (`src/main.ts`), which wraps each switch in a dithered dissolve. `?unlockall=1`, `?reset=1`, `?spools=1`, `?stardust=<n>` and `?soulstars=<n>` change the save before the first screen opens.

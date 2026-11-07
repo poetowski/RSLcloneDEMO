@@ -13,7 +13,7 @@ import { STATUSES } from '../src/game/data/statuses';
 import { ChampionDef, StatusId } from '../src/game/data/types';
 import { cardZone, ZONES } from '../src/game/data/zones';
 import { cleared, extraCombatOpen, frontier, isFresh, isUnlocked, locationOpen, newArchivist, readSave, recordClear, recordVictory, spoolsHeld, stageOpen, stockSample, tutorialDue, writeSave } from '../src/game/archivist';
-import { EXTRA_COMBAT } from '../src/game/data/extra';
+import { EXTRA_COMBAT, EXTRA_DOORS } from '../src/game/data/extra';
 import { BitmapFont } from '../src/engine/font';
 import type { MenuJson } from '../src/game/view/assets';
 import { buyPrice, CURRENCY, ROTATE_PRICE, sellPrice, STARTING_GOLD } from '../src/game/data/economy';
@@ -782,6 +782,24 @@ describe('main menu: Loomfall', () => {
     expect(extraCombatOpen(p)).toBe(false);
     recordClear(p, '10-10', 1);
     expect(extraCombatOpen(p)).toBe(true);
+  });
+
+  // Jakub, 2026-11-07: three doors in a row, each LOCKED; "player can click on first door ... doors would get permanently open. two other doors stay locked for now"
+  it("gives Extra Combat's hall three doors, only the first of which opens, and keeps it open through a save", () => {
+    expect(EXTRA_DOORS.map((d) => [d.id, d.opens])).toEqual([['demonic', true], ['celestial', false], ['runic', false]]);
+    const p = newArchivist();
+    expect(p.doors).toEqual([]);
+    p.doors.push('demonic');
+    expect(readSave(writeSave(p)).doors).toEqual(['demonic']);
+    const save = JSON.parse(writeSave(p)) as Record<string, unknown>;
+    expect(readSave(JSON.stringify({ ...save, doors: ['demonic', 'gone', 7] })).doors).toEqual(['demonic']);
+    delete save.doors;
+    expect(readSave(JSON.stringify(save)).doors).toEqual([]);
+    const hall = json('public/assets/extra/extra.json') as { doors: { id: string }[]; runes: unknown[]; candles: unknown[]; opening: { frames: unknown[] } };
+    expect(hall.doors.map((d) => d.id)).toEqual(EXTRA_DOORS.map((d) => d.id));
+    expect(hall.runes.length).toBeGreaterThan(20);
+    expect(hall.candles.length).toBeGreaterThan(20);
+    expect(hall.opening.frames.length).toBe(3);
   });
 
   it("hangs every label clear of the others, of the title and of the champions, at its widest", () => {

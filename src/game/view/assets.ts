@@ -1,6 +1,6 @@
 // Loads every generated asset (see tools/art/build.ts for the producers):
 // champion atlases, effects, combat backgrounds, the UI atlas, the font, the
-// world map and the main menu's diorama, Loomfall.
+// world map, the main menu's diorama, Loomfall, and Extra Combat's hall.
 import { loadImage, loadJson, silhouette } from '../../engine/assets';
 import { BitmapFont, FontJson } from '../../engine/font';
 
@@ -107,6 +107,19 @@ export interface MenuJson {
   lights: { x: number; y: number; rx: number; ry: number; rgb: [number, number, number]; k: number; rate: number; when?: string }[];
 }
 
+/** Extra Combat's hall (tools/art/extra.ts ExtraJson): its doors, the stripes that bar them, what moves in it. */
+export interface ExtraJson {
+  doors: { id: string; box: Rect4; cx: number; stripe: { pivot: [number, number]; angle: number } }[];
+  stripe: { rect: Rect4; w: number; h: number; nail: [number, number] };
+  opening: { frames: Rect4[]; at: [number, number] };
+  dust: Rect4;
+  candles: { x: number; y: number; tone: 'red' | 'pale' | 'warm'; small: boolean }[];
+  runes: [number, number][][];
+  stars: [number, number][];
+  lights: { x: number; y: number; rx: number; ry: number; rgb: [number, number, number]; k: number; rate: number; door?: number }[];
+  floor: number;
+}
+
 export interface ChampionArt {
   json: ChampionAtlasJson;
   img: HTMLImageElement;
@@ -130,6 +143,8 @@ export interface Assets {
   ui: { json: UiJson; img: HTMLImageElement };
   /** the main menu's diorama, Loomfall: its sky, its scene atlas and their layout */
   menu: { json: MenuJson; sky: HTMLImageElement; scene: HTMLImageElement };
+  /** Extra Combat's hall: the hall, its sprites and their layout */
+  extra: { json: ExtraJson; hall: HTMLImageElement; img: HTMLImageElement };
   /** the campaign world, larger than the screen */
   map: HTMLImageElement;
   /** the same world drawn small enough to fit one screen */
@@ -161,7 +176,7 @@ export async function loadAssets(championIds: string[], zoneIds: string[], progr
     ]);
     zones[id] = { json, tiles, backdrop, props };
   });
-  const [fxJson, fxImg, uiJson, uiImg, fontJson, fontImg, map, menuJson, menuSky, menuScene] = await Promise.all([
+  const [fxJson, fxImg, uiJson, uiImg, fontJson, fontImg, map, menuJson, menuSky, menuScene, extraJson, extraHall, extraImg] = await Promise.all([
     track(loadJson<FxJson>('assets/fx/fx.json')),
     track(loadImage('assets/fx/fx.png')),
     track(loadJson<UiJson>('assets/ui/ui.json')),
@@ -172,6 +187,9 @@ export async function loadAssets(championIds: string[], zoneIds: string[], progr
     track(loadJson<MenuJson>('assets/menu/menu.json')),
     track(loadImage('assets/menu/sky.png')),
     track(loadImage('assets/menu/scene.png')),
+    track(loadJson<ExtraJson>('assets/extra/extra.json')),
+    track(loadImage('assets/extra/hall.png')),
+    track(loadImage('assets/extra/extra.png')),
   ]);
   await Promise.all([...championJobs, ...zoneJobs]);
   return {
@@ -180,6 +198,7 @@ export async function loadAssets(championIds: string[], zoneIds: string[], progr
     zones,
     ui: { json: uiJson, img: uiImg },
     menu: { json: menuJson, sky: menuSky, scene: menuScene },
+    extra: { json: extraJson, hall: extraHall, img: extraImg },
     map,
     font: new BitmapFont(fontImg, fontJson),
   };
