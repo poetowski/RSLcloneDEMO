@@ -24,6 +24,14 @@
 // the double cross on it, before each ally; in Trial by Fire the levelled
 // blade roars up along its length, and the sweep passes through each enemy as
 // a flat arc of flame, flames bursting up where it went.
+// The Pikeman's pike lands as a long straight line of light driven through,
+// its Level Pikes as a long flat sweep with chips and dust, and Set Against the
+// Charge as dust round his set feet. The Chakra Manipulator's are pale points
+// and rings of light, the glow he works with (Pressure Point a bright point
+// struck and rings spreading; Open the Gates seven points rising up each ally
+// and a ring at its feet; Mended Flow a slow ring settling). Missis Ferret's
+// bite is two rows of small white teeth snapping shut, her War Dance quick
+// marks of chatter round her head and a ring of dust kicked up at her feet.
 import { ACCENT, MAT } from '../palette.ts';
 import { disc, dith, ellipseRing, polyFill, rampDither } from '../paint.ts';
 import { Bitmap, hash2, RGBA, rng } from '../raster.ts';
@@ -973,6 +981,133 @@ export const AZURE_CROWN_FX: Record<string, FxDef> = {
       motes(b, cx, cy + 22, 24, 46, 18, t, ramps.steel, 1461);
       motes(b, cx, cy + 22, 20, 40, 8, t, GO, 1465);
       if (i >= 1 && i <= 6) sparks(b, cx, cy, 8, 20, (i - 1) / 6, GO, 1463, 0);
+    },
+  },
+
+  /** Thrust: the pike driven straight through: a long level line of light, a flash at its point, chips. */
+  pike_pierce: {
+    w: 84, h: 48, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 8, 4, 4],
+    draw: (b, t, i) => {
+      const cy = 24;
+      if (i < 4) cut(b, 4, cy + 1, 62, cy, 0, [1.6, 2.6, 2.0, 1.2][i], DULL, [1.4, 1.2, 0.9, 0.6][i], [0.6, 1, 1, 1][i]);
+      if (i >= 1 && i < 4) burst(b, 58, cy, 8, [2, 3, 2][i - 1], [9, 14, 9][i - 1], [1.6, 2.2, 1.4][i - 1], DULL, 0.2);
+      if (i >= 1) sparks(b, 58, cy, 12, 22, (i - 1) / 5, DULL, 1501, 14);
+    },
+  },
+  /** Level Pikes: a long flat sweep crossing each enemy, leading edge thick, chips and dust after it. */
+  pike_sweep: {
+    w: 104, h: 56, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [4, 4, 16, 4],
+    draw: (b, t, i) => {
+      const cy = 30;
+      if (i < 4) cut(b, 98, cy - 10, 6, cy + 4, 4, [2.0, 3.2, 2.4, 1.4][i], DULL, [1.3, 1.2, 0.9, 0.6][i], [0.5, 0.9, 1, 1][i]);
+      if (i >= 1 && i < 4) burst(b, 52, cy, 8, [2, 3, 2][i - 1], [10, 15, 10][i - 1], [1.6, 2.2, 1.4][i - 1], DULL, 0.3);
+      if (i >= 2) dust(b, 52, cy + 12, 8, 30, (i - 2) / 4, 1507, 5);
+      if (i >= 1) sparks(b, 52, cy, 14, 30, (i - 1) / 5, DULL, 1511, 18);
+    },
+  },
+  /** Set Against the Charge: he sets the pike's butt and his feet, and dust kicks up round them. */
+  pike_set: {
+    w: 64, h: 32, n: 8, ms: 60, ax: 0.5, ay: 0.9, pad: [2, 4, 2, 4],
+    draw: (b, t, i) => {
+      const cx = 32, gy = 28;
+      const rr = [6, 12, 17, 20, 22, 22, 21, 19][i];
+      ellipseRing(b, cx, gy - 2, rr, rr * 0.22, i < 5 ? 1.4 : 1, (x, y, a) => (dith(x, y, 1 - t * 0.8) ? rampDither(DU, 3 - t * 1.3 + Math.sin(a) * 0.6, x, y) : 0));
+      dust(b, cx, gy - 3, 8, 22, t, 1523, 6);
+    },
+  },
+  /** Pressure Point: a bright point struck at the chest, pale rings spreading from it (additive). */
+  pressure_jab: {
+    w: 48, h: 48, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 24, cy = 24;
+      if (i < 4) burst(b, cx, cy, 8, [1, 2, 2, 1][i], [6, 10, 8, 5][i], [1.2, 1.6, 1.2, 0.8][i], IC, 0.4);
+      ring(b, cx, cy, 3 + t * 18, 3 + t * 18, Math.max(0.6, 1.6 - t), IC, 1.1 - t * 0.7);
+      if (i >= 2) ring(b, cx, cy, 2 + (t - 0.25) * 14, 2 + (t - 0.25) * 14, 0.8, IC, 0.9 - t * 0.6);
+      if (i < 6) mote(b, cx, cy, true, IC);
+    },
+  },
+  /** Open the Gates, on his own head: seven points flare in a column before him and spread out as rings (additive). */
+  chakra_gates: {
+    w: 48, h: 88, n: 9, ms: 60, ax: 0.5, ay: 0.82, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 24;
+      for (let k = 0; k < 7; k++) {
+        const on = (t + 0.15) * 9 - k * 0.6;
+        if (on <= 0) continue;
+        const y = 76 - k * 10;
+        mote(b, cx, y, on > 1 && on < 4, IC, Math.max(0.3, 1 - t * 0.6));
+        if (on > 1) ring(b, cx, y, Math.min(10, (on - 1) * 3), Math.min(4, on - 1), 0.8, IC, Math.max(0, 1 - (on - 1) * 0.25));
+      }
+    },
+  },
+  /** Open the Gates reaches an ally: points of light rise up it one after another, a ring settles at its feet (additive). */
+  chakra_bloom: {
+    w: 48, h: 80, n: 10, ms: 60, ax: 0.5, ay: 1, pad: [2, 4, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 24, gy = 78;
+      ellipseRing(b, cx, gy - 2, 6 + t * 12, 2 + t * 2.4, 1.2, (x, y, a) => (dith(x, y, 1 - t * 0.8) ? rampDither(IC, 2.6 + Math.sin(a) * 0.6, x, y) : 0));
+      for (let k = 0; k < 7; k++) {
+        const tt = t * 1.6 - k * 0.1;
+        if (tt <= 0 || tt >= 1) continue;
+        mote(b, cx + (k % 2 ? 1 : -1), Math.round(gy - 8 - k * 9 - tt * 6), k === 3, IC, 1 - tt * 0.6);
+      }
+      motes(b, cx, gy - 10, 18, 40, 6, t, IC, 1531);
+    },
+  },
+  /** Mended Flow: a slow ring of pale points turns round the ally and settles into it (additive). */
+  chakra_mend: {
+    w: 52, h: 52, n: 9, ms: 65, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 26, cy = 26;
+      for (let k = 0; k < 10; k++) {
+        const a = (k / 10) * Math.PI * 2 + t * 3;
+        const r = 20 * (1 - t * 0.6);
+        mote(b, Math.round(cx + Math.cos(a) * r), Math.round(cy + Math.sin(a) * r * 0.45), k % 3 === 0, IC, (Math.sin(a) > 0 ? 1 : 0.5) * (1 - t * 0.5));
+      }
+      if (i >= 6) mote(b, cx, cy, true, IC);
+    },
+  },
+  /** Nip and Worry: two rows of small white teeth snap shut, a dull flash, a few chips (additive). */
+  ferret_bite: {
+    w: 48, h: 48, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 4, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 24, cy = 24;
+      const gap = [10, 5, 1, 1, 2, 3, 4][i];
+      if (i < 5) for (let k = -2; k <= 2; k++) {
+        const x = cx + k * 4;
+        for (const [dy, sgn] of [[-gap, 1], [gap, -1]] as const) {
+          b.set(x, cy + dy, W);
+          b.set(x, cy + dy + sgn, W);
+          b.set(x - 1, cy + dy - sgn, DULL[3]);
+          b.set(x + 1, cy + dy - sgn, DULL[3]);
+        }
+      }
+      if (i >= 2 && i < 5) burst(b, cx, cy, 6, 1, [7, 10, 7][i - 2], 1.2, DULL, 0.3);
+      if (i >= 2) sparks(b, cx, cy, 8, 16, (i - 2) / 4, DULL, 1543, 12);
+    },
+  },
+  /** War Dance, on her own head: quick marks of chatter jump out round her (additive). */
+  dance_chatter: {
+    w: 56, h: 40, n: 8, ms: 60, ax: 0.5, ay: 0.7, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 22;
+      const r = rng(1549 + i * 7);
+      for (let k = 0; k < 6; k++) {
+        const a = r() * Math.PI * 2, d = 10 + r() * 12;
+        const x = Math.round(cx + Math.cos(a) * d), y = Math.round(cy + Math.sin(a) * d * 0.6);
+        b.set(x, y, W);
+        b.set(x + Math.round(Math.cos(a) * 2), y + Math.round(Math.sin(a) * 2), DULL[3]);
+      }
+    },
+  },
+  /** War Dance lands: a ring of dust kicked up round her feet as she comes down. */
+  dance_ward: {
+    w: 80, h: 32, n: 8, ms: 60, ax: 0.5, ay: 0.9, pad: [2, 6, 2, 6],
+    draw: (b, t, i) => {
+      const cx = 40, gy = 28;
+      const rr = [8, 15, 21, 25, 27, 28, 27, 25][i];
+      ellipseRing(b, cx, gy - 2, rr, rr * 0.22, i < 5 ? 1.5 : 1, (x, y, a) => (dith(x, y, 1 - t * 0.8) ? rampDither(DU, 3.1 - t * 1.3 + Math.sin(a) * 0.6, x, y) : 0));
+      dust(b, cx, gy - 3, 10, 30, t, 1553, 7);
     },
   },
 };

@@ -183,6 +183,9 @@ export const bannerman = (chance: number) =>
 /** A ward of its holder alone: a Shield of 10% of its max HP for 1 turn after every enemy blow on it. */
 export const hide = fixture('hide', { stats: { hp: 1500 }, passive: { id: 'hide', name: 'Hide', desc: '', kind: 'ward', self: true, value: 0.1, statuses: [{ status: 'shield', turns: 1 }] } });
 
+/** A ward that answers only a blow leaving an ally under 40% of its max HP: Regen for 2 turns, then a rest of 2. */
+export const lowWard = fixture('low_ward', { stats: { hp: 1400 }, passive: { id: 'low_ward', name: 'Low Ward', desc: '', kind: 'ward', below: 0.4, cooldown: 2, value: 0, statuses: [{ status: 'regen', turns: 2 }] } });
+
 /** Retaliate: an enemy skill that damaged it gets Poison for 1 turn on its attacker after the hit, with `chance`. */
 export const reproacher = (chance: number) =>
   fixture(`reproacher_${chance}`, { passive: { id: 'reproach', name: 'Reproach', desc: '', kind: 'reproach', value: 0, chance, statuses: [{ status: 'atk_down', turns: 1 }] } });

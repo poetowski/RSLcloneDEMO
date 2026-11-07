@@ -58,6 +58,9 @@ import { azulTheBlade } from './azul_the_blade';
 import { lycan } from './lycan';
 import { orchidHuntress } from './orchid_huntress';
 import { executioner } from './executioner';
+import { chakraManipulator } from './chakra_manipulator';
+import { pikeman } from './pikeman';
+import { missisFerret } from './missis_ferret';
 import { cinderSylph } from './cinder_sylph';
 import { hexWarden } from './hex_warden';
 import { transfusionist } from './transfusionist';
@@ -81,7 +84,7 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, astronomerRoyal, forestGargoyle, rootfather, deadKnightAmstron, cinderSylph, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman, overlordOfentol, verdantLuminary, silkfang, bogTroll, mothSeer, warTigress, hexWarden, transfusionist, coffinsLegs, wraith, haruspex, sirSiroslav, azulTheBlade, lycan, orchidHuntress, executioner,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, astronomerRoyal, forestGargoyle, rootfather, deadKnightAmstron, cinderSylph, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman, overlordOfentol, verdantLuminary, silkfang, bogTroll, mothSeer, warTigress, hexWarden, transfusionist, coffinsLegs, wraith, haruspex, sirSiroslav, azulTheBlade, lycan, orchidHuntress, executioner, pikeman, chakraManipulator, missisFerret,
 ];
 
 /**
@@ -102,4 +105,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { executioner, orchidHuntress, lycan, azulTheBlade, astronomerRoyal, cinderSylph, rootfather, silkfang, bogTroll, mothSeer, warTigress, hexWarden, transfusionist, crossbowman, overlordOfentol, verdantLuminary, toadcap, bristleback, hiveTender, archer, ashWidow, gravedigger, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, harvestSpecialist, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, sentry, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };
+export { pikeman, chakraManipulator, missisFerret, executioner, orchidHuntress, lycan, azulTheBlade, astronomerRoyal, cinderSylph, rootfather, silkfang, bogTroll, mothSeer, warTigress, hexWarden, transfusionist, crossbowman, overlordOfentol, verdantLuminary, toadcap, bristleback, hiveTender, archer, ashWidow, gravedigger, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, harvestSpecialist, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, sentry, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };

@@ -4954,3 +4954,66 @@ summoning, the Merchant's header and the Challenges' line on Gold).
 
 Stand-ins until he sets them: the name Loomfall and every place's name and look, the places' arrangement, the Arena as
 Extra Combat's place, and the words Extra Combat says while shut and once open.
+
+## 88. The Chakra Manipulator (received 2026-11-07)
+
+Jakub, for this and sections 89-90, verbatim:
+
+```
+i want to generate new heroes.
+one new champion for each role.
+each rarity = elite
+faction - all these three are azure crown.
+assign affinities, but also remember that the goal is not to have same numbers per each faction on affinities, there can be differences.
+ideas about their designs = support can be Chakra Manipulator. attacker can be Pikeman and tank can be some big trained ferret. be creative and consistent in design and their kits can use max 3 skills including passive. go
+```
+
+I proposed the three (looks, kits, affinities); his answer:
+
+```
+i said do not count affinities exactly to match symmetrically for each faction, so i do not want to have one affinity per each role. all is fine, just rename The Ferret to something else, like "Missis Ferret". go and deliver
+```
+
+So the proposal stands as shown, the ferret named Missis Ferret. My reason for the affinities (one of each, filling the gap
+each Elite pair left) was the wrong one: affinities need not even out by role or by faction. The three he kept stay, and the
+Azure Crown now holds 5 Bloom, 8 Ember and 5 Tide. Each has an A1, an A2 and a passive (three skills, the passive counting).
+**Stand-ins until he sets them:** the skills' and passives' names and texts, every number, the stats (on the Elite budget),
+the lore lines and the details of the art and effects.
+
+An Elite Support, Tide: a temple teacher the Crown keeps at court. Lean and barefoot, a sleeveless azure wrap crossed over the
+chest with white trim, a white sash, the wrap's skirt to the knee over loose white trousers, white wraps on the forearms, a
+shaved head with one long dark braid, his eyes always closed; seven pale points down his centre, a faint ring round his palm,
+two fingers raised.
+
+- **Pressure Point** (A1): one enemy, 1.0, a 30% chance of Slow for 1 turn.
+- **Open the Gates** (A2, CD 4): heals every ally by 12% of its max HP and fills every other ally's Turn Meter by 15%. No
+  attack; the AI keeps it for when an ally is hurt.
+- **Mended Flow** (passive, `ward` with the new `below`): when an enemy skill leaves an ally, himself included, standing
+  under 40% of its max HP, that ally takes Regen for 2 turns; then it rests for 2 of his turns.
+- Stats HP 1160, ATK 92, DEF 62, SPD 110, CRIT 5%, score 405. Impact 49%. Summoned.
+
+## 89. The Pikeman (received 2026-11-07)
+
+An Elite Damage, Bloom: twenty years in the front rank of the Crown's pike square. An open steel helmet with a brim, a comb
+and a small azure plume, a steel breastplate with the Crown's gold crown over a doublet quartered azure and white, puffed
+sleeves, breeches the same way round, leather boots, a short sword at the hip, a weathered face with stubble; a pike nearly
+twice his height, langets under a long narrow head, a small azure pennant with the gold crown.
+
+- **Thrust** (A1): one enemy, 1.15.
+- **Level Pikes** (A2, CD 4): all enemies, 0.65, and 15% of each one's Turn Meter: pikes stopping a charge.
+- **Set Against the Charge** (passive, `ward` with `self`): when an enemy skill damages him and leaves him standing, a 30%
+  chance that he takes Counterattack for 1 turn; then it rests for 1 of his turns.
+- Stats HP 1100, ATK 112, DEF 60, SPD 104, CRIT 10%, score 425. Proposed at 1.2 and 0.75 with ATK 120 (impact 67%), cut to
+  these: impact 62%, a little over the band like Gareth, waiting for his balance. Summoned.
+
+## 90. Missis Ferret (received 2026-11-07)
+
+An Elite Tank, Ember, named by him: a sable ferret the size of a pony, long and low, cream underfur with dark guard hairs, dark
+legs and tail, the dark mask, small round ears, a pink nose. The Crown's tunnellers raised her to flush diggers out of the
+mines under a besieged wall: a padded azure caparison with white trim and the gold crown, a small steel plate along her snout,
+a dark collar with a brass bell. War Dance is a ferret's own: hops and twists with the back arched, chattering.
+
+- **Nip and Worry** (A1): one enemy, 1.0, a 25% chance of ATK Down for 1 turn.
+- **War Dance** (A2, CD 4): Taunt and a Shield of 20% of her max HP on herself, both for 2 turns. No attack.
+- **Slippery** (passive, `immune`): she is immune to Stun.
+- Stats HP 1500, ATK 80, DEF 74, SPD 98, CRIT 2.5%, score 424. Impact 51%. Summoned.

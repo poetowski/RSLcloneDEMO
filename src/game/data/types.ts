@@ -174,7 +174,8 @@ export interface PassiveDef {
    *            standing, `chance` (always when absent) to give that ally `statuses` after the
    *            hit, a Shield worth `value` x the champion's max HP (Emissary Handlings' Unbroken
    *            Flag, 2026-10-17); with `self`, only the champion itself (the Black Rhino's Thick
-   *            Hide, 2026-10-17)
+   *            Hide, 2026-10-17); with `below`, only an ally the blow leaves under that share of
+   *            its max HP (the Chakra Manipulator's Mended Flow, 2026-11-07)
    * fallen:    in battle, adds `value` to the champion's `stat` for each fallen ally, up to
    *            `max`; extra, outside the stat budget, like a stat passive (Big Ears' Hidden in
    *            the Undergrowth, 2026-10-17)
@@ -224,6 +225,8 @@ export interface PassiveDef {
   max?: number;
   /** ward: it guards only the champion itself, not its allies */
   self?: boolean;
+  /** ward: it answers only a blow that leaves the ally under this share of its max HP (0.4 = 40%) */
+  below?: number;
   /** tend: it never reaches the champion itself, and with nobody else standing it does nothing (the Transfusionist's Bedside Rounds) */
   others?: boolean;
   /** remedy: besides, every hit of an enemy's A1 on an ally, the champion included, adds this much to its turn meter (Overlord Ofentol's Overlord's Round: 7) */

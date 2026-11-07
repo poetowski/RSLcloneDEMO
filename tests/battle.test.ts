@@ -7,7 +7,7 @@ import { flatten, simulate } from '../src/game/battle/sim';
 import { ALL_CHAMPIONS, astronomerRoyal, paladin, cinderSylph, necromancer, rootfather, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
-import { aligner, fencer, reaper, headsman, herald2, balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
+import { aligner, fencer, reaper, headsman, herald2, balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, lowWard, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
 
 const skill = (c: ChampionDef, id: string) => c.skills.find((s) => s.id === id)!;
 const PLAYER = combatants([guard, twin, striker]);
@@ -943,6 +943,22 @@ describe('statuses', () => {
     b2.get('e1').hp = 1;
     b2.useSkill(b2.get('p0'), mourner.skills[0], 'e1');
     expect(b2.critRate(b2.get('p0'))).toBe(0);
+  });
+
+  it('wards only an ally a blow leaves under its threshold with a ward that has one', () => {
+    const b = new Battle(combatants([lowWard, striker]), combatants([twin]), { seed: 3 });
+    // a full ally is still above 40% after the chop: nothing
+    let r = b.useSkill(b.get('e0'), skill(twin, 'twin_chop'), 'p1');
+    expect(r.events.some((e) => e.kind === 'passive')).toBe(false);
+    // one already low is left under it: Regen after the hit, then the ward rests
+    const p1 = b.get('p1');
+    p1.hp = Math.round(p1.maxHp * 0.45);
+    r = b.useSkill(b.get('e0'), skill(twin, 'twin_chop'), 'p1');
+    expect(r.events.filter((e) => e.kind === 'passive').map((e) => e.kind === 'passive' && [e.effect, e.target, e.source])).toEqual([['ward', 'p1', 'p0']]);
+    expect(b.has(p1, 'regen')).toBe(true);
+    expect(b.get('p0').cooldowns.low_ward).toBe(2);
+    r = b.useSkill(b.get('e0'), skill(twin, 'twin_chop'), 'p0');
+    expect(r.events.some((e) => e.kind === 'passive')).toBe(false);
   });
 
   it('wards only its holder with a ward of its own, after every enemy blow on it, once per skill', () => {

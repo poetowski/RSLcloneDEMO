@@ -117,6 +117,7 @@ export function auditChampion(c: ChampionDef): string[] {
   if ((p?.kind === 'retaliate' || p?.kind === 'reproach') && p.statuses?.some((st) => STATUSES[st.status].buff)) out.push(`${p.id}: a ${p.kind} passive places debuffs`);
   if (p?.kind === 'remedy' && p.statuses?.some((st) => !STATUSES[st.status].buff)) out.push(`${p.id}: a remedy gives buffs`);
   if (p?.self && p.kind !== 'ward') out.push(`${p.id}: only a ward guards its holder alone`);
+  if (p?.below !== undefined && (p.kind !== 'ward' || p.below <= 0 || p.below >= 1)) out.push(`${p.id}: only a ward answers below a share of HP, between 0 and 1`);
   // a defy answers a critical hit on its holder with something for the holder: buffs, a heal or both
   if (p?.kind === 'defy' && !p.statuses?.length && !p.value) out.push(`${p.id}: a defy passive needs statuses or a heal`);
   if (p?.kind === 'defy' && p.statuses?.some((st) => !STATUSES[st.status].buff)) out.push(`${p.id}: a defy passive gives its holder buffs`);

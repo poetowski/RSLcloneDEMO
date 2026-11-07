@@ -737,6 +737,8 @@ export class Battle {
    * With a `cooldown`, a ward that answered rests for that many of its holder's
    * own turns; it is ready from the start of the battle (the Junior Ward's Hold
    * Fast: 25% for DEF Up, then a rest of 1, so at most every other turn of his).
+   * With `below`, only an ally the blow leaves under that share of its max HP
+   * (the Chakra Manipulator's Mended Flow: Regen under 40%, then a rest of 2).
    */
   private ward(actor: Unit, damaged: Set<Unit>, hit: number, events: BattleEvent[]) {
     for (const d of damaged) {
@@ -744,6 +746,7 @@ export class Battle {
       for (const h of this.allies(d)) {
         const p = h.champion.passive;
         if (p?.kind !== 'ward' || (p.self && h !== d) || (h.cooldowns[p.id] ?? 0) > 0) continue;
+        if (p.below !== undefined && d.hp >= d.maxHp * p.below) continue;
         if (p.chance !== undefined && !this.rng.chance(p.chance)) continue;
         // the rest counts the holder's own turns: one more if it is its turn now (cooldowns tick at the end of its turn)
         if (p.cooldown) h.cooldowns[p.id] = p.cooldown + (h === this.acting ? 1 : 0);
