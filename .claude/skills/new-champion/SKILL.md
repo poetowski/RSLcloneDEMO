@@ -100,3 +100,4 @@ Look for: silhouette and hue distinct from the lineup, weapon arcs that read, hi
 - Every skill watched in `?demo=`; card, champion page and recruit ceremony reviewed; with `?unlockall=1` the new card is reachable in the collection and in the team-select roster (both scroll as the roster grows).
 - `docs/MECHANICS_GUIDE.md` section 9 (kits) and `docs/GAME_STRUCTURE.md` (roster table) updated; the Academy mentions any new mechanic.
 - Assets regenerated and committed together with the code (`public/assets` is versioned).
+- Last, show Jakub every new champion's card (his word of 2026-11-07): one screenshot of each champion page, captured with `npx tsx tools/shots.ts "http://localhost:5173/?unlockall=1&screen=champion&champion=<id>" <out> "w2500,B1:0"`, and linked in the final message for him to open.
