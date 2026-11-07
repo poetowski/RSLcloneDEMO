@@ -17,6 +17,13 @@
 // bronze light over him, a band of lit runes round each ally, a meter draining on
 // each enemy; his Earthen Surge: arcs running along the ground and up each enemy;
 // a plate of the Dominion's hexagon for his Shield; a green star for an affliction lifted.
+// The Frostwright's are the cold his skills make: Rime Shard bursts on the
+// enemy in white shards and frost, Deep Winter crusts each enemy in ice and
+// throws flakes, and his breath clouds white as he lets it go. The Scarab
+// Legionary's mandibles close in a dull flash; Close the Shell drops a dome of
+// crimson light over it and a hexagon plate before each ally. The Dowager
+// Countess's fan raps in a small dull flash; her Council's Favour reaches each
+// ally as falling red petals of light round a small gold glint.
 // Never their affinity (affinities are abstract, Jakub, 2026-10-11). Light
 // effects are additive in src/game/view/scene.ts.
 import { ACCENT, MAT } from '../palette.ts';
@@ -894,6 +901,124 @@ export const SANGUINE_DOMINION_FX: Record<string, FxDef> = {
       if (i >= 1 && i <= 4) burst(b, cx, cy, 10, 2, [14, 18, 14, 9][i - 1], 1.6, DULL, 0.2);
       if (i >= 2) ring(b, cx, cy + 22, 8 + (i - 2) * 5, 3 + (i - 2) * 1.6, 1.4, DU, 1.2 - (i - 2) * 0.15);
       if (i >= 1) sparks(b, cx, cy, 18, 34, (i - 1) / 7, DULL, 1211, 24);
+    },
+  },
+
+  /** Rime Shard: the shard bursts on the enemy, white splinters flying, frost hanging after (additive). */
+  rime_burst: {
+    w: 56, h: 56, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [2, 4, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      if (i < 4) burst(b, cx, cy, 8, [2, 3, 2, 1][i], [9, 14, 11, 7][i], [1.6, 2.2, 1.6, 1][i], I, 0.3);
+      if (i >= 1) for (let k = 0; k < 6; k++) {
+        const a = (k / 6) * Math.PI * 2 + 0.4, d = 4 + t * 20;
+        shard(b, Math.round(cx + Math.cos(a) * d * 0.4), Math.round(cy + Math.sin(a) * d * 0.4), Math.round(cx + Math.cos(a) * d), Math.round(cy + Math.sin(a) * d), 1.2, I);
+      }
+      if (i >= 2) flake(b, cx - 6, cy + 4, 2);
+      if (i >= 3) flake(b, cx + 7, cy - 5, 2);
+      if (i >= 1) sparks(b, cx, cy, 10, 18, (i - 1) / 6, I, 2101, 6);
+    },
+  },
+  /** Deep Winter: ice crusts up over each enemy from the ground, flakes thrown off it (additive). */
+  deep_winter: {
+    w: 56, h: 80, n: 9, ms: 55, ax: 0.5, ay: 0.9, pad: [2, 4, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 28, gy = 72;
+      const hgt = Math.min(1, t * 2.2) * 44;
+      for (let k = -3; k <= 3; k++) {
+        const x = cx + k * 5, top = gy - hgt * (1 - Math.abs(k) * 0.18);
+        if (hgt > 2) shard(b, x, gy, x + k, Math.round(top), 2.2, I);
+      }
+      ellipseRing(b, cx, gy, 10 + t * 12, 3 + t * 2, 1.2, (x, y, a) => (dith(x, y, 1 - t * 0.7) ? rampDither(I, 2.8 + Math.sin(a) * 0.6, x, y) : 0));
+      const r = rng(2111);
+      for (let k = 0; k < 6; k++) {
+        const x = Math.round(cx + (r() - 0.5) * 40), y = Math.round(gy - 20 - r() * 40 + t * 16);
+        if (t > 0.2 + k * 0.08) flake(b, x, y, 1);
+      }
+    },
+  },
+  /** Deep Winter, at his head: his breath clouds white as he lets the cold go (additive). */
+  winter_breath: {
+    w: 48, h: 32, n: 8, ms: 60, ax: 0.3, ay: 0.6, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      motes(b, 18, 18, 10 + t * 16, 6, 10, t, I, 2117);
+      if (i < 5) burst(b, 16, 18, 6, 1, [5, 8, 9, 7, 5][i], 1, I, 0.2);
+    },
+  },
+  /** Mandible Crush: the halberd hooks and the mandibles close: a dull flash, chips. */
+  mandible_crush: {
+    w: 56, h: 56, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 4, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      if (i < 2) cut(b, 40, 8, cx, cy, -2, [2.2, 3][i], DULL, [1.3, 1.1][i], [0.7, 1][i]);
+      if (i >= 1 && i < 4) burst(b, cx, cy, 8, [2, 3, 2][i - 1], [10, 14, 9][i - 1], [1.8, 2.2, 1.4][i - 1], DULL, 0.25);
+      if (i >= 1) sparks(b, cx, cy, 12, 22, (i - 1) / 5, DULL, 2129, 14);
+    },
+  },
+  /** Close the Shell, on itself: a dome of crimson light closes over it. */
+  shell_close: {
+    w: 72, h: 72, n: 9, ms: 60, ax: 0.5, ay: 0.85, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 36, gy = 62;
+      const R = ramps.blood;
+      const k = Math.min(1, t * 2);
+      const r = 30 * k;
+      for (let a = 180; a <= 360; a += 4) {
+        const x = Math.round(cx + Math.cos((a * Math.PI) / 180) * r), y = Math.round(gy + Math.sin((a * Math.PI) / 180) * r * 1.4);
+        if (dith(x, y, 1 - t * 0.6)) b.set(x, y, rampDither(R, 3 - t, x, y));
+      }
+      ellipseRing(b, cx, gy, r, r * 0.25, 1.2, (x, y) => (dith(x, y, 1 - t * 0.7) ? rampDither(R, 2.6, x, y) : 0));
+    },
+  },
+  /** Close the Shell reaches an ally: a plate of the Dominion's hexagon flares before it and fades (additive). */
+  shell_ward: {
+    w: 40, h: 44, n: 8, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 20, cy = 22, r = 8 + Math.min(1, t * 3) * 6;
+      const R = ramps.blood;
+      const pts: [number, number][] = [];
+      for (let k = 0; k < 6; k++) pts.push([cx + Math.cos((k / 6) * Math.PI * 2) * r, cy + Math.sin((k / 6) * Math.PI * 2) * r]);
+      for (let k = 0; k < 6; k++) {
+        const [x0, y0] = pts[k], [x1, y1] = pts[(k + 1) % 6];
+        line(b, Math.round(x0), Math.round(y0), Math.round(x1), Math.round(y1), t < 0.6 ? R[3] : R[2]);
+      }
+      if (i < 4) burst(b, cx, cy, 6, 1, [4, 7, 6, 4][i], 1, R, 0.3);
+    },
+  },
+  /** Fan Rebuke: the closed fan raps: a small dull flash, a few chips. */
+  fan_rap: {
+    w: 44, h: 44, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 4, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 22, cy = 22;
+      if (i < 2) cut(b, 30, 6, cx, cy, -1, [1.6, 2.2][i], DULL, [1.3, 1.1][i], [0.7, 1][i]);
+      if (i >= 1 && i < 4) burst(b, cx, cy, 6, [2, 2, 1][i - 1], [7, 10, 6][i - 1], [1.4, 1.6, 1][i - 1], DULL, 0.3);
+      if (i >= 1) sparks(b, cx, cy, 6, 14, (i - 1) / 4, DULL, 2137, 10);
+    },
+  },
+  /** The Council's Favour reaches an ally: red petals of light drift down round a small gold glint (additive). */
+  council_favour: {
+    w: 44, h: 72, n: 10, ms: 65, ax: 0.5, ay: 1, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 22, R = ramps.blood, G = ramps.gold;
+      const r = rng(2141);
+      for (let k = 0; k < 8; k++) {
+        const x0 = cx + (r() - 0.5) * 30, st = r() * 0.3, sp = 0.9 + r() * 0.4;
+        const tt = (t - st) * sp;
+        if (tt <= 0 || tt >= 1) continue;
+        const x = Math.round(x0 + Math.sin(tt * 7 + k) * 2), y = Math.round(10 + tt * 54);
+        b.set(x, y, R[3]);
+        b.set(x + 1, y, R[2]);
+      }
+      if (i < 7) { b.set(cx, 30, W); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) b.set(cx + dx, 30 + dy, G[3]); }
+    },
+  },
+  /** The Council's Favour, at her head: the fan flicks open in a small arc of red light (additive). */
+  fan_open: {
+    w: 40, h: 32, n: 7, ms: 55, ax: 0.5, ay: 0.7, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const R = ramps.blood;
+      ring(b, 20, 18, 4 + t * 12, 3 + t * 6, Math.max(0.6, 1.4 - t), R, 1.1 - t * 0.7);
+      motes(b, 20, 18, 14, 8, 6, t, R, 2153);
     },
   },
 };

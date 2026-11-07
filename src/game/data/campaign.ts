@@ -513,7 +513,7 @@ export const LOCATIONS: LocationDef[] = [
       { id: '6-5', blurb: RUINS, enemies: [{ champion: 'skeleton' }, { champion: 'necromancer' }, { champion: 'rot_hulk' }], power: 0.88 },
       { id: '6-6', blurb: RUINS, enemies: [{ champion: 'gravedigger' }, { champion: 'automated_soul' }, { champion: 'ash_widow' }], power: 0.8 },
       { id: '6-7', blurb: RUINS, enemies: [{ champion: 'irving_wellbington' }, { champion: 'gravedigger' }, { champion: 'necromancer' }], power: 0.79 },
-      { id: '6-8', blurb: LIGHTS, enemies: [{ champion: 'red_cloak' }, { champion: 'big_ears' }, { champion: 'grove_keeper' }], power: 0.79 },
+      { id: '6-8', blurb: LIGHTS, enemies: [{ champion: 'red_cloak' }, { champion: 'big_ears' }, { champion: 'grove_keeper' }], power: 0.77 },
       { id: '6-9', blurb: LIGHTS, enemies: [{ champion: 'black_rhino' }, { champion: 'captain_gareth' }, { champion: 'associate' }], power: 0.71 },
       { id: '6-10', blurb: `${LIGHTS} The last stage of the area.`, enemies: [{ champion: 'dead_knight_amstron', boss: true }, { champion: 'gravedigger' }, { champion: 'necromancer' }], power: 0.64 },
     ],

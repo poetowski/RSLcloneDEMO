@@ -5017,3 +5017,60 @@ a dark collar with a brass bell. War Dance is a ferret's own: hops and twists wi
 - **War Dance** (A2, CD 4): Taunt and a Shield of 20% of her max HP on herself, both for 2 turns. No attack.
 - **Slippery** (passive, `immune`): she is immune to Stun.
 - Stats HP 1500, ATK 80, DEF 74, SPD 98, CRIT 2.5%, score 424. Impact 51%. Summoned.
+
+## 91. The Frostwright (received 2026-11-07)
+
+Jakub, for this and sections 92-93, verbatim:
+
+```
+i want to now generate 3 new champions.
+all are sanguine dominion.
+each per role.
+rarity all elite
+be creative with your design. attacker is bloom affinity and mage with hoodie. he has A1 and A2 with freeze. tank should be humanoid but not human, be very creative and visually consistent. support is elegant lady, make her lore interesting and make her hair grey. support is also ember in this case. go
+```
+
+I proposed the three; he answered "make the new support bit weak for a change", I proposed a weaker Countess, and he said
+"go". Mid-build, of the Frostwright: "i dont like how frostwright looks, he should be in cold coat in white color with red and
+black insignias". **Stand-ins until he sets them:** the names, the skills' and passives' names and texts, every number, the
+stats, the lore lines, the Scarab Legionary's Tide (his brief left the Tank's affinity open), and the details of the art and
+effects.
+
+An Elite Damage, Bloom: a Dominion field-alchemist's apprentice who froze his master solid by accident and was drafted for it.
+Lanky and young, a long white cold-weather coat to the shins with its fur-rimmed hood always up, the hood's shadow over his eyes
+so only a pale jaw shows; the insignia: the Dominion's red hexagon on a black band down his chest, a black-and-red band on each
+sleeve, a black belt; black gloves frosted at the fingertips, a shard of ice turning over his palm. Two skills, as the brief.
+
+- **Rime Shard** (A1): one enemy, 1.0, a 25% chance of Freeze for 1 turn.
+- **Deep Winter** (A2, CD 4): all enemies, 0.6, a 30% chance on each of Freeze for 1 turn. Both Freezes are chances: a
+  certain one belongs to an A3.
+- Stats HP 1100, ATK 112, DEF 58, SPD 104, CRIT 10%, score 421. Proposed at 1.1 and 0.7 with ATK 124 (impact 66%), cut to
+  these: impact 60%, at the band's top. Summoned.
+
+## 92. The Scarab Legionary (received 2026-11-07)
+
+An Elite Tank, Tide: a man-sized beetle walking upright, bred in the dark under the Dominion's forges. Thin black jointed limbs
+and a ribbed black underside, a great domed shell lacquered the Dominion's crimson with the black hexagon painted on it, a
+small head thrust forward with a curved horn, hooked mandibles and a red-amber eye; a short iron halberd, a round iron shield.
+
+- **Mandible Crush** (A1): one enemy, 1.0, a 30% chance of DEF Down for 1 turn.
+- **Close the Shell** (A2, CD 4): Taunt on itself and DEF Up on all allies, both for 2 turns. No attack.
+- **Lacquered Shell** (passive, `stat`): +15 DEF in battle, extra to its stats.
+- Stats HP 1480, ATK 82, DEF 72, SPD 94, CRIT 2.5%, score 415. Impact 53%. Summoned.
+
+## 93. The Dowager Countess (received 2026-11-07)
+
+An Elite Support, Ember, weak on his word. She married three generals of the Sanguine Dominion and buried all three, each
+inheritance buying her a seat nearer the head of the Crimson Council; her hair went grey at twenty, the night her first
+husband's regiment did not come back; she sends other women's sons to war with perfect manners and has never forgotten one of
+their names. Tall and very upright, a floor-length crimson gown with a black bodice and a high black collar edged red, long
+black gloves, silver-grey hair swept up into a high coil with a ruby pin, a black fan.
+
+- **Fan Rebuke** (A1): one enemy, 0.9, a 20% chance of Slow for 1 turn.
+- **The Council's Favour** (A2, CD 5): ATK Up on all allies for 1 turn. No attack.
+- **Noblesse Oblige** (passive, `remedy`): when an enemy places a debuff on an ally, a 20% chance of ATK Up on that ally for 1
+  turn.
+- Stats HP 1200, ATK 84, DEF 62, SPD 114, CRIT 5%, score 405 (the budget's floor). Impact 34%, under the band as he asked.
+  Summoned.
+
+With the three in the summoned pool, 6-8 fell under its band (53%) and runs at 0.77 (was 0.79; 58%).

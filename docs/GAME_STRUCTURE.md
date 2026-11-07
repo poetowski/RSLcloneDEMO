@@ -88,6 +88,9 @@ The roster today:
 | Pikeman (`pikeman`) | Elite | Bloom (a stand-in) | Damage | Azure Crown | summoned |
 | Chakra Manipulator (`chakra_manipulator`) | Elite | Tide (a stand-in) | Support | Azure Crown | summoned |
 | Missis Ferret (`missis_ferret`) | Elite | Bloom | Tank | Azure Crown | summoned |
+| Frostwright (`frostwright`) | Elite | Bloom | Damage | Sanguine Dominion | summoned |
+| Scarab Legionary (`scarab_legionary`) | Elite | Tide (a stand-in) | Tank | Sanguine Dominion | summoned |
+| Dowager Countess (`dowager_countess`) | Elite | Ember | Support | Sanguine Dominion | summoned |
 | Executioner (`executioner`) | Heroic | Tide (a stand-in) | Damage | Sanguine Dominion | summoned |
 | Paladin (`paladin`) | Heroic | Ember | Tank | Azure Crown | summoned (the reward of a quest line Jakub designs later) |
 | Chief Engineer CJ (`chief_engineer_cj`) | Heroic | Bloom | Tank | Sanguine Dominion | summoned |

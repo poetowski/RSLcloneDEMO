@@ -8,7 +8,7 @@
 // her snout and a dark leather collar with a brass bell under the throat. The
 // silhouette is the long low body and the head carried high on a long neck.
 // Nip and Worry darts in and bites; War Dance is a ferret's own war dance,
-// hops and twists with the back arched. Her affinity (Ember) sets nothing here
+// hops and twists with the back arched. Her affinity (Bloom) sets nothing here
 // (Jakub, 2026-10-11).
 //
 // The rig is the Follower's wolf (solveWolf in follower.ts) with a ferret's
@@ -24,7 +24,7 @@ import { RGBA } from '../raster.ts';
 import { at, dir, Dims, Draw, ease, ik2, lerpPose, pose, Pose, Skel, tweak, V, v } from '../rig.ts';
 
 const D: Dims = {
-  hipH: 24,
+  hipH: 26,
   thigh: 11,
   shin: 11,
   ankleH: 3,
