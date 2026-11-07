@@ -4,7 +4,8 @@
 // star hangs at twice its size on its thread; on the left the Stardust and the
 // Soulstars merged from it, on the right the wish (a faction, a role) and the
 // odds it makes, below the star the summon, along the bottom the champions
-// still scattered, those the wish names lit. A merge sends the dust into a
+// still scattered in two rows, those the wish names lit, scrolling sideways
+// when they outgrow the strip (wheel, drag, the end arrows). A merge sends the dust into a
 // Soulstar; a summon draws motes in from all round, the star's light turns
 // the colour of the rarity that answers, a flash, and the champion's
 // ceremony (screens/recruit.ts). Rules: src/game/summoning.ts.
@@ -16,6 +17,7 @@ import { FRAGMENTS_PER_SHARD, SUMMONING, Wish } from '../data/summoning';
 import { ChampionDef, FactionId, Rarity, Role } from '../data/types';
 import { canMerge, mergeShard, rarityOdds, summon, Summoned, summonChances, summonPool, wishChance, wished } from '../summoning';
 import { fragmentsText, shardsText, SOULSTAR_TINT, STARDUST_TINT } from '../ui/stardust';
+import { Scroller } from '../ui/scroll';
 import { COLORS, Tip } from '../ui/ui';
 import { blit, nine, Rect4 } from '../view/assets';
 import { champion } from '../data/champions';
@@ -25,8 +27,10 @@ import { BaseScreen } from './base';
 const STAR = { x: W / 2, y: 104 };
 const LEFT: Rect4 = [14, 40, 180, 232];
 const RIGHT: Rect4 = [W - 194, 40, 180, 232];
-/** the strip of champions still scattered */
-const STRIP: Rect4 = [14, 280, W - 28, 66];
+/** the strip of champions still scattered: two rows of portraits */
+const STRIP: Rect4 = [14, 276, W - 28, 82];
+/** a portrait's size, the step from one column to the next, from the top row to the bottom */
+const CELL = 26, COL = 29, ROW = 31;
 /** a summon's call: motes rush in, the light turns at `REVEAL`, the flash rises from `FLASH`, the ceremony at the end */
 const CALL_MS = 1500;
 const REVEAL = 650;
@@ -57,6 +61,7 @@ export class SummonScreen extends BaseScreen {
   /** when the last Soulstar was merged: its count flares */
   private mergedT = -1e9;
   private soulT = 600;
+  private scroll = new Scroller();
 
   /** the wish's panel and the Stardust's (where the tutorial points) */
   readonly wishSpot: Rect4 = RIGHT;
@@ -87,7 +92,18 @@ export class SummonScreen extends BaseScreen {
     super.click(x, y);
   }
 
+  wheel(dy: number, dx: number) {
+    const d = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    this.scroll.by(Math.sign(d) * Math.min(4 * COL, Math.max(2 * COL, Math.abs(d))));
+  }
+
+  /** A finger (or the mouse) dragging the strip sideways, when the press was on it. */
+  drag(dx: number) {
+    if (this.ui.inside(...STRIP)) this.scroll.shift(-dx);
+  }
+
   protected update(dt: number) {
+    this.scroll.update(dt);
     for (const m of this.motes) m.t += dt;
     this.motes = this.motes.filter((m) => m.t < m.life);
     // now and then a soul drifts in to the star, as in Loomfall
@@ -331,41 +347,63 @@ export class SummonScreen extends BaseScreen {
     const [x, y, w, h] = STRIP;
     ui.panel(ctx, 'dark', x, y, w, h);
     const left = SHOWN.map((r) => [r, pool.filter((c) => c.rarity === r).length] as const).filter(([, n]) => n > 0);
-    ui.text(ctx, 'STILL SCATTERED', x + 12, y + 8, { color: COLORS.dim, variant: 'bold' });
+    ui.text(ctx, 'STILL SCATTERED', x + 12, y + 6, { color: COLORS.dim, variant: 'bold' });
     let tx = x + 18 + ui.measure('STILL SCATTERED', 'bold');
     for (const [r, n] of left) {
       const s = `${n} ${RARITIES[r].name}`;
-      ui.text(ctx, s, tx, y + 8, { color: RARITIES[r].color });
+      ui.text(ctx, s, tx, y + 6, { color: RARITIES[r].color });
       tx += ui.measure(s) + 8;
     }
     if (!pool.length) {
-      ui.text(ctx, 'None: every soul has been recollected.', x + w / 2, y + 34, { color: COLORS.text, align: 'center' });
+      ui.text(ctx, 'None: every soul has been recollected.', x + w / 2, y + 40, { color: COLORS.text, align: 'center' });
       return;
     }
     const chances = new Map(summonChances(pool, a.wish).map((e) => [e.c.id, e.p]));
     const any = !!a.wish.faction || !!a.wish.role;
-    // one portrait each, as large as the strip allows (28 px at most), its rarity in a bar under it
-    const step = Math.min(31, Math.floor((w - 24) / pool.length));
-    const size = Math.min(28, step - 3);
-    const x0 = Math.round(x + w / 2 - (step * pool.length - (step - size - 2)) / 2);
+    // one portrait each, column by column in two rows; a window between two arrows when they outgrow the strip
+    const cols = Math.ceil(pool.length / 2);
+    const contentW = cols * COL - (COL - CELL - 2);
+    const scrolls = contentW > w - 24;
+    const win: Rect4 = scrolls ? [x + 22, y + 16, w - 44, h - 17] : [x, y + 16, w, h - 17];
+    this.scroll.extent(scrolls ? contentW : 0, win[2]);
+    const x0 = scrolls ? win[0] - this.scroll.offset : Math.round(x + w / 2 - contentW / 2);
     const portraits = this.a.ui.json.portraits;
+    const cut = Math.floor((28 - CELL) / 2);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(...win);
+    ctx.clip();
     pool.forEach((c, i) => {
-      const px = x0 + i * step, py = y + 22;
+      const px = x0 + Math.floor(i / 2) * COL, py = y + 18 + (i % 2) * ROW;
+      if (px + CELL + 4 < win[0] || px - 2 > win[0] + win[2]) return;
       const lit = !any || wished(c, a.wish);
-      const r = portraits[c.id], cut = (28 - size) / 2;
+      const r = portraits[c.id];
       ctx.fillStyle = COLORS.ink;
-      ctx.fillRect(px, py, size + 2, size + 5);
-      ctx.drawImage(this.a.ui.img, r[0] + Math.floor(cut), r[1] + Math.floor(cut), size, size, px + 1, py + 1, size, size);
+      ctx.fillRect(px, py, CELL + 2, CELL + 5);
+      ctx.drawImage(this.a.ui.img, r[0] + cut, r[1] + cut, CELL, CELL, px + 1, py + 1, CELL, CELL);
       // still scattered: dim, and dimmer when the wish names others
       ctx.fillStyle = `rgba(6,7,16,${lit ? (any ? 0 : 0.3) : 0.7})`;
-      ctx.fillRect(px + 1, py + 1, size, size);
+      ctx.fillRect(px + 1, py + 1, CELL, CELL);
       ctx.fillStyle = RARITIES[c.rarity].color;
       ctx.globalAlpha = lit ? 1 : 0.45;
-      ctx.fillRect(px + 1, py + size + 2, size, 2);
+      ctx.fillRect(px + 1, py + CELL + 2, CELL, 2);
       ctx.globalAlpha = 1;
-      if (any && lit) ui.corners(ctx, px - 1, py - 1, size + 4, size + 7, 3);
-      ui.regions.push({ x: px, y: py, w: size + 2, h: size + 5, tip: () => ({ title: c.name, sub: `${RARITIES[c.rarity].name} ${c.role}, ${FACTIONS[c.faction].name}`, body: `Chance on the next summon: ${pct(chances.get(c.id) ?? 0)}.`, color: RARITIES[c.rarity].color }) });
+      if (any && lit) ui.corners(ctx, px - 1, py - 1, CELL + 4, CELL + 7, 3);
+      ui.regions.push({ x: px, y: py, w: CELL + 2, h: CELL + 5, clip: win, tip: () => ({ title: c.name, sub: `${RARITIES[c.rarity].name} ${c.role}, ${FACTIONS[c.faction].name}`, body: `Chance on the next summon: ${pct(chances.get(c.id) ?? 0)}.`, color: RARITIES[c.rarity].color }) });
     });
+    ctx.restore();
+    if (scrolls) {
+      // page by most of the window; an arrow dims when there is nothing more on its side
+      const page = win[2] - COL;
+      for (const [part, ax, more, d] of [['arrow_l', x + 6, this.scroll.before, -1], ['arrow_r', x + w - 16, this.scroll.after, 1]] as const) {
+        const ay = y + 38;
+        const hot = more && !this.calling && ui.inside(ax - 4, ay - 6, 18, 27);
+        ctx.globalAlpha = more ? 1 : 0.3;
+        ui.blit(ctx, part, ax + (hot ? d : 0), ay);
+        ctx.globalAlpha = 1;
+        if (more) ui.regions.push({ x: ax - 4, y: ay - 6, w: 18, h: 27, click: () => this.scroll.by(d * page) });
+      }
+    }
   }
 
   private drawMotes(ctx: CanvasRenderingContext2D) {
