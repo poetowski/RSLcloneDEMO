@@ -478,7 +478,7 @@ export const LOCATIONS: LocationDef[] = [
         id: '5-8',
         blurb: STORM,
         enemies: [{ champion: 'rot_hulk' }, { champion: 'automated_soul' }, { champion: 'necromancer' }],
-        power: 0.7,
+        power: 0.68,
       },
       {
         id: '5-9',
@@ -538,7 +538,7 @@ export const LOCATIONS: LocationDef[] = [
       { id: '7-6', blurb: ASHFALL, enemies: [{ champion: 'black_rhino' }, { champion: 'red_cloak' }, { champion: 'emissary_handlings' }], power: 0.72 },
       { id: '7-7', blurb: ROOTS, enemies: [{ champion: 'grove_keeper' }, { champion: 'bristleback' }, { champion: 'associate' }], power: 0.94 },
       { id: '7-8', blurb: HOLES, enemies: [{ champion: 'dead_knight_amstron' }, { champion: 'skeleton' }, { champion: 'gravedigger' }], power: 0.76 },
-      { id: '7-9', blurb: PEACE, enemies: [{ champion: 'chief_engineer_cj' }, { champion: 'necromancer' }, { champion: 'automated_soul' }], power: 0.58 },
+      { id: '7-9', blurb: PEACE, enemies: [{ champion: 'chief_engineer_cj' }, { champion: 'necromancer' }, { champion: 'automated_soul' }], power: 0.56 },
       { id: '7-10', blurb: `${PEACE} The last stage of the area.`, enemies: [{ champion: 'forest_gargoyle', boss: true }, { champion: 'grove_keeper' }, { champion: 'red_cloak' }], power: 0.68 },
     ],
   },

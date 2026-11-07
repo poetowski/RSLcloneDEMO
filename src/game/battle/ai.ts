@@ -52,6 +52,11 @@ function pickTarget(b: Battle, actor: Unit, s: SkillDef): string | undefined {
     const best = [...valid].sort((x, y) => debuffs(y) - debuffs(x) || x.hp / x.maxHp - y.hp / y.maxHp)[0];
     if (debuffs(best) > 0) return best.uid;
   }
+  if (s.target === 'ally' && (s.statuses ?? []).some((x) => x.status === 'atk_up' && x.to === 'targets')) {
+    // an ATK Up for one ally goes to the hardest hitter, someone else while anyone else stands (the Mask Carver's Lend a Face)
+    const others = valid.filter((v) => v !== actor);
+    return [...(others.length ? others : valid)].sort((x, y) => b.attack(y) - b.attack(x))[0].uid;
+  }
   // focus the weakest most of the time, otherwise spread pressure
   if (b.rng.chance(0.7)) return [...valid].sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0].uid;
   return b.rng.pick(valid).uid;

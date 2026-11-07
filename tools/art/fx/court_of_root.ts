@@ -22,6 +22,14 @@
 // Razor Gale: sharp leaves flying through the target; his Graven Dread: his face
 // looming huge over the enemy, its eyes alight, as its meter drains away; his
 // Heartwood: a ring of grain closing round him.
+// Leafshade's Tongue Lash: a pink smack and a white flash where the tongue's
+// club lands; its Vanish: leaf-green flecks scattering where it comes out of
+// hiding and the stab's white line. Greyback's Knuckle Slam: a heavy dull
+// burst and dust rolling out low; his Chest Beat: rings of sound drummed out
+// of his chest, and a shudder of dust at each enemy's feet. The Mask Carver's
+// Carving Knife: a short hooked cut of white light with wood shavings; her
+// Lend a Face: a mask of carved wood drawn in warm light over the ally, and a
+// glint of it at her hand.
 // Neutral light, dust, their own wood, the bell's bronze, the darts' poison
 // and the grove's green, never their affinities (affinities are abstract,
 // Jakub, 2026-10-11). Light effects are additive in src/game/view/scene.ts.
@@ -974,6 +982,86 @@ export const COURT_OF_ROOT_FX: Record<string, FxDef> = {
         if (t > 0.3) b.set(x, y + 2, AM[1]);
       }
       if (i < 3) burst(b, cx, cy, 6, 1, [5, 8, 6][i], 1, AM, 0.5);
+    },
+  },
+
+  /** Tongue Lash: the tongue's club lands: a pink smack, a white flash, flecks. */
+  tongue_snap: {
+    w: 44, h: 44, n: 6, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 4, 4, 2],
+    draw: (b, t, i) => {
+      const cx = 22, cy = 22, PK = MAT.earPink.ramp;
+      if (i < 3) disc(b, cx, cy, [3, 4.4, 3][i], () => (i === 1 ? W : PK[4]));
+      if (i >= 1 && i < 4) burst(b, cx, cy, 6, 1, [7, 10, 7][i - 1], 1.2, DULL, 0.3);
+      if (i >= 1) sparks(b, cx, cy, 8, 14, (i - 1) / 4, [PK[2], PK[3], PK[4], PK[5], W], 3101, 8);
+    },
+  },
+  /** Vanish: green flecks scattering where it comes out of the leaves, the white line of the stab, a dull flash. */
+  thorn_stab: {
+    w: 56, h: 56, n: 8, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 4, 4, 4],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      if (i < 3) cut(b, 10, 40, 44, 18, 0, [1.6, 2.4, 1.6][i], DULL, [1.3, 1.1, 0.8][i], [0.6, 1, 1][i]);
+      if (i >= 1 && i < 4) burst(b, cx, cy, 6, 1, [7, 11, 7][i - 1], 1.2, DULL, 0.2);
+      sparks(b, cx - 4, cy + 2, 14, 24, t, GN, 3107, 4);
+    },
+  },
+  /** Knuckle Slam: both fists land: a heavy dull burst, chips, a ring of dust rolling out low. */
+  knuckle_slam: {
+    w: 92, h: 72, n: 8, ms: 50, ax: 0.5, ay: 0.6, pad: [4, 8, 10, 8],
+    draw: (b, t, i) => {
+      const cx = 46, cy = 44;
+      if (i < 4) burst(b, cx, cy, 10, [3, 4, 3, 2][i], [16, 24, 18, 11][i], [2.6, 3.2, 2.2, 1.4][i], DULL, i * 0.15);
+      if (i >= 1) {
+        const r = 8 + (i - 1) * 6;
+        ring(b, cx, cy + 8, r, r * 0.3, Math.max(0.8, 2.8 - (i - 1) * 0.4), DU, 1.2 - (i - 1) * 0.14);
+      }
+      if (i >= 1) sparks(b, cx, cy, 16, 34, (i - 1) / 6, DULL, 3113, 26);
+    },
+  },
+  /** Chest Beat, on his chest: rings of sound drummed out (additive). */
+  chest_beat: {
+    w: 64, h: 64, n: 10, ms: 60, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => soundRings(b, 32, 32, i, 10, 3, 4, 6, DULL),
+  },
+  /** Chest Beat reaches each enemy: a shudder of dust at its feet. */
+  chest_beat_hit: {
+    w: 64, h: 28, n: 8, ms: 60, ax: 0.5, ay: 0.9, pad: [2, 4, 2, 4],
+    draw: (b, t, i) => {
+      const cx = 32, gy = 24;
+      const rr = [6, 12, 17, 20, 22, 22, 21, 19][i];
+      ellipseRing(b, cx, gy - 2, rr, rr * 0.22, i < 5 ? 1.4 : 1, (x, y, a) => (dith(x, y, 1 - t * 0.8) ? rampDither(DU, 3 - t * 1.3 + Math.sin(a) * 0.6, x, y) : 0));
+      sparks(b, cx, gy - 3, 8, 14, t, DU, 3119, 20);
+    },
+  },
+  /** Carving Knife: a short hooked cut of white light, curls of wood shaving thrown off it. */
+  carve_cut: {
+    w: 56, h: 56, n: 7, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 4, 6, 4],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 28;
+      if (i < 4) crescent(b, cx, cy, 16, [2, 3, 2.4, 1.4][i], -0.6, 1.9, DULL, [1.3, 1.2, 1, 0.7][i]);
+      if (i >= 1) sparks(b, cx + 6, cy + 4, 10, 18, (i - 1) / 5, AM, 3121, 16);
+    },
+  },
+  /** Lend a Face reaches the ally: a carved mask drawn in warm light before its face, then fading (additive). */
+  mask_lent: {
+    w: 40, h: 48, n: 9, ms: 65, ax: 0.5, ay: 0.4, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 20, cy = 22;
+      const k = Math.min(1, t * 3), fade = t < 0.6 ? 1 : 1 - (t - 0.6) * 2.4;
+      ellipseRing(b, cx, cy, 8 * k, 10 * k, 1.2, (x, y) => (dith(x, y, fade) ? rampDither(AM, 3.4, x, y) : 0));
+      if (k >= 1 && fade > 0) {
+        for (const ex of [-3, 3]) ellipseRing(b, cx + ex, cy - 2, 1.8, 1.8, 1, (x, y) => (dith(x, y, fade) ? W : 0));
+        for (let y = 0; y < 3; y++) if (dith(cx, cy + 2 + y, fade)) b.set(cx, cy + 2 + y, AM[3]);
+      }
+      motes(b, cx, cy + 10, 12, 18, 6, t, AM, 3127);
+    },
+  },
+  /** Lend a Face, at her hand: a glint of warm light off the mask as she holds it out (additive). */
+  mask_raise: {
+    w: 32, h: 32, n: 7, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      if (i < 5) burst(b, 16, 16, 6, 1, [4, 7, 8, 6, 4][i], 1, AM, 0.3);
+      motes(b, 16, 16, 8, 10, 5, t, AM, 3131);
     },
   },
 };

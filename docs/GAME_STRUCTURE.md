@@ -91,6 +91,9 @@ The roster today:
 | Frostwright (`frostwright`) | Elite | Bloom | Damage | Sanguine Dominion | summoned |
 | Scarab Legionary (`scarab_legionary`) | Elite | Tide (a stand-in) | Tank | Sanguine Dominion | summoned |
 | Dowager Countess (`dowager_countess`) | Elite | Ember | Support | Sanguine Dominion | summoned |
+| Leafshade (`leafshade`) | Elite | Tide | Damage | Court of Root | summoned |
+| Greyback (`greyback`) | Elite | Tide | Tank | Court of Root | summoned |
+| Mask Carver (`mask_carver`) | Elite | Ember | Support | Court of Root | summoned |
 | Executioner (`executioner`) | Heroic | Tide (a stand-in) | Damage | Sanguine Dominion | summoned |
 | Paladin (`paladin`) | Heroic | Ember | Tank | Azure Crown | summoned (the reward of a quest line Jakub designs later) |
 | Chief Engineer CJ (`chief_engineer_cj`) | Heroic | Bloom | Tank | Sanguine Dominion | summoned |

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { decide } from '../src/game/battle/ai';
 import { Battle, combatants, landShare } from '../src/game/battle/battle';
 import { flatten, simulate } from '../src/game/battle/sim';
-import { ALL_CHAMPIONS, astronomerRoyal, paladin, cinderSylph, necromancer, rootfather, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
+import { ALL_CHAMPIONS, maskCarver, astronomerRoyal, paladin, cinderSylph, necromancer, rootfather, hexWarden, overlordOfentol, transfusionist, verdantLuminary, warTigress } from '../src/game/data/champions';
 import { affinityEdge } from '../src/game/data/meta';
 import { ChampionDef } from '../src/game/data/types';
 import { aligner, fencer, reaper, headsman, herald2, balm, bannerman, reproacher, breaker, brute, cleaver, drummer, druid, fixture, foreman, freezer, grudger, guard, herald, hide, holdfast, lowWard, inAffinity, inspector, keen, marksman, massRaiser, medic, mender, mourner, overdrive, provisioner, piercer, raiser, rebuker, riter, sentinel, sheltering, stalker, stinger, striker, tender, toller, twin, unbreached, undying, warden, wellspring } from './fixtures';
@@ -1268,6 +1268,21 @@ describe('statuses', () => {
       expect(u.tm).toBe(0);
     }
     expect(b.ready(me, raise)).toBe(false);
+  });
+
+  it('lends an ATK Up for one ally to the hardest hitter, never its user while anyone else stands', () => {
+    const lend = skill(maskCarver, 'lend_a_face');
+    for (let seed = 1; seed <= 20; seed++) {
+      const b = new Battle(combatants([maskCarver, paladin, warTigress]), combatants([twin]), { seed });
+      const me = b.get('p0');
+      me.cooldowns = {};
+      const hardest = [b.get('p1'), b.get('p2')].sort((x, y) => b.attack(y) - b.attack(x))[0];
+      const d = decide(b, me);
+      expect(d.skill.id).toBe(lend.id);
+      expect(d.target).toBe(hardest.uid);
+    }
+    const alone = new Battle(combatants([maskCarver]), combatants([twin]), { seed: 1 });
+    expect(decide(alone, alone.get('p0')).target).toBe('p0');
   });
 
   it('ends a battle between two teams whose healers can raise everyone', () => {

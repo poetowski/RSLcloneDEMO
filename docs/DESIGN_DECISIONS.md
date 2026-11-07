@@ -5074,3 +5074,57 @@ black gloves, silver-grey hair swept up into a high coil with a ruby pin, a blac
   Summoned.
 
 With the three in the summoned pool, 6-8 fell under its band (53%) and runs at 0.77 (was 0.79; 58%).
+
+## 94. Leafshade (received 2026-11-07)
+
+Jakub, for this and sections 95-96, verbatim:
+
+```
+now i want to have 3 new elite champions for court of root. one damage tide. one tank tide. one support ember. be creative with their designs and give each 3 abilities. make one human, one humanoid not human and one animal beast. stay consistent w visuals but be creative in designing.
+```
+
+I proposed the three (three abilities read as an A1, an A2 and a passive, as his two batches before); he said "go". Mid-build,
+of the Mask Carver's passive: "is it cooldown to apply this every other turn? then reformulate that last sentence to be
+explicit", and of Leafshade: "leafshade can change colors during his moves". **Stand-ins until he sets them:** the names, the
+skills' and passives' names and texts, every number, the stats, the lore lines and the details of the art and effects. All
+three keep the Court's look: grown, not issued, no insignia (3.3).
+
+The humanoid not human, an Elite Damage, Tide: a lanky chameleon walking upright, a curled tail, a casque, a turret eye turning
+on its own, a twist of woven grass at the waist, a thorn dagger. Its colour changes with what it does: leaf-green at rest with
+bark-brown patches drifting, a yellow-orange flush as the tongue strikes and in victory, bark-brown to vanish, dark when hurt,
+fading to bark as it dies; mid-change, patches of the new colour spread over the old.
+
+- **Tongue Lash** (A1): one enemy, 1.0.
+- **Vanish** (A2, CD 4): it comes out behind one enemy (`blink`), 1.35, ignoring 30% of its Defense.
+- **Unseen** (passive, `stat`): +15% C.RATE in battle, extra to its stats.
+- Stats HP 1170, ATK 108, DEF 58, SPD 108, CRIT 7.5%, score 420. Proposed at 1.1 and 1.5 with ATK 120 (impact 68%), cut to
+  these: impact 62-63%, a little over the band like the Pikeman, its passive's crit the reason; waiting for his balance.
+  Summoned.
+
+## 95. Greyback (received 2026-11-07)
+
+The animal beast, an Elite Tank, Tide: an old silverback gorilla, huge and stooped on long arms, black fur with the grey saddle,
+moss and ferns grown into the fur of his shoulders, two old scars across the brow; no weapon and no gear.
+
+- **Knuckle Slam** (A1): one enemy, 1.0, a 30% chance of ATK Down for 1 turn.
+- **Chest Beat** (A2, CD 4): Taunt on himself for 2 turns, and a 50% chance on each enemy of Slow for 1 turn. No attack.
+- **Roused** (passive, `overdrive`): the first time he drops below 50% HP, Counterattack and ATK Up for 2 turns.
+- Stats HP 1540, ATK 82, DEF 72, SPD 92, CRIT 2.5%, score 418. Impact 59%. Summoned.
+
+## 96. The Mask Carver (received 2026-11-07)
+
+The human, an Elite Support, Ember: she carves a mask for every creature of the Court and can speak as it while she wears one;
+nobody in the Court agrees on anything, which makes her the nearest thing it has to a diplomat. A wiry woman of middle age, a
+straw skirt to the knee with a fringe, a wrap of bark-cloth, white paint in bands down her arms, long brown hair in a tail, a
+carved owl mask pushed up on her head (pulled down over her face in victory), small bark masks on cords at her belt, a curved
+carving knife.
+
+- **Carving Knife** (A1): one enemy, 1.0, a 30% chance of Heal Block for 1 turn.
+- **Lend a Face** (A2, CD 4): one chosen ally takes ATK Up and SPD Up for 2 turns. The AI gives it to the hardest hitter,
+  never herself while anyone else stands.
+- **Many Faces** (passive, `tend` with `others`): at the end of her turn, the ally with the lowest max HP other than her gains
+  DEF Up for 1 turn; it works every other turn of hers, on her 1st, 3rd, 5th turn and so on (worded so on his question).
+- Stats HP 1180, ATK 92, DEF 62, SPD 114, CRIT 5%, score 407. Impact 40%. Summoned.
+
+With the three in the summoned pool, 5-8 and 7-9 fell just under their band (54%) and run at 0.68 and 0.56 (were 0.70 and
+0.58; 60% and 61%).
