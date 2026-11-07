@@ -5008,7 +5008,7 @@ twice his height, langets under a long narrow head, a small azure pennant with t
 
 ## 90. Missis Ferret (received 2026-11-07)
 
-An Elite Tank, Ember, named by him: a sable ferret the size of a pony, long and low, cream underfur with dark guard hairs, dark
+An Elite Tank, Bloom (Ember proposed, Bloom on his word the same day), named by him: a sable ferret the size of a pony, long and low, cream underfur with dark guard hairs, dark
 legs and tail, the dark mask, small round ears, a pink nose. The Crown's tunnellers raised her to flush diggers out of the
 mines under a besieged wall: a padded azure caparison with white trim and the gold crown, a small steel plate along her snout,
 a dark collar with a brass bell. War Dance is a ferret's own: hops and twists with the back arched, chattering.

@@ -2,8 +2,8 @@ import { ChampionDef } from '../types';
 
 // Missis Ferret (Jakub's brief and name, docs/DESIGN_DECISIONS.md section 90,
 // 2026-11-07: "some big trained ferret", renamed by him "Missis Ferret"): an
-// Elite Tank of the Azure Crown; the kit, the look and Ember are my proposal,
-// approved with his "all is fine ... go and deliver". A ferret the size of a
+// Elite Tank of the Azure Crown, Bloom on his word (Ember proposed); the kit
+// and the look are my proposal, approved with his "all is fine ... go and deliver". A ferret the size of a
 // pony, long and low, sable and cream with the dark mask, a padded azure
 // caparison with white trim and the Crown's emblem, a small steel plate on her
 // snout, a harness with a brass bell; the Crown's tunnellers trained her to
@@ -15,7 +15,7 @@ export const missisFerret: ChampionDef = {
   name: 'Missis Ferret',
   role: 'Tank',
   rarity: 'elite',
-  affinity: 'ember',
+  affinity: 'bloom',
   faction: 'azure_crown',
   color: '#b98c5c',
   stats: { hp: 1500, atk: 80, def: 74, spd: 98, crit: 0.025, critDmg: 1, acc: 0, res: 0 },
