@@ -24,7 +24,7 @@ export const frostwright: ChampionDef = {
   skills: [
     {
       id: 'rime_shard', name: 'Rime Shard', tag: 'Single enemy', slot: 1, cooldown: 0,
-      desc: 'Flings the shard of ice turning over his palm at one enemy. A 25% chance to Freeze it for 1 turn.',
+      desc: 'Thrusts out his palm and flings the shards of ice turning over it at one enemy. A 25% chance to Freeze it for 1 turn.',
       target: 'enemy', anim: 'attack1', approach: 'none',
       hits: [{ mult: 1.0, fx: 'rime_burst' }],
       statuses: [{ status: 'freeze', turns: 1, chance: 0.25, to: 'targets' }],
@@ -32,7 +32,7 @@ export const frostwright: ChampionDef = {
     },
     {
       id: 'deep_winter', name: 'Deep Winter', tag: 'All enemies', slot: 2, cooldown: 4,
-      desc: 'Throws both hands open and lets the cold out over the enemy line: hits every enemy, with a 30% chance on each to Freeze it for 1 turn.',
+      desc: 'Throws both arms up, shards of ice round each hand, and lets the cold out over the enemy line: hits every enemy, with a 30% chance on each to Freeze it for 1 turn.',
       target: 'enemies', anim: 'skill', approach: 'none',
       hits: [{ mult: 0.6, fx: 'deep_winter' }],
       statuses: [{ status: 'freeze', turns: 1, chance: 0.3, to: 'targets' }],

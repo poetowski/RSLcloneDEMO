@@ -5040,6 +5040,10 @@ An Elite Damage, Bloom: a Dominion field-alchemist's apprentice who froze his ma
 Lanky and young, a long white cold-weather coat to the shins with its fur-rimmed hood always up, the hood's shadow over his eyes
 so only a pale jaw shows; the insignia: the Dominion's red hexagon on a black band down his chest, a black-and-red band on each
 sleeve, a black belt; black gloves frosted at the fingertips, a shard of ice turning over his palm. Two skills, as the brief.
+Redrawn the same day on his word (the first drawing "not sufficient"), approved from previews with his "yes": a closed
+white greatcoat to the ankles with a black hem band edged red and icicles, a short black shoulder cape lined red and
+rimed, a deep hood with a fur ruff round a pale face and cold blue eyes, a black armband with the red hexagon, a black
+sash with a red hexagon clasp, black gloves and fur-cuffed boots, three shards orbiting his palm.
 
 - **Rime Shard** (A1): one enemy, 1.0, a 25% chance of Freeze for 1 turn.
 - **Deep Winter** (A2, CD 4): all enemies, 0.6, a 30% chance on each of Freeze for 1 turn. Both Freezes are chances: a
