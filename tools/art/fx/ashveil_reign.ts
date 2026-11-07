@@ -23,7 +23,14 @@
 // of its rim pressed out, dust and a few pale sparks of its runes; Bulwark
 // Slam brings the rim down in a dull streak and a heavy flash, dust thrown out
 // low; when Old Grudge wakes, the runes on the shield blaze with the pale light
-// (additive).
+// (additive). Brimhorn's Gore drives two dull streaks in and throws sparks of
+// brimstone; his Chains of the Pit whips a length of iron chain across each
+// enemy. The Veil Adept's Veilfire is a knot of black fire rimmed in violet,
+// bursting in black tongues; her Shadow Feast is her shadow rearing up out of a
+// pool at the enemy's feet and biting, once from each side. All matter. The
+// Strung Thrall's Jerked Blow lands dull (matter); the violet of its threads
+// flares on its control, stitches across each ally it mends and winds round the
+// legs of whoever strikes it (light, additive).
 // Never their affinity (affinities are abstract, Jakub, 2026-10-11).
 import { ACCENT, MAT } from '../palette.ts';
 import { dith, ellipseFill, ellipseRing, line, polyFill, rampDither } from '../paint.ts';
@@ -102,6 +109,58 @@ function blackMote(b: Bitmap, x: number, y: number, big: boolean, k: number) {
 /** The Cinder Sylph's coal and embers, and her ash. */
 const FI = ramps.fire;
 const SM = ramps.smoke;
+
+/** Brimhorn's chain: the iron's grey, a dull flash at its links' edges; flecks off it. */
+const CHAINFLECK: RGBA[] = [IRON[1], IRON[2], IRON[3], IRON[4], W];
+/** The Veil Adept's black fire: violet at the edge, black at the heart (flame() and burst() put the last colour at the core). */
+const BLACKFIRE: RGBA[] = [VIO[3], VIO[1], MOTE[2], MOTE[1], MOTE[0]];
+
+/** Links of chain along an arc of the ellipse round (cx, cy), from angle a0 to a1 (radians, a1 the leading end), dithered by `fade`. */
+function chainArc(b: Bitmap, cx: number, cy: number, r: number, a0: number, a1: number, fade: number) {
+  const n = Math.max(1, Math.floor((Math.abs(a1 - a0) * r) / 2.6));
+  for (let k = 0; k <= n; k++) {
+    const a = a0 + ((a1 - a0) * k) / n;
+    const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * 0.4;
+    if (k % 2 === 0) ellipseRing(b, x, y, 1.8, 1.2, 0.9, (px, py) => (dith(px, py, fade) ? IRON[k === n ? 5 : 3] : 0));
+    else if (dith(Math.round(x), Math.round(y), fade)) b.set(Math.round(x), Math.round(y), IRON[4]);
+  }
+}
+
+/**
+ * The Veil Adept's shadow rising under an enemy (box 72x104, the feet at 96):
+ * a black pool spreads, a flat black figure rears up out of it behind the enemy
+ * (`dir` 1: from the left, -1: from the right), its head comes down at the
+ * chest with the jaws open, two violet eyes, and the jaws close on the 4th
+ * frame in a violet flash; then it sinks back into the pool.
+ */
+function shadowBite(b: Bitmap, i: number, dir: 1 | -1) {
+  const gy = 96, X = (x: number) => (dir === 1 ? x : 72 - x);
+  const h = [16, 36, 52, 56, 55, 50, 38, 22, 10, 0][i];
+  const open = [0.4, 0.9, 1, 0.1, 0, 0, 0, 0, 0, 0][i];
+  const fade = i < 7 ? 1 : [0.7, 0.45, 0.2][i - 7];
+  const ink = (px: number, py: number) => (dith(px, py, fade) ? MOTE[(px + py) % 7 === 0 ? 1 : 0] : 0);
+  ellipseFill(b, 36, gy, 16 - (i > 6 ? (i - 6) * 3 : 0), 3, (px, py) => (dith(px, py, fade) ? MOTE[0] : 0));
+  if (h > 2) {
+    // the body: a hunched column, the hump high behind, the neck bowed toward the enemy
+    const hx = X(40), hy = gy - h * 0.66;
+    polyFill(b, [[X(12), gy], [X(28), gy], [X(30), gy - h * 0.45], [hx, hy + 2], [X(36), hy - 6], [X(24), gy - h], [X(14), gy - h * 0.8], [X(12), gy - h * 0.4]], ink);
+    // the head and the jaws, open toward the enemy
+    polyFill(b, [[X(32), hy - 4], [X(38), hy - 7], [X(44), hy - 5 - open * 3], [X(50), hy - 2 - open * 4], [X(42), hy - 1]], ink);
+    polyFill(b, [[X(32), hy + 1], [X(42), hy + 1], [X(50), hy + 2 + open * 4], [X(44), hy + 4 + open * 2], [X(36), hy + 5]], ink);
+    if (open > 0.3) {
+      for (const k of [0, 1, 2]) {
+        b.set(X(41 + k * 3), Math.round(hy - 1 - open * (1.6 + k)), W);
+        b.set(X(41 + k * 3), Math.round(hy + 2 + open * (1.6 + k)), W);
+      }
+    }
+    if (fade > 0.4) {
+      b.set(X(37), Math.round(hy - 4), VIO[4]);
+      b.set(X(38), Math.round(hy - 4), VIO[3]);
+    }
+  }
+  if (i === 3 || i === 4) burst(b, X(48), Math.round(gy - h * 0.66), 8, 1, i === 3 ? 10 : 7, 1.2, VIO, 0.4);
+  if (i >= 3) sparks(b, X(48), Math.round(gy - 36), 8, 18, (i - 3) / 6, [MOTE[1], MOTE[2], MOTE[3], MOTE[4], VIO[3]], 1351 + dir, 6);
+}
 
 export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
   /** Cinder Touch in flight: a live cinder, a thread of sparks behind it (drawn pointing right). */
@@ -940,6 +999,143 @@ export const ASHVEIL_REIGN_FX: Record<string, FxDef> = {
       }
       ellipseRing(b, cx, gy, 6 + t * 18, (6 + t * 18) * 0.3, 1.3, (x, y, a) => (dith(x, y, 1 - t * 0.7) ? rampDither(PALE, 3.2 - t + Math.sin(a) * 0.5, x, y) : 0));
       motes(b, cx, gy - 4, 28, 80, 12, t, PALE, 1061);
+    },
+  },
+  /** Gore: the two horns driven in, two dull streaks thrust through the enemy, a heavy flash where they meet, sparks of brimstone thrown off and falling. Matter. */
+  horn_gore: {
+    w: 64, h: 64, n: 8, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 6, 10, 6],
+    draw: (b, t, i) => {
+      const reach = [0.5, 0.9, 1, 1, 1, 1, 1, 1][i];
+      const heat = [1.2, 1.3, 1.1, 0.85, 0.6, 0.4, 0.25, 0.1][i];
+      const th = [2.6, 3.4, 3.0, 2.4, 1.8, 1.2, 0.8, 0.5][i];
+      if (i < 7) {
+        cut(b, 6, 22, 44, 30, -5, th, DULL, heat, reach);
+        cut(b, 8, 42, 46, 34, 5, th * 0.85, DULL, heat, reach);
+      }
+      if (i >= 2 && i < 6) burst(b, 44, 32, 9, 2, [12, 16, 12, 8][i - 2], 1.3, DULL, 0.2);
+      if (i >= 2) ring(b, 42, 32, 6 + (i - 2) * 3.4, 4 + (i - 2) * 2.4, 1.3, DULL, 1.1 - (i - 2) * 0.16);
+      if (i >= 2) sparks(b, 42, 32, 12, 24, (i - 2) / 5, FI, 1301, 16);
+    },
+  },
+  /** Chains of the Pit on each enemy: a length of chain whips across it, a dull flash where it lands, flecks of iron and dust. Matter. */
+  chain_lash: {
+    w: 80, h: 60, n: 9, ms: 45, ax: 0.5, ay: 0.5, pad: [2, 4, 8, 4],
+    draw: (b, t, i) => {
+      const cx = 40, cy = 30;
+      if (i < 6) {
+        const head = Math.PI * (1.05 - Math.min(1, i / 3) * 0.95);
+        const fade = i < 4 ? 1 : [0.6, 0.3][i - 4];
+        chainArc(b, cx, cy, 30, head + 1.5, head, fade);
+        if (i < 4) cut(b, cx - 30, cy + 6, cx + 26, cy + 2, 6, [1.4, 2.2, 2.0, 1.2][i], DULL, 0.9, Math.min(1, 0.4 + i * 0.25));
+      }
+      if (i >= 2 && i < 5) burst(b, cx + 6, cy, 8, 2, [9, 13, 9][i - 2], 1.2, DULL, 0.5);
+      if (i >= 2) sparks(b, cx + 6, cy, 10, 22, (i - 2) / 6, CHAINFLECK, 1321, 14);
+      if (i >= 3) motes(b, cx + 4, cy + 8, 30, 10, 8, (i - 3) / 5, DU, 1327);
+    },
+  },
+  /** Veilfire in flight: a knot of black fire rimmed in violet, its tongues streaming back (drawn pointing right). */
+  veilfire_bolt: {
+    w: 22, h: 11, n: 2, ms: 70, ax: 0.75, ay: 0.5, loop: true,
+    draw: (b, t, i) => {
+      const cx = 15, cy = 5;
+      for (let y = -3; y <= 3; y++) {
+        for (let x = -4; x <= 3; x++) {
+          const d = Math.hypot(x * 0.9, y * 1.2);
+          if (d > 3.6) continue;
+          b.set(cx + x, cy + y, d > 2.6 ? VIO[3] : MOTE[d > 1.6 ? 2 : 0]);
+        }
+      }
+      for (const [x, y, k] of [[9, 3 + i, 2], [7, 5, 3], [5, 6 - i, 2], [3, 5, 1], [10, 7 - i, 2]] as const) b.set(x, y, VIO[k]);
+      b.set(cx + 2, cy - 1, VIO[4]);
+    },
+  },
+  /** Veilfire lands: a burst of black fire rimmed in violet, black tongues licking up the enemy and dying, violet sparks. Matter. */
+  veilfire_burst: {
+    w: 60, h: 64, n: 8, ms: 55, ax: 0.5, ay: 0.55, pad: [4, 4, 6, 4],
+    draw: (b, t, i) => {
+      const cx = 30, cy = 34;
+      if (i < 4) burst(b, cx, cy, 8, 1, [8, 13, 15, 11][i], 1.4, BLACKFIRE, 0.3);
+      if (i >= 1 && i < 7) {
+        const h = [10, 16, 18, 14, 9, 5][i - 1];
+        flame(b, 22, cy + 8, h * 0.7, 4, i * 0.9, BLACKFIRE);
+        flame(b, 30, cy + 8, h, 5, i * 0.9 + 2, BLACKFIRE);
+        flame(b, 38, cy + 8, h * 0.6, 3, i * 0.9 + 4, BLACKFIRE);
+      }
+      sparks(b, cx, cy, 10, 22, t, VIO, 1311, 8);
+    },
+  },
+  /** Shadow Feast, the first bite: her shadow rises from a pool at the enemy's feet behind it and bites into it; a flash of violet as the jaws close, then it sinks. Matter. */
+  shadow_bite: {
+    w: 72, h: 104, n: 10, ms: 45, ax: 0.5, ay: 0.96, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => shadowBite(b, i, 1),
+  },
+  /** Shadow Feast, the second bite: it comes up again from the other side. Matter. */
+  shadow_bite_back: {
+    w: 72, h: 104, n: 10, ms: 45, ax: 0.5, ay: 0.96, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => shadowBite(b, i, -1),
+  },
+  /** Jerked Blow: the slung arm comes down in a dull streak, a short flash, dust, and a fleck or two of the thread's violet. Matter. */
+  jerked_blow: {
+    w: 64, h: 64, n: 7, ms: 50, ax: 0.5, ay: 0.5, pad: [4, 4, 10, 4],
+    draw: (b, t, i) => {
+      const reach = [0.6, 1, 1, 1, 1, 1, 1][i];
+      if (i < 6) cut(b, 18, 12, 44, 50, 5, [2.6, 3.2, 2.6, 1.8, 1.2, 0.7][i], DULL, [1.2, 1.1, 0.9, 0.6, 0.4, 0.25][i], reach);
+      if (i >= 1 && i < 4) burst(b, 34, 34, 7, 2, [9, 12, 8][i - 1], 1.2, DULL, 0.3);
+      if (i >= 1) sparks(b, 34, 34, 9, 20, (i - 1) / 5, DULL, 1331, 14);
+      if (i >= 1 && i < 5) for (const [x, y] of [[24, 24], [42, 28], [30, 44]] as const) b.set(x + i, y - i, VIO[3]);
+    },
+  },
+  /** Stitch and Pull, at its control: the violet of its threads flares along the bone and runs down them. Light. */
+  thread_flare: {
+    w: 64, h: 44, n: 9, ms: 60, ax: 0.5, ay: 0.3, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 32, cy = 13;
+      const k = [0.4, 0.8, 1, 1, 0.9, 0.7, 0.55, 0.45, 0.35][i];
+      for (let x = -14; x <= 14; x++) if (dith(cx + x, cy, k * (1 - Math.abs(x) / 18))) b.set(cx + x, cy, VIO[x % 3 === 0 ? 4 : 3]);
+      if (i < 5) burst(b, cx, cy, 6, 1, [4, 7, 9, 7, 4][i], 1, VIO, 0.6);
+      for (const x of [-10, -3, 4, 11]) {
+        const y = Math.round(cy + 2 + t * 26);
+        if (dith(cx + x, y, k)) {
+          b.set(cx + x, y, VIO[4]);
+          b.set(cx + x, y - 1, VIO[2]);
+        }
+      }
+    },
+  },
+  /** Stitch and Pull on each ally: a violet thread stitches across its chest, crossing and crossing back, and pale motes of mending rise off it. Light. */
+  stitch_mend: {
+    w: 56, h: 72, n: 12, ms: 55, ax: 0.5, ay: 0.5, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 28, cy = 36;
+      const done = Math.min(1, (i + 1) / 7);
+      const fade = i < 9 ? 1 : [0.6, 0.35, 0.15][i - 9];
+      const pts: [number, number][] = [];
+      for (let k = 0; k <= 8; k++) pts.push([cx - 14 + k * 3.5, cy + (k % 2 ? -5 : 5) + (k - 4) * 0.6]);
+      const n = done * (pts.length - 1);
+      for (let k = 0; k < pts.length - 1 && k < n; k++) {
+        const [x0, y0] = pts[k], [x1, y1] = pts[k + 1];
+        const f = Math.min(1, n - k);
+        const steps = Math.ceil(Math.hypot(x1 - x0, y1 - y0));
+        for (let s = 0; s <= steps * f; s++) {
+          const x = Math.round(x0 + ((x1 - x0) * s) / steps), y = Math.round(y0 + ((y1 - y0) * s) / steps);
+          if (dith(x, y, fade)) b.set(x, y, VIO[f < 1 && s >= steps * f - 1 ? 4 : 3]);
+        }
+      }
+      if (i >= 4) motes(b, cx, cy + 10, 30, 40, 12, (i - 4) / 8, PALE, 1341);
+    },
+  },
+  /** Snagging Threads on the attacker: violet threads wind round its legs and draw tight, then fade. Light. */
+  thread_snag: {
+    w: 56, h: 64, n: 10, ms: 60, ax: 0.5, ay: 0.95, pad: [2, 2, 2, 2],
+    draw: (b, t, i) => {
+      const cx = 28, gy = 60;
+      const tight = Math.min(1, i / 4);
+      const fade = i < 7 ? 1 : [0.6, 0.35, 0.15][i - 7];
+      for (const [h, r0] of [[8, 16], [16, 14], [24, 12]] as const) {
+        const rx = r0 - tight * (r0 - 7), ry = rx * 0.3;
+        ellipseRing(b, cx, gy - h, rx, ry, 1, (x, y, a) => (dith(x, y, fade) ? VIO[Math.sin(a * 2 + h) > 0 ? 4 : 2] : 0));
+      }
+      if (i < 4) for (let y = gy - 30; y < gy - 4; y += 2) if (dith(cx - 12 + i * 3, y, fade)) b.set(cx - 12 + i * 3, y, VIO[3]);
     },
   },
 };

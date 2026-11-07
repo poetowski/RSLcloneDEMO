@@ -94,6 +94,9 @@ The roster today:
 | Leafshade (`leafshade`) | Elite | Tide | Damage | Court of Root | summoned |
 | Greyback (`greyback`) | Elite | Tide | Tank | Court of Root | summoned |
 | Mask Carver (`mask_carver`) | Elite | Ember | Support | Court of Root | summoned |
+| Brimhorn (`brimhorn`) | Elite | Tide | Tank | Ashveil Reign | summoned |
+| Veil Adept (`veil_adept`) | Elite | Bloom | Damage | Ashveil Reign | summoned |
+| Strung Thrall (`strung_thrall`) | Elite | Bloom | Support | Ashveil Reign | summoned |
 | Executioner (`executioner`) | Heroic | Tide (a stand-in) | Damage | Sanguine Dominion | summoned |
 | Paladin (`paladin`) | Heroic | Ember | Tank | Azure Crown | summoned (the reward of a quest line Jakub designs later) |
 | Chief Engineer CJ (`chief_engineer_cj`) | Heroic | Bloom | Tank | Sanguine Dominion | summoned |

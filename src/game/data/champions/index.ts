@@ -15,7 +15,7 @@
 // Engineer CJ, the Sanguine Dominion's, the Forest Gargoyle, the Court of
 // Root's, and Dead Knight Amstron, the Ashveil Reign's; Coffin's Legs, the
 // Wraith and the Haruspex, the Ashveil Reign's other Elites, my proposals on
-// his word (sections 61-63); Rootfather, the Court of Root's second Heroic (section 71); the Cinder Sylph, the Ashveil Reign's second (section 72); the Astronomer Royal, the Azure Crown's second (section 73); Azul the Blade, its third (section 74); Lycan, the Ashveil Reign's third (section 75); the Orchid Huntress, the Court of Root's third (section 76); the Executioner, the Sanguine Dominion's third (section 77); everything else waits for his design.
+// his word (sections 61-63); Rootfather, the Court of Root's second Heroic (section 71); the Cinder Sylph, the Ashveil Reign's second (section 72); the Astronomer Royal, the Azure Crown's second (section 73); Azul the Blade, its third (section 74); Lycan, the Ashveil Reign's third (section 75); the Orchid Huntress, the Court of Root's third (section 76); the Executioner, the Sanguine Dominion's third (section 77); Brimhorn, the Veil Adept and the Strung Thrall, Elites of the Ashveil Reign (sections 97-99); everything else waits for his design.
 import { ChampionDef } from '../types';
 import { archer } from './archer';
 import { associate } from './associate';
@@ -64,6 +64,9 @@ import { frostwright } from './frostwright';
 import { leafshade } from './leafshade';
 import { greyback } from './greyback';
 import { maskCarver } from './mask_carver';
+import { brimhorn } from './brimhorn';
+import { veilAdept } from './veil_adept';
+import { strungThrall } from './strung_thrall';
 import { scarabLegionary } from './scarab_legionary';
 import { dowagerCountess } from './dowager_countess';
 import { missisFerret } from './missis_ferret';
@@ -90,7 +93,7 @@ import { wildSpeaker } from './wild_speaker';
 /** Collection order: the order champions join. */
 export const CHAMPIONS: ChampionDef[] = [
   captainGareth, rimeScholar, follower, skirmisher, dominionMedic, lineholder, bloodhound, quartermaster, enforcer,
-  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, astronomerRoyal, forestGargoyle, rootfather, deadKnightAmstron, cinderSylph, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman, overlordOfentol, verdantLuminary, silkfang, bogTroll, mothSeer, warTigress, hexWarden, transfusionist, coffinsLegs, wraith, haruspex, sirSiroslav, azulTheBlade, lycan, orchidHuntress, executioner, pikeman, chakraManipulator, missisFerret, frostwright, scarabLegionary, dowagerCountess, leafshade, greyback, maskCarver,
+  walkingBush, wildSpeaker, jungleHerder, associate, emissaryHandlings, blackRhino, redCloak, groveKeeper, bigEars, skeleton, rotHulk, bellringer, necromancer, automatedSoul, irvingWellbington, paladin, chiefEngineerCj, astronomerRoyal, forestGargoyle, rootfather, deadKnightAmstron, cinderSylph, strongman, townGuard, lastRiter, archer, harvestSpecialist, juniorWard, sentry, gravedigger, ashWidow, toadcap, bristleback, hiveTender, crossbowman, overlordOfentol, verdantLuminary, silkfang, bogTroll, mothSeer, warTigress, hexWarden, transfusionist, coffinsLegs, wraith, haruspex, sirSiroslav, azulTheBlade, lycan, orchidHuntress, executioner, pikeman, chakraManipulator, missisFerret, frostwright, scarabLegionary, dowagerCountess, leafshade, greyback, maskCarver, brimhorn, veilAdept, strungThrall,
 ];
 
 /**
@@ -111,4 +114,4 @@ export function champion(id: string): ChampionDef {
   return c;
 }
 
-export { leafshade, greyback, maskCarver, frostwright, scarabLegionary, dowagerCountess, pikeman, chakraManipulator, missisFerret, executioner, orchidHuntress, lycan, azulTheBlade, astronomerRoyal, cinderSylph, rootfather, silkfang, bogTroll, mothSeer, warTigress, hexWarden, transfusionist, crossbowman, overlordOfentol, verdantLuminary, toadcap, bristleback, hiveTender, archer, ashWidow, gravedigger, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, harvestSpecialist, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, sentry, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };
+export { brimhorn, veilAdept, strungThrall, leafshade, greyback, maskCarver, frostwright, scarabLegionary, dowagerCountess, pikeman, chakraManipulator, missisFerret, executioner, orchidHuntress, lycan, azulTheBlade, astronomerRoyal, cinderSylph, rootfather, silkfang, bogTroll, mothSeer, warTigress, hexWarden, transfusionist, crossbowman, overlordOfentol, verdantLuminary, toadcap, bristleback, hiveTender, archer, ashWidow, gravedigger, associate, automatedSoul, bellringer, bigEars, blackRhino, bloodhound, captainGareth, chiefEngineerCj, deadKnightAmstron, dominionMedic, emissaryHandlings, enforcer, follower, forestGargoyle, groveKeeper, harvestSpecialist, irvingWellbington, jungleHerder, juniorWard, lastRiter, lineholder, necromancer, paladin, quartermaster, redCloak, rimeScholar, rotHulk, sentry, skeleton, skirmisher, strongman, townGuard, walkingBush, wildSpeaker };

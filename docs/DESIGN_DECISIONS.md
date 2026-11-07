@@ -351,7 +351,9 @@ Support and its first Elite (section 31), its fifth, the Automated Soul, an
 Elite of the Damage role (section 32), and its sixth, Irving Wellbington, an
 Elite Tank (section 33). Its other three Elites, Coffin's Legs (Tank), the
 Wraith (Damage) and the Haruspex (Support), are my proposals on his word of
-2026-11-01 (sections 61-63).
+2026-11-01 (sections 61-63). Brimhorn (Tank), the Veil Adept (Damage) and the
+Strung Thrall (Support) are its last three, on his brief of 2026-11-07
+(sections 97-99).
 
 **Name rationale.** "Reign" puts the faction on the same footing as Crown and
 Dominion — ruling nouns, one set. "Ashveil" gives it a distinctive seat
@@ -5132,3 +5134,62 @@ carving knife.
 
 With the three in the summoned pool, 5-8 and 7-9 fell just under their band (54%) and run at 0.68 and 0.56 (were 0.70 and
 0.58; 60% and 61%).
+
+## 97. Brimhorn (received 2026-11-07)
+
+Jakub, for this and sections 98-99, verbatim:
+
+```
+we need three heroes for ashveil reign, all elite. one damage, one tank, one support. make a tank some bulk demon with red colors and horns. damage dealer can be a dark adept and support can be some kind of controlled zombie or something. be consistent but deliver creative results in art visuals. give damage 2 skills, tank also 2 skills and support can have 2 skills and third passive.
+```
+
+I proposed the three (the Damage and the Tank an A1 and an A2, the Support an A1, an A2 and a passive); he said "go".
+They bring the Reign's Elites to three per class, like the other factions'. **Stand-ins until he sets them:** the names,
+the affinities (he named none; mine, chosen neither from their colours nor to fill a gap), the skills' and passive's names
+and texts, every number, the stats, the lore lines and the details of the art and effects. All three carry the Reign's
+white bone (3.6).
+
+The tank, an Elite Tank, Tide: a huge hunched demon of deep red hide (`demonHide`), two great horns sweeping up and back
+and curling forward over his head, a third on the brow broken off and ringed in iron; broken iron shackles on both
+wrists, their chains hanging and swinging; an iron collar with the white bone on it, a dark grey loincloth with the white
+bone across its flap; cloven hooves, a heavy tail ending in a spade, the Reign's pale light in his eyes, ash flaking off
+his shoulders.
+
+- **Gore** (A1): one enemy, 1.0, a 30% chance of Burn for 2 turns.
+- **Chains of the Pit** (A2, CD 4): all enemies, 0.5, from the middle of their line; then Taunt and DEF Up on himself
+  for 2 turns.
+- No passive.
+- Stats HP 1600, ATK 84, DEF 70, SPD 90, CRIT 2.5%, score 418. Impact 52%. Summoned.
+
+## 98. The Veil Adept (received 2026-11-07)
+
+The dark adept, an Elite Damage, Bloom: a slender woman in a floor-length black robe, a tall standing collar flaring up
+behind her head, wide sleeves to the elbow, bare pale forearms with bangles of bone; a veil of grey ash-cloth (`ashVeil`)
+over her head and her whole face, the violet light of her eyes showing through it; the white bone pinned at her throat; a
+small black flame rimmed in violet on her palm. Her shadow lies on the floor behind her, darker than anyone's, with two
+violet eyes, a beat behind her as she breathes; it leaves the floor for Shadow Feast.
+
+- **Veilfire** (A1): one enemy, 1.0, a bolt of black fire; a 30% chance of DEF Down for 1 turn.
+- **Shadow Feast** (A2, CD 4): her shadow rises under one enemy and bites twice, 0.7 each; she heals by 30% of the damage,
+  and Heal Block on it for 2 turns.
+- No passive.
+- Stats HP 1120, ATK 112, DEF 56, SPD 106, CRIT 10%, score 420 (DEF 54 proposed; 56 is the floor of the norms). Impact
+  51%. Summoned.
+
+## 99. The Strung Thrall (received 2026-11-07)
+
+The controlled zombie, an Elite Support, Bloom: a lanky stitched corpse worked like a marionette. Over it floats the
+control, the Reign's white bone laid across with a short crossbar, and threads of violet light run from it to the wrists,
+the crown of the head and the knees; the head lolls, the hands hang limp; a cold blue-grey skin (`thrallSkin`) stitched
+round the neck and down the chest, a torn dark grey shroud to the knee, bandaged forearms and shins, an iron nail through a
+linen tag on its brow with a violet sigil. When it dies the control drops and the threads go slack.
+
+- **Jerked Blow** (A1): one enemy, 1.0, a 25% chance of ATK Down for 1 turn.
+- **Stitch and Pull** (A2, CD 4): every ally heals by 15% of its max HP; then the ally lowest on HP, other than itself,
+  gains 15% turn meter.
+- **Snagging Threads** (passive, `retaliate`): when an enemy attack hits it and it stands, a 40% chance of Slow for 1
+  turn on the attacker.
+- Stats HP 1300, ATK 86, DEF 64, SPD 102, CRIT 5%, score 405 (HP 1260 proposed; 1300 keeps it inside the Elite budget).
+  Impact 41%. Summoned.
+
+With the three in the summoned pool every stage stays inside its band; no stage power changed.

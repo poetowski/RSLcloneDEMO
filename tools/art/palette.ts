@@ -140,6 +140,14 @@ export const MAT = {
   shroud: m('shroud', 'cloth', ['#0c0f10', '#1a2021', '#2c3433', '#434d49', '#626d65', '#8a9586']),
   /** the Haruspex's robe: a dust-brown wool, the colour of a tomb's floor */
   tombDust: m('tombDust', 'cloth', ['#140f0c', '#2a2119', '#433528', '#5e4c39', '#7c674e', '#9d8768']),
+  /** Brimhorn's hide: a deep demon red, dark as old blood in the folds, nothing like the crimson cloth of the Dominion */
+  demonHide: m('demonHide', 'skin', ['#16050a', '#360b10', '#5e1416', '#8c221e', '#b8382a', '#dc6446']),
+  /** his horns and hooves: a dark ridged horn, paling to a dull bone at the tips */
+  horn: m('horn', 'matte', ['#0e0a0a', '#1e1716', '#342a26', '#524238', '#7a6654', '#a69078']),
+  /** the Veil Adept's veil: a grey cloth of ash, a little warm, lighter where it is thin */
+  ashVeil: m('ashVeil', 'cloth', ['#121112', '#272527', '#3f3c3e', '#5c5857', '#7f7a77', '#a7a19b']),
+  /** the Strung Thrall's bloodless skin: a cold blue-grey, darker where it is stitched */
+  thrallSkin: m('thrallSkin', 'skin', ['#111317', '#242930', '#3b434c', '#58626b', '#7c868d', '#a3abaf']),
 
   // --- woods of the living ---------------------------------------------------
   /** the Walking Bush's bark: the grey-brown of a bush's woody stems (his few leaves are `moss`) */
